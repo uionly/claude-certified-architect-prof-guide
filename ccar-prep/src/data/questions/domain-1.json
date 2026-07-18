@@ -1,0 +1,750 @@
+[
+  {
+    "id": 101,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "An insurance carrier wants to modernize claims processing end to end with Claude. The current process includes reading adjuster notes and customer emails, extracting loss details, applying the policy's coverage rules, and calculating the payout amount. Leadership asks the architect to 'put AI on the whole pipeline.' How should the architect scope Claude's role?",
+    "options": [
+      "Use Claude for every stage so the pipeline is consistent, with a strong system prompt encoding the coverage rules and payout formulas",
+      "Use Claude only for the payout calculation, since that is the highest-stakes step and benefits most from advanced reasoning",
+      "Use Claude for extracting and summarizing the unstructured notes and emails, and keep coverage rules and payout math in deterministic code",
+      "Decline to use Claude until the carrier digitizes its coverage rules, since mixed pipelines are harder to maintain than uniform ones"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because a uniform stack feels simpler, but it puts deterministic, auditable logic inside a probabilistic component. Coverage rules and payout formulas have exact answers; running them through a model adds error surface and cost with no benefit, violating the principle of using the LLM only where language understanding is needed.",
+      "This inverts the fit. Payout calculation is exactly where determinism matters most — a formula executed in code is always correct and auditable, while a model can miscalculate. The high stakes argue for less model involvement in that step, not more.",
+      "Correct. It applies the principle of matching each subtask to the right tool: Claude handles the genuinely fuzzy language work (unstructured extraction and summarization), while rules and arithmetic stay in deterministic software that is testable and auditable.",
+      "Tempting as a caution against complexity, but it treats a scoping question as a blocker. Mixed pipelines that pair LLM stages with deterministic stages are the normal, recommended architecture; waiting for full digitization forfeits value the extraction use case can deliver now."
+    ],
+    "principle": "use the LLM only for the parts of the problem that need language understanding",
+    "relatedConcept": "Translating business problems starts with separating language-understanding subtasks from deterministic logic before any architecture is drawn."
+  },
+  {
+    "id": 102,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "A hospital network's innovation team is debating whether their clinical-documentation assistant should be a multi-step workflow or a tool-using agent. The debate has run for three weeks, and no one has stated what a successful pilot would look like or how current documentation time and error rates compare. As the consulting architect, what should you do first?",
+    "options": [
+      "Pause the pattern debate and define measurable success criteria and a baseline for documentation time and error rate",
+      "Recommend the workflow pattern, since healthcare compliance requirements favor predictable, auditable step sequences",
+      "Build small prototypes of both patterns and let clinician feedback on the demos decide which architecture to pursue",
+      "Recommend the agent pattern, since clinical documentation varies too much per patient for predefined steps to cover"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Success criteria and a measured baseline come before architecture: without them, no pattern can be evaluated, the pilot cannot prove value, and the team is optimizing against an undefined target. This applies the principle of framing measurable outcomes before choosing a design.",
+      "Tempting because the compliance argument is real, but it answers the wrong question first. Choosing a pattern before defining what success means just relocates the debate; you still cannot tell whether the workflow met the goal because no goal exists.",
+      "Prototyping feels empirical, but demos judged on impressions rather than defined metrics reward whichever prototype feels slicker. Without success criteria, clinician feedback cannot be compared against the business outcome, so the effort risks being a more expensive version of the same stalled debate.",
+      "Tempting because variability is a genuine argument for agency, but it commits the same error as option B: selecting an architecture before the problem's success measures are framed. Agency also raises cost and error surface, which cannot be justified against an undefined target."
+    ],
+    "principle": "define measurable success criteria before choosing architecture",
+    "relatedConcept": "Business-problem translation makes success measurable first so every later architectural trade-off has something to be weighed against."
+  },
+  {
+    "id": 103,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "A national retailer's executives want a Claude-powered assistant that handles 'everything customers ask' — orders, returns, product advice, complaints, store logistics, and loyalty accounts. The team has a six-month budget and no prior LLM deployment. The architect must propose the initial release. Which scoping approach is strongest?",
+    "options": [
+      "Deliver the full assistant behind a small beta flag so real breadth-of-use data is collected from day one across all intents",
+      "Build the complete intent taxonomy first, then implement all intents in parallel workstreams to hit the six-month deadline",
+      "Start with product advice, since recommendation quality is where a language model most visibly outperforms existing tooling",
+      "Launch with order status and returns only, chosen for high ticket volume and clear resolution criteria, and expand from there"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because real usage data is valuable, but shipping every intent at once means none is instrumented, evaluated, or hardened well. A first LLM deployment spread across all intents multiplies failure modes before the team has an evaluation practice, so the beta flag limits audience but not scope risk.",
+      "A full taxonomy is useful analysis, but implementing everything in parallel is the classic big-bang error: integration, evaluation, and guardrail work multiplies across intents, and the six-month budget is consumed before any single intent proves value in production.",
+      "Tempting because it is a narrow scope, but the selection criterion is wrong: 'most impressive' is a technology-led choice. Product advice has subjective success criteria and lower ticket volume, making it hard to measure and weak as an MVP value proof.",
+      "Correct. It applies MVP scoping: pick the slice with high volume (real impact), objectively checkable outcomes (measurable success), and contained blast radius, then expand with the evaluation muscle built on that slice. Scope by measurable value, not by breadth or wow factor."
+    ],
+    "principle": "scope the MVP to a narrow, high-volume use case with objectively measurable outcomes",
+    "relatedConcept": "Good problem translation resists breadth pressure and sequences use cases by measurability and value density."
+  },
+  {
+    "id": 104,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "A state benefits agency wants Claude to review submitted applications. The review has two parts: checking that fields are complete, dates are valid, and income figures fall within program thresholds; and reading the applicant's free-text hardship statement to flag cases needing expedited handling. A vendor proposes sending the entire application to Claude for both parts. What should the architect recommend instead?",
+    "options": [
+      "Accept the vendor design but add a second Claude pass that double-checks the field validation results before final submission",
+      "Implement field and threshold checks as deterministic validation code, and use Claude only to analyze the hardship statements",
+      "Use Claude for both parts but constrain it with a strict JSON output schema so validation results are machine-checkable",
+      "Split the work between two Claude models: Haiku for the structured field checks and Sonnet for the hardship statement analysis"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because verification passes do catch some errors, but this treats the symptom. Stacking a second probabilistic check on top of a probabilistic check still cannot guarantee correctness for rules that ordinary code evaluates perfectly, and it doubles cost on the exact subtask that needs no model at all.",
+      "Correct. Threshold and format checks are deterministic rules with exact answers — code beats an LLM on accuracy, cost, latency, and auditability there. Claude adds value only on the genuinely linguistic subtask, the hardship narrative. This is the principle that deterministic software wins wherever rules are explicit.",
+      "A JSON schema constrains the output's shape, not its correctness: the model can still return a well-formed but wrong verdict on an income threshold. The reasoning error is confusing structural validity with logical validity, while still paying model costs for rule evaluation.",
+      "Tempting because model tiering is a real cost technique, but it optimizes the wrong decision. Choosing a cheaper model for the field checks still leaves a probabilistic component doing work that should not involve a model at all; the split should be code versus model, not model versus model."
+    ],
+    "principle": "deterministic rules belong in code, not in a model",
+    "relatedConcept": "A core translation skill is recognizing which subtasks are rule evaluation in disguise and keeping the model out of them."
+  },
+  {
+    "id": 105,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "A B2B SaaS company tells its architect only that 'support costs are too high' and asks for a Claude solution. Ticket data shows 40% of tickets are password resets and billing lookups already answerable by existing self-service tools, 35% are how-to questions answered from documentation, and 25% are ambiguous multi-system issues requiring senior engineers. Where should the architect focus the Claude proposal?",
+    "options": [
+      "The 25% ambiguous tickets, since they cost the most per ticket and advanced reasoning is where Claude differentiates most",
+      "All three segments with one assistant, since a unified entry point maximizes deflection across the whole ticket volume",
+      "The 35% how-to segment with retrieval over documentation, while routing the 40% segment to existing self-service tools",
+      "The 40% segment first, since it is the largest share of volume and therefore offers the biggest cost reduction opportunity"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because per-ticket cost is highest there, but ambiguous multi-system issues are the hardest to automate reliably, have no clean success criteria, and would need senior-engineer review anyway. Starting at the hardest segment is a high-risk translation of the business problem.",
+      "A unified assistant sounds efficient, but it ignores that the segments need different solutions — one of which already exists. Building LLM handling for tickets that deterministic self-service resolves duplicates capability and dilutes effort, violating the simplest-solution principle.",
+      "Correct. It matches each segment to the right mechanism: how-to questions are a strong retrieval-augmented LLM fit with measurable deflection, while the reset and billing segment needs routing to existing tools, not a new model. The principle is mapping problem segments to the cheapest mechanism that resolves each.",
+      "Tempting because volume looks like opportunity, but those tickets are already solvable by existing deterministic tools — the gap is discoverability or routing, not capability. Applying an LLM there is a tech-led answer to a process problem and adds cost where a redirect suffices."
+    ],
+    "principle": "segment the problem and apply the LLM only where it is the cheapest adequate mechanism",
+    "relatedConcept": "Translating a vague cost complaint into an architecture requires decomposing the demand data before selecting any AI component."
+  },
+  {
+    "id": 106,
+    "domain": "Solution Design & Architecture",
+    "objective": "Translate business problems into Claude-based AI solutions",
+    "type": "single",
+    "question": "A fintech CFO asks the platform team to build 'an autonomous AI agent' for the monthly reconciliation report. The process is fully specified: pull transactions from three systems, match them on reference IDs, list unmatched items, and produce a summary memo for auditors. The steps never vary month to month. How should the architect respond to the request?",
+    "options": [
+      "Propose a deterministic pipeline for extraction and matching, with a single Claude call drafting the auditor memo from the computed results",
+      "Build the requested agent with tools for each system, since agent autonomy will absorb future changes to the reconciliation process",
+      "Build an orchestrator-workers system where one agent per source system extracts data and a lead agent merges and reports",
+      "Propose a Claude workflow that chains extraction, matching, and memo-writing prompts so each step is a reviewable model output"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. When every step is known in advance and mostly mechanical, code should orchestrate — and record matching on reference IDs is pure deterministic logic. Claude earns its place only at the language step, drafting the memo. This is the simplest-pattern-that-works principle applied against an executive's framing.",
+      "Tempting because it satisfies the stakeholder's literal request, but autonomy is justified only when steps cannot be predicted in advance. Here they are fixed, so an agent adds cost, latency, and nondeterminism to a process auditors need to be repeatable — speculative flexibility is not a requirement.",
+      "Multi-agent structure mirrors the three systems nicely, which makes it tempting, but the extraction and matching work is deterministic and needs no model at all. This is over-engineering: it multiplies token cost and failure modes for a task a scheduled job handles exactly.",
+      "Tempting because a workflow is humbler than an agent, but it still runs matching logic through model calls. ID matching done by a model can silently mismatch records in an audit-critical process; a prompt chain is the simplest LLM pattern, yet the requirement barely needs an LLM at all."
+    ],
+    "principle": "add model involvement, and especially agency, only where the task actually requires it",
+    "relatedConcept": "Part of problem translation is converting a stakeholder's solution language ('an agent') back into requirements before designing anything."
+  },
+  {
+    "id": 107,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A healthcare revenue-cycle company uses Claude to suggest ICD-10 billing codes from clinical notes, writing suggestions directly into the billing system. Auditors find a small but costly rate of codes that are well-formed but do not exist in the current ICD-10 code set. The team asks the architect to fix the pipeline. What is the most appropriate change?",
+    "options": [
+      "Move the workload to Opus with extended reasoning so the model recalls the valid code set more reliably before writing output",
+      "Add a deterministic output-validation stage that checks every suggested code against the licensed ICD-10 code list before it reaches billing",
+      "Add few-shot examples of correct codes to the prompt so the model learns the format and range of legitimate ICD-10 entries",
+      "Ask Claude to self-verify each suggested code in a second pass and discard any code it cannot confirm as valid"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a stronger model does reduce error rates, but it treats a structural gap probabilistically. No model tier guarantees membership in an external licensed code set, so invalid codes still leak into billing — at higher cost and latency — while the architectural hole remains.",
+      "Correct. Where a ground-truth reference exists, output validation must be deterministic: a lookup against the actual code list catches every invalid code with certainty and negligible cost. This applies the principle that model outputs crossing into systems of record pass through a deterministic validation stage.",
+      "Few-shot examples improve formatting and typical-case behavior, but they cannot enumerate tens of thousands of valid codes. The reasoning error is using prompt-side mitigation for a post-processing problem that has an exact, checkable answer outside the model.",
+      "Tempting because self-verification is a real technique for fuzzy criteria, but here validity is a database membership question, not a judgment call. A second probabilistic pass can still confirm a nonexistent code; it adds a model call where a deterministic lookup is strictly better."
+    ],
+    "principle": "validate model output deterministically before it enters a system of record",
+    "relatedConcept": "End-to-end design places hard validation at the output boundary so probabilistic components never write unchecked into downstream systems."
+  },
+  {
+    "id": 108,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A retail chain feeds supplier invoices through OCR and then to Claude for line-item extraction. Accuracy is strong on clean scans but collapses on a subset of invoices where OCR output is garbled, duplicated, or missing whole regions. The team's first instinct is to upgrade to a more capable model. What should the architect recommend for the pipeline?",
+    "options": [
+      "Upgrade the extraction stage to Opus, since a stronger model can better reconstruct intended content from degraded OCR text",
+      "Have Claude attempt extraction on all inputs but attach a self-reported confidence score that downstream systems can filter on",
+      "Prompt Claude to first repair the garbled OCR text and then extract line items from its own repaired version in the same call",
+      "Add an input-quality gate before the model stage that scores OCR output and routes degraded documents to re-scanning or manual keying"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because model capability does correlate with robustness, but when input regions are missing or duplicated, no model can recover information that never arrived. Paying Opus prices to guess at absent data treats the symptom; the defect is upstream of the model.",
+      "Confidence scores are a useful signal, but self-reported confidence on garbled input is itself unreliable, and this design still lets the model produce guesses from broken data. It manages bad output downstream instead of preventing bad input upstream, inverting the pipeline's quality gates.",
+      "Tempting because repair-then-extract sometimes helps mild noise, but asking the model to invent missing invoice regions and then extract from its own invention manufactures plausible, unverifiable line items. That is the most dangerous failure mode for financial data — confident fabrication.",
+      "Correct. Garbage in, garbage out: the architecture needs input validation before the processing stage. A quality gate keeps unrecoverable documents out of the model path and routes them to a channel that can actually fix them, which is the standard preprocessing pattern for pipelines fed by lossy capture steps."
+    ],
+    "principle": "validate and gate input quality before the model stage",
+    "relatedConcept": "End-to-end architecture assigns each failure mode to the stage that can actually correct it, starting at input."
+  },
+  {
+    "id": 109,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A SaaS company's support tool drafts replies with Claude, and human agents edit the drafts before sending. After six months, edit rates remain flat at around 45% even though agents clearly fix the same kinds of mistakes repeatedly. The pipeline was designed as input, retrieval, generation, and human edit, with edited replies going straight to customers. What is the key architectural gap?",
+    "options": [
+      "The agents' edits are never captured and fed back to improve the prompts, few-shot examples, or retrieval configuration",
+      "The human edit step sits too late in the flow; agents should review the retrieved context before generation instead of after it",
+      "The generation stage lacks an evaluator-optimizer loop, so drafts are not self-critiqued and refined before agents see them",
+      "The retrieval stage should be replaced with fine-grained routing so each ticket category gets a specialized generation prompt"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The system produces a free, high-quality supervision signal every day — human corrections — and discards it. Closing the feedback loop by mining edits into prompt updates, few-shot examples, and retrieval fixes is exactly what a feedback stage is for; a static pipeline cannot improve no matter how long it runs.",
+      "Tempting because earlier human input sounds proactive, but pre-reviewing retrieved context makes agents do extra work on every ticket and still would not stop repeated model mistakes from recurring. It rearranges the human step without creating any mechanism for the system to learn.",
+      "An evaluator-optimizer loop can raise single-draft quality, but it critiques against fixed criteria and cannot know about the specific recurring errors agents keep correcting. It also adds per-request cost and latency while leaving the accumulated human signal unused — improvement in the wrong loop.",
+      "Routing by category is a plausible refinement, but it is a guess at the cause. Without analyzing the captured edits, the team cannot know whether errors stem from category confusion, stale retrieval, or prompt gaps; restructuring first is optimizing blind."
+    ],
+    "principle": "capture human corrections as a feedback signal that improves the system",
+    "relatedConcept": "A complete architecture treats human edits and eval results as inputs to the next iteration, not as terminal byproducts."
+  },
+  {
+    "id": 110,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A fintech is designing a Claude workflow that resolves disputed card transactions and can trigger refunds. Roughly 80% of disputes are small-value and follow clear precedents; 20% involve large amounts or unusual patterns. Compliance requires human accountability for money movement, but the operations lead warns that reviewing every case would erase the efficiency gains. Where should humans sit in this flow?",
+    "options": [
+      "Have humans review every resolution before any refund executes, since money movement makes universal review the safest default",
+      "Let the workflow execute all refunds automatically and have humans audit a random sample of completed cases weekly",
+      "Auto-approve small-value, precedent-matching resolutions with post-hoc sampling, and require human approval before refunds on large or anomalous cases",
+      "Place the human at intake instead, triaging which disputes enter the automated flow so downstream approval steps become unnecessary"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because it maximizes control, but universal review recreates the original workload and destroys the value case — the stem states this explicitly. Blanket review is the safe-sounding answer that ignores the stated constraint; risk-proportionate gating achieves accountability without it.",
+      "Post-hoc sampling alone means large or anomalous refunds execute before any human sees them, which fails the compliance requirement for accountability over money movement. Sampling is a fine quality-monitoring feedback signal but cannot serve as the control for high-impact irreversible actions.",
+      "Correct. This is risk-tiered human-in-the-loop placement: deterministic criteria (amount, precedent match, anomaly flags) route only high-risk actions to a pre-execution approval gate, while low-risk volume flows through with sampled oversight feeding quality metrics. Human attention is spent where impact and irreversibility are highest.",
+      "Tempting because intake triage feels efficient, but a human deciding entry cannot foresee what the workflow will conclude or how much money it will move. The risk lives at the action, so the control belongs at the action; gating only at intake leaves refund execution unaccountable."
+    ],
+    "principle": "place human gates at high-impact, irreversible actions in proportion to risk",
+    "relatedConcept": "End-to-end design treats human review as a scarce architectural resource positioned by risk, not applied uniformly."
+  },
+  {
+    "id": 111,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "multi",
+    "question": "A public records office uses a Claude pipeline to convert scanned historical filings into structured registry entries. Recent output audits show two problems: some entries are missing required fields or use invalid date formats, and some entries with subtle transcription errors are entering the registry unnoticed. The architect must harden the pipeline without stalling throughput. Which two changes best address these findings? (Choose two.)",
+    "options": [
+      "Migrate the transcription stage to Opus so a more capable model reduces both structural and transcription errors at the source",
+      "Add a deterministic schema-validation stage that rejects entries with missing fields or malformed dates before registry insertion",
+      "Re-run every document through the pipeline twice and only accept entries when both runs produce identical output",
+      "Route entries the model flags as low-confidence, plus a sampled share of the rest, to a human review queue before insertion"
+    ],
+    "correct": [1, 3],
+    "optionExplanations": [
+      "Tempting because a stronger model lowers error rates, but it is a probabilistic mitigation for both problems and guarantees neither: malformed entries can still occur without a hard gate, and subtle errors still pass unnoticed without review. It also raises cost across all documents, including easy ones.",
+      "Correct. Missing fields and bad date formats are mechanically checkable, so a deterministic schema gate at the output boundary eliminates that entire error class with certainty and near-zero cost. This applies the principle that structural validity is enforced in code, not hoped for from the model.",
+      "Tempting because agreement between runs signals stability, but doubling every document doubles cost and latency against the stated throughput constraint, and two runs can agree on the same transcription mistake. Consistency checking is a weak proxy for correctness on this error type.",
+      "Correct. Subtle transcription errors have no mechanical oracle, so the right control is targeted human review: confidence-based routing concentrates attention where errors are likely, and sampling provides an ongoing quality signal — a feedback loop — without reviewing everything and stalling throughput."
+    ],
+    "principle": "pair deterministic gates for checkable errors with targeted human review for fuzzy ones",
+    "relatedConcept": "Robust pipelines layer different validation mechanisms by error type rather than seeking one control that catches everything."
+  },
+  {
+    "id": 112,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A property insurer's Claude-based intake system classifies incoming emails into claim types and extracts key fields. When staff spot a misclassification, they fix it in the case system and move on. A year in, the same ambiguous email patterns — such as water damage versus flood — are still misclassified at the original rate. The architect is asked to make the system improve over time. What should be added?",
+    "options": [
+      "A scheduled prompt-review meeting where the team brainstorms improvements to the classification instructions each quarter",
+      "An escalation path so that any email the model classifies with low confidence is handled entirely by staff instead of the pipeline",
+      "A second Claude model that re-classifies every email independently, with disagreements decided by whichever model is more confident",
+      "A correction-capture mechanism that logs each staff fix with the original email, building a labeled set that drives prompt and example updates and regression evals"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because periodic review sounds like iteration, but brainstorming without data is guesswork: the team lacks the actual failure cases to study. A meeting cadence is not a feedback loop unless it consumes captured evidence of what the system got wrong.",
+      "Confidence-based escalation reduces exposure to hard cases but makes the system static by design — the hardest emails are removed from the pipeline rather than learned from. It manages the symptom while guaranteeing the misclassification rate on ambiguous patterns never improves.",
+      "Tempting because ensembling can raise accuracy a little, but two models trained similarly tend to share confusions like water versus flood, and self-reported confidence is an unreliable tiebreaker. It doubles cost per email while still containing no mechanism for improvement over time.",
+      "Correct. The corrections staff already make are ground-truth labels; capturing them closes the feedback loop. The labeled set identifies systematic confusions, supplies few-shot examples and prompt clarifications, and becomes a regression eval so fixes are verified and protected. Improvement requires routing real-world signal back into the system."
+    ],
+    "principle": "turn user corrections into labeled data that feeds prompts and evals",
+    "relatedConcept": "Feedback loops are a designed pipeline stage with capture, analysis, and redeployment — not an assumption that systems improve on their own."
+  },
+  {
+    "id": 113,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A fintech compliance team processes suspicious-activity narratives through three invariant steps: extract entities and amounts, classify the typology against a fixed list, and draft a regulator-facing summary. Each step's output feeds the next, quality checks exist per step, and regulators expect consistent, explainable processing. Which pattern should the architect choose?",
+    "options": [
+      "A prompt-chaining workflow where code invokes each step in sequence with programmatic checks between the steps",
+      "A tool-using agent that decides per narrative which of the three operations to run and in what order",
+      "An orchestrator-workers design where a lead model delegates each narrative to specialized extraction, classification, and drafting agents",
+      "A single augmented LLM call with retrieval that performs extraction, classification, and drafting in one comprehensive prompt"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The steps are fixed, ordered, and individually checkable — the textbook profile for prompt chaining, where code orchestrates predefined model calls with gates between them. It delivers the consistency and explainability regulators expect at the lowest complexity, applying the simplest-pattern-that-works rule.",
+      "Tempting because agents are flexible, but the sequence never varies, so there is nothing for the model to decide. Agency here adds nondeterminism, latency, and cost to a compliance process that must behave identically on identical inputs — autonomy without a task that needs it.",
+      "Orchestrator-workers suits problems where subtasks cannot be predicted and must be delegated dynamically. Here the three subtasks are known at design time, so a dynamic orchestrator re-decides a fixed answer on every request, multiplying model calls for zero added capability.",
+      "Tempting because one call is simple to build, but cramming three distinct steps into one prompt sacrifices the per-step quality gates and the step-level traceability the stem requires. When intermediate checkpoints matter, chaining beats a monolithic prompt despite the extra calls."
+    ],
+    "principle": "when steps are fixed and checkable, chain prompts under code control",
+    "relatedConcept": "Pattern selection starts by asking whether the task's steps are predictable in advance; here they demonstrably are."
+  },
+  {
+    "id": 114,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A SaaS help desk receives queries that fall into clearly distinct categories: billing questions needing account-system lookups, technical troubleshooting needing product documentation, and cancellation requests needing a retention script and human handoff. One general prompt handles all three mediocrely — improving instructions for one category degrades the others. What pattern fits this situation?",
+    "options": [
+      "Parallelization: send each query to three specialized prompts simultaneously and select the strongest response by a voting step",
+      "Evaluator-optimizer: keep the general prompt but add a critique-and-refine loop so weak first drafts are iteratively improved",
+      "Routing: a lightweight classification step directs each query to a dedicated prompt, toolset, and handling path per category",
+      "Agent: give one model all three toolsets and let it determine per query which category applies and which tools to invoke"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because specialized prompts do appear in this design, but running all three on every query triples cost and latency to answer a question — which category is this? — that a cheap classifier settles up front. Parallelization pays off for aggregating diverse perspectives, not for category dispatch.",
+      "An evaluator loop polishes outputs against quality criteria, but the stem describes a separation-of-concerns problem: the categories interfere within one prompt. Refining a draft from a conflicted prompt adds cost per query without removing the interference, treating the symptom rather than the structure.",
+      "Correct. Distinct input categories that each need different instructions, tools, and downstream handling — and that degrade each other when merged — are precisely the routing pattern's use case. Classification separates concerns so each path can be optimized independently, and the classifier itself can be a fast, cheap model.",
+      "Tempting because an agent would implicitly route via tool choice, but this buys the dispatch decision at the price of an autonomous loop: more tokens, variable latency, and less predictable handling of sensitive paths like cancellations. When categories are clean and enumerable, explicit routing is the simpler, more controllable mechanism."
+    ],
+    "principle": "route distinct input categories to specialized paths instead of one conflicted prompt",
+    "relatedConcept": "The named workflow patterns each solve a specific structural problem; recognizing category interference as routing's signature is a core selection skill."
+  },
+  {
+    "id": 115,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A hospital IT group wants Claude to investigate integration incidents, such as lab results failing to appear in patient charts. Root causes vary wildly — interface engine errors, mapping mismatches, vendor outages, credential expiries — and each finding changes what should be examined next. Investigations today take engineers hours of querying logs, configs, and monitoring dashboards. Read-only tool access to these systems is available. Which pattern is justified?",
+    "options": [
+      "A routing workflow that classifies each incident by symptom and runs the matching predefined diagnostic sequence",
+      "A prompt chain that always executes the same ordered battery of log, config, and monitoring checks and summarizes findings",
+      "An augmented LLM call with retrieval over past incident reports, producing likely root causes from historical similarity",
+      "An agent that iteratively queries the systems through read-only tools, forming and testing hypotheses until it isolates the cause"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because symptom-based playbooks mirror how runbooks work, but the stem says findings redirect the investigation dynamically — the diagnostic path cannot be enumerated per symptom in advance. A router picks a branch once; it cannot re-plan when evidence mid-branch points elsewhere.",
+      "A fixed battery ignores the sequential dependence described: each result should determine the next probe. Running everything regardless wastes calls on irrelevant checks, misses paths not in the battery, and produces a data dump rather than an isolated root cause.",
+      "Tempting because historical similarity is genuinely useful context, but a single retrieval-augmented call can only hypothesize from past patterns — it cannot examine the live systems to confirm or refute anything. Novel failure modes, which incidents often are, would be forced into old templates.",
+      "Correct. This is the profile that justifies agency: steps unpredictable in advance, each observation informing the next action, and value high enough to absorb agent cost and latency. Read-only tools bound the blast radius, satisfying the guardrail side of the more-autonomy-more-risk trade-off."
+    ],
+    "principle": "use an agent when the solution path cannot be predicted and must emerge from observations",
+    "relatedConcept": "Agency is the pattern of last resort in the taxonomy, earned only when workflows' predefined steps demonstrably cannot cover the task."
+  },
+  {
+    "id": 116,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "An online retailer wants shoppers to ask natural-language questions about products — compatibility, materials, sizing — answered from its catalog and spec sheets. Questions are single-turn, answers come straight from the product data, and the team wants to launch within a quarter with predictable per-query costs. A consultant has pitched a multi-agent research system for the job. What should the architect build?",
+    "options": [
+      "An orchestrator-workers system in which specialist agents cover catalog, specs, and reviews, and a lead agent composes answers",
+      "An augmented LLM: a single Claude call with retrieval over the catalog and spec sheets, returning a grounded answer per question",
+      "An evaluator-optimizer loop where one model drafts answers and a second critiques them until quality thresholds are reached",
+      "A tool-using agent that browses catalog pages step by step, gathering evidence across multiple calls before answering"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because data spans a few sources, but a decent retrieval index unifies them without any orchestration. Multi-agent coordination multiplies token costs and latency on every query for a single-turn lookup task — a clear case of buying complexity the requirement never asked for.",
+      "Correct. A single-turn question answerable from indexed data is the augmented LLM's home ground: one model call plus retrieval yields grounded answers with flat, predictable per-query cost and the shortest path to launch. This is the simplest-pattern-that-works principle in its purest form.",
+      "Tempting because a critique loop sounds like cheap quality insurance, but it multiplies model calls per query against the stated cost-predictability goal, and factual product answers are better assured by retrieval grounding than by iterative self-critique. Optimization loops earn their cost on refinement-heavy generation, not lookups.",
+      "An agent browsing step by step suits questions whose answer location is unknown and must be discovered. Here the data is the company's own catalog, which can simply be indexed — iterative tool use per query recreates retrieval expensively, with variable latency shoppers will feel."
+    ],
+    "principle": "prefer the augmented LLM until the task proves it needs more",
+    "relatedConcept": "The taxonomy is an escalation ladder — single augmented call, then workflows, then agents — and most production tasks resolve on its first rung."
+  },
+  {
+    "id": 117,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A city government translates public notices into five languages. Certified reviewers rejected too many first-pass machine translations for terminology and register problems, though they agree the errors are objectively identifiable against the city's style guide and glossary. Notices are published on a weekly cycle, so a few minutes of extra processing per notice is acceptable. Which pattern best fits?",
+    "options": [
+      "Evaluator-optimizer: a generator model translates, an evaluator model critiques against the glossary and style guide, and the loop repeats until the critique passes",
+      "Parallelization with voting: several models translate the same notice independently and the version most consistent across outputs is published",
+      "Routing: classify each notice by subject area and send it to a translation prompt specialized for that department's terminology",
+      "An agent with glossary and style-guide lookup tools that translates iteratively, checking terms as it goes and revising autonomously"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The stem states the two preconditions for evaluator-optimizer: articulable evaluation criteria (glossary and style guide) and demonstrated value from iterative refinement (reviewers catch fixable issues). The weekly cycle tolerates loop latency, so the pattern's cost lands where the business can afford it.",
+      "Tempting because ensembles raise average quality, but voting selects among first drafts rather than fixing any of them — the shared terminology and register errors the reviewers flag would survive in every candidate. It also multiplies translation cost without applying the style guide anywhere.",
+      "Routing by subject would help if the problem were category interference between departments' terminology, but the diagnosis is first-pass quality falling short of criteria that iteration against the guide can satisfy. Specialized prompts still produce unreviewed single drafts, leaving the rejection rate largely intact.",
+      "Tempting because tool-checking terms sounds rigorous, but translation is a predictable transform, not an open-ended problem needing autonomous direction. A workflow loop under code control achieves the same generate-critique-revise cycle with more predictability and less cost than a self-directing agent."
+    ],
+    "principle": "use evaluator-optimizer when clear criteria exist and iteration demonstrably improves output",
+    "relatedConcept": "Each workflow pattern has stated preconditions; matching a scenario's evidence to those preconditions is how patterns are selected defensibly."
+  },
+  {
+    "id": 118,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A brokerage is adding an assistant to its trading dashboard that explains portfolio changes and market events. The contract mandates a 2-second p95 response time during market hours, and answers must draw on the client's positions plus a curated news feed. A prototype agent that plans queries and iterates over tools produces excellent answers with 8-to-20-second, highly variable latencies. What should the architect do?",
+    "options": [
+      "Keep the agent but cap it at two tool-use iterations so responses stay within a bounded number of model calls per question",
+      "Keep the agent and switch every call to Haiku, trading answer depth for the speed needed to satisfy the latency contract",
+      "Redesign as a fixed workflow: fetch positions and relevant news in parallel by code, then make a single generation call with the assembled context",
+      "Keep the agent but return a streamed partial answer within two seconds, letting the full analysis follow as it completes"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because capping iterations bounds the worst case, but two agent iterations still mean sequential model calls plus tool round-trips — likely above 2 seconds at p95 — and questions needing a third step now degrade unpredictably. It trims the pattern's cost without fixing its mismatch to a hard-latency setting.",
+      "Model choice and pattern choice are different levers: Haiku shortens each call, but the agent loop's variable number of sequential calls remains the dominant, unpredictable latency term. Downgrading capability while keeping the wrong pattern sacrifices quality yet may still miss the SLA.",
+      "Correct. The data needed per question is known in advance — positions and relevant news — so nothing requires the model to direct its own retrieval. Parallel deterministic fetches plus one generation call gives near-fixed latency that can be engineered to the SLA. Hard latency contracts favor predictable workflows over open-ended loops.",
+      "Tempting because streaming improves perceived responsiveness, but a partial answer is not the contracted answer, and p95 completion still runs 8 to 20 seconds. This treats the symptom at the UX layer while the architecture continues to violate the stated requirement."
+    ],
+    "principle": "hard latency SLAs demand patterns with bounded, predictable call structure",
+    "relatedConcept": "Latency, cost, and reliability constraints can override quality preferences in pattern selection — the taxonomy is chosen under constraints, not in the abstract."
+  },
+  {
+    "id": 119,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A SaaS startup's platform team proposes five specialized agents for their DevOps assistant — one each for logs, metrics, deployments, incident tickets, and documentation — coordinated by a router agent. The actual workload is answering engineers' questions, each typically needing one or two of those data sources. The CTO asks an architect to review the design. What should the review conclude?",
+    "options": [
+      "Approve the design but insist the five agents share one conversation context so coordination overhead stays manageable",
+      "Approve the design, since specialized agents per data source will each develop deeper competence than any generalist could",
+      "Replace the router agent with deterministic classification code, keeping the five specialist agents behind cheaper dispatch",
+      "Replace the ensemble with a single agent holding five well-designed tools, one per data source, invoked as each question requires"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because shared context does reduce hand-off loss, but it concedes the flawed premise and adds a new problem: five agents writing into one context bloat and pollute it. The design question is whether multiple agents are warranted at all, and for single-question, few-source tasks they are not.",
+      "The 'deeper competence' intuition imports a human-team metaphor that does not hold: an agent's competence per source comes from its tool design and context, which a single agent carries just as well. What the split actually guarantees is inter-agent handoffs, context duplication, and multiplied token cost on every question.",
+      "Tempting because deterministic dispatch is a real improvement over a router model, but it optimizes the wrong layer. The expense and fragility live in running five agent loops with duplicated context; cheaper routing into an unnecessary ensemble still pays that price.",
+      "Correct. When each request needs a bounded, predictable slice of capability, a single agent with well-designed tools beats a multi-agent system: no coordination overhead, no context duplication, no cost multiplication, one thing to evaluate and debug. Multi-agent is justified by scale or parallel breadth, not by tidy org-chart decomposition of data sources."
+    ],
+    "principle": "a single agent with good tools beats multiple agents for bounded tasks",
+    "relatedConcept": "The first multi-agent design decision is whether to be multi-agent at all — tool boundaries usually suffice where people reflexively draw agent boundaries."
+  },
+  {
+    "id": 120,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A private-equity firm runs due diligence on acquisition targets: for each deal, dozens of independent questions across financials, litigation history, market position, and key contracts must be researched against a large document room within a 48-hour window. A single agent handles quality fine but cannot finish in time, and its context fills long before the question list is exhausted. How should the architect structure a multi-agent design?",
+    "options": [
+      "Peer agents, one per domain area, sharing a common conversation so each can build on the others' discoveries as research progresses",
+      "An orchestrator that spawns worker agents per research question, each with an isolated context, and synthesizes their returned findings",
+      "A sequential relay in which each specialist agent completes its domain and passes a condensed brief to the next until coverage is complete",
+      "A single agent kept in place, with an external memory store that summarizes and evicts older findings so its context never overflows"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because cross-pollination between domains sounds valuable, but a shared conversation recreates the exact context-exhaustion problem at ensemble scale, and peers coordinating without a lead produce duplicated work and unclear ownership. The questions are stated to be independent, so shared state buys little and costs much.",
+      "Correct. Independent parallelizable questions, a hard deadline, and context exhaustion form the canonical orchestrator-workers case: each worker gets an isolated context sized to its one question, workers run in parallel to beat the clock, and the orchestrator alone holds the synthesis. Context isolation per subagent is what makes the parallelism clean.",
+      "A relay is still sequential, so it does not attack the 48-hour constraint, and each condensation step loses detail the next specialist might have needed. It inherits multi-agent cost while forgoing multi-agent's actual advantage here, which is parallel breadth.",
+      "Tempting because memory management is the lighter-touch fix, but it addresses only the context ceiling, not throughput: one agent working serially still cannot cover dozens of questions in 48 hours. Summarization eviction also risks discarding details that later questions require."
+    ],
+    "principle": "orchestrator-workers with isolated contexts for parallel, independent research",
+    "relatedConcept": "Multi-agent designs earn their cost when breadth and parallelism are the bottleneck, and context isolation is what keeps parallel workers cheap and clean."
+  },
+  {
+    "id": 121,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A logistics company's nightly Claude system uses an orchestrator that dispatches eight worker agents, one per regional carrier feed, to reconcile shipment exceptions. When any single worker hits a malformed feed or an API outage, the current implementation aborts the entire run, and operations staff arrive to no report at all. The architect is asked to improve resilience. What is the best change?",
+    "options": [
+      "Have the orchestrator treat worker failures as data: collect successful results, retry or flag failed regions, and publish a report with explicit coverage gaps",
+      "Wrap the full orchestration in a retry loop so any failed nightly run automatically re-executes from the beginning until all eight workers succeed",
+      "Merge the eight workers into one sequential agent, since a single context makes partial progress naturally recoverable after an error",
+      "Add a supervisor agent that monitors the eight workers in real time and reassigns a failing worker's region to a healthy peer mid-run"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is failure containment: a worker's failure should be scoped to its own subtask, not propagated to the whole system. The orchestrator's job includes degrading gracefully — partial results with explicitly flagged gaps beat no report — and per-region retries target the actual failure instead of punishing healthy work.",
+      "Tempting because retries are the reflexive resilience tool, but re-running the entire orchestration discards seven regions of good work each attempt, multiplies cost, and never terminates if one feed stays down all night. All-or-nothing retry logic is the same brittleness moved up one level.",
+      "A single sequential agent removes the coordination surface but also the parallelism, and it does not actually contain failures: a malformed feed mid-run can still corrupt or halt the one shared context, now with every region's progress at stake in it.",
+      "Tempting because live reassignment sounds robust, but a region's feed being down fails whichever agent touches it — reassignment to a peer just relocates the same error. Adding a supervisory agent introduces new coordination machinery and cost without addressing the actual failure mode."
+    ],
+    "principle": "contain worker failures at the orchestrator and degrade to partial results gracefully",
+    "relatedConcept": "Multi-agent orchestration is as much about designing for subagent failure as for subagent success."
+  },
+  {
+    "id": 122,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "multi",
+    "question": "A media-monitoring firm runs an orchestrator-workers system in which workers scan outlet clusters for brand mentions and a lead agent compiles client briefings. Output quality is good, but token spend is running four times the original estimate, and finance has set a hard monthly budget. The architect must cut cost without a major quality loss. Which two changes are most effective? (Choose two.)",
+    "options": [
+      "Run worker agents on Haiku with tightly scoped scanning instructions, reserving the stronger model for the lead agent's synthesis",
+      "Give every worker the full orchestration history and prior briefings as shared context so repeated background tokens amortize",
+      "Trim each worker's context to only its outlet cluster and task brief, instead of the full client profile and system history workers currently receive",
+      "Standardize all agents on Opus so fewer retries and re-scans are needed, reducing total calls even at a higher per-token price"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. Tiering models by role is the primary multi-agent cost lever: scanning for mentions is a narrow, high-volume task well within Haiku's capability, while synthesis quality concentrates in one lead-agent call. Matching model capability to subtask difficulty cuts the multiplied worker spend where it accumulates.",
+      "Tempting because 'shared context' sounds efficient, but it is precisely how multi-agent costs explode: every worker re-reads the entire history on every call, so tokens multiply by worker count. Amortization is an illusion here — input tokens are paid per call, and workers gain nothing from other clusters' scan logs.",
+      "Correct. Context isolation is a cost control as much as a quality one: each worker needs only its own cluster and brief, and everything beyond that is paid for across every worker on every invocation. Minimal per-worker context attacks the token multiplication that defines multi-agent overspend.",
+      "Tempting because fewer retries is a real effect of stronger models, but the workload is high-volume scanning where Haiku already suffices — Opus pricing across all workers would raise spend dramatically against a hard budget. This is over-provisioning capability where the task does not demand it."
+    ],
+    "principle": "control multi-agent cost through model tiering by role and minimal isolated contexts",
+    "relatedConcept": "Token cost in multi-agent systems multiplies by agent count and context size, so both levers must be designed deliberately."
+  },
+  {
+    "id": 123,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "An e-commerce platform team runs three Claude coding agents in parallel on one large migration — one on the checkout service, one on inventory, one on notifications. The agents share a workspace and a running conversation 'so everyone stays informed.' Runs keep degrading: agents overwrite each other's edits, act on each other's stale plans, and burn tokens re-reading unrelated discussion. What should the architect change?",
+    "options": [
+      "Keep the shared conversation but instruct each agent, via its system prompt, to ignore messages that are not addressed to it",
+      "Serialize the agents so only one works at a time on the shared context, with each picking up where the previous one stopped",
+      "Add a fourth agent as moderator, summarizing the shared conversation and telling each worker which parts are relevant to it",
+      "Isolate each agent to its own context and service boundary, with an orchestrating process defining the interfaces between services up front"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it is the cheapest edit, but instructions to ignore content still leave that content in the window: tokens are paid, attention is diluted, and stale plans remain available to act on. Prompt-level discipline cannot substitute for architectural isolation — the shared mutable context is the defect.",
+      "Serialization does stop the overwrites, but it surrenders the parallelism that was the point of using three agents, and the ever-growing shared context still bloats and confuses each successive agent. It trades the corruption problem for a throughput problem instead of fixing the structure.",
+      "Tempting because a moderator mimics how human teams handle noisy channels, but it adds a fourth agent's cost and latency to compensate for a structure that should not exist. Summaries also lag reality, so the stale-plan failure mode survives — this treats the symptom with more machinery.",
+      "Correct. Parallel workers need isolated contexts and non-overlapping ownership, with coordination expressed as explicit interface contracts defined up front rather than as a shared stream of chatter. This is context isolation plus boundary design: each agent sees only what its subtask needs, and integration happens at defined seams."
+    ],
+    "principle": "coordinate parallel agents through explicit interfaces, not shared mutable context",
+    "relatedConcept": "Shared context versus isolation is the central multi-agent design axis, and isolation with defined contracts is the default for parallel work."
+  },
+  {
+    "id": 124,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A health insurer is designing multi-agent handling for provider-contract analysis. Contracts vary enormously: some need only rate-table extraction, others require checks across regulatory riders, amendment histories, and referenced fee schedules — which subtasks apply only becomes clear once the contract is opened. Volume justifies multiple agents. Which orchestration strategy fits?",
+    "options": [
+      "A fixed pipeline of specialist agents through which every contract passes in the same order, with agents skipping stages they find irrelevant",
+      "An orchestrator agent that inspects each contract, decides which specialist subtasks it requires, spawns those workers, and synthesizes their results",
+      "Broadcast parallelization: run all specialist agents on every contract simultaneously and merge whatever findings each produces",
+      "A round-robin peer group in which agents pass the contract among themselves, each contributing analysis until one judges the work complete"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a fixed pipeline is the simplest multi-stage shape, and 'skip if irrelevant' seems to add the needed flexibility. But every contract still traverses every stage, paying invocation and context cost per skip, and the pipeline cannot adapt when a contract reveals a need outside the fixed sequence.",
+      "Correct. When required subtasks cannot be predicted before examining the input, the delegation decision itself needs a model — the defining trigger for orchestrator-workers. The orchestrator inspects, plans, dispatches only the needed workers with scoped contexts, and owns synthesis, keeping cost proportional to each contract's actual complexity.",
+      "Tempting because it guarantees coverage, but running every specialist on every contract is the most expensive possible strategy when the stem says most contracts need only a subset. Irrelevant analyses also generate noise the merge step must reconcile, degrading precision along with the budget.",
+      "Peer round-robin has no owner of the plan or of completion: agents duplicate effort, context accumulates as the contract circulates, and 'one judges the work complete' makes termination itself nondeterministic. Peer patterns suit negotiation-style tasks, not conditional coverage of specialist subtasks."
+    ],
+    "principle": "use an orchestrator when the needed subtasks emerge only from inspecting each input",
+    "relatedConcept": "Choosing an orchestration strategy hinges on whether the subtask set is static (pipeline) or input-dependent (dynamic orchestrator)."
+  },
+  {
+    "id": 125,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "A law firm needs Claude to review 300-page credit agreements against the firm's risk checklist. Whole-document prompts miss issues buried mid-document, and reviews must finish within an hour of receipt. The agreements have a strong conventional structure — definitions, covenants, events of default, schedules. How should the architect decompose the task?",
+    "options": [
+      "Chain sequential passes over the whole document, each pass focusing on one checklist theme so attention stays narrow per pass",
+      "Split the document into fixed 20-page windows with overlap, review each window in parallel, and merge the flagged issues",
+      "Section the agreement along its structural boundaries, review each section in parallel against the checklist items relevant to it, then aggregate findings with cross-references",
+      "Run the full document through three independent review calls and keep only issues that at least two of the three reviews flag"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because per-theme passes do narrow the model's focus, but each pass still spans 300 pages, so the mid-document attention problem persists — and the passes run sequentially against a one-hour deadline. It decomposes along the wrong axis: the document's length is the bottleneck, not the checklist's breadth.",
+      "Parallel windows solve length and latency, but arbitrary 20-page cuts sever the document's semantic units: a covenant split across windows is reviewed in fragments, and overlap only papers over boundaries rather than aligning with them. Fixed-size chunking is the lazy version of the structural split available here.",
+      "Correct. Sectioning along natural document boundaries keeps each unit semantically whole, lets checklist items map to the sections where they apply, and parallelism meets the deadline. Aggregation handles cross-section references. Decompose where the artifact itself draws its lines — that is the sectioning pattern done properly.",
+      "Tempting because voting raises confidence, but each vote is still a whole-document pass that suffers the stated mid-document blindness — three correlated weak reviews do not make a strong one. Majority filtering also discards findings that a single pass legitimately catches, trading recall away in a risk review."
+    ],
+    "principle": "decompose along the artifact's natural structural boundaries",
+    "relatedConcept": "Effective decomposition follows the seams already present in documents and processes rather than imposing arbitrary cuts."
+  },
+  {
+    "id": 126,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "A fintech security team uses Claude to review pull requests for vulnerabilities before release. A single review call catches issues inconsistently — the same PR reviewed twice can yield different findings — and missing a real injection flaw is far costlier than a few false positives the team must triage. Latency up to several minutes is acceptable. Which decomposition approach fits this requirement?",
+    "options": [
+      "Run several independent review calls on the same diff, optionally with varied prompts, and union the findings so anything any pass flags gets triaged",
+      "Chain the review into two steps: one call lists the code paths worth examining, and a second call reviews only those paths in depth",
+      "Section the diff by file and review each file in a separate parallel call, merging per-file findings into one report",
+      "Use one review call but require structured output listing each finding with a confidence score, triaging only findings above a threshold"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is parallelization in its voting form: multiple independent attempts at the same task, aggregated to the requirement. Because the stated cost asymmetry punishes misses far more than false positives, union aggregation is the right voting rule — each independent pass catches issues others miss, directly attacking the inconsistency described.",
+      "Tempting because chaining narrows focus, but making one call nominate the paths to examine creates a single point of failure at the first step: a vulnerable path omitted from the list is never reviewed at all. Chaining helps when steps transform each other's output, not when the problem is variance in what one pass notices.",
+      "Sectioning by file helps attention on large diffs, but each file still gets exactly one pass, so run-to-run inconsistency is untouched — and injection flaws often span files, which per-file review severs. This decomposes by size when the stated problem is reliability of detection.",
+      "Tempting because confidence thresholds feel like rigor, but one call still only surfaces what that single pass happened to notice, and thresholding then suppresses findings — raising miss risk, the exact cost the stem says is unacceptable. Self-reported confidence is also a weak signal to gate on."
+    ],
+    "principle": "use voting-style parallelization when misses are costly and single passes are inconsistent",
+    "relatedConcept": "Sectioning and voting are both parallelization, but they answer different problems — coverage of a large input versus confidence on a hard judgment."
+  },
+  {
+    "id": 127,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "A marketing SaaS vendor built a 12-step prompt chain for campaign copy: separate calls extract the brief, infer audience, choose tone, draft a headline, critique the headline, draft body text, critique it, harmonize the two, check brand terms, adjust length, polish, and format. The chain takes 90 seconds, any step's failure aborts the run, and quality is no better than a designer's earlier 3-step prototype. What should the architect conclude?",
+    "options": [
+      "The chain needs checkpointing so a failed step resumes from the last good output instead of aborting the whole run",
+      "The critique steps should run in parallel with the drafting steps to recover most of the 90 seconds of latency",
+      "The chain's step granularity is right, but each step should get a dedicated few-shot prompt to lift quality above the prototype",
+      "The task is over-decomposed: steps that add no measurable quality should be merged back until each remaining boundary earns its cost"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because checkpointing genuinely reduces the cost of failures, but it hardens a structure that should not exist: twelve sequential model calls impose twelve failure opportunities and 90 seconds of latency for quality no better than three calls achieved. Making a bloated chain restartable optimizes the symptom.",
+      "Critiques cannot run in parallel with the drafts they critique — the data dependency is inherent — so the recoverable latency is small. More fundamentally, this accepts the twelve-step structure as given and tunes its schedule, when the evidence says the decomposition itself is the problem.",
+      "Tempting because per-step prompt tuning is standard practice, but it multiplies engineering and maintenance effort across twelve steps whose existence is unjustified: the 3-step prototype already matches quality. Investing in every step before questioning the step count is effort spent defending over-decomposition.",
+      "Correct. Decomposition boundaries must pay for themselves in measurable quality, reliability, or checkability; here the extra nine steps add latency and failure surface with no quality gain over the 3-step baseline. The remedy is consolidation — the simplest structure that meets the requirement, validated step boundary by step boundary."
+    ],
+    "principle": "every decomposition boundary must earn its latency and failure cost",
+    "relatedConcept": "Over-decomposition is the mirror-image failure of monolithic prompting, and the corrective test is measured quality per added step."
+  },
+  {
+    "id": 128,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "A global retailer generates product descriptions in English, checks them against brand and legal guidelines, and then translates approved copy into eight languages. Today one mega-prompt does everything, and failures are opaque: when Portuguese copy violates a legal rule, no one can tell whether generation, checking, or translation is at fault. How should the architect restructure this?",
+    "options": [
+      "Keep one call but require a structured output with separate fields for the draft, the compliance verdict, and each translation, making failures attributable per field",
+      "Chain the stages — generate, then check, then translate — with a programmatic gate after the check that blocks non-compliant copy from ever reaching translation",
+      "Split by language instead: eight parallel calls each generate, check, and translate for one locale, so failures at least isolate to a language",
+      "Add an evaluator model that reviews the mega-prompt's final output in every language and reports which stage most likely caused each defect"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because structured fields do improve output legibility, but the work still happens in one entangled forward pass: the 'compliance verdict' field is produced by the same generation that wrote the draft, so nothing independently gates anything. Attribution labels on a monolith are not stage isolation.",
+      "Correct. The task has natural sequential stages with a hard dependency — only approved copy should be translated — which is prompt chaining's home case: decompose into calls at the process boundaries and place a programmatic checkpoint between check and translate. Each stage becomes separately testable, and the gate stops defects from propagating into eight languages' worth of wasted work.",
+      "Per-locale splitting multiplies the generation and compliance work eight times over — the English draft and its legal check are shared work that should happen once. It parallelizes along the wrong seam and still leaves each call an unattributable mega-prompt internally, just eight of them.",
+      "Tempting because an evaluator adds a quality signal, but post-hoc guessing at which stage inside an opaque call failed is exactly backwards: the architecture should make stages observable, not hire a model to speculate about them. It adds cost while leaving the entangled structure intact."
+    ],
+    "principle": "chain at process boundaries and gate programmatically between dependent stages",
+    "relatedConcept": "Decomposition converts opaque end-to-end behavior into stages that can be gated, tested, and debugged independently."
+  },
+  {
+    "id": 129,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "An auto insurer's Claude system reads accident claims — police reports, photos' captions, adjuster notes — and outputs a liability recommendation with reasoning. Accuracy is mediocre and improvement has stalled because the team cannot tell whether errors come from misreading the documents or from flawed liability reasoning. Regulators are also asking for clearer decision traces. How should the task be decomposed?",
+    "options": [
+      "Separate extraction from adjudication: one stage produces a structured facts record from the documents, and a distinct stage reasons over that record to recommend liability",
+      "Keep the single call but request chain-of-thought reasoning in the output so reviewers can trace where each decision went wrong",
+      "Split by document type — one call per source — and have each call output its own liability opinion, reconciled by a final merging call",
+      "Run the same end-to-end call three times and adopt the majority liability recommendation, using disagreement as the error signal"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The stem describes two distinct competencies — reading and judging — fused into one unattributable step. Decomposing at that process boundary yields a structured intermediate artifact that can be independently validated against the documents, evaluated separately from the reasoning stage, and shown to regulators as a decision trace. Each error class now has an owner.",
+      "Tempting because visible reasoning aids review, but chain-of-thought is a narrative, not a checkable artifact: extraction mistakes and reasoning flaws remain interleaved in one pass, and the team still cannot evaluate or fix either independently. Transparency of a monolith is not decomposition of it.",
+      "Per-document splitting is decomposition along the wrong boundary: liability judgment inherently requires synthesizing across sources, so asking each call for its own opinion forces conclusions from partial evidence, and the merge call inherits contradictions. The natural seam is between reading and judging, not between files.",
+      "Tempting because majority voting can lift accuracy a little, but three runs of the same conflated task share the same structural blindness, and disagreement tells you something went wrong without saying where. It triples cost while leaving the diagnostic question — extraction or reasoning? — exactly as unanswerable."
+    ],
+    "principle": "split perception from judgment so each stage is independently checkable",
+    "relatedConcept": "The most valuable decomposition boundaries are the ones that make a validated intermediate representation possible."
+  },
+  {
+    "id": 130,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "A regional bank's operations group deploys Claude to process loan-servicing correspondence that a 40-person team currently handles manually. The workflow, outputs, and volumes stay exactly the same, but processing cost per document drops 70% and turnaround falls from days to hours. Preparing the executive readout, the architect must name the primary value pillar this delivers. Which is it?",
+    "options": [
+      "Transformation, because AI-driven document processing is a fundamentally new operating capability for the bank",
+      "Efficiency, because the same defined work is now done cheaper and faster without changing what the bank produces",
+      "Productivity, because each remaining employee can now oversee a much larger volume of correspondence than before",
+      "Performance, because the turnaround improvement from days to hours is the headline measurable outcome"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because the technology is new to the bank, but transformation means new capabilities, offerings, or revenue that were not possible before — the stem says workflow, outputs, and volumes are unchanged. Novel tooling applied to the same work is not a new business capability; calling it transformation inflates the claim.",
+      "Correct. Efficiency is precisely this shape: identical defined work delivered at lower cost and faster cycle time, with the 70% unit-cost drop as the headline metric. Naming the pillar accurately matters because it sets which measurements the executive readout should anchor on and what expectations follow.",
+      "Tempting because staff leverage sounds like the human framing of the same numbers, but productivity as a pillar means people accomplish more or higher-value output. Here output is fixed and the machine absorbed the work — the gain is in cost and speed of the process, not in expanded human accomplishment.",
+      "Faster turnaround is real, but 'performance' as a pillar concerns meeting defined SLAs and service commitments, and the stem states no SLA target being met or missed. Turnaround here is one component of the efficiency story, not a distinct pillar being served."
+    ],
+    "principle": "efficiency is the same work done cheaper and faster; name the pillar the numbers actually support",
+    "relatedConcept": "Classifying a design's value pillar correctly determines which metrics prove success and keeps executive expectations honest."
+  },
+  {
+    "id": 131,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "A telehealth platform is contractually bound to answer patients' routine pre-visit questions with a p95 response under 3 seconds; breaches carry financial penalties. The architecture team's favored design uses Opus with a rich multi-step retrieval flow, benchmarking at 6-to-9-second responses of excellent quality. Patient testing shows a faster, slightly less polished answer is preferred anyway. What should the architect direct?",
+    "options": [
+      "Ship the Opus design and renegotiate the SLA, since demonstrably superior answer quality justifies revisiting the contract terms",
+      "Ship the Opus design with an animated progress indicator, since perceived latency matters more to patients than measured latency",
+      "Run the Opus flow asynchronously and deliver answers by notification, converting the interaction so the 3-second bound no longer applies",
+      "Rework the design around the SLA: a faster model with a single-pass retrieval flow engineered to meet the p95 bound, quality-checked against the contract's scope of routine questions"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because the quality is real, but it treats a binding constraint as negotiable on the vendor's preferred timeline while penalties accrue. Contracted SLAs are design inputs, not outputs — proposing renegotiation is a business conversation, not an architecture that meets the commitment.",
+      "Perceived-latency tricks improve waiting, but the contract binds measured p95, so penalties trigger regardless of how pleasant the spinner is. This confuses a UX mitigation with SLA compliance — the metric that carries financial consequences is unmoved.",
+      "Tempting because asynchrony genuinely sidesteps latency bounds for some workloads, but pre-visit Q&A is an interactive use case: patients are present and waiting, and the stem says they prefer fast answers. Redefining the interaction to dodge the SLA serves the architecture, not the patient or the contract.",
+      "Correct. The SLA is the requirement; the design must be derived from it, not defended against it. A faster model with a bounded single-pass flow can be engineered to the p95 target, and the stem confirms the quality trade is acceptable for routine questions — the performance pillar directs this choice, and patient preference corroborates it."
+    ],
+    "principle": "SLAs are binding design constraints that drive model and pattern choices",
+    "relatedConcept": "Performance-pillar alignment means engineering to the contracted metric first and optimizing quality within that envelope."
+  },
+  {
+    "id": 132,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "A manufacturing conglomerate's innovation lab requests architecture support for a multi-agent 'factory intelligence mesh' spanning maintenance, scheduling, and procurement. Asked what it improves, the sponsor says the company 'needs a flagship AI initiative' and competitors 'are doing agents.' No metric, owner, or affected process is identified. Six months of platform budget is at stake. How should the architect respond?",
+    "options": [
+      "Design the mesh with strong observability baked in, so whichever benefits emerge after launch can be measured and reported credibly",
+      "Accept the initiative but descope it to a single-agent pilot in maintenance, cutting the investment while preserving the flagship story",
+      "Require the sponsor to identify a target process, an owner, a baseline, and a value pillar with a metric before any architecture work begins, and offer to facilitate that discovery",
+      "Benchmark the named competitors' agent deployments first, so the initiative's scope can be justified by documented industry practice"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because observability is a genuine virtue, but instrumenting an aimless system just measures aimlessness precisely. 'Launch, then discover the benefit' inverts the value discipline: without a target metric there is no way to design toward anything, and six months of budget is spent finding out what the question was.",
+      "Descoping reduces the waste but keeps the flawed premise: the pilot still has no metric, owner, or process problem it exists to move, so even its results will be uninterpretable. A smaller tech-led initiative is still tech-led — the missing ingredient is a value case, not a smaller blast radius.",
+      "Correct. Architecture that cannot name the value pillar it serves and the metric it will move is not ready to be designed. Insisting on a target process, baseline, owner, and measurable outcome converts a fashion-driven request into a fundable case — or reveals there is none — before budget burns. Value case precedes solution design.",
+      "Tempting because competitive intelligence sounds diligent, but competitors' deployments cannot supply this company's value case: their processes, baselines, and economics are theirs. Benchmarking in service of 'they are doing agents' launders the original tech-led rationale rather than replacing it."
+    ],
+    "principle": "no architecture without a named value pillar, metric, and owner",
+    "relatedConcept": "Value-pillar alignment is the architect's defense against technology-led initiatives that consume budget without a measurable case."
+  },
+  {
+    "id": 133,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "An education publisher has always sold static textbooks. Using Claude, it launches a service that generates an individualized practice curriculum for each student from that student's own errors and pace — something no amount of editorial staffing could produce, and now its fastest-growing revenue line. The board asks the architect to characterize the value pillar in the annual technology review. Which framing is correct?",
+    "options": [
+      "Transformation, because the system creates a capability and revenue stream that did not and could not exist in the prior operating model",
+      "Productivity, because the editorial team now effectively serves every student individually instead of producing one shared textbook",
+      "Efficiency, because generating curricula by model is vastly cheaper per student than any manual authoring process would be",
+      "Cost, because the marginal cost of serving each additional student is near zero once the generation system is in place"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Transformation is the pillar for genuinely new capabilities and revenue — the stem states individualized curricula were impossible under the old model and now constitute a growing revenue line. Framing it correctly matters: transformation initiatives are judged on new revenue and capability metrics, not on cost-per-unit comparisons.",
+      "Tempting because 'editors serving every student' is a poetic reading, but productivity means existing people accomplishing more of their work; the editors' work has not scaled — an entirely new product exists that no editorial process produced. This mislabels a new capability as an amplification of the old one.",
+      "The cheaper-than-manual comparison is hypothetical: no manual process ever produced individualized curricula, so there is no baseline being beaten. Efficiency requires the same work done cheaper or faster; comparing against work that could never have been done misapplies the pillar.",
+      "Tempting because near-zero marginal cost is a real and attractive property, but it describes the economics of delivering the new capability, not the pillar the initiative serves. Leading the board with a cost framing undersells — and mismeasures — a revenue-creating transformation."
+    ],
+    "principle": "transformation is a new capability or revenue stream, not a cheaper version of old work",
+    "relatedConcept": "Distinguishing transformation from efficiency and productivity determines how an initiative is measured, funded, and defended."
+  },
+  {
+    "id": 134,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "A SaaS vendor's Claude-drafted support responses cost $0.42 per ticket against a mandated ceiling of $0.15, with quality above target. Analysis shows 70% of tickets are simple and short, while 30% are complex; every ticket currently gets the same Sonnet pipeline with the full knowledge base stuffed into each prompt's context. The architect must hit the ceiling without breaching the quality floor. What is the strongest approach?",
+    "options": [
+      "Negotiate the ceiling up to $0.25 by presenting the quality metrics, since the mandated number predates evidence of what quality costs",
+      "Keep the pipeline but truncate the stuffed knowledge base to its most-used third, cutting input tokens roughly proportionally across all tickets",
+      "Move all tickets to Haiku immediately, which arithmetically lands under the ceiling, and accept whatever quality change follows",
+      "Route the simple 70% to Haiku, retrieve only relevant knowledge-base sections per ticket instead of stuffing everything, and reserve Sonnet for the complex 30%"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because the quality evidence is real, but the ceiling is stated as a mandate — a design constraint, not an opening bid — and the stem shows obvious architectural waste (uniform model, stuffed context) that has not been addressed. Negotiating before engineering asks the business to pay for the architecture's slack.",
+      "Blunt truncation cuts tokens but severs it from relevance: the discarded two-thirds is exactly what some tickets need, so quality degrades unpredictably on those. Retrieval achieves the same token reduction while preserving relevance — truncation is the crude version of the right idea.",
+      "Tempting because the arithmetic works, but 'accept whatever quality follows' abandons the stated quality floor on the 30% of complex tickets that plausibly need Sonnet. Uniform downgrade repeats the original design's error — treating heterogeneous tickets homogeneously — in the opposite direction.",
+      "Correct. This attacks both cost drivers in proportion to the workload's actual shape: model tiering matches capability to ticket difficulty, and per-ticket retrieval replaces paying for the whole knowledge base on every request. Cost targets are met by removing spend that buys no quality — the cost pillar served without sacrificing the floor."
+    ],
+    "principle": "hit cost targets by matching model tier and context size to each request's actual needs",
+    "relatedConcept": "Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope."
+  }
+]

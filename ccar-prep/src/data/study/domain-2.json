@@ -1,0 +1,118 @@
+{
+  "domain": 2,
+  "title": "Claude Models, Prompting & Context Engineering",
+  "weight": 13,
+  "intro": "This domain covers the decisions an architect makes closest to the model itself: which Claude tier to run, how to structure system prompts and guardrails, which prompting technique fits a task, how to spend a finite context window, and how to reuse prompt content economically. The exam tests these as trade-off judgments in realistic production scenarios, not as feature recall, so expect stems that give you cost, latency, quality, and volume constraints and ask which choice best balances them. Nearly every question rewards the same habit: measure before deciding, and pick the simplest mechanism that satisfies the stated constraints.",
+  "objectives": [
+    {
+      "objective": "Select appropriate Claude models based on trade-offs",
+      "explanation": "Claude models come in tiers with a consistent trade-off shape. Opus offers the highest capability at the highest cost and latency; Sonnet balances intelligence and speed and is the default for most production workloads; Haiku is the fastest and cheapest tier, suited to high-volume, well-defined tasks such as classification, routing, extraction, and short summarization. Model selection is therefore an economic decision constrained by quality: choose the cheapest tier whose measured quality meets the task's bar.\n\nThe operative word is measured. Architects run pilots or evaluations comparing tiers on representative data before committing, because intuition about which tasks need a big model is unreliable in both directions. If a blinded evaluation shows two tiers performing equivalently, the cheaper tier wins regardless of how high-stakes the domain feels; if a mid-tier model demonstrably misses multi-step reasoning cases, a low-volume, high-error-cost workload can easily justify Opus, since a handful of premium requests cost far less than one expensive mistake.\n\nTwo refinements matter in production. First, tiered routing: real traffic is rarely uniform, so a lightweight classifier can send the simple majority of requests to Haiku, the moderate middle to Sonnet, and the hard tail to Opus, satisfying cost and quality goals that no single tier can meet alone. Second, extended thinking: a per-request dial that buys additional reasoning depth for extra token cost and latency. It fits workloads whose failure mode is multi-step reasoning and whose workflow tolerates slower responses, and it should be turned off where experiments show no benefit.",
+      "whyItMatters": "Model tier is usually the single largest lever on an AI system's cost, latency, and quality, and it is set before any prompt is written. Teams that default to the biggest model burn budget on traffic a cheaper tier handles identically, while teams that default to the cheapest ship reasoning failures into high-stakes decisions. Architects are expected to defend tier choices to finance and executives with evaluation data, and tiered routing is often the only way a system meets its cost target and its quality SLA at the same time.",
+      "examples": [
+        {
+          "title": "Right-sizing a two-workload deployment",
+          "body": "A logistics firm runs both a nightly driver-log summarizer and a real-time dispatch assistant on Opus, and costs have tripled. The architect decomposes spend per workload. The summarizer is high-volume and simple, so it is trialed on Haiku against a quality sample and migrated, capturing the largest saving. The dispatch assistant is interactive and latency-sensitive, so Sonnet is trialed there. Each workload is right-sized on evidence rather than moving everything to one tier, and the review board gets before-and-after quality metrics justifying both moves."
+        },
+        {
+          "title": "When the premium tier is the cheap option",
+          "body": "A bank wants Claude to flag covenant conflicts across related term sheets: a few dozen documents daily, overnight turnaround, and a missed conflict costs millions. A mid-tier pilot misses conflicts requiring cross-document clause chaining. Here the arithmetic favors Opus decisively: at low volume the per-request premium is trivial next to error cost, latency slack removes the main Opus downside, and the failure mode is capability, which prompt tweaks on a smaller model cannot reliably close."
+        }
+      ],
+      "pitfalls": [
+        "Choosing a tier by domain stakes or brand prestige instead of measured quality; if a blinded pilot shows tier equivalence, the premium buys nothing.",
+        "Treating model selection as one global decision when traffic is mixed; a routing layer usually beats any single tier on the combined cost-quality objective.",
+        "Assuming prompt engineering can close genuine capability gaps; few-shot examples shape format and edge cases but do not add missing reasoning depth.",
+        "Enabling extended thinking everywhere or nowhere; it is a paid per-request dial for multi-step reasoning failures with latency slack, not a default setting.",
+        "Optimizing output token limits or negotiating pricing when the real problem is workload-to-tier mismatch, which survives any discount."
+      ]
+    },
+    {
+      "objective": "Design system prompts, templates, and guardrails",
+      "explanation": "A well-designed system prompt establishes role, tone, constraints, and output format in stable, reviewable text. The key structural discipline is separating what never changes from what changes per request: stable instructions live in one versioned system prompt, while per-request data such as customer records or documents is injected as template variables, typically in the user turn. This separation makes prompts maintainable artifacts, prevents drift between hand-edited copies, and later enables caching.\n\nStructure inside the prompt matters too. XML tags delimit distinct sections, and they are the standard defense for untrusted input: wrapping user-supplied text in clearly labeled tags and instructing the model to treat tagged content as data to analyze, never as instructions, keeps the instruction channel and the data channel separate. Ordering also matters: long documents belong before the instructions and question, so the task description sits adjacent to where the model generates. And because model behavior under contradiction is undefined, conflicting instructions accumulated by multiple teams must be resolved at the source through ownership and review, not papered over with precedence meta-rules.\n\nFinally, guardrails must be layered. Instructions in the prompt are probabilistic steering, valuable but never guaranteed. Any behavior the business must guarantee, such as regulatory disclaimers, refusal policies, or schema-valid output, needs a deterministic check outside the model: output validation, filtering, or structured parsing before a response reaches the user. The prompt reduces violation frequency; the external layer enforces the boundary.",
+      "whyItMatters": "The system prompt is the closest thing an LLM application has to a specification, and in production it is edited by multiple teams under deadline pressure. Without templating, versioning, and single ownership, prompts drift and contradict themselves, producing behavior no one can explain or reproduce. And when compliance or security asks what guarantees the system's behavior, an architect who can only point at prompt text has no defensible answer; the deterministic validation layer is what turns an intention into a control.",
+      "examples": [
+        {
+          "title": "From monolithic generated prompts to a template",
+          "body": "An e-commerce assistant regenerates its entire system prompt per request, interleaving the customer's name, orders, and daily promotions with policy text; copies of the generation code have drifted across flows. The architect extracts one versioned system prompt holding role, tone, and policy, and moves all per-request data into templated variables in the user turn. Behavior differences between flows disappear because there is now exactly one instruction source, and the stable prefix becomes cacheable as a bonus."
+        },
+        {
+          "title": "Layering guardrails for a regulated output",
+          "body": "A robo-advisory prompt says never to give personalized investment advice and always to include a disclaimer. Compliance asks if that suffices. The architect explains that instructions lower violation probability but the model remains non-deterministic, so the design adds an output validator that scans each response for advice-like content and confirms the disclaimer before delivery, with failed responses regenerated or escalated. The prompt and the validator together form the control; neither alone would pass audit."
+        }
+      ],
+      "pitfalls": [
+        "Interleaving per-request data with stable instructions in one generated blob, which makes prompts unreviewable, drift-prone, and uncacheable.",
+        "Trusting instruction placement or repetition to guarantee behavior; placement shifts probabilities, and guarantees require validation outside the model.",
+        "Appending raw untrusted user content directly after instructions, letting instruction-like text in the data act as instructions; delimit it with XML tags and label it as data.",
+        "Stacking a precedence meta-rule on top of contradictory instructions instead of deleting or scoping the losing rule.",
+        "Putting long documents after the instructions and question, which weakens instruction adherence; long content goes first, task description last."
+      ]
+    },
+    {
+      "objective": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
+      "explanation": "The three core techniques form an escalation ladder, and the architect's job is to stop at the lowest rung that meets the quality bar. Zero-shot, clear instructions with no examples, is the starting point because capable Claude models handle most well-specified tasks without demonstrations, and every additional technique adds tokens, latency, and maintenance surface to every request.\n\nFew-shot prompting, typically three to five examples, earns its place when output format or edge-case handling must be pinned down precisely; demonstrations convey rigid structure more reliably than prose descriptions of it. Quality and diversity of examples matter far more than quantity: the set defines the input distribution the model expects, so it must include the messy cases production will contain, such as multi-item records or missing fields. Large homogeneous example sets are actively harmful, inflating cost while overfitting outputs to the examples' incidental quirks.\n\nChain-of-thought, instructing the model to reason step by step before answering, often in a scratchpad or thinking tags, targets a specific failure mode: tasks requiring multi-step reasoning where the model otherwise skips steps or jumps to conclusions. It trades output tokens and latency for reliability and produces an auditable reasoning trace, which suits asynchronous, high-stakes workflows. It is waste on trivial tasks, and the decision to keep or remove it should rest on A/B evidence: if accuracy is identical without the reasoning, the reasoning has stopped paying rent.",
+      "whyItMatters": "Technique choice is multiplied by request volume: an unnecessary 22-example block or reasoning preamble on millions of daily requests is a permanent tax on cost and latency, while a missing technique on a hard task ships reasoning failures to users. Architects who match technique to failure mode, and who validate with experiments rather than habit, get systems that are simultaneously cheaper, faster, and more reliable than teams that apply every technique everywhere as insurance.",
+      "examples": [
+        {
+          "title": "Diagnosing a few-shot coverage gap",
+          "body": "A medical billing extractor uses five few-shot examples, all clean single-procedure notes, and produces malformed JSON on multi-procedure or missing-field notes. The architect recognizes the pattern: the model fails exactly where the examples are silent. Rather than adding more clean examples or abandoning few-shot, the team rebuilds the set so it spans the real distribution, one clean case, one multi-procedure case, one missing-field case, each with the exact expected output, and the malformations on edge cases disappear."
+        },
+        {
+          "title": "Removing chain-of-thought that stopped paying",
+          "body": "A marketplace classifier demands step-by-step reasoning before each of millions of monthly category labels. Accuracy is 98%, but reasoning text dominates latency and spend. An A/B test without the reasoning step shows statistically identical accuracy, so the architect removes it, recovering latency and cost at zero quality loss. The lesson is that chain-of-thought is a tool with a per-request price, and experiments, not habit, decide whether a task still needs it."
+        }
+      ],
+      "pitfalls": [
+        "Adding many examples as insurance; past a small diverse set, more examples raise cost and overfit outputs to example quirks without improving quality.",
+        "Building few-shot sets from only happy-path cases, which guarantees failures on the edge cases the examples never demonstrated.",
+        "Applying chain-of-thought to trivial tasks, paying reasoning tokens and latency for zero measured accuracy gain.",
+        "Using chain-of-thought to fix formatting problems or few-shot to fix reasoning problems; each technique targets a different failure mode.",
+        "Placing reasoning after the answer; deliberation only helps when it precedes the conclusion it is meant to improve."
+      ]
+    },
+    {
+      "objective": "Optimize context windows and manage token usage",
+      "explanation": "Claude's 200K-class context windows are large, but capacity is not a reason to fill them. Accuracy degrades as context fills with content irrelevant to the request: the model's attention is diluted, similar-but-wrong passages invite confusion, and every irrelevant token adds cost and latency on every call. The first context-engineering decision is therefore what belongs in context at all. Retrieving the few relevant sections at request time almost always beats dumping an entire corpus, even when the corpus technically fits.\n\nLong-running interactions need deliberate memory management. Resending full transcripts eventually becomes impractical, and naive truncation to recent turns discards durable facts like goals and earlier decisions, producing forgetting and self-contradiction. The standard remedy is structured summarization: periodically distill history into a compact record of goals, decisions, and open items, and carry that summary forward with only recent turns. Agentic workflows have the same problem in a sharper form, where raw tool results accumulate turn over turn; the treatment is context hygiene, filtering each tool result to what is relevant before it enters the conversation and compacting older exchanges into summaries.\n\nToken usage should be managed like any budget: profile it first. Measure where tokens actually go per request, input versus output, instructions versus data, and attack the dominant term, which in data-heavy pipelines is usually machine-generated input that deterministic preprocessing can collapse. The output side has its own trap: max output token limits sized by default rather than measured worst case silently truncate the largest responses, so limits should be set above the measured worst-case output with margin.",
+      "whyItMatters": "Context composition drives the three metrics every production system is judged on at once: irrelevant tokens raise cost linearly, raise latency, and lower accuracy through dilution and confusion. Long-running assistants and agents live or die on memory management, since context rot is the dominant failure mode of extended sessions. And because token spend scales with traffic, an unprofiled budget quietly turns a viable product economics into an unviable one.",
+      "examples": [
+        {
+          "title": "Retrieval instead of a 150K-token dump",
+          "body": "A telecom assistant ships all 150K tokens of product manuals with every request because the window fits it; it cites wrong plans, runs slowly, and costs the most in the portfolio. The architect replaces the dump with retrieval that selects only the sections relevant to each question. Requests shrink by two orders of magnitude, wrong-plan citations drop because near-identical competing documents are no longer present, and latency and cost fall together, three improvements from one decision about what belongs in context."
+        },
+        {
+          "title": "Profiling a token budget before optimizing",
+          "body": "A reporting pipeline sends 4K tokens of instructions and 60K tokens of raw event logs per request and gets 1K-token reports back. The team debates tightening instructions or capping output, but profiling shows logs are roughly 94% of every request. The architect adds deterministic pre-aggregation, counts, rates, and top-N deltas computed in code, collapsing the dominant term by an order of magnitude and improving report quality by removing noise. The lesson: measure the budget, then attack its largest line item."
+        }
+      ],
+      "pitfalls": [
+        "Treating a large context window as a license to include everything; fitting is not the bar, relevance is, and overstuffed context degrades accuracy.",
+        "Truncating long conversations to recent turns instead of summarizing, which discards the durable goals and decisions coherence depends on.",
+        "Appending raw agent tool output unfiltered, letting context rot accumulate until answer quality collapses mid-session.",
+        "Optimizing whichever tokens are most visible, usually instructions, without profiling; the dominant cost is typically machine-generated input data.",
+        "Leaving max output token limits at defaults, which silently truncates exactly the largest, most complex responses."
+      ]
+    },
+    {
+      "objective": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
+      "explanation": "Prompt caching lets repeated prompt content be written once at a premium and then read at a large discount on subsequent requests. The mechanism is strict prefix matching: the cache hits only when the beginning of the prompt is byte-for-byte identical to a cached entry, so any change anywhere in the prefix, a timestamp, a session ID, reordered content, invalidates it. Cache-friendly design therefore orders prompts stable-first and variable-last, and places the cache breakpoint at the boundary so only stable content forms the cached prefix. Entries have a short time-to-live, on the order of five minutes, that refreshes on each use, which means steady traffic and sequential batch jobs keep prefixes warm indefinitely, while content seen only once should never be cached at all.\n\nModular prompts apply software reuse discipline to instruction text. When several assistants share rules, compliance language, tone, safety policies, copy-paste duplication guarantees drift and eventual contradiction. The fix is a single versioned module assembled into each assistant's prompt at build time: one source of truth, changes propagate through a reviewable release, and shared blocks can be tested independently. Build-time composition is deliberate; fetching prompt text live at request time bypasses review and rollback and churns the cached prefix.\n\nAgent Skills extend reuse with progressive disclosure: instructions and supporting resources packaged so an agent loads them only when a task requires them. Skills fit specialized, occasional procedures, a document formatting standard, a niche workflow, that would otherwise sit in every system prompt consuming window and attention on requests that never use them. Caching makes resident tokens cheap, but only on-demand loading keeps them from occupying context at all.",
+      "whyItMatters": "Reuse strategy is where prompt engineering meets unit economics and governance. Correct caching routinely cuts input costs dramatically on prompt-heavy workloads, and a single misplaced timestamp silently forfeits all of it while billing looks superficially normal. Modular prompts are how organizations keep policy text consistent across a growing fleet of assistants, and Skills are how agents scale their capabilities without every capability taxing every request's context window.",
+      "examples": [
+        {
+          "title": "The timestamp that cost the whole cache",
+          "body": "A support platform enables caching on a 20K-token system prompt but sees near-zero cache reads and writes on almost every request. The template begins with the current date and time, so the prefix differs on every call and never matches. The architect reorders the template, stable policy text first, timestamp and per-request data after the cache breakpoint, and read rates jump to nearly every request. The write premium is now paid rarely, and roughly 90% of the prompt's input cost disappears with no behavioral change."
+        },
+        {
+          "title": "Choosing Skills over a resident procedure",
+          "body": "A consultancy's agent carries an 8K-token brand formatting procedure in every system prompt although only about 10% of tasks produce client deliverables, and more procedures keep arriving. Caching would cut the cost but not the window occupancy or attention dilution on the 90% of unrelated tasks. The architect packages the procedure and its reference templates as a Skill loaded only when a deliverable task triggers it: routine requests stay lean, deliverable tasks get the full procedure, and each new specialty becomes another Skill rather than more resident prompt text."
+        }
+      ],
+      "pitfalls": [
+        "Placing any variable value, a timestamp, user ID, or request data, ahead of stable content, which breaks the prefix match and silently zeroes cache reads.",
+        "Assuming the roughly five-minute TTL makes caching useless for batches; the TTL refreshes on each use, so sequential runs keep the prefix warm.",
+        "Caching content seen only once, paying the write premium repeatedly while never collecting a read.",
+        "Copy-pasting shared rules across assistants instead of composing a versioned module, guaranteeing drift and eventual policy contradictions.",
+        "Keeping large occasional-use procedures resident in every prompt because caching makes them cheap; cheap tokens still consume window and attention that Skills would reclaim."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,618 @@
+[
+  {
+    "id": 601,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "The CEO of a mid-size retail chain opens a kickoff meeting by telling the consulting architect, 'We want a chatbot like ChatGPT for our business — how fast can you build it?' No use case, metric, or user group has been identified yet. The architect has one hour with the executive team. What should the architect do with that hour?",
+    "options": [
+      "Sketch a reference architecture for a retail chatbot so the executives leave with something concrete to react to",
+      "Agree to the chatbot and schedule a follow-up workshop with IT to scope the integration and data requirements",
+      "Redirect the conversation to the business problems behind the request and the metric an AI solution would need to move",
+      "Present a menu of proven retail AI use cases and ask the executives to vote on which one to build first"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because executives respond well to concrete visuals, but sketching architecture now commits to a solution before any problem is defined. It anchors the room on 'chatbot' and makes it harder to surface the actual business need later.",
+      "This feels collaborative and action-oriented, but it accepts the stated solution unchallenged and pushes discovery down to an integration conversation. IT can tell you how to build a chatbot; only the business can tell you whether a chatbot solves anything worth solving.",
+      "Correct. This applies problem-first elicitation: requirements start from the business problem and the measurable outcome, not from a technology request. Once the problem and target metric are clear, the right solution may or may not be a chatbot.",
+      "A use-case menu sounds structured, but it is still solution-first — it asks executives to pick a technology deliverable rather than articulate a problem. Voting also privileges whoever is loudest over where the measurable business pain actually is."
+    ],
+    "principle": "start discovery from the business problem and its metric, not the requested technology",
+    "relatedConcept": "Problem-first discovery is the foundation of every later lifecycle phase, because a solution scoped to the wrong problem cannot be rescued by good engineering."
+  },
+  {
+    "id": 602,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "An architect is two weeks into discovery for a Claude-based clinical documentation assistant at a hospital network. All sessions so far have been with the innovation team that sponsors the project, and the requirements document is nearly complete. The sponsor is pleased with the pace and wants to move to design. What is the most significant gap in the discovery process?",
+    "options": [
+      "Key stakeholder groups — clinicians, compliance, IT security — have not been engaged, so the requirements reflect only the sponsor's view",
+      "The discovery phase is too short for a healthcare engagement and should be extended by at least another month",
+      "The requirements document has not yet been reviewed against HIPAA technical safeguards by outside counsel",
+      "No competitive analysis of existing clinical documentation products has been performed to validate the build decision"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies stakeholder mapping: requirements gathered from the sponsor alone capture stated wants, not the constraints and needs of users, security, and compliance. Discovering those groups' requirements after design begins is where healthcare AI projects typically stall or get blocked.",
+      "Tempting because healthcare feels like it deserves long timelines, but duration is not the problem — coverage is. Two more weeks of talking only to the innovation team would produce the same one-sided requirements, just later.",
+      "Compliance review matters, but outside counsel reviewing a document is not a substitute for engaging the hospital's own compliance and security stakeholders, whose operational requirements shape the architecture itself. It treats compliance as a checkpoint instead of a stakeholder.",
+      "Build-vs-buy analysis is a reasonable diligence step, but it does not address the core flaw: whatever gets built or bought will be specified from a single stakeholder's perspective. Fixing coverage of voices comes before validating the sourcing decision."
+    ],
+    "principle": "map and engage the full stakeholder set — sponsor, users, IT, security, compliance — before requirements are frozen",
+    "relatedConcept": "Stakeholder mapping during discovery determines whose constraints shape the design, and missing voices resurface later as blockers rather than requirements."
+  },
+  {
+    "id": 603,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "At a fintech lender, the head of operations asks an architect for 'an agent that answers every customer email automatically, end to end.' During workflow analysis the architect finds that about 70% of inbound email maps to five templated inquiry types, while the remaining 30% involves disputes and hardship cases with regulatory sensitivity. How should the architect respond to the stated requirement?",
+    "options": [
+      "Scope the agent to full automation as requested, but add a disclaimer to responses on dispute and hardship emails",
+      "Decline the engagement scope until the operations head can produce a written requirements specification for all email types",
+      "Propose full automation for a 90-day pilot and use the pilot data to decide whether disputes can be included later",
+      "Probe the underlying goal — likely reducing handling load — and propose automating the templated 70% with human routing for the rest"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it delivers exactly what was asked and a disclaimer feels like a safeguard, but disclaimers do not mitigate the regulatory risk of automated responses to disputes. It takes the stated want literally instead of examining what the requester actually needs.",
+      "Pushing paperwork back to the stakeholder sounds rigorous, but discovery is the architect's job — eliciting and structuring requirements is precisely what the stakeholder is paying for. This avoids the conversation rather than conducting it.",
+      "Piloting sounds prudent, but piloting full automation still exposes real dispute and hardship customers to unreviewed automated replies during the pilot. It defers a scoping judgment the workflow analysis already gives you enough evidence to make now.",
+      "Correct. This distinguishes the stated want (automate everything) from the underlying need (reduce handling load), and shapes scope from the workflow data. Automating the high-volume templated majority captures most of the value while keeping regulated edge cases with humans."
+    ],
+    "principle": "distinguish stated wants from underlying needs and scope from workflow evidence",
+    "relatedConcept": "Requirement gathering is interpretation, not transcription — the architect converts what stakeholders ask for into what the business measurably needs."
+  },
+  {
+    "id": 604,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "A SaaS company engages an architect to design a Claude-powered onboarding assistant. When asked how success will be judged, the VP sponsor says, 'We'll know it when we see it — just make onboarding feel smoother.' The engineering lead is ready to start and warns that pressing the VP for numbers may slow the project. What should the architect do before design begins?",
+    "options": [
+      "Start design with the engineering lead and revisit success criteria once a prototype gives the VP something tangible to evaluate",
+      "Facilitate a working session to define measurable success criteria and explicit non-goals, even at the cost of a short delay",
+      "Adopt standard industry benchmarks for onboarding assistants as the success criteria and document them in the statement of work",
+      "Ask the VP to nominate a delegate with more analytical inclination to own the definition of success on their behalf"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a prototype does make evaluation feel easier, but it inverts the process: the prototype's design choices depend on what 'better onboarding' means. Without criteria first, the demo becomes the goalpost and every stakeholder judges it against a private, unstated standard.",
+      "Correct. This applies the principle that success criteria and non-goals are defined before design, not discovered afterward. 'Feels smoother' can be decomposed into measurable proxies — time-to-first-value, activation rate, support tickets during onboarding — and non-goals prevent silent scope expansion.",
+      "Industry benchmarks sound objective, but they measure someone else's product and users, and the VP never agreed to them. When results come in, the sponsor can reasonably reject criteria they had no hand in setting, which is worse than a short delay now.",
+      "Delegating sounds efficient, but the sponsor's own definition of success is what the project will ultimately be judged by. A delegate's metrics that the VP never internalized will not protect the project when the VP's undefined expectations go unmet."
+    ],
+    "principle": "define measurable success criteria and explicit non-goals with the sponsor before design starts",
+    "relatedConcept": "Success criteria agreed in discovery become the shared yardstick that expectation management and pilot evaluation rely on for the rest of the lifecycle."
+  },
+  {
+    "id": 605,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "A state benefits agency wants a Claude-based assistant that answers caseworker questions about eligibility policy. The program director is eager to see a design proposal and notes that 'all our policy is documented, so retrieval should be easy.' The architect has not yet examined the source material. What discovery step should the architect insist on before proposing an architecture?",
+    "options": [
+      "A survey of caseworkers to rank which eligibility topics generate the most questions during a typical week",
+      "A benchmark of retrieval frameworks against a synthetic policy corpus to pre-select the technology stack",
+      "An audit of the actual policy documents and the current question-answering workflow to verify data quality, currency, and coverage",
+      "A formal data-sharing agreement between the agency and the consultancy covering access to policy materials"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "User research is valuable and would likely be part of discovery, but topic ranking assumes the underlying documents can support answers at all. Knowing which questions are common does not help if the policy corpus is stale, contradictory, or scattered across formats.",
+      "Benchmarking frameworks on synthetic data is solution-first work dressed up as diligence — it selects technology before the real data's shape is known. Results on a clean synthetic corpus say little about scanned PDFs, superseded memos, and conflicting policy versions.",
+      "Correct. This applies the discovery principle of mapping current workflows and verifying data availability before design. 'All our policy is documented' is a stated belief, not a verified fact — agencies commonly hold outdated, duplicated, or contradictory documents, and the architecture depends on what is actually there.",
+      "Legal agreements matter for execution, but they govern access rather than establish whether the data can support the use case. A signed agreement over an unusable corpus still produces a design built on an unverified assumption."
+    ],
+    "principle": "verify data availability and quality firsthand before designing around it",
+    "relatedConcept": "Discovery exists to replace stakeholder assumptions with observed facts, and data readiness is the assumption most often wrong in RAG-style engagements."
+  },
+  {
+    "id": 606,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "multi",
+    "question": "An architect is planning the discovery phase for a Claude-based returns-processing assistant at a national retailer. The sponsor has allotted three weeks before a design review with executives, and the architect must choose where to focus limited discovery time. Which two activities should take priority? (Choose two.)",
+    "options": [
+      "Building a lightweight prototype on sample data so executives see momentum at the design review",
+      "Identifying the specific business metric the assistant must move and how it is currently measured",
+      "Selecting the Claude model and architectural pattern early so engineering can begin environment setup",
+      "Mapping the current returns workflow end to end, including exception paths and where the needed data lives"
+    ],
+    "correct": [1, 3],
+    "optionExplanations": [
+      "Tempting because prototypes create visible momentum, but a prototype built before the problem and workflow are understood demonstrates the wrong thing convincingly. It also sets executive expectations from a demo rather than from evidence, a debt that comes due at pilot time.",
+      "Correct. Anchoring the engagement to a specific, currently-measured business metric — cost per return, cycle time, agent handling minutes — gives every later design and evaluation decision an objective target. Without it, the design review becomes a matter of taste.",
+      "Model and pattern selection are design-phase outputs that depend on what discovery finds — volume, latency needs, data shape, and risk tolerance. Choosing them now is solution-before-problem sequencing, and 'saving time' this way usually costs a redesign later.",
+      "Correct. Workflow and data mapping reveals what the assistant must actually do, where the exceptions are, and whether the data to support automation exists and is reachable. Exception paths are where returns processes hide their cost, so skipping them scopes the easy 80% and misses the value."
+    ],
+    "principle": "discovery prioritizes the target metric and the real workflow over early building",
+    "relatedConcept": "Structured discovery front-loads the two facts — what to move and what exists today — that every downstream lifecycle phase depends on."
+  },
+  {
+    "id": 607,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "A consulting architect at a fintech presents the proposed architecture for a fraud-alert triage assistant to the executive steering committee. Ten minutes in — during a walkthrough of latency percentiles, token budgets, and retrieval configurations — the CFO interrupts: 'I have no idea what any of this means for the business.' What should the architect change about the presentation?",
+    "options": [
+      "Reframe the content around business value and risk — analyst hours saved, error exposure, cost per case — and keep the technical rationale for the engineering review",
+      "Add an introductory glossary section defining terms like p99 latency and token so executives can follow the technical material",
+      "Split the meeting so engineering-minded executives stay for the full walkthrough while others receive a one-page summary afterward",
+      "Shorten the presentation to only the final recommendation and defer all supporting detail until executives ask questions"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies audience-tailored communication: executives need decisions framed in value, cost, and risk terms they can weigh, while engineers need the technical rationale. The same decision gets two framings, not one framing pitched at the wrong altitude.",
+      "Tempting because it addresses comprehension directly, but it asks the audience to adapt to the material instead of the reverse. Executives do not need to learn what p99 means — they need to know what the architecture does to money, risk, and customers.",
+      "Segmenting the audience sounds respectful of different backgrounds, but a steering committee exists to decide together; splitting it fragments the decision and signals that some members are not expected to understand. The problem is the framing, not the roster.",
+      "Recommendation-only briefings hide the trade-offs executives are there to weigh, turning a governance decision into a rubber stamp. When something later goes wrong, the committee can fairly say the risks were never communicated to them."
+    ],
+    "principle": "tailor decision framing to the audience — value and risk for executives, technical rationale for engineers",
+    "relatedConcept": "Communicating a decision means translating one set of trade-offs into the terms each stakeholder group uses to make judgments."
+  },
+  {
+    "id": 608,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "An architect at a hospital system has just decided to use retrieval-augmented generation instead of fine-tuning for a clinical guidelines assistant, after weighing update frequency, auditability, and cost. Engineering will implement over the next quarter, and the architect knows from experience that this choice will be second-guessed repeatedly as new team members join. What is the most effective way to communicate the decision?",
+    "options": [
+      "Present the decision at the next engineering all-hands and take questions until the team is satisfied with the rationale",
+      "Send a summary email to engineering leads stating the decision and offering office hours for anyone who wants the details",
+      "Pair with the lead engineer for the first sprint so the rationale transfers through collaboration on the initial implementation",
+      "Write a decision record capturing the options considered, why each was rejected, and the conditions under which the choice should be revisited"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because live Q&A builds genuine shared understanding, but a presentation is an event, not an artifact. The team members who will second-guess the choice next quarter were not in the room, and the rationale evaporates with attendance.",
+      "Email creates a written trace, which is better than nothing, but summaries state conclusions without the comparative reasoning — what else was considered and why it lost. That missing 'why not' is exactly what future skeptics will relitigate.",
+      "Pairing transfers deep understanding to one person, but it makes the rationale tribal knowledge with a single point of failure. When that engineer moves on, the organization is back to guessing at the reasoning behind its own architecture.",
+      "Correct. This applies the decision-record principle: durable communication of an architectural choice includes the alternatives, the rejection rationale, and revisit triggers. New joiners can read why fine-tuning lost, and the team knows what changed circumstances would legitimately reopen the question."
+    ],
+    "principle": "record decisions with options considered, rejection rationale, and revisit conditions",
+    "relatedConcept": "Decision records turn architectural reasoning into an organizational asset that outlives meetings, emails, and individual team members."
+  },
+  {
+    "id": 609,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "At a SaaS company, the product director asks the architect whether the support-ticket classifier can move from a large Claude model to a smaller, cheaper one. The architect believes the smaller model is 'probably fine' based on general experience with similar workloads. The director wants an answer at Thursday's roadmap meeting. How should the architect handle the communication?",
+    "options": [
+      "Recommend the smaller model on Thursday, framed as a reversible decision that can be rolled back if quality complaints appear",
+      "Run both models against the existing eval set and present the measured accuracy, cost, and latency deltas as the basis for the decision",
+      "Recommend keeping the larger model, since classification quality issues are harder to detect than cost overruns",
+      "Present the trade-off qualitatively on Thursday — cheaper but somewhat less capable — and let the director weigh the balance"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because reversibility genuinely lowers decision stakes, but 'roll back on complaints' uses customers as the eval set and support tickets as the metric pipeline. Misclassification often degrades silently, so the complaint signal arrives late or never.",
+      "Correct. This applies the principle of quantifying trade-offs instead of asserting them: an eval run converts 'probably fine' into measured deltas the director can actually weigh. Two days is enough to run an existing eval set, and the numbers make Thursday's decision defensible rather than anecdotal.",
+      "Tempting because it sounds risk-aware, but it answers a measurable question with a defensive default and denies the business a legitimate cost saving without evidence either way. Caution that skips measurement is still guessing — just in the expensive direction.",
+      "Handing the director a vague 'cheaper but less capable' framing looks like respecting their authority, but qualitative trade-offs cannot be weighed — how much cheaper, how much less capable? It delegates the decision while withholding the information needed to make it."
+    ],
+    "principle": "quantify trade-offs with eval evidence instead of communicating vague directional claims",
+    "relatedConcept": "Trade-off communication is only as good as the measurements behind it; numbers turn opinions into decisions stakeholders can own."
+  },
+  {
+    "id": 610,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "A hospital executive preparing a board presentation asks the architect to include the line 'the discharge-summary assistant will not make clinical errors.' Evals show 96–98% accuracy with a clinician review step catching most residual issues. The executive argues the board 'will not fund something that admits it makes mistakes.' How should the architect respond?",
+    "options": [
+      "Agree to the line for the board deck but ensure the internal documentation states the measured error rates accurately",
+      "Suggest softer phrasing such as 'clinical errors are not expected in normal operation' to satisfy both accuracy and the executive",
+      "Decline the claim and offer framing the board can fund: measured accuracy ranges plus the clinician-review safeguard that manages residual error",
+      "Provide the eval data to the executive and let them decide what claims are appropriate for their own board"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Splitting the message between audiences is tempting because it seems to serve both, but it makes the architect party to a false claim in the highest-stakes forum. When an error inevitably surfaces, the board learns the system 'that makes no mistakes' does — and the internal docs prove the team knew.",
+      "Softening the wording is tempting diplomacy, but 'not expected' still communicates zero-error performance to a lay audience. LLM systems have irreducible error rates; hedged phrasing that hides that fact is over-promising with plausible deniability attached.",
+      "Correct. This applies the principle of being direct about LLM limitations: error rates are never zero, so credible communication pairs measured accuracy ranges with the safeguard design. Boards fund managed risk all the time — what they punish is discovering an unmanaged one.",
+      "Handing over the data sounds respectful of the executive's ownership, but the architect remains the technical authority whose silence endorses whatever claim gets made. Professional responsibility for accurate representation of system limits cannot be delegated to the person motivated to overstate them."
+    ],
+    "principle": "never promise zero errors — communicate measured ranges plus the safeguards that manage residual risk",
+    "relatedConcept": "Honest limitation framing is the trust foundation that every later expectation-management and SLA conversation depends on."
+  },
+  {
+    "id": 611,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "At a retail company, the CFO insists the new product-description generator run on the cheapest available model, while the VP of merchandising insists on the highest-quality model, citing brand voice. Both claim executive authority and the architect is asked to 'just decide.' The architect has eval results for three candidate models against brand-voice criteria. What is the best way to resolve the conflict?",
+    "options": [
+      "Present the quantified quality-cost curve across the three models, tied to the agreed business metric, and facilitate a joint decision on where to sit on it",
+      "Side with the VP of merchandising, since output quality directly touches customers while cost is an internal concern",
+      "Choose the middle model as a compromise both executives can accept without either side losing the argument",
+      "Escalate the disagreement to the project sponsor, since resolving executive conflicts is beyond the architect's mandate"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies quantified trade-off communication to conflict resolution: the disagreement is really about where to sit on a measurable quality-cost curve, and the eval data lets both executives see what each position costs. The architect frames the decision; the business owns the choice.",
+      "Tempting because customer-facing quality feels like the safer priority, but it resolves the conflict by fiat using the architect's personal values rather than evidence. The CFO's constraint is legitimate, and unilaterally overruling a stakeholder poisons the relationship the project depends on.",
+      "Splitting the difference is tempting because it avoids confrontation, but the middle model is only right if the data says so — a compromise chosen for its diplomatic properties rather than its measured performance optimizes for meeting harmony over business outcome.",
+      "Escalation has its place, but escalating before presenting the evidence wastes the architect's actual leverage: this conflict is resolvable with data the architect already holds. Kicking it upstairs unframed just moves the same argument to a bigger room."
+    ],
+    "principle": "convert stakeholder conflicts into quantified trade-off decisions the business can own",
+    "relatedConcept": "Most stakeholder conflicts over AI systems are unpriced trade-offs; the architect's job is to price them, not to referee them."
+  },
+  {
+    "id": 612,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "multi",
+    "question": "A public-sector agency's architect must communicate a major decision — routing citizen inquiries through a single-agent workflow rather than the multi-agent design the vendor originally pitched — to an audience that includes the agency director, the engineering team, and an oversight auditor. Which two practices will make this communication effective? (Choose two.)",
+    "options": [
+      "Support the recommendation with measured comparisons — accuracy, cost per inquiry, failure modes — rather than qualitative preference",
+      "Deliver one uniform presentation to all three audiences so no group can claim they received a different story",
+      "Capture the decision in a written record that documents the rejected multi-agent option and the reasoning, available to the auditor",
+      "Emphasize the strengths of the chosen design and omit its limitations to prevent the director from losing confidence"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. Quantified evidence is what makes a decision communicable across audiences with different stakes: the director sees cost and risk, engineers see the technical justification, and the auditor sees due diligence. Preference-based rationale satisfies none of them.",
+      "Uniformity sounds fair, but consistent substance does not require identical framing — the director, engineers, and auditor need different levels of depth on the same facts. One-size presentations typically land at the wrong altitude for everyone at once.",
+      "Correct. A written decision record with the rejected alternative and rationale serves the engineering team's future questions and gives the auditor exactly the traceability oversight requires. In public-sector work, undocumented architectural reversals of a vendor pitch invite procurement scrutiny.",
+      "Omitting limitations is tempting when confidence feels fragile, but it is over-promising by curation, and an auditor's role is precisely to find what was left out. Directors keep confidence in architects who surface limitations with mitigations, and lose it in those caught hiding them."
+    ],
+    "principle": "communicate decisions with quantified evidence and a durable written record of alternatives",
+    "relatedConcept": "Effective decision communication pairs measurement with documentation so the reasoning survives scrutiny from every audience it must serve."
+  },
+  {
+    "id": 613,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "After a flawless scripted demo of a Claude-powered contract-review assistant, the CEO of a SaaS company announces she wants it live for all customers within two weeks. The architect knows the demo used curated contracts, and evaluation on a representative sample has not yet been run. How should the architect respond to the CEO's timeline?",
+    "options": [
+      "Commit to the two-week launch but restrict the assistant to the contract types shown in the demo until evals complete",
+      "Explain that demo performance is not a production baseline, and propose a measured pilot with a defined cohort and eval-based exit criteria",
+      "Accept the launch date and add a prominent beta label so customers calibrate their own expectations about accuracy",
+      "Ask engineering to compress the evaluation work into the two-week window so the launch date can be preserved"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because scoping to demo-adjacent contracts feels like controlled risk, but the demo used curated examples of those types — real customer contracts of the same category will still hit unmeasured failure modes. It converts an unvalidated launch into a slightly narrower unvalidated launch.",
+      "Correct. This applies the principle of anchoring expectations to measured baselines rather than demos: a scripted demo shows what the system can do, not what it reliably does. A pilot cohort with eval-based exit criteria gives the CEO a credible path to launch with evidence instead of hope.",
+      "A beta label is tempting because it shifts expectations downward, but it outsources risk management to customers reading a badge, and contract review errors carry consequences a label does not mitigate. It manages liability optics rather than actual expectations or quality.",
+      "Compressing evaluation to protect the date is tempting because it looks responsive, but rushed evals on convenient data reproduce the demo problem with extra steps. When the timeline drives the evidence rather than the reverse, the expectation being managed is the calendar's, not reality's."
+    ],
+    "principle": "anchor expectations to measured baselines, not demos",
+    "relatedConcept": "The demo-to-production expectation gap is the most common source of stakeholder disappointment in AI engagements, and pilots exist to close it with evidence."
+  },
+  {
+    "id": 614,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "A fintech's sales team has drafted a contract promising an enterprise client 99.95% availability and sub-second p99 response times for a Claude-based document-analysis service. The current architecture is single-region, and typical long-document requests measure 4–9 seconds at p99. Sales asks the architect to 'sign off quickly — the client is ready.' What should the architect do?",
+    "options": [
+      "Sign off with a side letter noting the latency figures are targets rather than commitments, preserving the deal's momentum",
+      "Approve the availability figure, which redundancy can address later, but ask sales to strike the latency clause entirely",
+      "Sign off contingent on a roadmap commitment to multi-region deployment and response streaming within two quarters",
+      "Block the sign-off and rework the SLA with sales around measured performance — realistic percentiles, or redefined terms like time-to-first-token"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "A side letter is tempting because it seems to soften the commitment while keeping the deal alive, but the client will hold the contract's headline numbers regardless of annexes. It also teaches sales that the architect will paper over unmeetable promises under deal pressure.",
+      "Half-approving is tempting as a compromise, but single-region architecture cannot honestly support 99.95% availability either — 'redundancy later' is a hope, not a current capability. Approving one unmeetable number to soften rejecting another still commits the company to breach.",
+      "Roadmap-contingent sign-off sounds like engineering rigor, but the SLA binds from contract signature while the roadmap delivers in two quarters at best — and multi-region plus streaming still may not bring 4–9 second analyses under one second. It commits now against capabilities that may never arrive.",
+      "Correct. This applies the principle that SLAs must reflect what the architecture measurably delivers. Reworking the terms — honest percentiles, or metrics like time-to-first-token that match how LLM services actually behave — gives the client commitments the company can keep, which is what protects the relationship."
+    ],
+    "principle": "define SLAs the architecture can measurably meet, using metrics that fit how the system behaves",
+    "relatedConcept": "SLA design is expectation management with contractual teeth, so it must be grounded in measured performance rather than sales optimism."
+  },
+  {
+    "id": 615,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "A public records office is procuring a Claude-based system to extract structured data from scanned historical filings. The procurement lead states that the winning solution 'must guarantee 100% extraction accuracy, since these are legal records.' Eval runs on sample filings show 93–96% field-level accuracy depending on scan quality. How should the architect set expectations?",
+    "options": [
+      "Commit to 100% on machine-readable filings and carve scanned documents out of the accuracy guarantee",
+      "Propose deferring the accuracy commitment until a larger evaluation across the full archive produces a more definitive figure",
+      "Present the measured accuracy range and propose a workflow where low-confidence extractions route to human verification, achieving the legal-grade outcome end to end",
+      "Recommend the office drop the AI approach for legal records, since no LLM system can meet a 100% accuracy requirement"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Segmenting the guarantee is tempting because clean digital documents do extract well, but 100% is still not an honest commitment for any LLM extraction path — edge cases exist in machine-readable filings too. It preserves an impossible number by shrinking its scope rather than correcting it.",
+      "A bigger eval is tempting because more data feels more definitive, but no evaluation size will ever produce a defensible 100%, so the deferral just postpones the same hard conversation. It reads as diligence while actually avoiding the expectation reset the procurement lead needs now.",
+      "Correct. This applies the principle of setting accuracy expectations as measured ranges and designing the workflow around residual error: the automated layer delivers 93–96%, and confidence-routed human verification carries the output to the legal standard. The system, not the model alone, meets the requirement.",
+      "Walking away is tempting as the 'honest' answer, but it treats the stated want (a model that never errs) as the actual need (records that are reliably correct). The need is achievable with a human-in-the-loop design; abandoning the engagement forfeits real value to avoid an expectations conversation."
+    ],
+    "principle": "set accuracy expectations as evidenced ranges and design the workflow to absorb residual error",
+    "relatedConcept": "Expectation alignment often means redirecting an impossible demand on the model into an achievable requirement on the end-to-end system."
+  },
+  {
+    "id": 616,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "Three weeks into a pilot of a Claude-based prior-authorization assistant at a health insurer, the only feedback the architect has received is sporadic complaints forwarded from a Slack channel — some contradictory, most lacking the case details needed to act. Nurses on the pilot say they are 'too busy to fill out surveys.' How should the architect fix the feedback loop?",
+    "options": [
+      "Instrument lightweight in-workflow feedback capture tied to specific cases, and establish a recurring review session with a defined pilot cohort",
+      "Extend the pilot by a month so the volume of Slack feedback grows large enough to reveal reliable patterns",
+      "Replace subjective user feedback with automated quality metrics, since accuracy dashboards do not depend on busy nurses",
+      "Assign a project coordinator to interview each nurse individually and consolidate their impressions into a monthly report"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies the structured-feedback-loop principle: feedback must be captured in the workflow at the moment of use, linked to the specific case so it is actionable, and reviewed on a regular cadence with an accountable cohort. Low friction is what makes busy clinicians actually participate.",
+      "More time on a broken channel is tempting because volume feels like signal, but unstructured, detail-free complaints do not become actionable by accumulating. The defect is the capture mechanism, not the sample size, so extension just delays the fix.",
+      "Automated metrics are a necessary complement, but they cannot detect what pilot users uniquely see — workflow friction, clinically misleading phrasing, cases where a technically accurate answer is unusable. Dropping human feedback replaces a broken loop with a blind one.",
+      "Interviews sound thorough, but monthly consolidated impressions arrive slowly, detached from specific cases, and filtered through a coordinator's summary. The pilot needs case-linked signal on a tight cadence, not a lagging digest of recollections."
+    ],
+    "principle": "build feedback capture into the workflow and review it on a fixed cadence with a defined cohort",
+    "relatedConcept": "Structured feedback loops are how pilots convert user experience into design changes instead of into an unread complaints channel."
+  },
+  {
+    "id": 617,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "Midway through building a Claude-based product-recommendation assistant for a retail client, the sponsor has informally requested three additions in a month: order tracking, returns initiation, and a Spanish-language mode. Each was raised in a status call as 'a small thing while you're in there.' The delivery date has not moved. What should the architect do?",
+    "options": [
+      "Absorb the three requests since each is individually modest, and flag any future additions as scope changes",
+      "Take each request through explicit change control — impact on timeline, cost, and the agreed success criteria — before anything is committed",
+      "Decline all three additions until after launch, when they can be considered as a fast-follow release informed by production data",
+      "Build the two low-effort requests and quietly defer the Spanish-language mode, which carries the most evaluation burden"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Absorbing 'modest' requests is tempting because each seems cheap and the sponsor stays pleased, but three unpriced additions with an unmoved deadline is scope creep by installments. Drawing the line at future requests concedes the pattern that produced the problem.",
+      "Correct. This applies scope-creep management through change control: every addition is priced against timeline, cost, and the success criteria agreed in discovery, and the sponsor decides with the trade-off visible. The point is not refusal — it is that scope changes become explicit decisions rather than accumulating silently.",
+      "A blanket deferral is tempting because it protects the date cleanly, but some requests may be genuinely cheap or strategically important enough to warrant a conscious trade. Refusing without assessing impact substitutes a rigid rule for the priced conversation the sponsor is owed.",
+      "Quietly deferring one item is tempting triage, but unilateral, uncommunicated scope decisions surface eventually — usually at launch, as a broken expectation the sponsor believes was agreed. Silent deferral is expectation misalignment manufactured by the architect."
+    ],
+    "principle": "route every scope addition through explicit change control against agreed success criteria",
+    "relatedConcept": "Scope creep is an expectation-alignment failure in slow motion; change control keeps the sponsor's expectations and the delivery plan describing the same project."
+  },
+  {
+    "id": 618,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "Two weeks after a fintech's Claude-based KYC-screening assistant enters pilot with strong early results, the delighted COO proposes removing the human review step entirely 'since the AI clearly works,' and expanding from the pilot's 50 analysts to the full 800-person operation next month. How should the architect manage this enthusiasm?",
+    "options": [
+      "Agree to the expansion but keep human review, presenting the reviewer layer as permanent regardless of future results",
+      "Support removing human review for the pilot's low-risk case categories while expanding the pilot population gradually",
+      "Ask the compliance team to rule on the proposal, since KYC oversight requirements are ultimately their call rather than the architect's",
+      "Welcome the confidence but tie both changes to pre-agreed evidence gates — sustained quality thresholds over a defined window and volume — before either is approved"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Holding the review layer as permanently untouchable is tempting because it feels safely conservative, but 'never, regardless of evidence' is as unanchored as the COO's 'now, because two good weeks.' It also accepts a 16x expansion without gates, which is the riskier half of the proposal.",
+      "Partial concession is tempting because it looks like balanced pragmatism, but two weeks of pilot data is too thin a base to remove oversight from any regulated screening category. It negotiates the safeguard away by degrees instead of anchoring changes to evidence.",
+      "Compliance absolutely has a voice, but routing the whole question there is deferral, not expectation management — the architect owns the evidence framework that tells compliance whether the system's performance supports a change. Punting also leaves the COO's timeline expectations unaddressed.",
+      "Correct. This applies evidence-gated expectation management: overexcitement is handled the same way as disappointment, by returning to pre-agreed measures. Sustained quality over a defined window and volume becomes the objective trigger for scaling and for revisiting oversight, converting enthusiasm into a plan rather than a leap."
+    ],
+    "principle": "manage overexcitement like disappointment — tie changes to pre-agreed evidence gates, not sentiment",
+    "relatedConcept": "Expectation alignment cuts both ways; stakeholder euphoria after early wins is as dangerous to a deployment as stakeholder disillusionment."
+  },
+  {
+    "id": 619,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "A consulting architect finishes designing a Claude-based churn-prediction briefing tool for a SaaS company and rolls off in three weeks. An in-house engineering team the architect has never met will build it over the following two quarters. The engagement budget allows limited documentation time. What should the documentation effort prioritize?",
+    "options": [
+      "A thorough written specification of the final architecture, with component descriptions detailed enough to answer most design questions",
+      "A recorded video walkthrough of the design plus the architect's contact details for questions that arise during the build",
+      "A handoff package the team can execute unaided — architecture and data-flow diagrams, prompt and config specifications, decision rationale, and known risks with mitigations",
+      "A phased implementation plan with sprint-level task breakdowns so the engineering team knows exactly what to build in what order"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "A detailed spec of the final design is tempting because it feels complete, but it captures what to build without why — and over two quarters, the team will hit situations the spec never anticipated. Without decision rationale, they cannot distinguish load-bearing choices from incidental ones.",
+      "Video plus availability is tempting because it feels personal and low-effort, but it makes the architect the runtime dependency the handoff is supposed to remove. Recordings are unsearchable and unmaintainable, and 'call me' does not scale across two quarters of an ended engagement.",
+      "Correct. This applies the handoff-package principle: documentation succeeds when the receiving team can execute without the architect present. Diagrams with data flows, versioned prompt and config specs, the rationale behind decisions, and known risks give the team both instructions and the judgment context to adapt them.",
+      "Sprint-level task plans are tempting because they look actionable, but sequencing work is the engineering team's competence and the plan will be obsolete by sprint three. The architect's irreplaceable contribution is design intent and rationale, not project management artifacts."
+    ],
+    "principle": "a handoff package succeeds when the receiving team can execute without the architect present",
+    "relatedConcept": "Documentation is the mechanism by which architectural knowledge survives the architect's departure, which is the ultimate test of a consulting engagement."
+  },
+  {
+    "id": 620,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "During an incident at a fintech, a Claude-based transaction-dispute assistant begins producing noticeably worse responses. The on-call engineer discovers that nobody can say which system prompt version is in production, what changed recently, or what the prompt looked like when quality was last verified — edits have been made directly in a dashboard by three different people. What practice would have prevented this situation?",
+    "options": [
+      "Versioning prompts and configurations like code — change history, review before deploy, and links from each version to its eval results",
+      "Restricting dashboard edit access to a single senior engineer so all prompt changes flow through one accountable person",
+      "Scheduling a weekly quality regression run so degradations are caught within days regardless of who changed what",
+      "Keeping a shared document where engineers paste the current prompt after each edit along with a dated note"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies the prompt-versioning principle: prompts and configs are behavioral source code, so they need the same discipline — version history, reviewed changes, and traceability to the eval evidence that validated each version. That turns 'what is running and why' from archaeology into a lookup.",
+      "Funneling changes through one person is tempting because it creates accountability, but it builds a bottleneck and a bus-factor problem without creating history — the senior engineer's memory becomes the version control. Access control complements versioning; it does not substitute for it.",
+      "Scheduled regressions are a valuable complementary control, but they detect that something degraded without answering which change caused it or what to roll back to. Detection without traceability still leaves the on-call engineer exactly where this incident found them.",
+      "A paste-after-edit document is tempting because it is easy to adopt, but voluntary manual logging fails silently the first time someone is rushed — which is precisely when changes are riskiest. It also lacks review, diffing, and any link between a version and its verified quality."
+    ],
+    "principle": "treat prompts and configs as versioned, reviewed artifacts traceable to eval results",
+    "relatedConcept": "Prompt and configuration versioning extends documentation discipline to the artifacts that actually determine an LLM system's behavior in production."
+  },
+  {
+    "id": 621,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "A hospital's IT operations team will assume support for a Claude-based patient-message triage system after go-live. In the readiness review, the ops lead asks: 'When triage quality drops at 2 a.m., what exactly do my people do?' The architect has delivered architecture diagrams and an API reference, and the ops team has no LLM experience. What deliverable is missing?",
+    "options": [
+      "A service catalog entry defining severity levels and response-time commitments for triage-system incidents",
+      "A training program to build the operations team's LLM fundamentals before they take on support duties",
+      "An automated alerting pipeline that pages the engineering team directly, bypassing operations for model-quality issues",
+      "A runbook mapping observable symptoms to diagnostic steps, safe interim actions such as fallback routing, and escalation criteria"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "A service catalog entry is tempting because it formalizes the support obligation, but severity definitions and SLAs describe how fast to respond, not what to actually do. The ops lead's question is about actions at 2 a.m., and a catalog entry answers a different question.",
+      "Training is tempting because the team's LLM inexperience is real, but general fundamentals do not tell anyone which dashboard to check or when to flip to fallback routing for this system. Runbooks are precisely the tool that lets a team operate a system they did not build.",
+      "Bypassing ops is tempting because engineers understand the system best, but it makes the builders a permanent 2 a.m. dependency and leaves the designated support team unable to execute even safe interim measures. It avoids enabling operations rather than accomplishing it.",
+      "Correct. This applies the runbook principle: operational documentation translates the architect's diagnostic knowledge into symptom-to-action procedures — what degraded quality looks like, what to check, what safe mitigations exist, and when to escalate. It is written before handoff, because incidents do not wait."
+    ],
+    "principle": "runbooks convert the architect's diagnostic knowledge into actions an unfamiliar team can execute",
+    "relatedConcept": "Implementation guidance includes operating guidance; a system is not truly handed off until the team supporting it knows what to do when it misbehaves."
+  },
+  {
+    "id": 622,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "A year after launch, a city government's Claude-based permit-inquiry assistant has been through eleven prompt revisions, a model upgrade, and a new escalation flow. A newly hired engineer follows the original design documentation and breaks the escalation flow, because the docs still describe the launch-day architecture. The engineering manager asks the architect how to stop this from recurring. What should the architect recommend?",
+    "options": [
+      "Institute a quarterly documentation sprint where the team reviews and refreshes all system documentation in one pass",
+      "Make documentation updates a required part of the change process itself, so no prompt, model, or flow change ships without its docs",
+      "Add a prominent last-verified date to every document so readers know when the content might be stale",
+      "Move the documentation into the codebase repository so engineers encounter it during development instead of on the wiki"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Quarterly sprints are tempting because they create a visible ritual, but docs are then wrong for up to three months at a time — and this incident shows stale docs cause failures well within a quarter. Batch refreshes also depend on reconstructing changes from memory, which loses detail.",
+      "Correct. This applies the living-documentation principle: docs stay true only when updating them is part of the definition of done for every change, not a separate activity that competes for time. Coupling docs to the change process means accuracy is maintained at the moment knowledge is freshest.",
+      "Staleness dates are tempting because they at least warn the reader, but they institutionalize unreliable documentation rather than fix it — the new engineer would have learned only that the docs might be wrong, not what the system actually does. A warning label is not a maintenance strategy.",
+      "Co-locating docs with code is a genuinely useful enabler and often part of the solution, but location alone does not cause updates — a repo can hold a stale document as easily as a wiki can. Without a process rule tying doc changes to system changes, the drift continues in a new venue."
+    ],
+    "principle": "documentation stays alive only when updating it is a required step of every change",
+    "relatedConcept": "Living documentation is what keeps the handoff package trustworthy across the iteration phase, long after the original architect has moved on."
+  },
+  {
+    "id": 623,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "A fintech's security team schedules an architecture review of a proposed Claude-based loan-document assistant before approving production access to customer data. The architect's current deck contains a high-level block diagram built for the executive pitch — boxes labeled 'AI engine,' 'data layer,' and 'user experience.' What should the architect prepare for the review?",
+    "options": [
+      "The existing diagram supplemented by a live whiteboard session where the security team can ask about any component in depth",
+      "A written attestation of the security controls in place — encryption, access policies, retention settings — for each labeled block",
+      "A data-flow diagram showing what data moves between components, where customer PII travels and is stored, and the trust boundaries it crosses",
+      "A threat model produced with the security team in the review itself, using the block diagram as the starting canvas"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "A live session is tempting because verbal depth can fill diagram gaps, but it makes the review's quality depend on the security team guessing the right questions and leaves no reviewable artifact behind. Security approvals need documentation that can be examined, referenced, and audited.",
+      "A controls attestation is tempting because it speaks security's language, but controls listed per block cannot be assessed without knowing what data actually flows where — encryption 'in the data layer' means little if PII also transits a logging pipeline nobody diagrammed. Flows come before controls.",
+      "Correct. This applies the audience-appropriate documentation principle: a security review consumes data-flow diagrams — what moves, where sensitive data lives, and which trust boundaries it crosses. The same architecture needs different documentation artifacts for executives, engineers, and security reviewers.",
+      "Collaborative threat modeling is a legitimate practice, but running it against a three-box pitch diagram produces a threat model of an abstraction. The prerequisite artifact is still the detailed data-flow view; arriving without it converts the review into discovery of the architect's own system."
+    ],
+    "principle": "match the documentation artifact to the audience — security reviews need data flows and trust boundaries",
+    "relatedConcept": "Architecture documentation is a family of views on one system, and knowing which view each stakeholder needs is part of the architect's communication craft."
+  },
+  {
+    "id": 624,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "A retail conglomerate's CTO tells the newly engaged architect: 'We already know what we need — an assistant that helps store managers with inventory questions. Skip the discovery phase, we're paying for design and build.' The architect has seen only a two-paragraph project brief. How should the architect handle the phase question?",
+    "options": [
+      "Honor the client's framing and begin design, treating the first design review as the checkpoint where any requirement gaps will surface",
+      "Propose a timeboxed discovery — one to two weeks — to verify the metric, workflow, and data assumptions the brief leaves open, framed as de-risking the build",
+      "Insist on the standard full discovery phase, since abbreviating the methodology compromises the quality the client is paying for",
+      "Begin design while running discovery interviews in parallel, folding any findings into the architecture as they arrive"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Deferring to the client is tempting because they are paying and sound certain, but a design review catches gaps in the design, not gaps in the problem definition beneath it. Requirement flaws discovered at review time have already shaped weeks of work in the wrong direction.",
+      "Correct. This applies lifecycle-phase discipline with proportionality: discovery can compress when prior knowledge is strong, but it cannot be skipped, because design quality is bounded by requirement quality. A timeboxed verification of metric, workflow, and data assumptions — sold as de-risking — respects both the phase and the client's urgency.",
+      "Insisting on the full standard process is tempting as methodological integrity, but rigidity invites the client to see discovery as consultant ritual rather than value. Phases exist for their outputs, not their durations; a leaner discovery that secures the same outputs serves the client better and preserves the relationship.",
+      "Parallel design-and-discovery is tempting because it looks like progress on both fronts, but design decisions made before findings arrive anchor the architecture — late-arriving discoveries then face a built-in bias toward whatever is already drawn. Sequencing exists precisely to keep evidence ahead of commitment."
+    ],
+    "principle": "compress lifecycle phases under pressure, but never skip the outputs they exist to produce",
+    "relatedConcept": "Lifecycle management is about ensuring each phase's essential outputs exist before the next phase consumes them, whatever the calendar looks like."
+  },
+  {
+    "id": 625,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "A SaaS company's platform team took over a Claude-based release-notes generator from a consulting architect four weeks ago. Since then they have twice modified the retrieval configuration in ways that degraded output quality, not realizing which behaviors were load-bearing, and morale around 'the consultant's system' is souring. The consultancy is asked what a better handoff would have included. What is the key missing element?",
+    "options": [
+      "A structured transition period with overlap — the team operating the system while the architect remains available, plus a documented support window with defined off-ramps",
+      "A contractual clause freezing system configuration for the first quarter after handoff so the team learns before changing anything",
+      "An acceptance test the platform team must pass before assuming ownership, demonstrating they understand the system's design",
+      "A retainer arrangement keeping the consulting architect on call indefinitely for configuration questions and quality issues"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies the handoff-phase principle: handoff is a transition, not an event. An overlap period where the receiving team drives while the architect observes and advises — with a defined support window and clear end — transfers the tacit knowledge documentation alone cannot, like which configurations are load-bearing.",
+      "A change freeze is tempting because it would have prevented these specific incidents, but it teaches nothing — the team emerges from the quarter equally unprepared, having been forbidden to learn by doing. It also blocks legitimate fixes and signals distrust that worsens the morale problem.",
+      "A gating test is tempting because it verifies understanding, but a one-time exam checks recall, not the operational judgment that develops through supported practice. It also frames handoff adversarially — passing a test — rather than as the collaborative transfer it needs to be.",
+      "An indefinite retainer is tempting because expertise stays reachable, but it removes the forcing function for ownership to actually transfer — the team calls the consultant instead of developing judgment. Handoff succeeds when the dependency ends on purpose, not when it becomes permanent."
+    ],
+    "principle": "handoff is a supported transition with overlap and a defined end, not a document drop",
+    "relatedConcept": "The handoff phase determines whether all earlier lifecycle investment survives contact with the team that must live with the system."
+  },
+  {
+    "id": 626,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "Six months after launch, a health system's Claude-based referral-letter assistant has comprehensive dashboards — quality scores, latency, cost, usage — that no one has opened in eight weeks. A slow decline in quality scores, coinciding with a shift in referral patterns toward a new specialty, went unnoticed until clinicians complained. Monitoring infrastructure clearly exists. What is the gap?",
+    "options": [
+      "The dashboards lack automated alert thresholds that would page the team when quality scores cross a defined floor",
+      "The quality metric was poorly designed, since a well-constructed metric would have made the decline more visible",
+      "Ownership of the assistant should have transferred to the clinical informatics team, who are closer to referral patterns",
+      "No operating rhythm exists around the monitoring — scheduled reviews with an accountable owner, feeding findings into an iteration backlog"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Alerts are tempting because they would have caught this specific decline, but thresholds only fire on anticipated failure signatures — a slow drift or an unforeseen pattern shift can stay under any static floor. Alerts complement human review cadences; they cannot replace the judgment that noticed the specialty shift's meaning.",
+      "Blaming the metric is tempting because better metrics do help, but the score did decline — measurably — and no one was looking. A perfectly designed metric on an unopened dashboard produces exactly this outcome, so metric quality is not the binding constraint here.",
+      "Reassigning ownership is tempting because clinical informatics has relevant context, but the failure was not who owned the dashboards — it was that no review practice existed for any owner to execute. Transferring an unowned rhythm to a new team transfers the vacuum.",
+      "Correct. This applies the monitoring-phase principle: monitoring is a practice, not an artifact. Dashboards create the possibility of insight; a scheduled review cadence with a named owner, and a defined path from findings into the iteration backlog, is what converts measurement into action before users feel the problem."
+    ],
+    "principle": "monitoring is an operating rhythm that feeds iteration, not a set of dashboards",
+    "relatedConcept": "The monitoring phase only closes the lifecycle loop when its findings are reviewed on a cadence and routed into iteration decisions."
+  },
+  {
+    "id": 627,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "A retail company's Claude-based customer-email assistant, designed two years ago around pre-sale product questions, has declined from 91% to 78% resolution. The team has shipped four rounds of prompt tuning in six months; each recovered two or three points that eroded again within weeks. Analysis shows over half of today's inquiries concern post-purchase issues — orders, refunds, delivery — which the original retrieval corpus and workflow never covered. What should the architect conclude?",
+    "options": [
+      "The tuning cycles were too shallow — a systematic prompt overhaul addressing post-purchase intents should precede any larger intervention",
+      "The model has drifted with successive version updates, and pinning or upgrading the model should be evaluated before architectural work",
+      "The workload has shifted outside the original design's assumptions, so this is a signal to re-enter design with the new inquiry mix as a requirement",
+      "Resolution rate has become the wrong success metric for a mixed workload and should be redefined before further changes are judged against it"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "One more, bigger tuning pass is tempting because tuning is cheap and familiar, but no prompt revision can make the system retrieve post-purchase knowledge its corpus does not contain or execute order-status lookups its workflow never included. Four fade-out cycles are evidence the fix is below the prompt layer.",
+      "Model drift is a real phenomenon worth checking, but the analysis already identifies a sufficient cause: half the traffic falls outside the designed scope. Reaching for a model explanation over the documented workload shift is looking for the problem where the tools are easiest.",
+      "Correct. This applies the tune-versus-redesign principle: repeated tuning that decays while the workload's composition moves outside original design assumptions is the classic signal to revisit design. The lifecycle loops back — the new inquiry mix becomes a discovery input, and the corpus and workflow get redesigned around it.",
+      "Re-examining metrics is tempting because mixed workloads do complicate measurement, but redefining the metric would improve the number without helping a single customer with a refund. The metric is faithfully reporting a real capability gap; changing it treats the messenger."
+    ],
+    "principle": "recurring fixes that decay under a shifted workload signal redesign, not more tuning",
+    "relatedConcept": "The iteration phase includes knowing its own limits — recognizing when accumulated change has invalidated design assumptions and the lifecycle must loop back."
+  },
+  {
+    "id": 628,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "A government tax agency runs a citizen-guidance assistant on a Claude model version whose deprecation was just announced, with retirement in nine months. The system passed a lengthy accessibility and accuracy certification on the current version. The program manager suggests waiting until month eight to switch, 'since the current model works and we have other priorities.' What should the architect recommend?",
+    "options": [
+      "Begin the migration now — run the certification eval suite against the successor model, fix regressions, and cut over with months of buffer before retirement",
+      "Accept the month-eight plan but negotiate an extended support contract for the deprecated version as a contingency",
+      "Wait deliberately until later in the window, since successor models improve with point releases and early migration means certifying twice",
+      "Switch immediately to the newest available model without re-running certification, since successor versions are validated as improvements by the vendor"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This applies lifecycle model-management: a deprecation clock starts the migration, not a reminder for later. Running the certification evals against the successor now surfaces behavioral regressions while there is time to remediate — prompt adjustments, re-certification, staged rollout — instead of discovering them against a hard deadline.",
+      "A support extension is tempting as insurance, but extensions for deprecated model versions may not be purchasable at all, and the plan still compresses evaluation, fixes, and re-certification into one month. Insurance against a self-imposed schedule risk is dearer than removing the risk.",
+      "Waiting for point releases is tempting optimization, but it trades a speculative quality gain for certain schedule compression on a system with a heavyweight certification process. If a chosen successor improves later, re-validating an already-migrated system is far cheaper than starting late.",
+      "Vendor validation is tempting to lean on, but 'improved overall' is a claim about aggregate benchmarks, not about this agency's certified behaviors — model version changes routinely shift outputs in ways that matter locally. Certification exists precisely because general claims do not transfer to specific workloads."
+    ],
+    "principle": "treat model deprecation as the start of a planned, eval-verified migration — not a deadline to approach",
+    "relatedConcept": "Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles."
+  }
+]

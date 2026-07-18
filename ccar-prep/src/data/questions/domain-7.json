@@ -1,0 +1,310 @@
+[
+  {
+    "id": 701,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "A SaaS company rolls out Claude Code to a 40-person engineering org. Within weeks, the platform lead notices the agent repeatedly suggests the wrong build commands, ignores the team's error-handling conventions, and proposes dependencies the team has banned. Each developer has been correcting it in chat, session after session. What should the platform lead do first?",
+    "options": [
+      "Ask developers to start each session with a standard prompt that lists the team's conventions and build commands",
+      "Create a CLAUDE.md file in each repository capturing conventions, build commands, and banned dependencies, and check it into version control",
+      "Switch the org to a more capable Claude model so the agent infers the team's conventions from the codebase on its own",
+      "Add a post-merge review checklist so reviewers catch convention violations before code reaches the main branch"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it delivers the same information, but it depends on every developer remembering to paste it every session, which is exactly the per-developer drift that caused the problem. Knowledge that lives in individual habits decays; it should live where the tool reads it automatically.",
+      "Correct. CLAUDE.md is project memory that Claude Code loads automatically at the start of every session, so conventions, build commands, and constraints are supplied consistently to everyone. Checking it into the repo makes the fix versioned, reviewable, and shared — encode team knowledge where the tool reads it.",
+      "Tempting because stronger models do infer more from code, but no model can reliably infer negative constraints like banned dependencies or unwritten conventions. This is a tool-first response to a context problem: the missing input is explicit team knowledge, not model capability.",
+      "Tempting because review is a real safety net, but it treats the symptom downstream instead of fixing the cause upstream. Developers would keep burning time correcting the agent and reviewers would keep catching the same violations that a shared memory file would prevent."
+    ],
+    "principle": "encode team knowledge where the tool reads it",
+    "relatedConcept": "Shared, version-controlled configuration is the foundation of consistent team-wide agentic tooling adoption."
+  },
+  {
+    "id": 702,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "A fintech company wants to enable Claude Code in a repository that contains payment-processing code and local .env files with API credentials. The security team is concerned that the agent could read secrets or run destructive commands. The platform architect must propose a configuration that satisfies security without blocking daily development. What is the best approach?",
+    "options": [
+      "Require developers to manually approve every individual tool action the agent takes for the life of the project",
+      "Keep permissions permissive but enable full session logging so the security team can audit everything the agent did after the fact",
+      "Have each developer configure their own personal permission preferences so the settings match their individual risk tolerance",
+      "Define a shared project settings file with deny rules for reading .env and secrets paths, an allowlist of safe commands, and approval prompts for everything else"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it maximizes control, but blanket manual approval for every action creates so much friction that developers either abandon the tool or approve reflexively without reading, which erodes the control it was meant to provide. Security that ignores usability tends to get bypassed.",
+      "Tempting because auditability is a legitimate need, but logging is detective, not preventive: by the time the audit runs, the secret has already been read or the destructive command already executed. Prevention of secret exposure must happen before the action, not after.",
+      "Tempting because it respects developer autonomy, but per-user settings guarantee inconsistent enforcement — the security posture of a payments repo would depend on which developer opened it. Policy for sensitive code must be set at the project level and shared, not left to individual drift.",
+      "Correct. Claude Code's shared project settings (checked into the repo) support deny rules that block reading sensitive paths like .env, allowlists for known-safe commands, and prompts for anything else. This applies least privilege consistently to every developer while keeping routine work frictionless."
+    ],
+    "principle": "least privilege, enforced in shared project settings",
+    "relatedConcept": "Permission policy for agentic tools is an access-control decision and belongs in version-controlled, team-level configuration."
+  },
+  {
+    "id": 703,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "At a retail company, three squads share a monorepo and all use Claude Code. Each squad has invented its own local setup: different personal permission settings, private prompt snippets, and one squad's hand-rolled shell aliases for common agent tasks. New hires get inconsistent behavior depending on whose laptop they pair on, and a recent incident occurred when one squad's loose permissions let the agent modify a shared CI script. What should the architect recommend?",
+    "options": [
+      "Standardize the baseline in version control: a shared CLAUDE.md, project-level settings.json with permission rules, and team slash commands, leaving personal settings only for individual preferences",
+      "Document each squad's current setup in the engineering wiki so new hires can replicate whichever configuration their squad uses",
+      "Designate the squad with the most mature setup as the standard and have the other squads copy its members' local configuration files by hand",
+      "Restrict Claude Code usage to senior engineers until every squad completes training on safe configuration practices"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Claude Code distinguishes shared project settings (checked into the repo and applied to everyone) from user settings (personal). Putting the memory file, permission policy, and reusable slash commands in version control eliminates drift, makes onboarding deterministic, and closes the loose-permissions gap that caused the incident.",
+      "Tempting because documentation feels like standardization, but it codifies the drift instead of eliminating it — three documented setups is still three setups. Wikis also rot silently, whereas configuration in the repo is enforced by the tool itself on every session.",
+      "Tempting because it picks a single standard, but hand-copying local files is a one-time sync with no mechanism to stay aligned; the squads will drift apart again within weeks. The fix is a shared source of truth the tool reads, not a manual replication ritual.",
+      "Tempting because training and access control sound prudent after an incident, but this treats a configuration-governance problem as a people problem. Restricting users reduces the productivity benefit without fixing the root cause: nothing in the environment enforced a consistent, safe baseline."
+    ],
+    "principle": "configuration in version control beats configuration in people's heads",
+    "relatedConcept": "Eliminating per-developer configuration drift is central to operating agentic developer tools at team scale."
+  },
+  {
+    "id": 704,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "A healthcare software team uses Claude Code heavily, but AI-authored changes keep arriving in pull requests with formatting violations and lint errors, failing CI hours later. The team's CLAUDE.md already says 'always run the linter and formatter before finishing.' The agent follows the instruction most of the time but not always. How should the platform lead make this reliable?",
+    "options": [
+      "Strengthen the CLAUDE.md wording to state that running lint and format is mandatory and must never be skipped under any circumstances",
+      "Ask developers to visually inspect diffs for formatting issues before allowing the agent to conclude its session",
+      "Configure a Claude Code hook that automatically runs the formatter and linter after the agent edits files, blocking on failures",
+      "Move linting fully into CI and accept the failed builds as the enforcement mechanism, since CI is the ultimate gate anyway"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because the instruction clearly needs reinforcing, but prompts are probabilistic: stronger wording raises compliance without guaranteeing it. When a behavior must happen every single time, it needs deterministic enforcement, not more emphatic instructions.",
+      "Tempting because human inspection catches problems, but it converts an automatable check into recurring manual toil and depends on reviewer vigilance. Humans are poor at consistently spotting mechanical issues like formatting — that is exactly what tooling is for.",
+      "Correct. Hooks are deterministic commands that run at defined points in the agent's tool use, such as after file edits. Unlike an instruction the model may or may not follow, a post-edit hook runs every time — use guaranteed mechanisms, not hopeful instructions, for must-happen behaviors.",
+      "Tempting because CI is indeed the final gate, but relying on it alone pushes feedback hours downstream: the failure surfaces long after the session ends, and someone must re-engage to fix it. Enforcing at the point of edit keeps the feedback loop tight and the failure cheap."
+    ],
+    "principle": "deterministic hooks for must-happen behaviors, prompts for preferences",
+    "relatedConcept": "Choosing between probabilistic instructions and deterministic enforcement is a recurring design decision when configuring agentic environments."
+  },
+  {
+    "id": 705,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "A public-sector agency's development team uses Claude Code, but their work constantly requires internal context: an in-house API catalog, a Jira-like ticket system, and an internal design-standards portal. Developers currently copy-paste excerpts from these systems into their sessions, which is slow and frequently stale. The architect wants the agent to access this context directly and consistently across the team. What is the most appropriate approach?",
+    "options": [
+      "Export the internal systems' content into large markdown files in each repository so the agent can read them from disk",
+      "Stand up MCP servers for the internal systems and register them in project-level configuration so every developer's agent can query live data with the same access controls",
+      "Train developers on better copy-paste discipline, including a checklist of which excerpts to include for each task type",
+      "Build a nightly job that summarizes each internal system into the CLAUDE.md file so the context is refreshed automatically"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because files in the repo are easy for the agent to read, but exported snapshots go stale immediately and bulk-dumping entire systems bloats the repo and the agent's context with mostly irrelevant material. The team needs live, queryable access, not frozen copies.",
+      "Correct. MCP is the standard protocol for connecting Claude Code to internal tools and data sources; project-level registration gives every team member the same live integrations under consistent, centrally governed access controls. Connect the agent to the source of truth instead of ferrying copies to it.",
+      "Tempting because it improves the current practice at low cost, but it optimizes a workflow that should be eliminated: manual transfer stays slow, error-prone, and stale no matter how disciplined it becomes. This treats the symptom rather than removing the manual step.",
+      "Tempting because it automates freshness, but CLAUDE.md is for stable project conventions, not a dumping ground for summarized external systems. Nightly summaries are still up to a day stale, lossy, and consume context in every session whether relevant or not."
+    ],
+    "principle": "connect the agent to live sources of truth via MCP, not stale copies",
+    "relatedConcept": "Integrating internal systems through standard protocols is how team environments scale beyond what fits in static project files."
+  },
+  {
+    "id": 706,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "single",
+    "question": "A fintech CTO announces that every engineer must use AI coding tools daily and asks the platform architect to 'drive adoption to 100% within a quarter.' The architect's own analysis shows the org's delivery is actually bottlenecked on code review: median PR wait time is 2.5 days, while coding itself is not the constraint. How should the architect proceed?",
+    "options": [
+      "Redirect the effort toward the review bottleneck first, for example AI-assisted first-pass review to shrink PR wait time, and let adoption grow from demonstrated wins",
+      "Comply with the mandate and roll out the tools org-wide, since executive sponsorship is rare and broad usage will surface valuable use cases organically",
+      "Run a formal tool evaluation comparing several AI coding assistants on code-generation benchmarks before committing the org to one",
+      "Focus the rollout on the teams with the heaviest coding workload, since they will realize the largest productivity gains from faster code generation"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is workflow-first adoption: identify the real constraint in the delivery pipeline and apply the tooling there. Accelerating code generation when review is the bottleneck just deepens the review queue; attacking PR wait time produces measurable wins that make the broader rollout credible.",
+      "Tempting because executive sponsorship is genuinely valuable and shouldn't be squandered, but a tool-first mandate detached from a real bottleneck tends to produce shallow, checkbox usage. Adoption percentage would rise while delivery outcomes stay flat, ultimately discrediting the initiative.",
+      "Tempting because rigorous evaluation sounds diligent, but it evaluates the wrong dimension: generation benchmarks are irrelevant when generation is not the constraint. This is analysis effort spent before asking the more basic question of which workflow problem needs solving.",
+      "Tempting because it targets heavy coders, but speeding up the non-bottleneck stage of a pipeline does not increase throughput — it increases work-in-progress piling up at review. Theory-of-constraints reasoning says improvement anywhere but the bottleneck is largely wasted."
+    ],
+    "principle": "target the workflow bottleneck, not tool adoption for its own sake",
+    "relatedConcept": "Workflow-first adoption is the core discipline separating productive AI enablement from mandate-driven tool rollouts."
+  },
+  {
+    "id": 707,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "single",
+    "question": "Six months after a retail company adopted AI-assisted development, leadership asks whether the investment is working. The enablement team's dashboard shows 92% weekly active usage, 1.4 million AI-generated lines of code accepted, and 30,000 prompts per week. The CFO remains unconvinced and asks the platform architect what evidence would actually demonstrate impact. What should the architect propose measuring?",
+    "options": [
+      "Acceptance rate of AI suggestions, since it shows how often the tool's output is good enough for developers to keep",
+      "The ratio of AI-generated to human-written lines in merged code, since it quantifies how much of the product the AI is now producing",
+      "Delivery outcomes such as cycle time, PR throughput, change-failure rate, and developer satisfaction, compared against the pre-adoption baseline",
+      "Total developer-hours saved, computed by multiplying accepted AI-generated lines by an average manual coding time per line"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because acceptance rate at least measures perceived quality, but it is still a tool-activity metric: developers may accept suggestions that later cost time in review, debugging, or rework. It says nothing about whether the team ships better or faster.",
+      "Tempting because it sounds like a productivity share, but lines of code have never been a measure of value — more lines can mean worse outcomes, and AI makes generating lines nearly free. This metric can rise while quality and delivery speed fall.",
+      "Correct. Impact must be measured in delivery outcomes, not tool activity: cycle time, PR throughput, and change-failure rate capture speed and quality, developer satisfaction captures sustainability, and the pre-adoption baseline makes the comparison meaningful. Measure outcomes, not usage.",
+      "Tempting because it produces a dollar-friendly number, but the formula is fiction: lines-per-hour assumptions don't survive contact with reality, and it ignores time spent reviewing, correcting, and maintaining AI output. A precise-looking number built on a vanity metric is still a vanity metric."
+    ],
+    "principle": "measure delivery outcomes, not tool activity",
+    "relatedConcept": "Choosing outcome metrics over vanity metrics determines whether an enablement program can prove and improve its value."
+  },
+  {
+    "id": 708,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "single",
+    "question": "A healthcare software company finds that pull requests largely authored by AI tooling are getting rubber-stamp approvals — reviewers assume the agent 'already checked it,' and two subtle defects recently reached production in a patient-scheduling service. Velocity has genuinely improved and leadership does not want to lose it. What should the architect change?",
+    "options": [
+      "Prohibit AI-generated code in patient-facing services so the highest-risk components are always written entirely by humans",
+      "Reassert that the human author owns every change they merge — require authors to explain and test AI-written diffs, and hold reviews to the same standard as human-written code",
+      "Add a second required reviewer to every pull request so AI-generated changes get more total scrutiny before merging",
+      "Route all AI-authored diffs through an additional automated AI review step tuned to catch the kinds of defects that reached production"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it removes AI risk from the most critical code, but it sacrifices the velocity gains leadership wants to keep and misdiagnoses the failure: the defects escaped because review discipline collapsed, not because AI wrote code. Provenance bans treat the symptom, not the broken accountability.",
+      "Correct. The failure mode is diffusion of accountability — humans deferring to the machine. Re-establishing that the merging engineer owns the change, can explain it, and has tested it restores the review contract without giving up AI-driven speed. Accountability for merged code always rests with a human.",
+      "Tempting because more eyes sound like more scrutiny, but if the root cause is reviewers assuming the AI already checked the code, a second reviewer inherits the same assumption. Doubling a rubber stamp yields two rubber stamps plus added review latency.",
+      "Tempting because AI-assisted review is genuinely useful as a first pass, but using AI to check unowned AI output deepens the accountability gap that caused the incident. Automated review augments human judgment; it cannot substitute for a human who answers for the change."
+    ],
+    "principle": "a human is always accountable for merged code",
+    "relatedConcept": "Preserving human ownership and review discipline is the guardrail that lets teams capture AI velocity safely."
+  },
+  {
+    "id": 709,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "single",
+    "question": "At a SaaS company, every squad has developed its own way of prompting Claude Code for release-notes drafting, migration-script generation, and dependency-upgrade checks. Results vary widely: some developers get excellent output from refined personal prompts, others get poor results from ad-hoc ones, and the good prompts leave when their authors change teams. The platform lead wants these workflows to produce consistent results org-wide. What should they do?",
+    "options": [
+      "Collect the best personal prompts into a shared wiki page of prompt templates that developers can copy into their sessions",
+      "Hold a prompt-engineering workshop so every developer learns to write prompts as effective as the top performers' versions",
+      "Have the top prompt authors pair with weaker prompters during these tasks until quality evens out across the squads",
+      "Package the proven workflows as custom slash commands and Skills checked into the repos, so anyone invokes the refined version directly in the tool"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it captures the knowledge, but a wiki adds a manual find-copy-paste step that developers skip under deadline pressure, and pasted copies fork and drift from the source. Knowledge stored outside the tool's execution path decays into documentation nobody uses.",
+      "Tempting because skill-building has value, but it aims to replicate expertise in every head rather than encode it once in the system. Training fades, new hires arrive untrained, and the org remains dependent on individual prompting ability for what should be a standardized workflow.",
+      "Tempting because pairing transfers tacit knowledge well, but it is a slow, unscalable transmission mechanism for what is fundamentally a reusable artifact. The refined prompt can simply be captured and shared as executable configuration instead of being re-taught person by person.",
+      "Correct. Custom slash commands and Skills turn refined prompts and multi-step procedures into named, version-controlled workflows invoked directly inside Claude Code. The best-known method becomes the default method for everyone, survives team changes, and improves through normal code review."
+    ],
+    "principle": "capture proven workflows as executable, version-controlled commands",
+    "relatedConcept": "Converting individual prompting expertise into shared tool-level workflows is how teams compound productivity gains."
+  },
+  {
+    "id": 710,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "multi",
+    "question": "A public-sector IT department is planning its first rollout of AI-assisted development tooling across 12 teams. The CIO wants results this fiscal year but cannot afford a visible failure, since the program will face legislative scrutiny. The architect is asked to design the rollout approach. Which two elements are most important to include? (Choose two.)",
+    "options": [
+      "Start with a pilot group working on real backlog items, with published usage guidelines and a defined evaluation period before expanding",
+      "Deploy to all 12 teams simultaneously so no team is left behind and the fiscal-year impact is maximized across the whole department",
+      "Define baseline delivery metrics before the pilot begins so post-pilot outcomes can be compared against something concrete",
+      "Let each team independently choose whether and how to adopt the tooling, since organic adoption produces the strongest engagement"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. A managed pilot on real work — not toy exercises — with explicit guidelines and a defined evaluation window limits blast radius, surfaces configuration and policy issues cheaply, and builds the evidence base a scrutinized program needs before scaling to all 12 teams.",
+      "Tempting because it maximizes reach within the fiscal year, but a simultaneous big-bang rollout multiplies every unresolved issue — permissions, guidelines, training gaps — by 12 teams at once. Under legislative scrutiny, one avoidable visible failure costs more than a quarter of measured, staged progress.",
+      "Correct. Without a pre-pilot baseline of cycle time, throughput, and quality, the program cannot demonstrate impact no matter how well the pilot goes. Measurement designed in from the start is what turns a rollout into an evidence-backed case for expansion — you cannot show improvement without a before.",
+      "Tempting because organic adoption does correlate with engagement, but fully decentralized adoption produces inconsistent security configuration, no comparable measurements, and uneven outcomes — exactly the ungoverned variance a scrutinized public program cannot defend."
+    ],
+    "principle": "pilot on real work, measure against a baseline, then scale",
+    "relatedConcept": "Managed, measured rollouts are how organizations de-risk AI tooling adoption while building the case for expansion."
+  },
+  {
+    "id": 711,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Support debugging and operational issue resolution",
+    "type": "single",
+    "question": "A fintech operations team wants on-call engineers to use an AI assistant during production incidents in the payments platform — querying logs, correlating metrics, and explaining unfamiliar service code. The security lead worries an agent with production access could make things worse mid-incident. The architect must define the access model. What should they propose?",
+    "options": [
+      "Grant the assistant the same production permissions as the on-call engineer, since the engineer supervises every step of the session anyway",
+      "Restrict the assistant to a staging environment that mirrors production, so investigations carry no production risk at all",
+      "Give the assistant read-only access to logs, metrics, and code for diagnosis, and require explicit human approval for any state-changing action such as restarts or config edits",
+      "Defer the assistant's rollout until the incident-response runbooks are fully automated, so the agent only ever executes pre-approved procedures"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because human supervision sounds sufficient, but mid-incident is precisely when supervision is weakest — engineers are stressed, rushed, and inclined to approve suggestions quickly. Inheriting full write permissions gives one confidently wrong suggestion the power to compound the outage.",
+      "Tempting because it eliminates production risk entirely, but it also eliminates most diagnostic value: staging does not contain the live logs, traffic patterns, or state that characterize the actual incident. Diagnosing a production issue requires observing production, safely.",
+      "Correct. Diagnosis is overwhelmingly a read activity — logs, metrics, traces, code — and read-only access carries minimal blast radius, while the rare state-changing action goes through a human approval gate. This is least privilege split along the read/write boundary: free to observe, gated to act.",
+      "Tempting because pre-approved automation is a worthy end state, but full runbook automation is a long program, and it forfeits the assistant's most immediate value: ad-hoc investigation of novel incidents that no runbook anticipates. This delays a safe, high-value capability waiting for a distant one."
+    ],
+    "principle": "read-only for diagnosis, human approval for action",
+    "relatedConcept": "Splitting agent permissions along the observe/act boundary is the standard guardrail for AI-assisted incident response."
+  },
+  {
+    "id": 712,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Support debugging and operational issue resolution",
+    "type": "single",
+    "question": "During a checkout outage at a retail company, an on-call engineer asks Claude Code to analyze the failing service. It identifies a plausible race condition in the inventory-reservation path and produces a patch. The diff looks clean, the explanation is coherent, and the incident commander is pressing to restore service quickly. What should the engineer do next?",
+    "options": [
+      "Deploy the patch to production immediately, since the explanation is coherent and every minute of checkout downtime costs revenue",
+      "First reproduce the failure with a test, confirm the patch makes that test pass, and run the existing suite before deploying",
+      "Ask the assistant to re-derive its analysis in a fresh session and deploy if the second run reaches the same root cause",
+      "Reject the AI-generated patch and have a senior engineer write an equivalent fix by hand, since incident fixes need human authorship"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because downtime pressure is real and the fix looks right, but a coherent explanation is not evidence — models produce fluent, confident analyses that are sometimes wrong, and an unverified patch can convert one outage into two. Plausibility is not verification.",
+      "Correct. A reproducing test converts the AI's hypothesis into checkable evidence: if the test captures the failure and the patch makes it pass without breaking the suite, the fix is verified rather than trusted. Verify AI-suggested fixes empirically before they touch production.",
+      "Tempting because independent agreement feels like validation, but a second model run can share the same blind spot and confidently converge on the same wrong root cause. Model self-consistency is not ground truth; only the actual system's behavior is.",
+      "Tempting because human authorship feels safer, but who typed the patch is irrelevant to whether it is correct — a hand-written fix deployed without a reproducing test carries the same risk. This substitutes provenance for verification and wastes time re-deriving work that only needed testing."
+    ],
+    "principle": "verify the fix against the reproduced failure, not the explanation",
+    "relatedConcept": "Empirical verification of AI-proposed fixes is the discipline that makes AI-assisted debugging production-safe."
+  },
+  {
+    "id": 713,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Support debugging and operational issue resolution",
+    "type": "single",
+    "question": "A healthcare company's on-call engineer spends 45 minutes using an AI assistant to debug intermittent failures in an HL7 message-ingestion service. The assistant has proposed three different root causes in succession; each explanation sounded authoritative, but the evidence it cites keeps shifting and none of the proposed checks confirmed anything. The outage is ongoing. What should the engineer do?",
+    "options": [
+      "Recognize the assistant is guessing, stop the AI-led thread, and escalate to the service's owning team while preserving the hypotheses already ruled out",
+      "Continue the session with more detailed context about the service, since the assistant's accuracy generally improves as it sees more relevant information",
+      "Start a fresh session with a tightly scoped prompt describing only the newest hypothesis, removing the clutter accumulated across the session",
+      "Ask the assistant to rank its three root causes by confidence and systematically test them in order until one is confirmed"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Serially revised, authoritative-sounding root causes with shifting and unconfirmed evidence is the signature of a model guessing beyond its knowledge. The right operational move is to recognize the pattern, escalate to humans with real system context, and hand over the eliminated hypotheses so the 45 minutes still adds value.",
+      "Tempting because more context often does help, but the failure pattern here — confident, mutually inconsistent explanations none of which survived checking — indicates the assistant lacks grounding, not merely detail. Feeding a guessing loop extends the outage in a regulated, patient-impacting system.",
+      "Tempting because fresh sessions do cure context clutter, but this anchors the restart on the latest unverified guess and discards the elimination work already done. It reshuffles the guessing rather than exiting it, while the clock keeps running.",
+      "Tempting because it sounds systematic, but the model's self-reported confidence is not calibrated evidence — it will happily rank three fabrications. Structuring a guessing process does not convert guesses into knowledge, and it defers the escalation the situation already warrants."
+    ],
+    "principle": "recognize when the assistant is guessing and escalate to humans",
+    "relatedConcept": "Knowing the failure signatures of AI-assisted debugging — and when to exit to human escalation — is a core operational skill."
+  },
+  {
+    "id": 714,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Support debugging and operational issue resolution",
+    "type": "single",
+    "question": "A SaaS company's SRE team wants to automate triage of recurring operational alerts: when a known alert class fires, a pipeline should gather logs, run the relevant runbook's diagnostic steps, and post a structured summary to the incident channel. The team asks the platform architect how to build this with Claude Code. What should the architect recommend?",
+    "options": [
+      "Have the on-call engineer keep an interactive Claude Code session open during their shift so they can paste alerts in as they arrive",
+      "Build a traditional script for the entire flow, since anything triggered automatically should contain no model in the loop at all",
+      "Run Claude Code interactively on a shared operations server that all SREs can attach to when an alert needs investigation",
+      "Trigger Claude Code in headless mode from the alerting pipeline with a scoped prompt per alert class, read-only diagnostic permissions, and output posted to the channel"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it uses the familiar interactive workflow, but it keeps a human as the trigger for work the team explicitly wants automated — triage still waits on someone pasting an alert. It automates nothing and doesn't survive the handoffs and gaps of real on-call shifts.",
+      "Tempting because deterministic scripts are the right tool for fixed steps, but pure scripting cannot do the part that motivates this project: interpreting messy logs and composing a useful structured summary varies with each incident. The sound design is deterministic triggering around a model doing the interpretive work.",
+      "Tempting because a shared server centralizes access, but attaching to an interactive session is still human-initiated investigation, and a long-lived shared interactive agent on an ops box is a governance liability with no clear permission or audit boundary per invocation.",
+      "Correct. Claude Code runs headless for programmatic, non-interactive use — exactly the CI-and-pipeline pattern this calls for. Per-alert-class prompts keep each run scoped, read-only permissions bound the blast radius of an unattended agent, and the structured summary lands where responders work."
+    ],
+    "principle": "headless invocation with scoped, least-privilege permissions for unattended automation",
+    "relatedConcept": "Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact."
+  }
+]

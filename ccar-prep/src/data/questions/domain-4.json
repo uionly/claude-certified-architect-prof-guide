@@ -1,0 +1,706 @@
+[
+  {
+    "id": 401,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "A hospital network deploys a Claude-based discharge summary generator. Offline evals report a 92% overall quality score from an LLM judge, and the team considers the system ready. During a pilot, however, clinicians discover summaries that state medication dosages not present anywhere in the patient record. The architect is asked what is missing from the evaluation approach. What should be added?",
+    "options": [
+      "Raise the LLM judge's passing threshold from 92% to 95% so lower-quality summaries are filtered out before release",
+      "Add p95 latency measurement, since clinicians waiting on slow generations may perceive the summaries as lower quality",
+      "Add a dedicated faithfulness metric that verifies every factual claim in the summary is grounded in the source patient record",
+      "Expand the eval dataset so the 92% score carries enough statistical significance to be trusted for a clinical launch"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because a stricter bar sounds safer, but a generic quality score does not measure grounding at all. Raising the threshold on a metric blind to fabricated dosages just filters harder on the wrong signal — the reasoning error is tightening a metric instead of measuring the actual failure mode.",
+      "Latency is a legitimate production metric, but it has no relationship to fabricated dosages. This confuses operational performance with output correctness, and adding it would leave the clinical safety gap completely unaddressed.",
+      "Correct. A holistic quality score can be high while the output contains ungrounded claims; high-stakes domains need a separate faithfulness/grounding metric that checks each claim against the source. This applies the principle that you must measure the specific failure mode that matters, not a proxy aggregate.",
+      "More data improves confidence in the 92% number, but the problem is not statistical noise — it is that the metric itself cannot see hallucinated dosages. This treats a measurement-validity problem as a sample-size problem."
+    ],
+    "principle": "measure the failure mode that matters, not a proxy aggregate score",
+    "relatedConcept": "Choosing metrics that capture domain-specific risks is the foundation on which all downstream evaluation and monitoring work rests."
+  },
+  {
+    "id": 402,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "A fintech company is about to start building a Claude-powered assistant that triages fraud alerts for analysts. The product lead proposes building the system first and figuring out quality bars later, arguing 'we'll know good output when we see it.' The architect must recommend how evaluation should be handled in the project plan. What is the strongest recommendation?",
+    "options": [
+      "Define measurable pass criteria — accuracy, latency, cost, and safety targets tied to business outcomes — before development begins",
+      "Ship a minimum viable version quickly and derive quality metrics from the behavior analysts actually observe in early usage",
+      "Adopt published benchmark scores for the chosen Claude model as the quality bar, since they are independently validated",
+      "Let the pilot analysts rate outputs for a month, then set thresholds at the level the ratings show is realistically achievable"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Defining success criteria before building forces the team to translate business requirements into measurable targets, gives iteration a fixed goal, and prevents shipping on vibes. This applies the principle of defining pass criteria up front so evaluation drives development rather than rationalizing it.",
+      "Tempting because it feels lean and empirical, but without predefined criteria the team cannot tell whether the MVP is good enough to expose to analysts at all, and 'we'll know it when we see it' consistently drifts toward accepting whatever ships. It reverses the dependency between goals and measurement.",
+      "Public benchmarks measure general model capability, not this task on this data. Using them as the bar confuses model-level evaluation with system-level evaluation and says nothing about fraud-triage accuracy for this company's alerts.",
+      "Setting thresholds at whatever the system already achieves is metric-gaming in reverse: the bar is defined by current performance instead of business need. If analysts need 95% precision to trust the tool, discovering the system delivers 70% should fail it, not calibrate it."
+    ],
+    "principle": "define pass criteria before you build, derived from the business requirement",
+    "relatedConcept": "Up-front success criteria are what turn evaluation from a retrospective report into the engine that steers iteration."
+  },
+  {
+    "id": 403,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "A large retailer's Claude shopping assistant has a 3-second response SLA. The engineering team reports an average latency of 1.8 seconds and declares the SLA met, yet customer complaints about slowness spike every evening during peak traffic. The architect reviews the latency measurement approach. Which change would best explain and expose the problem?",
+    "options": [
+      "Track cost per conversation alongside latency, since peak-hour scaling costs may be forcing throttling that slows responses",
+      "Measure request throughput per second at peak, since the complaint pattern suggests the system is saturating its capacity",
+      "Segment mean latency by query intent, since some intents likely require more tool calls and drag averages up at night",
+      "Report p95 and p99 latency plus time-to-first-token during peak windows, since averages hide the tail users actually feel"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Cost visibility is useful but it is a different dimension; nothing in the scenario indicates throttling, and adding a cost metric would not reveal how slow the slowest requests are. This substitutes an adjacent metric for the one that answers the question.",
+      "Throughput could be a contributing cause, but it still would not show what users experience. Even a saturation diagnosis must be confirmed through tail latency; measuring capacity first treats a hypothesis about the cause as if it were the missing metric.",
+      "Segmenting the mean is more granular but still a mean — a segment average of 1.8s can coexist with a p99 of 15s. The reasoning error is refining the wrong statistic instead of switching to percentiles that represent worst-case experience.",
+      "Correct. Averages systematically hide tail behavior; a 1.8s mean is fully compatible with severe p95/p99 degradation at peak, and time-to-first-token captures perceived responsiveness for streamed replies. This applies the principle that SLAs must be defined and measured on percentiles, not means."
+    ],
+    "principle": "users live in the tail — define latency SLAs on percentiles, not averages",
+    "relatedConcept": "Percentile-based latency metrics connect evaluation practice directly to the user-perceived performance the SLA is meant to protect."
+  },
+  {
+    "id": 404,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "A state agency is preparing to launch a Claude assistant that helps residents navigate benefits applications. The security team requires a quantitative, pre-launch measure of the system's resilience to prompt injection before signing off. The architect must propose the metric. Which option best satisfies the requirement?",
+    "options": [
+      "The number of terms caught by the content filter's blocklist each week, showing how much malicious input is being intercepted",
+      "Injection success rate measured by running a curated adversarial red-team suite against the system on every release candidate",
+      "The harmful output rate on a standard public safety benchmark, since it is a recognized measure of model-level robustness",
+      "The count of security incidents reported by residents after launch, tracked through the agency's existing incident process"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Blocklist hit counts measure input volume, not outcomes: a filter can block thousands of strings while a single crafted injection sails through. This mistakes activity of a control for effectiveness of the system, a classic vanity-metric error.",
+      "Correct. An adversarial suite executed against the real system yields a repeatable, quantitative injection success rate before exposure to residents, and re-running it per release makes regressions visible. It applies the principle of using leading, actively-measured security metrics rather than waiting for harm.",
+      "Tempting because it is quantitative and standardized, but a generic safety benchmark measures the model in isolation, not this system with its prompts, tools, and data paths. Injection resilience is a property of the whole deployment, so this evaluates the wrong unit.",
+      "Post-launch incident counts are a lagging metric: they only move after residents have already been harmed, which is exactly what the security team's pre-launch gate exists to prevent. This confuses monitoring after the fact with evaluation before release."
+    ],
+    "principle": "measure security with leading, adversarial tests — not lagging incident counts",
+    "relatedConcept": "Security metrics belong in the same pre-launch evaluation gate as accuracy and latency, tested against the deployed system rather than the bare model."
+  },
+  {
+    "id": 405,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "A B2B SaaS company evaluates its Claude support copilot using customer churn and quarterly CSAT scores. The team ships prompt and retrieval changes every two weeks but cannot tell for months whether any change helped, and two regressions were caught only after customers complained. The architect is asked to fix the measurement strategy. What should the team do?",
+    "options": [
+      "Introduce leading metrics — such as golden-set pass rate and resolution accuracy per release — that move within a single iteration cycle",
+      "Increase the CSAT survey sample size substantially so the quarterly signal becomes statistically reliable enough to attribute to releases",
+      "Move CSAT collection from quarterly to weekly so the existing satisfaction signal arrives fast enough to evaluate each release",
+      "Tie a portion of the engineering team's performance goals to CSAT so releases are more carefully validated before shipping"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Churn and CSAT are lagging indicators — they aggregate many influences and move slowly — so per-release quality needs leading metrics that respond immediately, like eval pass rate on a golden set. This applies the leading-vs-lagging principle: pair fast proxies for iteration with slow outcomes for validation.",
+      "A bigger sample tightens confidence intervals but does not shorten the causal lag or disentangle the dozen other factors that drive quarterly CSAT. This treats an attribution-and-latency problem as a statistical power problem.",
+      "Weekly CSAT arrives faster but is still contaminated by pricing, outages, and account issues unrelated to copilot changes, and per-week samples will be small and noisy. Frequency does not fix the fact that CSAT is a lagging composite, not a release-level quality signal.",
+      "Incentives may raise caution, but without a fast, attributable metric the team still has nothing to validate against — and tying goals to a slow composite metric invites gaming rather than measurement. It addresses motivation while the actual gap is instrumentation."
+    ],
+    "principle": "iterate on leading metrics, validate with lagging ones",
+    "relatedConcept": "Pairing fast eval-based signals with slow business outcomes is what allows a two-week release cadence to remain evidence-driven."
+  },
+  {
+    "id": 406,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+    "type": "single",
+    "question": "An insurance company compares two designs for automated claims data extraction. Leadership favors Design A because its model has a much lower per-token price. The architect notes that Design A fails validation more often, triggering automatic retries and manual correction by adjusters, while Design B usually succeeds on the first pass. How should the cost comparison be framed?",
+    "options": [
+      "Negotiate committed-use discounts for Design B's model so its per-token price becomes competitive with Design A's",
+      "Weight each design's per-token price by its average context length, since longer prompts change the effective cost per call",
+      "Measure end-to-end cost per successfully completed claim, including retries and adjuster correction time, for both designs",
+      "Cap maximum output tokens on both designs so per-claim spend is bounded and the token prices can be compared directly"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Discounts change the price of tokens but leave the comparison framed on the wrong unit. Even a discounted Design B cannot be judged fairly until the retry and human-correction costs of Design A are counted, so this optimizes an input to a flawed analysis.",
+      "Context-length weighting refines the per-call token cost but still ignores the dominant costs in the scenario: repeated attempts and adjuster labor. It is a more precise measurement of an incomplete quantity.",
+      "Correct. The economically meaningful unit is cost per successful task outcome — API spend across all attempts plus the human time to reach a correct claim. This applies the principle that cheap tokens producing wrong answers are expensive, and it aligns the metric with the business objective.",
+      "Output caps bound spend per call but do nothing about failure-driven retries and manual rework, and truncating extractions could increase failures. This controls a visible cost while the hidden cost — failed completions — keeps growing."
+    ],
+    "principle": "compare cost per successful outcome, not cost per token",
+    "relatedConcept": "Task-level cost accounting is what lets accuracy, retry, and human-review effects show up honestly in cost-performance decisions."
+  },
+  {
+    "id": 407,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "single",
+    "question": "A SaaS company is building its first golden evaluation set for a Claude onboarding assistant that has been in limited beta for three months. An engineer proposes generating 500 synthetic test queries with Claude itself, arguing it is fast and avoids any privacy review. The architect must decide how the golden set should be sourced. What is the best approach?",
+    "options": [
+      "Approve the synthetic-only approach but generate several thousand queries, since scale compensates for any distribution mismatch",
+      "Build the core set from anonymized real beta queries, then augment it with synthetic edge cases and adversarial inputs",
+      "Use established public benchmark datasets for assistant-style tasks so results can be compared against industry baselines",
+      "Have the product managers write the test queries, since they best understand the intended use cases and success criteria"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because volume feels rigorous, but synthetic queries systematically miss the phrasing, typos, ambiguity, and unexpected intents of real users — and more of the wrong distribution is still the wrong distribution. Scale cannot correct a sampling bias.",
+      "Correct. Real traffic anchors the eval set to the distribution the system actually serves, while synthetic augmentation deliberately covers edge cases and adversarial inputs that are rare in three months of beta data. This applies the principle of evaluating on the distribution you serve, plus targeted coverage of what you fear.",
+      "Public benchmarks measure generic capability, not this product's tasks, terminology, or users. Scores on them would be comparable across models but uninformative about onboarding-assistant quality — the classic error of choosing what is measurable over what is relevant.",
+      "PM-written queries capture intended use, but users reliably deviate from intent, and an eval set built from imagined usage inherits the team's blind spots. It is a reasonable supplement but a poor foundation when real traffic is available."
+    ],
+    "principle": "evaluate on the distribution you serve, not the one you imagine",
+    "relatedConcept": "Golden sets grounded in production traffic are the backbone that makes every later eval score meaningful."
+  },
+  {
+    "id": 408,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "single",
+    "question": "A healthcare technology firm uses Claude for two tasks: extracting ICD-10 billing codes from encounter notes, and drafting empathetic follow-up messages to patients. The team wants a single grading methodology across both to keep the eval framework simple. The architect must define how each task's outputs should be graded. What should they recommend?",
+    "options": [
+      "Use an LLM judge with one shared rubric for both tasks, since a single automated grader keeps scores consistent and comparable",
+      "Use exact-match checks for both tasks by writing reference messages, since deterministic grading removes all judge subjectivity",
+      "Use trained human reviewers for all outputs of both tasks, since clinical context makes any automated grading too risky to rely on",
+      "Grade codes with exact-match checks and messages with a rubric-based LLM judge validated against clinician labels"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting for its simplicity, but code extraction has a single verifiable answer — using a probabilistic judge there introduces noise and cost where a deterministic check is perfect. Forcing one methodology onto structurally different outputs sacrifices grading validity for uniformity.",
+      "Exact match works for codes but fails for open-ended messages, where many different wordings are equally good; grading against one reference message would penalize valid outputs. This over-applies deterministic grading to a task without a single correct answer.",
+      "Human review is the gold standard but does not scale to every output of every eval run, making iteration slow and expensive. The error is treating the most rigorous method as the only acceptable one instead of reserving humans for validation and high-stakes samples.",
+      "Correct. Matching methodology to output type is the core of mixed-methodology eval design: deterministic outputs get code-graded checks, open-ended outputs get an LLM judge constrained by a rubric, and the judge itself is validated against human (clinician) labels before being trusted."
+    ],
+    "principle": "match the grading method to the output type — deterministic checks for verifiable answers, validated judges for open-ended ones",
+    "relatedConcept": "Mixed grading methodologies let one eval framework cover both structured extraction and free-form generation without compromising either."
+  },
+  {
+    "id": 409,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "multi",
+    "question": "A retail company grades its Claude product-description generator with an LLM-as-judge pipeline. Recently the judge's scores stopped correlating with what merchandisers consider good: outputs the team rejects still score highly, and scores swing between runs. The architect is asked to make the judge trustworthy. Which two practices should be adopted? (Choose two.)",
+    "options": [
+      "Periodically measure the judge's agreement against human merchandiser labels on a sample, and recalibrate when agreement drops",
+      "Use the same model and prompt for both generation and judging so the grader shares the generator's understanding of the task",
+      "Give the judge an explicit rubric with concrete scoring criteria and worked examples of good and bad descriptions",
+      "Show the judge each output's previous score so its new score stays consistent with the established scoring history"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. An LLM judge is itself a model that must be evaluated: measuring judge-human agreement on labeled samples is the only way to know its scores mean anything, and periodic re-checks catch judge drift. This applies the principle that the judge must be validated before it is trusted.",
+      "Tempting because shared context sounds like alignment, but a judge sharing the generator's model and prompt inherits the generator's blind spots and tends to rate its own failure patterns favorably. Independence between generator and grader is what gives the score information value.",
+      "Correct. Vague instructions like 'rate quality 1-10' produce unstable, uncalibrated scores; a rubric with concrete criteria and exemplars anchors the judge's decisions and reduces run-to-run variance. Rubric-constrained judging is the standard practice for open-ended output grading.",
+      "Anchoring the judge on prior scores manufactures consistency rather than validity — it suppresses legitimate score changes and propagates past errors forward. Stable-but-wrong is worse than noisy, because the drift becomes invisible."
+    ],
+    "principle": "an LLM judge is a model too — constrain it with a rubric and validate it against human labels",
+    "relatedConcept": "Judge reliability determines whether automated evaluation accelerates iteration or silently misleads it."
+  },
+  {
+    "id": 410,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "single",
+    "question": "A city government's Claude assistant for permit applications passed its 15-example eval suite at 100%, and the team shipped confidently. Within two weeks, residents reported frequent wrong answers about permit fees and expiration rules that the suite never touched. The architect reviews the testing framework. What is the most important correction?",
+    "options": [
+      "Re-run the existing 15 cases multiple times at temperature 0 to confirm the pass results were reproducible and not sampling luck",
+      "Expand the eval set until results carry statistical signal, stratifying cases across permit types, fee questions, and edge conditions",
+      "Move evaluation to a stronger judge model, since the current grader likely passed answers that were actually incorrect",
+      "Replace offline evaluation with production monitoring, since real resident traffic reveals failures faster than any curated suite"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Reproducibility checks are good hygiene, but re-running the same 15 cases only confirms performance on those 15 cases. The failures came from untested regions of the input space, so the error is polishing precision while coverage is the actual gap.",
+      "Correct. Fifteen examples cannot represent the breadth of permit queries — a 100% pass tells you almost nothing statistically, and unstratified sets leave whole intents unmeasured. This applies the principle that eval size and coverage must be sufficient to distinguish signal from noise across the real task space.",
+      "A stronger judge helps only if grading was the failure point, but the reported failures were on question types the suite never contained. This misdiagnoses a coverage problem as a grading-accuracy problem.",
+      "Monitoring is essential but is a complement, not a substitute: relying on production traffic to find failures means residents become the test suite. Abandoning offline evals removes the pre-release safety gate rather than fixing its weakness."
+    ],
+    "principle": "a small eval passing 100% measures the eval, not the system",
+    "relatedConcept": "Eval set size and stratified coverage determine how much a pass rate can actually be trusted before release."
+  },
+  {
+    "id": 411,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "single",
+    "question": "A fintech firm built its golden set from pilot traffic when its Claude budgeting assistant launched eighteen months ago. The eval still passes at 98%, yet support tickets about wrong answers have doubled since the product added investment and tax features and the user base shifted toward small businesses. What should the architect prioritize?",
+    "options": [
+      "Raise the pass bar from 98% to 100%, since a rising ticket volume means the tolerated 2% failure rate is no longer acceptable",
+      "Add a batch of adversarial and jailbreak cases to the suite, since hostile usage grows as a product's user base expands",
+      "Have the eval graded by human reviewers instead of the automated pipeline, since the judge may have drifted over eighteen months",
+      "Refresh the golden set from recent production traffic so it reflects the current features and user mix, then re-baseline"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tightening the threshold squeezes the last 2% of a set that no longer represents the product. The suite contains no investment, tax, or small-business queries, so even a 100% pass would be silent about the failures users report — a stricter bar on stale data measures nothing new.",
+      "Adversarial coverage is worthwhile, but the tickets describe wrong answers on new features, not attacks. Adding hostile cases addresses a different threat model and leaves the actual dataset-drift problem untouched.",
+      "Judge drift is a real phenomenon, but here the eval is passing while production fails, and the simplest explanation is that the eval's inputs no longer match production inputs. Auditing the grader before auditing the dataset inspects the wrong component first.",
+      "Correct. The golden set has drifted from the served distribution: it predates two major feature areas and a user-mix shift. Golden sets are living artifacts that must be refreshed from current traffic on a cadence, then re-baselined — evaluate on the distribution you serve today."
+    ],
+    "principle": "a golden set is a living artifact — refresh it as the product and users change",
+    "relatedConcept": "Dataset drift is the quiet way eval suites decay from safety gates into false reassurance."
+  },
+  {
+    "id": 412,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+    "type": "single",
+    "question": "A healthcare SaaS team iterated on its triage-assistant prompt for six weeks, checking every change against its full 300-case golden set until the pass rate reached 99%. After release, production accuracy measured well below the eval score, and new failure patterns appeared that the suite never showed. What testing-framework flaw most likely explains the gap?",
+    "options": [
+      "The team tuned against the entire golden set, so the prompt overfit to those cases; a held-out set never used during iteration was needed",
+      "The eval ran at a different temperature than production, so sampling variance made the offline scores systematically optimistic",
+      "The 300 cases were too few for a triage domain; a suite several times larger would have kept the offline score aligned with production",
+      "The grading pipeline was too lenient; stricter pass criteria would have kept the reported 99% closer to true production accuracy"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Checking every prompt tweak against the full set turns the golden set into training data: the prompt accumulates case-specific fixes that do not generalize. The remedy is a held-out test set, evaluated rarely, that estimates performance on unseen inputs — the eval-hygiene equivalent of train/test separation.",
+      "Temperature mismatch can add variance, but it produces noise around the true score, not a systematic six-week climb to 99% that then collapses in production. This explanation mistakes a small random effect for a structural methodology flaw.",
+      "Size alone does not prevent the gap: a 3,000-case set tuned against directly would be overfit just the same, only more slowly. The error is treating overfitting as a sample-size problem when it is a usage-protocol problem.",
+      "Lenient grading would depress real quality at any score, but it does not explain why offline and online numbers diverged after weeks of tuning specifically. The signature here — eval climbing while generalization falls — points to optimization against the measurement itself."
+    ],
+    "principle": "any eval you optimize against stops measuring generalization — keep a held-out set",
+    "relatedConcept": "Held-out data is what separates genuine capability gains from memorized answers to your own test."
+  },
+  {
+    "id": 413,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Conduct A/B testing and iterative improvements",
+    "type": "single",
+    "question": "A retail company's team shipped a release of its Claude support agent that changed the system prompt, upgraded the model version, and increased retrieval depth all at once. Metrics improved, so the team repeated the pattern — but the next bundled release regressed sharply and nobody can identify which change caused it. What should the architect institute going forward?",
+    "options": [
+      "Roll back to the last known-good release and freeze changes until the team fully understands the current system's behavior",
+      "Run each bundled release through a longer A/B test window so regressions are detected with higher statistical confidence",
+      "Isolate variables: evaluate one change at a time offline against the golden set before combining validated changes into a release",
+      "Require the LLM judge to produce written rationales for each score so improvements and regressions can be attributed to causes"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Rolling back stops the bleeding but a change freeze is not a methodology — when changes resume, the team will bundle again and face the same attribution problem. This treats the symptom of one bad release rather than the process flaw that produced it.",
+      "A longer test detects that a bundle regressed with more confidence, but still cannot say which of three simultaneous changes caused it. More statistical power on a confounded experiment is precision applied to an unanswerable question.",
+      "Correct. Changing one variable at a time is the foundational rule of iterative improvement: each change gets its own offline eval result, so effects are attributable and regressions are traceable to a specific cause. Validated changes can then be combined with a final confirmation run.",
+      "Judge rationales explain why an output scored as it did, not which upstream change altered the output. Attribution requires controlled comparison of system versions; narrative explanations of scores cannot substitute for isolating the experimental variable."
+    ],
+    "principle": "change one variable at a time so every effect has an owner",
+    "relatedConcept": "Controlled, single-variable iteration is what turns eval results into causal knowledge instead of correlations."
+  },
+  {
+    "id": 414,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Conduct A/B testing and iterative improvements",
+    "type": "single",
+    "question": "A SaaS product manager has rewritten the system prompt for the company's Claude billing assistant and wants it pushed straight into a 50/50 production A/B test this week, arguing that real users are the only meaningful test. The current prompt serves thousands of paying customers daily. How should the architect sequence the rollout?",
+    "options": [
+      "Approve the 50/50 split immediately, since maximizing sample size is the fastest route to a statistically conclusive result",
+      "Gate the variant on offline eval results first, then expose it as a small canary with guardrail metrics before widening the split",
+      "Keep the variant in shadow mode indefinitely, scoring its unserved responses against production until it proves consistently superior",
+      "Restrict the new prompt to internal employees' accounts for a quarter so any quality issues surface without customer exposure"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because bigger samples do conclude faster, but a 50/50 launch exposes half of all paying customers to an unvalidated prompt — the blast radius of an undetected regression is maximal. Speed of conclusion is being purchased with uncontrolled risk.",
+      "Correct. The standard sequence is offline evals as the cheap, safe filter, then a canary on a small traffic slice with guardrail metrics (error rate, safety, latency) watched for degradation, then progressive widening. This applies the principle of testing offline before online and bounding blast radius during rollout.",
+      "Shadow mode is a valuable pre-exposure step, but 'indefinitely' means the variant never faces real interactive dynamics — user follow-ups, clarifications, satisfaction — that only served traffic reveals. Perpetual shadow testing is risk aversion that blocks learning.",
+      "Internal dogfooding surfaces some issues, but employees ask different questions than customers and a quarter-long gate slows iteration to a crawl. It substitutes an unrepresentative population and an arbitrary duration for a controlled, metric-gated ramp."
+    ],
+    "principle": "validate offline first, then canary with guardrails — blast radius should grow only with evidence",
+    "relatedConcept": "Staged rollout discipline is how A/B testing delivers learning without gambling the production experience."
+  },
+  {
+    "id": 415,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Conduct A/B testing and iterative improvements",
+    "type": "single",
+    "question": "A fintech team is A/B testing a new retrieval configuration for its Claude advisory assistant. After one day and roughly 200 user sessions, the variant shows a 2% higher task-success rate, and the team wants to declare victory and roll it to 100% before a board demo. What should the architect advise?",
+    "options": [
+      "Proceed with the rollout, since a positive early signal on real traffic is more trustworthy than any further offline analysis",
+      "Add a third variant with an intermediate retrieval depth so the test can also reveal the shape of the configuration's effect",
+      "Re-run the offline golden-set eval on both configurations, and let the offline comparison settle the decision before the demo",
+      "Continue the test until the sample reaches statistical significance, monitoring guardrail metrics for degradation meanwhile"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "A 2% difference over 200 sessions is well within the range random noise produces; treating it as a real effect is eyeballing dressed up as experimentation. Deadline pressure is the classic driver of this error, and a rollout based on noise can just as easily ship a regression.",
+      "Adding variants mid-test splits the already-thin traffic three ways, pushing significance even further away, and answers a refinement question before the basic 'is it better' question has an answer. It expands the experiment when the experiment needs power.",
+      "Offline evals are the right pre-test filter but the team is past that stage: the question the A/B test uniquely answers is behavior on live traffic, which the golden set cannot fully represent. Retreating offline discards the stronger evidence source mid-collection.",
+      "Correct. The disciplined move is to run the test until the observed difference clears a pre-defined significance threshold, while guardrail metrics (latency, cost, safety, error rate) confirm nothing else degraded. This applies the principle of statistical significance over eyeballing — and business deadlines do not change the math."
+    ],
+    "principle": "an underpowered A/B test read early is a coin flip with a dashboard",
+    "relatedConcept": "Statistical discipline in online testing protects the iteration loop from shipping noise as improvement."
+  },
+  {
+    "id": 416,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Conduct A/B testing and iterative improvements",
+    "type": "single",
+    "question": "A hospital system wants to trial a substantially revised prompt for its Claude clinical documentation assistant. Compliance insists that no patient-facing or clinician-facing output may come from the unvalidated variant, but the team needs evidence from realistic clinical traffic, since synthetic tests have missed workflow-specific failures before. Which testing approach fits these constraints?",
+    "options": [
+      "Shadow deployment: the variant processes real production inputs in parallel, its outputs logged and scored but never shown to users",
+      "A 5% canary release to a low-acuity department, with rapid rollback triggers if quality or safety guardrail metrics degrade",
+      "An expanded synthetic eval suite built with clinician input, exercised offline until the variant demonstrates consistent superiority",
+      "A staged rollout beginning with one volunteer clinic, widening week by week as clinician-reported issues are triaged and resolved"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Shadow deployment is precisely the pattern for this constraint set: the variant sees genuine production inputs — capturing the realistic-traffic requirement — while its outputs are diverted to logging and evaluation, so no unvalidated content reaches clinicians or patients. It buys real-world evidence at zero user-facing risk.",
+      "A canary serves live variant outputs to real users, which directly violates the compliance requirement — and 'low-acuity' does not mean low-stakes when clinical documentation errors propagate into records. This picks the right general tool for the wrong constraint profile.",
+      "More synthetic testing is safe but the scenario states synthetic tests have already missed workflow-specific failures; repeating the approach with more cases does not close the realism gap that motivated the trial. It optimizes the method that is known to be insufficient.",
+      "A staged rollout still exposes real clinicians to unvalidated outputs from day one at the volunteer clinic, and relies on humans reporting problems as the detection mechanism. It sequences the risk over time rather than eliminating it as compliance requires."
+    ],
+    "principle": "when unvalidated output must never reach users, shadow the traffic instead of serving it",
+    "relatedConcept": "Shadow deployments extend the A/B toolkit to high-stakes domains where online exposure is not an acceptable price for evidence."
+  },
+  {
+    "id": 417,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Conduct A/B testing and iterative improvements",
+    "type": "single",
+    "question": "A public transit agency's Claude journey-planning assistant collects thumbs-up/down feedback, and negative ratings have accumulated around fare-calculation answers for months without any change in system behavior. The architect is asked to make the feedback actually improve the product. What should be established?",
+    "options": [
+      "Display a notice on low-confidence fare answers asking riders to rephrase their question or verify fares on the official tariff page",
+      "Schedule a weekly session where the team reads through all negative-feedback transcripts together to build shared quality intuition",
+      "A triage loop that clusters flagged failures, converts recurring ones into eval cases, and verifies each fix against them before release",
+      "An automatic escalation that re-runs any thumbs-down conversation through a stronger model tier and serves the regenerated answer"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "A disclaimer shifts the correction burden onto riders and leaves the underlying fare-calculation failures fully intact. It manages the perception of the problem rather than feeding the signal back into the system — feedback is collected but never closes any loop.",
+      "Reading transcripts builds intuition but produces no durable artifact: insights evaporate, nothing prevents regressions, and coverage depends on who attended. Human review is a useful input to a loop, not the loop itself — the error is stopping at awareness instead of institutionalizing the fix.",
+      "Correct. This is a feedback-driven iteration loop: production signal is triaged, recurring failures become permanent eval cases, fixes are validated against those cases, and the suite grows to prevent regression. Each user complaint is converted into lasting test coverage — feedback becomes infrastructure.",
+      "Tempting because it reacts instantly, but regenerating after a thumbs-down helps only the next message in that one conversation, costs more on every retry, and teaches the team nothing about why fares fail. It automates a workaround while the failure pattern persists for every new user."
+    ],
+    "principle": "close the loop — production failures should become permanent eval cases",
+    "relatedConcept": "Feedback-driven iteration is the mechanism that turns monitoring signals into compounding quality improvements."
+  },
+  {
+    "id": 418,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+    "type": "single",
+    "question": "A fintech compliance assistant built on Claude confidently cites policy clause numbers that do not exist in the company's policy library. Trace review shows that for these queries, the retrieval step returned no relevant policy document, yet the model produced a specific, authoritative-sounding answer anyway. What is the correct diagnosis and fix?",
+    "options": [
+      "Prompt failure: add explicit instructions such as 'never fabricate clause numbers' so the model stops inventing citations",
+      "A grounding gap: fix retrieval so relevant policies reach the context, and instruct the model to answer only from provided sources or abstain",
+      "Model mismatch: upgrade to the most capable model tier, which has a lower intrinsic hallucination rate on knowledge-intensive tasks",
+      "Sampling instability: set temperature to zero so the model stops generating speculative clause numbers on ambiguous queries"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because instructions are cheap, but 'do not fabricate' cannot supply the missing document — the model still has nothing correct to say and instruction-only fixes reduce fabrication unreliably. This treats the visible symptom while the root cause sits in the retrieval step the traces already identified.",
+      "Correct. The traces show the classic hallucination signature: generation ungrounded because retrieval delivered nothing relevant. The fix is two-part — repair the grounding pipeline so sources arrive, and constrain generation to answer only from provided context with an explicit abstention path when context is empty.",
+      "A stronger model may hallucinate somewhat less, but no model tier can correctly cite documents it was never given. This misdiagnoses a pipeline problem as a capability problem and adds cost while leaving the empty-context condition fully in place.",
+      "Temperature zero makes outputs deterministic, not grounded — the model will fabricate the same plausible clause number every time instead of varied ones. This confuses reducing randomness with adding factual grounding."
+    ],
+    "principle": "hallucination under missing context is a retrieval problem wearing a generation costume",
+    "relatedConcept": "Reading traces to locate where grounding broke is the difference between fixing hallucinations and papering over them."
+  },
+  {
+    "id": 419,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+    "type": "single",
+    "question": "A SaaS analytics platform's Claude report generator intermittently produces outputs in the wrong structure. Reviewing the 2,000-token system prompt, an architect finds it says 'be extremely concise' in one section and 'explain every metric in full detail' in another, and specifies two different JSON schemas added by different teams over time. What is the most appropriate next step?",
+    "options": [
+      "Upgrade to a higher model tier, since stronger models are better at reconciling tension between competing instructions",
+      "Add a post-generation validator that checks the output structure and automatically retries the request when validation fails",
+      "Reduce the temperature setting so the model resolves the ambiguity the same way on every request instead of intermittently",
+      "Audit the prompt for conflicting instructions, and consolidate it to a single owned specification with one schema and one style"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because capability often fixes things, but no model can satisfy contradictory requirements — it can only pick one interpretation per request, which is exactly the intermittent behavior observed. Paying more to arbitrate a contradiction leaves the contradiction in place.",
+      "A validator-retry loop catches bad structures but each retry burns tokens and latency, and the model is still coin-flipping between two schemas underneath. This treats the symptom and institutionalizes the failure as a permanent runtime cost instead of removing its cause.",
+      "Lower temperature makes the coin-flip more consistent, not correct: the model may reliably choose the same schema — possibly the wrong one — and 'in full detail' still fights 'extremely concise' within each output. Determinism is not the same as coherence.",
+      "Correct. The evidence is a textbook prompt failure: conflicting instructions accreted without ownership. The fix is to resolve the contradiction at its source — one schema, one style directive, a single owner for the prompt — because a model given incompatible goals cannot be reliable no matter what surrounds it."
+    ],
+    "principle": "when instructions conflict, no model tier or retry loop can make the output reliable",
+    "relatedConcept": "Distinguishing prompt failure from model limitation prevents spending capability budget on problems that editing text would solve."
+  },
+  {
+    "id": 420,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+    "type": "single",
+    "question": "A healthcare startup runs its prior-authorization reasoning task — multi-step eligibility logic across overlapping policy rules — on a fast, low-cost Claude tier. After six weeks of prompt iterations including few-shot examples, chain-of-thought scaffolding, and task decomposition, accuracy has plateaued far below target, while the same eval passes comfortably on the top-tier model. What conclusion should the architect draw?",
+    "options": [
+      "This is model mismatch: the task exceeds the tier's reasoning capability, so these cases should run on the stronger model despite the cost",
+      "The golden set needs expansion, since more failure examples would reveal which prompt patterns finally unlock reliable performance",
+      "Add a self-critique pass where the same model reviews and revises its own answer, effectively raising capability without changing tiers",
+      "Raise the temperature on failed cases and sample multiple attempts, selecting the majority answer to lift accuracy past the plateau"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The diagnostic signature of model mismatch is exactly this: extensive, competent prompt engineering plateaus below target while a stronger tier passes the same eval. The task sits above the tier's capability ceiling, and the economic question becomes routing or paying for capability — not more prompting.",
+      "Tempting because more data usually helps, but six weeks of iteration across few-shot, chain-of-thought, and decomposition is already a thorough search of prompt space. Expanding the eval refines measurement of a plateau it cannot move — it mistakes a capability ceiling for an information gap.",
+      "Self-critique with the same model is bounded by that model's ability to recognize its own reasoning errors, which on above-capability tasks is precisely what is missing. It adds latency and cost for marginal gains and postpones the tier decision the evidence already supports.",
+      "Majority voting over high-temperature samples helps when the model is sometimes right by reasoning, but on tasks beyond capability the errors are systematic, so the majority converges on confident wrong answers. It multiplies cost per task while averaging over the same ceiling."
+    ],
+    "principle": "when strong prompting plateaus and a bigger model passes, the task is above the tier — route up, stop prompting",
+    "relatedConcept": "Recognizing capability ceilings early saves weeks of prompt iteration that no amount of wording can win."
+  },
+  {
+    "id": 421,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+    "type": "single",
+    "question": "A retailer's Claude merchandising agent follows its operating rules flawlessly in short sessions, but in long sessions that grow past 150K tokens it starts ignoring constraints — like never discounting clearance items — that were stated once in the middle of the accumulated context. Short-session evals of the identical prompt pass consistently. What is the most likely diagnosis?",
+    "options": [
+      "Prompt failure: the constraint wording is too ambiguous, and rewriting it more forcefully will restore compliance in long sessions",
+      "Model mismatch: the agent's reasoning degrades under complexity, so long sessions require upgrading to a more capable model tier",
+      "A context problem: critical instructions are being lost in the middle of a long context, so key constraints need repositioning and reinforcement as sessions grow",
+      "Emerging hallucination: the agent is generating ungrounded actions, so retrieval-backed grounding checks should gate each discount decision"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because rewording is the cheapest lever, but the identical wording achieves full compliance in short sessions — the instruction is clear when the model attends to it. The failure correlates with context length, not phrasing, so this fixes a variable the evidence already ruled out.",
+      "Capability mismatch would show up on the task's hardest reasoning regardless of session length, yet short sessions pass flawlessly. Upgrading tiers spends heavily on a diagnosis the length-dependence contradicts, though longer effective attention can mask — not fix — the structural issue.",
+      "Correct. Instruction adherence that decays specifically as context grows, for content positioned mid-context, is the lost-in-the-middle signature. The remedy is context engineering: keep critical constraints in the system prompt or near the end, re-assert them periodically, and compact stale history as sessions lengthen.",
+      "Hallucination means generating claims unsupported by available grounding, but here the grounding is present in context and simply not being honored. Adding retrieval gates addresses a failure mode the system does not have while leaving instruction placement untouched."
+    ],
+    "principle": "instruction-following that decays with context length is a placement problem, not a wording problem",
+    "relatedConcept": "Long-running agent sessions make context management a first-class failure category alongside prompts and model choice."
+  },
+  {
+    "id": 422,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+    "type": "single",
+    "question": "A public sector benefits chatbot fails intermittently: roughly one query in twenty yields an irrelevant answer, with no obvious pattern. Three engineers have simultaneously adjusted the prompt, swapped embedding models, and tweaked temperature over two weeks, and the failure rate has not moved. The architect steps in to establish a diagnostic process. What should it be?",
+    "options": [
+      "Revert all recent changes to the last stable release and lock the configuration, since uncoordinated fixes have clearly made things worse",
+      "Reproduce failing queries, inspect end-to-end traces to localize which step breaks, then test one candidate fix at a time against that evidence",
+      "Stand up a production A/B test comparing each engineer's proposed fix, letting live traffic determine empirically which change works",
+      "Replace the model with the top-capability tier first, since eliminating model capability as a variable is the fastest way to narrow the search"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Reverting restores a known state but the failure predates the flailing — the rate never moved, so the recent changes are neither cause nor cure. A freeze without a diagnostic process just preserves the original bug while stopping all learning.",
+      "Correct. This is the diagnostic method: first reproduce the failure so it can be studied, then read traces to find where in the pipeline — retrieval, context assembly, generation — the query goes wrong, then change a single variable and verify against the reproduced cases. Evidence before intervention, one variable at a time.",
+      "An A/B test measures which blind guess performs best, but with a 5% intermittent failure it would need enormous traffic to distinguish fixes, and none of the candidates was derived from evidence about the cause. It is an expensive way to avoid looking at the traces.",
+      "Swapping the model first is changing the most expensive variable on no evidence — the traces might show retrieval returning garbage, which no model upgrade fixes. 'Eliminate variables by replacement' inverts the method: observation should narrow the search before anything is replaced."
+    ],
+    "principle": "reproduce, trace, isolate — diagnose with evidence before changing anything",
+    "relatedConcept": "Systematic root-cause analysis is what separates targeted fixes from the shotgun debugging that stalls LLM systems."
+  },
+  {
+    "id": 423,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+    "type": "single",
+    "question": "A SaaS company's Claude customer-service agent resends the same 30K tokens — system prompt, policy excerpts, and tool definitions — with every single API call, and this stable prefix now dominates the monthly bill. Response quality is meeting targets, and the team wants costs cut without touching behavior. What should the architect do first?",
+    "options": [
+      "Move the agent to a smaller, cheaper model tier, since a well-tuned prompt of this size often performs adequately on lower tiers",
+      "Truncate older conversation history more aggressively so the total context per call shrinks along with the per-call token cost",
+      "Shift customer-service traffic to asynchronous batch processing, trading response immediacy for a substantially lower token rate",
+      "Enable prompt caching on the stable prefix so the system prompt and tool definitions are priced at the reduced cached rate after the first call"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because tier downgrades cut every token's price, but the team's constraint is 'without touching behavior' and a tier change alters output quality in ways that require full re-evaluation. It trades a validated quality bar for savings that caching achieves risk-free.",
+      "History truncation shrinks the variable part of the context, but the bill is dominated by the 30K stable prefix, which truncation never touches. It also risks degrading multi-turn coherence — a behavior change — for savings in the wrong term of the cost equation.",
+      "Batch processing offers deep discounts but customer service is an interactive, latency-sensitive workload; making customers wait for batch turnaround sacrifices the product experience for savings. Right tool, disqualifying workload mismatch.",
+      "Correct. A large, byte-identical prefix resent on every call is the textbook prompt-caching case: cached prefix tokens are billed at a small fraction of the base input rate, latency improves, and generated outputs are unaffected. It exploits the structure of the spend — optimize the biggest term with the least behavioral risk."
+    ],
+    "principle": "a stable prefix resent on every call is cache material, not a cost of doing business",
+    "relatedConcept": "Prompt caching is usually the first optimization to evaluate because it cuts cost and latency without changing model behavior."
+  },
+  {
+    "id": 424,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+    "type": "single",
+    "question": "A fintech firm's Claude document-review pipeline is drawing latency complaints from analysts. An engineer proposes immediately swapping to the fastest model tier, another wants to rewrite the retrieval layer, and a third suggests trimming the prompt. No one has data on where the fifteen seconds per request actually goes. What should the architect direct the team to do?",
+    "options": [
+      "Instrument the pipeline to attribute latency across retrieval, tool calls, queueing, and generation before selecting any optimization",
+      "Adopt the model swap first since it is the quickest to implement, and revert it if quality evals show the faster tier degrades accuracy",
+      "Enable streaming responses immediately, since perceived latency drives complaints and streaming improves it regardless of the bottleneck",
+      "Apply all three proposed optimizations together in one release, since each targets a different stage and their latency savings will compound"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Measure before optimizing: a per-stage latency breakdown reveals whether the fifteen seconds sits in retrieval, queueing, tool round-trips, or token generation, and each answer implies a different fix. Instrumentation costs little and prevents optimizing a stage that contributes a fraction of the delay.",
+      "Tempting because it is fast to try, but if generation is only three of the fifteen seconds, the swap risks accuracy for a marginal win. 'Cheapest to implement' is not 'most likely to help' — this is optimization by convenience rather than by evidence.",
+      "Streaming genuinely improves perceived latency, but a document-review pipeline may deliver results into a queue where time-to-first-token is irrelevant, and it does nothing to the underlying fifteen seconds. It is a reasonable later addition being used to skip diagnosis.",
+      "Bundling all three confounds attribution — if latency improves, no one knows which change mattered or which can be reverted — and some changes (model swap, prompt trim) carry quality risk that now cannot be isolated. It violates both measure-first and one-variable-at-a-time."
+    ],
+    "principle": "profile before you optimize — the bottleneck is an empirical fact, not a vote",
+    "relatedConcept": "Latency attribution is the evaluation discipline that keeps optimization effort pointed at the stage that actually dominates."
+  },
+  {
+    "id": 425,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+    "type": "single",
+    "question": "A retail chain's Claude assistant answers everything — from 'what are your store hours' to complex multi-order refund disputes — with its top-tier model. Traffic analysis shows about 80% of queries are simple FAQs the smallest model handles perfectly in offline tests, while costs are triple budget. Leadership wants savings without degrading hard-case quality. What architecture should be proposed?",
+    "options": [
+      "Migrate all traffic to the smallest model and add few-shot examples for the complex cases, accepting minor quality loss on disputes",
+      "Keep the top-tier model for everything but aggressively cache prompts and compress conversation history to offset the cost overrun",
+      "Add a router that classifies incoming queries, sending simple ones to the small model and escalating complex or uncertain ones to the top tier",
+      "Negotiate committed-throughput pricing for the top-tier model, since predictable volume discounts preserve quality with zero engineering work"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because it maximizes savings, but it directly violates the stated constraint: refund disputes involve multi-step reasoning the small model was never shown to handle, and few-shot examples rarely close a genuine capability gap. This optimizes cost by quietly paying with hard-case quality.",
+      "Caching and compression are real levers but they discount every call rather than re-pricing the 80% of calls that never needed top-tier capability. The dominant inefficiency — capability overprovisioning on easy queries — survives intact, so savings will likely fall short of a 3x overrun.",
+      "Correct. Tiered routing matches capability to task difficulty: the 80% of simple queries run at small-model prices where quality is proven, complex and low-confidence cases escalate to the top tier, and hard-case quality is preserved by design. This moves the system toward the cost-performance frontier instead of along one axis.",
+      "Volume discounts reduce the unit price of an architecture that overpays on most requests — a discounted mismatch is still a mismatch. It also caps future savings at the negotiated rate, whereas routing compounds with every other optimization."
+    ],
+    "principle": "route by difficulty — pay for top-tier capability only where the task demands it",
+    "relatedConcept": "Model routing is the primary structural lever for moving a system toward the cost-performance frontier."
+  },
+  {
+    "id": 426,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+    "type": "single",
+    "question": "Clinicians at a telehealth provider complain that the Claude visit-summary assistant 'hangs' — the screen shows nothing for 12 seconds, then a long summary appears all at once. Tracing shows retrieval completes in under a second; nearly all the time is token generation, inflated by verbose summaries that restate boilerplate clinicians skip anyway. What combination best addresses the complaints?",
+    "options": [
+      "Provision dedicated capacity for the workload so generation throughput rises and the full summary arrives several seconds sooner",
+      "Stream tokens as they are generated and constrain output length to the sections clinicians use, so text appears immediately and finishes sooner",
+      "Move summary generation to a smaller, faster model tier, accepting some summarization quality risk in exchange for shorter waits",
+      "Parallelize the retrieval and patient-record lookups ahead of generation so the pipeline's pre-generation stages no longer serialize"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Higher throughput shaves seconds off total generation but the screen still shows nothing until completion, so the 'hang' experience — the actual complaint — persists in shorter form. It also adds standing cost to solve what output design solves for free.",
+      "Correct. This pairs the two levers matched to the evidence: streaming converts a 12-second blank wait into sub-second time-to-first-token, and trimming boilerplate cuts real generation time and tokens since output tokens dominate latency. Perceived latency and actual latency both improve, with no quality trade on content clinicians read.",
+      "A faster tier reduces generation time but gambles summarization quality in a clinical context — a trade the evidence does not require, since verbosity and the all-at-once delivery pattern explain the complaints. It reaches for capability changes before exhausting risk-free output controls.",
+      "Parallelizing pre-generation stages attacks under one second of a twelve-second budget: the trace already localized the time in generation. This optimizes the measured non-bottleneck — the precise mistake latency attribution exists to prevent."
+    ],
+    "principle": "output tokens are the latency you pay for twice — stream them and generate fewer of them",
+    "relatedConcept": "Perceived latency is a first-class optimization target, and streaming plus output-length control are its cheapest levers."
+  },
+  {
+    "id": 427,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+    "type": "single",
+    "question": "A national archives agency classifies 500,000 digitized documents per night with Claude, writing results to a database that curators query the next morning. No user ever waits on an individual response, yet the workload runs through the same synchronous real-time API path as the agency's interactive tools, and cost pressure is mounting. What should the architect change?",
+    "options": [
+      "Stream the classification responses to cut effective processing time per document and reduce the compute window the job occupies",
+      "Apply prompt caching to the classification instructions and rely on that discount alone, keeping the synchronous path unchanged",
+      "Spread the classification calls evenly across the full 24 hours so the job stays under rate limits without infrastructure changes",
+      "Move the workload to batch processing, accepting delayed turnaround in exchange for the substantially lower per-token cost of asynchronous jobs"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Streaming improves time-to-first-token for a human watching a response render, but nobody watches an overnight pipeline — the tokens cost the same and the job's economics are untouched. This applies a perceived-latency lever to a workload with no perceiver.",
+      "Caching the shared instruction prefix is worthwhile and stacks well, but taking the discount 'alone' leaves the workload on real-time pricing when its shape qualifies for batch's roughly half-price rate on every token. It captures the smaller discount and forfeits the larger one.",
+      "Smoothing the load solves a rate-limit problem the scenario does not report, and every call still pays full synchronous price. It reorganizes when tokens are spent without changing what any of them cost — logistics mistaken for economics.",
+      "Correct. This workload is the canonical batch case: high volume, fully asynchronous, with a many-hour tolerance window before curators arrive. Batch APIs price tokens at roughly half the synchronous rate precisely for such jobs, so matching the API modality to the workload's latency tolerance converts slack time directly into savings."
+    ],
+    "principle": "price follows urgency — workloads that can wait should never pay real-time rates",
+    "relatedConcept": "Matching API modality to workload latency tolerance is a structural cost lever independent of prompts and model choice."
+  },
+  {
+    "id": 428,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Monitor system performance using logging and observability tools",
+    "type": "single",
+    "question": "A fintech firm's Claude loan-eligibility assistant gave a customer materially wrong guidance last week, and the incident review stalled immediately: the application logs contain only HTTP status codes and timestamps, so nobody can see what the model was asked or answered. Compliance now requires that any future incident be fully reconstructable. What should the architect implement?",
+    "options": [
+      "Structured logging of prompts, completions, and tool calls, linked by request IDs, with PII redaction and retention policies applied",
+      "Error-and-status logging with increased verbosity levels, keeping storage costs manageable while capturing more failure detail",
+      "Reliance on the API provider's usage dashboard, which already records token counts, latency, and error rates for every request",
+      "A user-feedback capture flow so customers can flag wrong answers, creating a reviewable record whenever an incident occurs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Reconstructing an LLM incident requires the actual content — what context and prompt the model received, what it generated, and what tools it called — correlated by request ID into a full trace. Redaction and retention policies reconcile this with privacy obligations; this is the observability baseline for regulated LLM systems.",
+      "Tempting because it extends the existing setup cheaply, but verbose status logging still records that something happened, never what was said. An LLM's failure lives in its inputs and outputs; without content, the next incident review stalls at exactly the same wall.",
+      "Provider dashboards aggregate operational metrics — tokens, latency, errors — but do not retain the request-level content needed to reconstruct a specific customer's interaction. Metrics tell you the system was healthy while it gave wrong guidance; that is the gap that caused this stall.",
+      "Feedback flows surface incidents users notice, but detection is not reconstruction: a flag without the underlying prompt and completion still leaves nothing to review. It also misses every wrong answer customers fail to recognize as wrong — often the most dangerous ones."
+    ],
+    "principle": "you cannot debug what you did not record — log the content, not just the status code",
+    "relatedConcept": "Content-level structured logging is the foundation every other monitoring, evaluation, and audit capability builds upon."
+  },
+  {
+    "id": 429,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Monitor system performance using logging and observability tools",
+    "type": "multi",
+    "question": "A SaaS company monitors its Claude knowledge assistant with dashboards for cost, token usage, latency, and error rates — all of which stayed green while answer quality quietly degraded for six weeks after a knowledge-base migration, until enterprise customers escalated. The architect must ensure quality regressions are detected without waiting for complaints. Which two additions address the gap? (Choose two.)",
+    "options": [
+      "Finer-grained cost anomaly alerts, since spend patterns often shift measurably when a system's output behavior changes",
+      "A recurring sampled human review of production outputs, graded against the quality rubric with results tracked over time",
+      "Higher latency alert thresholds tuned to the post-migration baseline so the dashboards reflect the system's new normal",
+      "Automated quality scoring of sampled production outputs with drift detection on input and output distributions, alerting on degradation"
+    ],
+    "correct": [1, 3],
+    "optionExplanations": [
+      "Tempting because cost sometimes co-moves with behavior shifts, but the six-week incident proves the premise false here: quality collapsed while spend stayed green. Sharpening an operational metric still leaves zero direct measurement of answer quality — the gap is a missing dimension, not missing granularity.",
+      "Correct. Sampled human review is the ground-truth layer of production quality monitoring: a regular cadence of rubric-graded samples catches degradation that operational metrics cannot see, and the accumulated grades double as calibration data for automated scorers. Humans stay in the loop where judgment is required.",
+      "Retuning latency thresholds is dashboard housekeeping unrelated to the failure — latency was never the problem, and no threshold on an operational metric can detect wrong answers. This polishes the instruments that were already blind to the incident.",
+      "Correct. Automated scoring of sampled outputs — an LLM judge or checks against the eval rubric — plus drift detection on inputs and outputs turns quality into a continuously monitored, alertable signal. A knowledge-base migration is exactly the distribution shift drift detection exists to flag within days, not weeks."
+    ],
+    "principle": "operational dashboards cannot see quality — monitor it directly, with machines for coverage and humans for truth",
+    "relatedConcept": "Quality observability pairs automated scoring at scale with sampled human review, closing the blind spot operational metrics leave open."
+  },
+  {
+    "id": 430,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Monitor system performance using logging and observability tools",
+    "type": "single",
+    "question": "A hospital group runs a Claude agent that processes insurance claims through a 12-step chain of model calls and tool invocations — eligibility lookups, code validation, document retrieval, and drafting. About 7% of runs end in a wrong determination, but only the final output is logged, so every investigation restarts from guesswork about which step went wrong. What observability capability should the architect prioritize?",
+    "options": [
+      "Enrich the final-output log record with metadata such as total duration, token counts, and which tools were invoked during the run",
+      "Add automatic retry logic to the final drafting step, since regenerating the determination resolves transient failures without investigation",
+      "Implement per-step tracing that records every model call and tool invocation with inputs and outputs under a single correlated trace ID",
+      "Alert whenever a final determination fails schema validation, so failing runs are flagged for review the moment they complete"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting as an incremental step, but metadata summarizes the run without exposing any step's content: knowing the eligibility tool was called does not reveal that it returned stale data which step six then propagated. Investigations still cannot see where correctness broke.",
+      "Retrying the last step assumes the failure originates there, but in a 12-step chain a wrong determination usually crystallizes upstream — retrying the drafting step faithfully re-drafts the same corrupted intermediate state. This automates guesswork about the failure's location instead of observing it.",
+      "Correct. Multi-step agent debugging requires distributed-tracing discipline: every model call and tool invocation logged with its inputs and outputs, correlated under one trace ID, so an investigator can walk the chain and pinpoint the step where the run diverged. Failure localization becomes reading a trace instead of reproducing a mystery.",
+      "Validation alerts catch structurally malformed outputs quickly, but a wrong eligibility determination can be perfectly schema-valid — and an alert only says that a run failed, never which of twelve steps caused it. Detection without localization leaves the core investigative problem intact."
+    ],
+    "principle": "in a multi-step agent, the unit of observability is the step, not the run",
+    "relatedConcept": "Trace-level visibility into agent chains is what converts intermittent multi-step failures from mysteries into diagnoses."
+  },
+  {
+    "id": 431,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Monitor system performance using logging and observability tools",
+    "type": "single",
+    "question": "A retail platform pages its on-call engineer every time a single request to the Claude gift-recommendation service fails. During peak season this produced dozens of pages per night for transient blips that self-resolved, and the team has begun acknowledging pages without reading them — last week a genuine two-hour outage went unnoticed for 40 minutes. How should alerting be redesigned?",
+    "options": [
+      "Alert on error-rate and latency thresholds tied to service SLOs, paging only for sustained breaches while transient blips flow to a log",
+      "Disable paging during peak season and have the on-call engineer review the dashboards at the start and end of each shift instead",
+      "Add automatic retries for failed requests so most transient failures resolve silently and the page volume drops to a manageable level",
+      "Route all failure alerts to a team channel rather than pages, letting engineers triage collectively as alerts arrive throughout the day"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Alerting on symptoms at the rate level — error percentage or latency breaching an SLO-derived threshold for a sustained window — separates signal from noise: individual blips are invisible, real degradation pages reliably. Every page becomes actionable, which is what rebuilds on-call trust after fatigue.",
+      "Tempting because it stops the noise instantly, but scheduled dashboard checks reintroduce exactly the detection gap the outage exposed — a failure starting after the morning review runs unobserved until evening. It cures alert fatigue by abandoning real-time detection altogether.",
+      "Retries are good resilience engineering and reduce user-visible failures, but they fix the requests, not the alerting design: whatever still fails after retries presumably still pages per-event, and retries can mask a growing degradation until it is severe. The paging philosophy remains broken underneath.",
+      "Moving pages to a channel lowers urgency without adding discrimination — the same noise arrives in a place engineers are even freer to ignore, and diffuse collective ownership means a genuine outage may sit unclaimed. It relocates alert fatigue rather than resolving it."
+    ],
+    "principle": "alert on sustained rates against SLOs, not individual events — a page nobody reads protects nothing",
+    "relatedConcept": "Threshold and SLO-based alerting is what keeps monitoring signals trusted enough to act on when it matters."
+  },
+  {
+    "id": 432,
+    "domain": "Evaluation, Testing & Optimization",
+    "objective": "Monitor system performance using logging and observability tools",
+    "type": "single",
+    "question": "A national legislature's Claude research assistant was evaluated thoroughly at launch, but over the following year new policy domains — climate disclosure rules, AI regulation — began dominating citizen queries. Accuracy is eroding a little each month, invisible week-to-week, and the team only learns about gaps when a parliamentary office files a complaint. What monitoring capability would catch this pattern early?",
+    "options": [
+      "A scheduled quarterly audit in which staff manually review a large sample of transcripts from the preceding three months",
+      "Monthly re-indexing of the document corpus and embedding refresh, ensuring retrieval always operates over current legislative material",
+      "Guardrail filters on outputs about new policy domains, blocking answers in topic areas the launch evaluation never covered",
+      "Drift detection comparing production query and output distributions against the eval baseline, alerting when divergence crosses a threshold"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because human review is thorough, but a quarterly cadence means up to three months of accumulating degradation before anyone looks — the complaint-driven status quo with a calendar. Slow-drift problems need continuous statistical detection, with human review triggered by the signal rather than the season.",
+      "Fresh indexes help retrieval find new documents but cannot report whether the system answers new-domain questions well, or that the query mix has shifted at all. It maintains an input to quality while measuring nothing about quality — maintenance mistaken for monitoring.",
+      "Blocking new topics trades silent wrongness for loud uselessness on precisely the questions citizens increasingly ask, and the block list still has to learn about new domains somehow. It suppresses the symptom while the underlying signal — the shifting distribution — goes unmeasured.",
+      "Correct. The described pattern is dataset drift in production: the served query distribution has walked away from the evaluated baseline. Statistical drift detection on inputs and outputs surfaces that divergence within days, and the alert triggers the right responses — refresh the eval set, extend the corpus, re-baseline — before complaints accumulate."
+    ],
+    "principle": "drift is invisible week-to-week and obvious year-to-year — only continuous baseline comparison catches it in between",
+    "relatedConcept": "Drift detection is the monitoring layer that tells you when yesterday's evaluation no longer describes today's system."
+  }
+]

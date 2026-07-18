@@ -1,0 +1,838 @@
+[
+  {
+    "id": 301,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "A retail chain's customer-service agent has grown to 45 tools spanning returns, inventory, pricing, loyalty, and marketing. Support engineers report the agent increasingly calls the wrong tool for routine return requests, and per-request token costs have doubled since the tool catalog expanded. The architect must recommend a fix before peak season. What should they do first?",
+    "options": [
+      "Upgrade to the most capable model tier so the agent can reason over the larger tool catalog more reliably",
+      "Add a longer system prompt section that lists every tool with usage rules the model must follow",
+      "Prune and consolidate the tool set to the workflows this agent actually handles, merging overlapping tools",
+      "Split each broad tool into several narrower variants so the model has more precise options to choose from"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because stronger models do select tools better, but it treats the symptom and raises cost further. Tool-selection accuracy degrades as the catalog grows for any model, and 45 overlapping definitions still bloat every request's context.",
+      "More instructions add tokens on top of the existing bloat and force the model to reconcile a rulebook with a crowded catalog. This addresses the symptom with prompt patches rather than removing the underlying selection ambiguity.",
+      "Correct. Too many tools degrades selection accuracy and inflates context cost, so the first move is scoping the agent to a curated, non-overlapping tool set. This applies the principle that well-scoped tools with clear boundaries outperform a large catalog.",
+      "Splitting tools multiplies the catalog and worsens the exact problem being diagnosed. It confuses precision of individual tools with clarity of the overall set; more near-duplicate options increases selection ambiguity."
+    ],
+    "principle": "fewer, well-scoped tools beat a large overlapping catalog",
+    "relatedConcept": "Tool catalog curation is the integration-side counterpart of context engineering: every definition competes for the model's attention."
+  },
+  {
+    "id": 302,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "A hospital network is building a Claude agent that helps staff reschedule appointments. A developer proposes adding a single generic 'execute_sql' tool against the scheduling database because it would cover any future need without new development. The security architect objects during design review. Which recommendation best resolves the objection?",
+    "options": [
+      "Replace the generic tool with a few narrowly scoped tools (find_slot, reschedule_appointment) that expose only the needed operations",
+      "Keep the SQL tool but add a system prompt instruction forbidding the model from writing UPDATE or DELETE statements",
+      "Keep the SQL tool but restrict it to a read replica so at least destructive writes against production are impossible",
+      "Require a human to approve every SQL statement the agent generates before it executes against the database"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. A capability the agent does not need is pure attack surface and a source of confusion; scoping tools to the actual task shrinks both. This applies least privilege at the tool-design level, where enforcement is deterministic.",
+      "Tempting because prompt rules feel like control, but the model is non-deterministic and a prompt injection or misgeneration can bypass instructions. Guardrails that only exist in the prompt are not an enforcement boundary.",
+      "A read replica removes writes but still exposes the entire schema, including patient data unrelated to scheduling. It narrows one risk while leaving broad read capability the task never required.",
+      "Human approval of every statement destroys the efficiency the agent was meant to provide and reviewers fatigue quickly on raw SQL. It compensates for excessive capability with process rather than removing the excess capability."
+    ],
+    "principle": "unneeded capability is attack surface — scope tools to the task",
+    "relatedConcept": "Capability bloat evaluation asks what the agent must do, not what it might someday do, before granting any tool."
+  },
+  {
+    "id": 303,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "A SaaS company's ticketing agent has eight tools, yet evaluation transcripts show the model regularly passes malformed arguments and picks 'search_tickets' when 'get_ticket_by_id' would be correct. The tool descriptions read like internal API stubs, e.g. 'search_tickets: searches tickets'. The team debates the next step. What is the highest-leverage change?",
+    "options": [
+      "Add few-shot examples of correct tool calls into the conversation history for every request",
+      "Introduce a validation layer that rejects malformed calls and asks the model to retry with corrected arguments",
+      "Wrap all eight tools behind one 'ticket_action' dispatcher tool so the model only has a single choice to make",
+      "Rewrite each tool description to state what it does, when to use it over its neighbors, and what each parameter expects"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Few-shot examples can help but they add tokens to every request and only cover the cases you exemplify. They compensate for poor interface documentation instead of fixing it at the source.",
+      "Retry-on-validation-failure is a reasonable safety net, but it adds latency and cost per error while the model keeps making the same mistakes. It treats the symptom rather than the ambiguity that causes wrong calls.",
+      "A dispatcher hides the real choice inside an opaque argument, which usually makes selection worse because the model loses per-tool schemas and guidance. It also concentrates capability in one loosely typed interface.",
+      "Correct. Tool descriptions are prompt engineering: the model chooses and parameterizes tools based on what the definitions say. Precise descriptions with disambiguation guidance and parameter semantics are the cheapest, most direct fix for wrong-tool and wrong-argument errors."
+    ],
+    "principle": "tool descriptions are prompt engineering",
+    "relatedConcept": "An agent's effective capability is bounded by how clearly its tool interfaces are described, not just what they can do."
+  },
+  {
+    "id": 304,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "A government agency's research assistant connects to two MCP servers maintained by different teams. One exposes 'search_documents' over the records archive; the other exposes 'find_records' over an overlapping copy of the same archive. Analysts report inconsistent answers because the agent alternates between the two tools, which return differently formatted results. What should the architect recommend?",
+    "options": [
+      "Add routing instructions to the system prompt telling the model which tool to prefer for each document category",
+      "Remove the duplication by designating one canonical search tool and dropping the overlapping one from the agent's configuration",
+      "Keep both tools but have the agent call each on every query and merge the results before answering",
+      "Rename the tools so their names clearly differ, making it easier for the model to tell them apart"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Routing rules in the prompt add ongoing token cost and remain probabilistic; the model can still pick either tool. It manages the overlap instead of eliminating it, leaving inconsistency in place.",
+      "Correct. Overlapping tools create selection ambiguity and inconsistent behavior, and the fix is consolidation: one canonical tool per capability. This directly applies the principle of eliminating redundant tools rather than instructing around them.",
+      "Calling both doubles latency and token cost on every query and still requires reconciling two result formats. It converts an occasional inconsistency into a permanent tax, which is the wrong trade-off.",
+      "Distinct names do not remove the underlying overlap: both tools still claim the same job, so the model still has to guess. The ambiguity is in capability, not naming."
+    ],
+    "principle": "consolidate overlapping tools to one canonical capability",
+    "relatedConcept": "When multiple integration teams contribute tools, someone must own deduplicating the combined catalog the agent actually sees."
+  },
+  {
+    "id": 305,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "A fintech platform team plans to auto-generate a Claude tool for every endpoint in their internal API gateway — roughly 220 tools — so any future agent can do anything from day one. The architect reviewing the plan predicts poor results. Which prediction and remedy are most accurate?",
+    "options": [
+      "Tool selection accuracy will degrade and context costs will balloon; instead curate small per-agent tool sets aligned to specific workflows",
+      "The gateway will be overloaded by agent traffic; instead add rate limiting and caching in front of the generated tools",
+      "The generated schemas will drift from the APIs; instead add contract tests that regenerate tools on every API change",
+      "The model will refuse to operate with that many tools; instead shard the tools across several cooperating agents that each hold half"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Presenting hundreds of tool definitions dilutes the model's attention, degrades selection accuracy, consumes enormous context, and expands the attack surface. Curated, workflow-aligned tool sets apply the principle that agents should get the minimum capability their job requires.",
+      "Tempting because infrastructure load is a real operational concern, but nothing in the scenario indicates traffic volume is the risk. Rate limiting does nothing about selection accuracy, token bloat, or the security exposure of universal capability.",
+      "Schema drift is a genuine maintenance issue, but contract tests would keep 220 tools accurately described while leaving the core problem — an unusably large, over-privileged catalog — completely intact.",
+      "Models do not refuse based on tool count, so the premise is wrong. Sharding tools across agents adds orchestration complexity while each agent still carries a bloated, unfocused catalog; it redistributes the problem rather than curating it."
+    ],
+    "principle": "minimum viable tool set per agent, not maximum coverage",
+    "relatedConcept": "Auto-exposing an entire API surface as tools is the integration equivalent of granting an employee every permission on day one."
+  },
+  {
+    "id": 306,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "A hospital deploys a Claude assistant that lets clinicians look up patient records via an internal FHIR API. The agent uses one service account with read access to all patients, and the system prompt tells the model to only discuss patients assigned to the requesting clinician. A security review is scheduled. Which change closes the most significant gap?",
+    "options": [
+      "Encrypt patient data in transit and at rest between the agent and the FHIR API to prevent interception",
+      "Log every record the agent retrieves and review the logs weekly for access outside a clinician's assignments",
+      "Move the list of each clinician's assigned patients from the system prompt into a database the model can query",
+      "Exchange the clinician's session for a scoped token so the FHIR API itself enforces that clinician's access rights"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Encryption protects data from network attackers but does nothing about which records the agent can fetch. The gap here is authorization scope, not confidentiality of transport or storage.",
+      "Tempting because auditing is a real control, but weekly log review is detective, not preventive: unauthorized disclosures happen first and are found later. Detective controls cannot substitute for enforcing scope up front.",
+      "Moving assignment data into a queryable database still leaves the model deciding what to enforce, and the service account can still read everything. The authorization decision remains inside a non-deterministic component.",
+      "Correct. The model must never be the authorization boundary; access must be enforced deterministically downstream. Per-user scoped tokens mean even a prompt-injected or confused agent physically cannot retrieve records outside the clinician's permissions."
+    ],
+    "principle": "the model is never the authorization boundary",
+    "relatedConcept": "Every agent integration should be designed so a fully compromised prompt still cannot exceed the calling user's real permissions."
+  },
+  {
+    "id": 307,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "A SaaS company connects its executive assistant agent to an email MCP server that can read and send mail with the executive's full privileges. The agent automatically summarizes incoming messages, including mail from external senders. A security architect reviewing the design is most concerned about which failure mode?",
+    "options": [
+      "The MCP server could go down during business hours, leaving the executive without email summaries when they are most needed",
+      "An external email could contain injected instructions that the agent follows using the executive's send and read privileges",
+      "The executive's OAuth token could expire mid-session, causing the agent to silently drop messages from its summaries",
+      "Summaries could omit important context from long threads, causing the executive to act on incomplete information"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Availability matters operationally, but an outage is a visible, recoverable inconvenience. It is not the class of risk a security review prioritizes when an agent processes untrusted content with broad privileges.",
+      "Correct. This is a confused-deputy setup: untrusted external content flows into the context of an agent holding powerful credentials, so injected instructions can exfiltrate mail or send messages as the executive. Untrusted input plus over-privileged tools is the canonical prompt-injection risk pattern.",
+      "Token expiry is an authentication hygiene issue with a deterministic fix (refresh flows) and a visible failure mode. It does not create the silent, adversary-driven misuse that combining untrusted input with broad privileges does.",
+      "Summary quality is an accuracy concern for evaluation work, not a security gap. Focusing on it confuses model output quality with the authorization exposure created by the integration design."
+    ],
+    "principle": "untrusted content + over-privileged tools = confused deputy",
+    "relatedConcept": "Threat modeling agent integrations means tracing where untrusted data enters the context and what credentials it can reach."
+  },
+  {
+    "id": 308,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "A tax authority's citizen-service agent calls several internal APIs through a shared machine identity. After an incident, investigators could see that the agent accessed a taxpayer's file but could not determine which caseworker's session triggered it. Compliance requires attributable access to taxpayer data. What design change addresses the finding?",
+    "options": [
+      "Increase log retention from 90 days to seven years so investigators have a longer window of evidence for future incidents",
+      "Add the caseworker's name to the prompt so it appears in the model's reasoning and can be recovered from transcripts",
+      "Propagate the authenticated caseworker's identity on every downstream API call so access is authorized and recorded per user",
+      "Issue each API its own dedicated service account so investigators can at least tell which system performed each access"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Longer retention preserves more of the same unattributable records. The gap is that the logs never captured who acted, so keeping them longer adds storage cost without adding attribution.",
+      "Tempting because the name would appear somewhere, but prompt text is unverified user-supplied context, not an authenticated identity. Transcripts can be incomplete or manipulated and downstream systems still see only the shared account.",
+      "Correct. Identity propagation makes the end user, not the shared machine identity, the subject of both the authorization decision and the audit record. This applies per-user credential scoping, which yields attributable access as a byproduct of correct authorization.",
+      "Per-API service accounts tell you which service called, which investigators already knew. It refines system-level attribution while leaving the actual requirement — user-level attribution — unmet."
+    ],
+    "principle": "propagate end-user identity; shared accounts erase attribution",
+    "relatedConcept": "Audit trails for agent systems are only as granular as the identity that reaches the systems of record."
+  },
+  {
+    "id": 309,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "A wealth-management firm is rolling out a remote MCP server that gives advisors' Claude clients access to portfolio data. One engineer suggests shipping the server with a static admin API key baked into its configuration since it is 'internal anyway'. The architect must choose the authentication approach for this integration. Which is most appropriate?",
+    "options": [
+      "An OAuth flow where each advisor authorizes the MCP server and it acts with tokens scoped to that advisor's entitlements",
+      "The static admin key, but stored in a secrets manager and rotated automatically every 24 hours to limit exposure",
+      "Mutual TLS between each advisor's client and the MCP server so only company-managed devices can connect at all",
+      "A single service key per office location so a leaked credential only exposes one branch's client portfolios"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. OAuth is the standard authorization pattern for MCP servers: each user consents and the server receives tokens carrying that user's scope. Every downstream call is then constrained and attributable to the actual advisor, applying least privilege end to end.",
+      "Tempting because secrets management and rotation are genuine hardening, but the key is still admin-scoped: any request through the server can reach any portfolio. Rotation shortens credential lifetime without narrowing what the credential can do.",
+      "Mutual TLS strongly authenticates the device and channel but says nothing about which portfolios a given advisor may read. It solves authentication of the connection while leaving authorization completely unscoped.",
+      "Per-office keys reduce blast radius somewhat but every advisor in a branch still shares one identity over all of that branch's clients. It is coarse-grained partitioning where per-user scoping is both required and available."
+    ],
+    "principle": "per-user OAuth scope beats shared credentials, however hardened",
+    "relatedConcept": "MCP server authentication design determines whether least privilege is even possible for every agent built on top of it."
+  },
+  {
+    "id": 310,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "An e-commerce marketplace gives its seller-support agent tools to read seller messages, adjust listing status, and issue refunds up to $500. The agent's context routinely includes buyer-written product reviews and messages. In a tabletop exercise, the red team demonstrates a review containing hidden text that causes the agent to issue a refund. What is the most robust remediation?",
+    "options": [
+      "Fine-tune or prompt the model with examples of injection attempts so it learns to recognize and refuse embedded instructions",
+      "Scan incoming reviews with a classifier and strip any content that looks like instructions before it reaches the agent",
+      "Reduce the refund tool's limit from $500 to $50 so successful injections cause much smaller financial losses",
+      "Require a deterministic policy check outside the model — such as human approval or verified order-state validation — before any refund executes"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Model-level hardening reduces susceptibility but is probabilistic; novel injection phrasings will keep appearing. Treating the model as the last line of defense violates the rule that safety-critical actions need deterministic enforcement.",
+      "Input filtering is a useful defense-in-depth layer, but classifiers miss obfuscated attacks and adversaries iterate faster than filters. Alone, it leaves a consequential action gated only by content screening.",
+      "Lowering the limit shrinks the loss per event but leaves the vulnerability fully exploitable and repeatable at scale. It tunes the blast radius instead of interposing a control between untrusted input and money movement.",
+      "Correct. Consequential, irreversible actions triggered from untrusted content need a check the model cannot be talked out of: deterministic validation or human confirmation outside the model. This enforces that authorization for high-impact actions lives beyond the prompt."
+    ],
+    "principle": "gate irreversible actions with deterministic checks outside the model",
+    "relatedConcept": "Prompt injection defenses layer, but the load-bearing layer for high-impact tools must be non-probabilistic."
+  },
+  {
+    "id": 311,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "A retail chatbot answers order-status questions and complex return-policy disputes through the same pipeline: a top-tier model with extended thinking and deep retrieval. The p95 latency is 9 seconds against a 3-second SLA, and 80% of traffic is simple order-status lookups. The team must meet the SLA without hurting quality on disputes. What should the architect propose?",
+    "options": [
+      "Move all traffic to the fastest model tier and disable extended thinking, accepting some quality loss on disputes",
+      "Route simple intents to a faster, smaller-model path with shallow retrieval, reserving the heavy configuration for dispute cases",
+      "Keep the pipeline unchanged but stream tokens to the user so the interface feels responsive despite the 9-second completion",
+      "Cache the full responses to previously seen questions so repeat queries return instantly and average latency falls"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting for its simplicity, but it sacrifices accuracy on exactly the 20% of traffic — policy disputes — where the business risk of a wrong answer is highest. A uniform downgrade is the wrong trade-off when workload difficulty is bimodal.",
+      "Correct. Matching model tier, thinking budget, and retrieval depth to each use case's actual difficulty and SLA is the core accuracy-latency discipline. The easy majority gets fast handling; the hard minority keeps the capability it needs — cost and latency drop without a quality regression where it matters.",
+      "Streaming improves perceived latency and is worth doing, but a 9-second completion still misses a 3-second completion SLA and users still wait for the answer they need. It masks the problem for one metric without meeting the stated requirement.",
+      "Order-status answers are per-customer and time-varying, so exact-response caching has low hit rates and staleness risk. It optimizes averages while p95 — the SLA metric — stays dominated by uncached heavy-path requests."
+    ],
+    "principle": "match model tier and pipeline depth to per-use-case difficulty and SLA",
+    "relatedConcept": "Tiered routing is how production systems buy accuracy only where the workload actually demands it."
+  },
+  {
+    "id": 312,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "A hospital system wants Claude to draft discharge summaries from full inpatient records. Clinicians review each draft the next morning, so turnaround of several hours is acceptable, but factual errors create direct patient-safety risk. The team debates configuration. Which approach best fits these constraints?",
+    "options": [
+      "Use a fast, low-cost model tier so drafts are ready within seconds of discharge and clinicians can review immediately",
+      "Use a mid-tier model with streaming enabled so clinicians can watch drafts generate and interrupt when they spot errors",
+      "Use the most capable model with extended thinking and thorough retrieval over the record, processed asynchronously in batches",
+      "Use two fast models in parallel and present both drafts so clinicians can choose whichever version looks more accurate"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because speed feels like a virtue, but nothing in the requirements rewards seconds-level latency: review happens the next morning. Choosing a lower-accuracy tier here spends nothing and buys risk in a safety-critical task.",
+      "Streaming addresses perceived latency in interactive sessions, but clinicians are not watching generation — they review finished drafts later. This optimizes an experience that does not exist in the workflow while settling for mid-tier accuracy.",
+      "Correct. When the latency budget is loose and the accuracy stakes are high, spend the budget on quality: top model tier, extended thinking, and deep retrieval, run asynchronously. The principle is justifying configuration against the actual SLA, not a generic preference for speed.",
+      "Two fast drafts doubles cost without ensuring either reaches the accuracy a stronger single configuration would. It also pushes the burden of error detection onto clinicians, the failure mode the system should minimize."
+    ],
+    "principle": "spend a loose latency budget on accuracy, not speed nobody asked for",
+    "relatedConcept": "Accuracy-latency decisions start from the use case's real SLA and risk profile, not from default settings."
+  },
+  {
+    "id": 313,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "A fintech app is adding a conversational assistant to its mobile home screen. Product research shows users abandon the feature if nothing appears within about one second, though they tolerate answers that take several seconds to finish. The current design waits for retrieval and two sequential tool calls before returning anything. What should the architect change first?",
+    "options": [
+      "Stream the response as it generates and run the independent tool calls and retrieval in parallel to cut time-to-first-token",
+      "Replace retrieval with a larger system prompt containing the product documentation so no retrieval round-trip is needed",
+      "Precompute likely answers for each user overnight so the assistant can respond instantly from a personalized cache",
+      "Switch to the smallest model tier across the board so total generation time fits inside the one-second window"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The binding constraint is perceived latency — time to first visible output — not total completion time. Streaming plus parallelizing independent calls attacks exactly that constraint without sacrificing model quality or retrieval grounding.",
+      "Stuffing documentation into the prompt trades a retrieval round-trip for a much larger prompt, which slows time-to-first-token and dilutes attention. It also freezes content that retrieval would keep current.",
+      "Tempting because caches are fast, but conversational financial queries are long-tail and account-specific; overnight precomputation mostly misses. It also raises freshness and data-handling concerns for per-user financial predictions.",
+      "The requirement tolerates multi-second completions, so forcing everything under one second overshoots and costs accuracy. This misreads which latency metric matters: first token, not last."
+    ],
+    "principle": "optimize the latency metric users actually feel — time to first token",
+    "relatedConcept": "Streaming and parallelism often deliver the perceived-latency win that teams mistakenly buy with model downgrades."
+  },
+  {
+    "id": 314,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "A SaaS company's internal knowledge assistant retrieves the top 100 chunks, reranks them, and passes the top 20 to Claude. Employees complain about slow answers; a junior engineer proposes cutting retrieval to top-10 with no reranking, noting answers 'still look fine' in a few spot checks. The architect wants to approve a change responsibly. What should happen before shipping?",
+    "options": [
+      "Ship the change behind a feature flag for all users and roll back if the complaint volume increases within two weeks",
+      "Reject the change, since reducing retrieval depth always harms recall and the latency problem should be solved with a faster model",
+      "Approve it immediately because internal tools have low stakes and spot checks are adequate evidence for this audience",
+      "Measure answer quality on a representative eval set at several retrieval depths, then pick the shallowest configuration that holds the quality bar"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because flags feel safe, but complaint volume is a lagging, noisy signal and employees often silently distrust bad answers rather than report them. Using production users as the first quality measurement inverts the evaluation order.",
+      "Retrieval depth is a tunable trade-off, not a monotonic good — beyond some depth extra chunks add noise and latency for no recall gain. Reflexively refusing to tune it, and reaching for a model swap instead, ignores the cheapest lever.",
+      "Spot checks sample a handful of easy queries and internal tools still shape real decisions. Approving on anecdote confuses absence of observed failures with measured quality.",
+      "Correct. Accuracy-latency changes should be justified with measurement: sweep the parameter, quantify quality at each setting, and choose the cheapest configuration that meets the bar. This is the eval-driven configuration principle in action."
+    ],
+    "principle": "justify configuration changes with evals, not anecdotes",
+    "relatedConcept": "Every knob in a retrieval pipeline is an accuracy-latency trade that deserves a measured curve, not a guess."
+  },
+  {
+    "id": 315,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "A public-sector benefits office processes 40,000 scanned application packets per night, extracting eligibility fields for caseworkers to verify each morning. The overnight window is eight hours and the current fast-model pipeline finishes in two, but caseworkers report correcting many extraction errors. The architect is asked to improve the system. What is the best use of the available headroom?",
+    "options": [
+      "Keep the current pipeline and use the spare six hours to run it three more times, taking the majority answer per field",
+      "Keep the fast model but add a nightly human QA shift that samples and corrects a percentage of extractions before morning",
+      "Move to a more capable model tier with richer document context per packet, using more of the overnight window for higher accuracy",
+      "Split the workload across more parallel workers so processing finishes in 30 minutes and errors surface earlier for review"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Self-consistency voting can help on some tasks, but rerunning the same under-powered configuration mostly reproduces correlated errors. Tripling cost for marginal gains is weaker than moving to a configuration that is actually more accurate.",
+      "Tempting because human QA does catch errors, but it adds recurring labor cost and only samples the output. It treats the symptom downstream instead of using the freely available compute budget to reduce errors at the source.",
+      "Correct. Latency headroom in a batch pipeline is a resource: converting it into accuracy via a stronger model and fuller context directly reduces the caseworker correction burden. This is the accuracy-latency trade-off exercised in the accuracy direction, justified by the SLA.",
+      "Finishing faster has no value when the deadline is 8 a.m. either way, and it does nothing about error rates. It optimizes a metric nobody is constrained by while the real complaint is accuracy."
+    ],
+    "principle": "in batch pipelines, convert latency headroom into accuracy",
+    "relatedConcept": "The accuracy-latency dial turns both ways; architects should notice when a workload leaves speed on the table."
+  },
+  {
+    "id": 316,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "single",
+    "question": "A SaaS vendor's assistant now handles two million conversations a month. Storing full prompts, completions, and tool traces for everything has become expensive, but engineers say they cannot debug incidents without detailed traces. The head of platform asks for a sustainable observability design. Which approach balances the needs?",
+    "options": [
+      "Store aggregate metrics only — latency percentiles, token counts, error rates — and drop conversation-level logging entirely",
+      "Keep aggregate metrics for all traffic and retain full traces for a random sample plus all errored or negatively rated conversations",
+      "Keep full traces for every conversation but move them to cold storage after 48 hours to cut storage costs substantially",
+      "Log full traces only when an engineer manually enables debug mode while actively reproducing a reported incident"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Aggregates tell you that something regressed but never why: no prompt, no tool sequence, no failing example to inspect. Losing trace-level visibility makes every incident investigation start from zero evidence.",
+      "Correct. Sampling is the standard answer to observability at scale: metrics on everything, deep traces on a statistical sample, and guaranteed retention for the conversations most likely to need investigation — errors and bad feedback. Coverage and cost both hold.",
+      "Tempting because nothing is lost, but 48 hours of hot data misses issues reported later, and total storage volume — the stated cost problem — is unchanged, just relocated to a slower tier.",
+      "On-demand debug logging captures nothing from the past, and most LLM incidents are discovered after the fact from user reports. Failures that cannot be reproduced on command would remain permanently invisible."
+    ],
+    "principle": "metrics for all, sampled traces plus guaranteed capture of failures",
+    "relatedConcept": "Observability at scale is a sampling-design problem: decide up front which conversations you must be able to replay."
+  },
+  {
+    "id": 317,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "multi",
+    "question": "A healthcare scheduling assistant logs full prompts and completions for debugging. A privacy review finds patient names, diagnoses, and phone numbers throughout the logs, which dozens of engineers can search freely. The team must keep enough visibility to debug production issues while satisfying the privacy office. Which two measures should the architect prioritize? (Choose two.)",
+    "options": [
+      "Redact or pseudonymize identifiers in prompts and completions before log records are persisted",
+      "Stop logging prompt and completion bodies entirely and keep only timestamps, token counts, and status codes",
+      "Restrict log access to a need-to-know group with audited queries and enforce a defined retention period",
+      "Add a system prompt instruction telling the model to avoid repeating patient identifiers in its responses"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. Redaction or pseudonymization at ingestion means the sensitive values never land in the log store, addressing the exposure at its source while preserving conversational structure for debugging. This is data minimization applied to observability pipelines.",
+      "Tempting because it eliminates the privacy risk completely, but it also eliminates the visibility engineers need: without content you cannot diagnose prompt failures, hallucinations, or injection attempts. It overcorrects instead of balancing the two requirements.",
+      "Correct. Access control, query auditing, and retention limits are the complementary layer: even redacted logs can contain residual sensitive context, so who can read them and for how long must be governed. Least privilege applies to telemetry, not just production data.",
+      "A prompt instruction affects what the model says, not what the system logs — the user's own messages containing PHI would still be persisted verbatim. It also relies on probabilistic compliance for a control that must be deterministic."
+    ],
+    "principle": "minimize PII at ingestion and govern access to what remains",
+    "relatedConcept": "Logs are a second copy of your most sensitive data flows and deserve the same protection as the primary systems."
+  },
+  {
+    "id": 318,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "single",
+    "question": "A brokerage's agent executes multi-step workflows: it plans, calls a market-data tool, queries positions, and drafts a recommendation. When outcomes are wrong, engineers see only the final response and per-request logs from each downstream service, and they spend days guessing which step went astray. What observability investment fixes this class of problem?",
+    "options": [
+      "Increase log verbosity on each downstream service so every API request and response body is captured in its own system",
+      "Add an LLM-as-judge scorer on final responses so bad recommendations are flagged automatically as they occur",
+      "Record user satisfaction ratings after each session so the team can quantify how often workflows go wrong",
+      "Implement end-to-end tracing that links every model call, tool invocation, and intermediate output under one workflow trace ID"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "More verbose per-service logs deepen the silos that already exist: each system knows its own requests but nothing connects them into one agent run. Engineers would still manually stitch timelines across systems.",
+      "Tempting because automatic flagging sounds proactive, but a judge on final outputs only tells you that a run went wrong, which users already report. It adds detection without adding the step-level visibility needed for diagnosis.",
+      "Satisfaction ratings quantify the problem's frequency but carry zero information about which step — planning, data retrieval, or synthesis — failed. Measurement of impact is not a substitute for traceability.",
+      "Correct. Multi-step agents need trace-level observability: a correlated view of the plan, every tool call with inputs and outputs, and each intermediate model response. Distributed-tracing discipline applied to agent workflows turns days of guessing into minutes of replay."
+    ],
+    "principle": "multi-step agents require correlated end-to-end traces, not siloed logs",
+    "relatedConcept": "An agent run is a distributed transaction; debugging it demands the same trace propagation discipline as microservices."
+  },
+  {
+    "id": 319,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "single",
+    "question": "A retail company's shopping assistant has stable latency, error, and token dashboards, yet the support team insists answer quality has 'gotten worse' since a recent catalog migration. The dashboards show nothing unusual and the team has no way to confirm or refute the claim. What monitoring gap should the architect close?",
+    "options": [
+      "Add per-endpoint latency percentile alerts so performance regressions from the migration are caught within minutes",
+      "Add production quality signals — user feedback controls plus scheduled scoring of sampled transcripts against a quality rubric",
+      "Add token-usage anomaly detection, since a shift in tokens per conversation would reveal the model behaving differently",
+      "Add synthetic monitoring that replays a fixed set of golden queries hourly and alerts when responses change from the baseline"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Latency alerting refines a dimension the team already monitors and which shows nothing wrong. The complaint is about answer quality, which no latency percentile can ever reflect.",
+      "Correct. Operational metrics do not measure semantic quality; that requires eval-in-production signals: explicit user feedback (thumbs), and periodic graded review of sampled real conversations. This closes the gap between 'the system is up' and 'the system is right.'",
+      "Token anomalies are an indirect proxy at best — quality can degrade badly while token counts stay typical, especially when the cause is stale catalog data rather than model behavior. It adds a signal that correlates weakly with the actual complaint.",
+      "Tempting because golden queries give a controlled baseline, but a fixed replay set covers a sliver of real traffic and can miss degradation concentrated in migrated catalog areas users actually hit. It complements, but cannot substitute for, measuring quality on live conversations."
+    ],
+    "principle": "operational dashboards don't measure quality — add production eval signals",
+    "relatedConcept": "Mature LLM observability treats answer quality as a first-class monitored metric alongside latency and cost."
+  },
+  {
+    "id": 320,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "single",
+    "question": "A state agency runs one Claude integration serving twelve citizen-facing programs. The monthly API bill has tripled, but finance can only see a single aggregate number and each program director claims their usage is minimal. Leadership wants accountability before approving next year's budget. What should the architect implement?",
+    "options": [
+      "Tag every request with program and feature identifiers and report token consumption and cost per program on a shared dashboard",
+      "Negotiate committed-use pricing with the vendor so the aggregate bill becomes predictable regardless of which program drives usage",
+      "Set a hard monthly token quota for the whole integration that rejects requests once the aggregate budget is exhausted",
+      "Switch all programs to a cheaper model tier until the bill returns to its previous level, then review quality complaints"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Cost observability requires attribution: tagging requests with program and feature metadata turns one opaque bill into per-tenant token and cost metrics. Once consumption is visible per program, accountability and targeted optimization both become possible.",
+      "Tempting because predictable spend soothes finance, but it changes the price of the mystery, not the mystery itself. Leadership asked who is consuming what, and committed pricing answers a different question.",
+      "An aggregate quota punishes all twelve programs when any one overconsumes, and outages hit citizens who did nothing wrong. Enforcement before attribution is governance applied blind.",
+      "A blanket downgrade trades quality across every program to offset costs nobody has localized. Without per-program visibility, the team cannot even tell whether the downgrade targeted the actual driver of growth."
+    ],
+    "principle": "cost accountability starts with per-tenant token and cost attribution",
+    "relatedConcept": "Token metrics tagged by feature and tenant are the FinOps backbone of any shared LLM platform."
+  },
+  {
+    "id": 321,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "single",
+    "question": "An insurance company builds RAG over policy documents that have a strong internal structure: numbered sections, clauses, and exception lists. The pipeline chunks at a fixed 512 tokens, and adjusters complain that answers about coverage exceptions are wrong because retrieved chunks begin or end mid-clause. How should the architect revise chunking?",
+    "options": [
+      "Reduce the fixed chunk size to 256 tokens so each chunk is more focused and more chunks fit in the context window",
+      "Increase the fixed chunk size to 2,048 tokens so most clauses fit inside a single chunk by sheer size",
+      "Chunk along the documents' structural boundaries — sections and clauses — adding overlap where provisions reference each other",
+      "Keep 512-token chunks but instruct the model to note when a retrieved passage appears truncated and answer more cautiously"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Smaller fixed chunks split clauses even more often, making the mid-clause truncation problem worse. It optimizes chunk focus while ignoring that the failure is about breaking semantic units.",
+      "Tempting because bigger chunks split less often, but they still cut arbitrarily somewhere, and each chunk now mixes several clauses — diluting the embedding and dragging irrelevant text into context. Size is a blunt instrument against a structural problem.",
+      "Correct. When documents carry meaningful structure, chunk boundaries should follow it: a clause or section is the natural unit of retrieval and keeps exceptions attached to the provisions they modify. Overlap preserves cross-references. Chunking strategy should mirror document structure.",
+      "Cautious answering may reduce confident errors but adjusters still do not get correct coverage determinations. It asks the model to work around broken retrieval instead of fixing the pipeline that feeds it."
+    ],
+    "principle": "chunk along semantic and structural boundaries, not arbitrary token counts",
+    "relatedConcept": "The retrieval unit defines what the model can ever see intact; chunking is where RAG accuracy is won or lost first."
+  },
+  {
+    "id": 322,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "single",
+    "question": "A developer-tools company runs RAG over support articles covering six products and many versions. Retrieval frequently returns a chunk that answers the question — but for the wrong product, because chunks like 'Restart the service to apply changes' carry no indication of which product or version they describe. Which pipeline change addresses this failure most directly?",
+    "options": [
+      "Raise top-k so more candidate chunks reach the model, letting it choose the passage matching the user's product",
+      "Fine-tune the embedding model on the company's support corpus so product-specific vocabulary embeds more distinctly",
+      "Deduplicate near-identical chunks across products so only one canonical version of each instruction remains in the index",
+      "Prepend each chunk's document and section context — product, version, topic — to its text before embedding and indexing"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "More candidates does not help when the chunks themselves are indistinguishable — the wrong-product chunk still looks identical to the right one. It adds tokens and noise while the ambiguity persists at the source.",
+      "Tempting because domain-tuned embeddings sound powerful, but no embedding can recover product identity that is absent from the chunk text itself. It is heavy investment aimed at the wrong layer of the pipeline.",
+      "Deduplication makes things worse: collapsing to one canonical chunk erases genuine per-product and per-version differences that the instructions may have. It mistakes the symptom (similar chunks) for redundancy.",
+      "Correct. This is contextual retrieval: enriching each chunk with its surrounding document context — product, version, section — before embedding, so chunks are both retrievable and interpretable on their own. It fixes the isolated-chunk problem at ingestion time."
+    ],
+    "principle": "chunks must carry their context — enrich at ingestion (contextual retrieval)",
+    "relatedConcept": "A chunk stripped of its document context is ambiguous to both the retriever and the model reading it."
+  },
+  {
+    "id": 323,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "multi",
+    "question": "A payments company's internal assistant answers engineer questions over runbooks. Queries split between exact identifiers ('what does error PSP-4092 mean') and loose paraphrases ('payouts stuck in a weird state'). Pure vector search misses many exact-identifier queries, and relevant chunks often rank below marginal ones. Which two pipeline additions best address these problems? (Choose two.)",
+    "options": [
+      "Increase embedding dimensionality so the vector space can represent error codes and identifiers more precisely",
+      "Add a lexical index (e.g., BM25) alongside the vector index and merge candidates from both at query time",
+      "Lower the top-k so only the strongest vector matches are returned, filtering out the marginal chunks",
+      "Add a reranking stage that rescores the merged candidate set against the query before selecting what enters context"
+    ],
+    "correct": [1, 3],
+    "optionExplanations": [
+      "Tempting because 'more precise vectors' sounds like it should capture codes, but identifiers like PSP-4092 are near-arbitrary strings with little distributional meaning; embeddings of any dimension handle them poorly. The gap is lexical, not geometric.",
+      "Correct. Exact identifiers are precisely what lexical matching excels at and where embeddings are weakest, while embeddings cover the paraphrase queries. Hybrid search — BM25 plus vectors with merged candidates — matches the retrieval mechanism to both query patterns present.",
+      "Cutting top-k does not improve ranking; it just truncates the same imperfect ordering earlier, and for identifier queries the right chunk often is not in the vector candidates at all. It reduces recall exactly where recall is failing.",
+      "Correct. When relevant chunks retrieve but rank poorly, a reranker — which scores each candidate directly against the query with a stronger model — fixes the ordering before context assembly. Rerankers are the standard precision layer over a high-recall hybrid candidate pool."
+    ],
+    "principle": "hybrid lexical+vector recall, then rerank for precision",
+    "relatedConcept": "Robust RAG stacks recall-oriented retrieval and precision-oriented reranking rather than betting on one mechanism."
+  },
+  {
+    "id": 324,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "single",
+    "question": "A hospital group indexes clinical guidelines, HR policies, and IT runbooks in one vector store for a staff assistant. Nurses asking clinical questions sometimes receive HR policy passages that are semantically similar ('protocol for reporting incidents'), and outdated guideline versions surface alongside current ones. What indexing change most directly fixes both issues?",
+    "options": [
+      "Store metadata (department, document type, version, effective date) with each chunk and apply filters at query time",
+      "Create a separate assistant per department so each one's vector store contains only that audience's documents",
+      "Embed each document twice with two different embedding models and intersect the result sets to improve precision",
+      "Add a post-generation check where the model states which document it used so users can spot mismatched sources"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Metadata filtering constrains semantic search to the right slice of the corpus: filter to document_type=clinical for clinical questions and to the current version by effective date. Structured attributes handle what embedding similarity fundamentally cannot — category and recency.",
+      "Tempting because separation feels clean, but many staff legitimately need cross-domain answers, and fragmenting into per-department assistants multiplies operational surface. It also does nothing about outdated versions within each store.",
+      "Dual embeddings attack a precision problem that is not actually about embedding quality: an HR incident-reporting chunk is genuinely similar to a clinical one in any model. Category is metadata, not geometry, and cost doubles for little gain.",
+      "Source citation improves transparency but arrives after the wrong content has already shaped the answer. It shifts quality control onto busy clinical users instead of preventing the retrieval error."
+    ],
+    "principle": "metadata filters do what similarity can't — enforce category and freshness",
+    "relatedConcept": "A production vector index is a database: schema, filters, and versioning matter as much as the embeddings."
+  },
+  {
+    "id": 325,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "single",
+    "question": "An online retailer's RAG system answers questions over long merchandising guides. With whole-page chunks, retrieval precision is poor — embeddings blur many topics together. With small 150-token chunks, retrieval hits precisely, but answers miss caveats from surrounding paragraphs the model never sees. The architect wants both precise matching and sufficient context. Which design achieves this?",
+    "options": [
+      "Use the small chunks but raise top-k substantially so enough fragments arrive to reconstruct the surrounding context by accident",
+      "Return to page-level chunks and rely on a reranking model to compensate for the diluted page embeddings",
+      "Index small chunks for matching, but at retrieval time expand each hit to its parent section before passing it to the model",
+      "Ask the model to request follow-up retrievals whenever it notices an answer might depend on missing surrounding text"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "High top-k over small fragments retrieves many precise but scattered pieces; adjacent caveats only appear if they independently match the query, which is exactly when they do not. Context reconstruction by coincidence is not a design.",
+      "Tempting because rerankers do boost precision, but a reranker can only reorder the candidates the diluted page embeddings produce — if the right page never surfaces, nothing downstream recovers it. It patches the symptom of oversized retrieval units.",
+      "Correct. This is the small-to-big pattern: embed fine-grained chunks so similarity search is precise, then expand hits to their parent section so the model receives complete surrounding context. It decouples the matching unit from the reading unit, resolving the size trade-off directly.",
+      "Iterative self-retrieval can work in agentic designs, but it adds a round-trip per gap, depends on the model noticing what it cannot see, and leaves first-pass answers incomplete. It outsources a pipeline design flaw to runtime behavior."
+    ],
+    "principle": "decouple the matching unit from the reading unit (small-to-big retrieval)",
+    "relatedConcept": "Chunk size tensions between precision and completeness dissolve when retrieval and context assembly use different granularities."
+  },
+  {
+    "id": 326,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A bank wants its assistant to answer questions like 'What was the total of my card transactions in March?' and 'Which direct debits changed amount this quarter?'. An engineer proposes exporting transaction histories as text documents into the existing vector store, since the RAG infrastructure is already built. What should the architect direct instead?",
+    "options": [
+      "Proceed with the vector store but chunk each statement by month so retrieved passages align with common query timeframes",
+      "Give the agent a parameterized query tool over the transaction database so questions become filtered, aggregated lookups",
+      "Embed each individual transaction as its own record so retrieval granularity matches single-transaction questions",
+      "Generate natural-language summaries of each account's activity weekly and index those summaries for retrieval"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it reuses working infrastructure, but these questions require exact filtering and arithmetic over structured records. Similarity search over prose renderings cannot guarantee complete or correct totals — retrieval may silently miss transactions.",
+      "Correct. Transactions are structured data with precise query semantics: the right retrieval mechanism is a deterministic query interface (SQL or API) that filters and aggregates exactly. Match the retrieval strategy to the data's shape — structured data wants structured queries, not embeddings.",
+      "Per-transaction embeddings make granularity worse: answering a monthly total would require retrieving every relevant row via similarity, with no guarantee of completeness. Vector recall is probabilistic, and financial aggregates cannot be.",
+      "Pre-written summaries only answer the questions someone anticipated, go stale within days, and still cannot support arbitrary filters or exact arithmetic. It adds a lossy derivative layer where a direct query would be exact."
+    ],
+    "principle": "structured data calls for SQL/API retrieval, not vector search",
+    "relatedConcept": "The first retrieval question is always the data's shape; embeddings are one tool, not the default."
+  },
+  {
+    "id": 327,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A manufacturing firm's support portal lets technicians search a parts knowledge base. Log analysis shows over 70% of queries are exact part numbers, fault codes, or model identifiers like 'VLT-2200-B3'; the rest are descriptive symptom searches. The current pure-embedding retrieval performs poorly on the majority segment. How should retrieval be revised?",
+    "options": [
+      "Replace the embedding model with one trained on industrial vocabulary so part numbers embed more distinctively",
+      "Normalize part numbers into words during indexing (e.g., 'VLT twenty-two hundred') so embeddings capture them better",
+      "Apply query expansion that rewrites identifier queries into full descriptive sentences before running the vector search",
+      "Route identifier-pattern queries to exact/lexical matching over indexed part fields, keeping embeddings for symptom descriptions"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Domain-tuned embeddings improve terminology handling, but part numbers are essentially arbitrary tokens whose exact-match semantics embeddings represent poorly regardless of training data. The mechanism, not the model, is mismatched to the query type.",
+      "Normalization tricks make identifiers slightly more embeddable but destroy their exact-match precision — 'VLT-2200-B3' and 'VLT-2200-B4' must never be confused, and fuzzy vector similarity invites exactly that confusion.",
+      "Tempting because query expansion helps vague queries, but padding an exact identifier with generated prose dilutes the one signal that matters and adds a rewriting step that can introduce errors. The user already gave a perfect key.",
+      "Correct. Query patterns dictate retrieval: keyword-heavy, identifier-style queries favor lexical/exact matching, while semantic paraphrase queries favor embeddings. Routing by detected query pattern gives each segment the mechanism it is best served by."
+    ],
+    "principle": "identifier queries favor lexical matching; paraphrase queries favor embeddings",
+    "relatedConcept": "Analyzing real query logs is how architects discover which retrieval mechanisms a workload actually needs."
+  },
+  {
+    "id": 328,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A software company wants a Claude agent that answers engineers' questions about their monorepo — where functions are defined, how modules interact, what changed recently. One faction wants to embed the whole codebase into a vector store nightly; another proposes giving the agent code-search tools (grep, file listing, file reading) to navigate the repo live. Hundreds of commits merge daily. Which approach should the architect favor and why?",
+    "options": [
+      "Agentic search with code navigation tools, because the corpus changes constantly and code queries reward exact symbol matching and live exploration",
+      "The vector store, because embedding similarity finds conceptually related code that exact text matching would systematically miss",
+      "The vector store with hourly instead of nightly re-embedding, because fresher vectors remove the staleness objection at modest cost",
+      "Agentic search, but backed by a full-text index refreshed weekly, because grep alone is too slow to scan a large monorepo interactively"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Code questions center on exact identifiers, structure, and current state — grep-style search and file navigation answer them against the live repo with zero staleness. Agentic search fits corpora that change faster than any index and queries that demand exactness.",
+      "Tempting because semantic similarity does help conceptual queries, but the dominant question types here — definitions, usages, recent changes — are exact-match and freshness-bound. A nightly-embedded store is stale by mid-morning at hundreds of commits a day.",
+      "Hourly re-embedding shrinks the staleness window but never closes it, and continuous re-embedding of a large monorepo is substantial ongoing cost for an index whose similarity semantics still fit the query pattern poorly.",
+      "The direction is right but the fix is self-defeating: a weekly-refreshed index reintroduces worse staleness than the vector store it replaces. Live tools querying the current working tree are the point of the agentic approach."
+    ],
+    "principle": "fast-changing, exact-match corpora favor agentic search over pre-built indexes",
+    "relatedConcept": "Freshness requirements and query exactness together often disqualify pre-indexed retrieval before quality is even measured."
+  },
+  {
+    "id": 329,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A regional utility's customer portal needs an assistant for billing and outage questions. The entire knowledge source is a curated FAQ of about 180 question-answer pairs totaling roughly 25,000 tokens, updated a few times per quarter. The team budgets three sprints to build a vector-database RAG pipeline with chunking, hybrid search, and reranking. What should the architect advise?",
+    "options": [
+      "Proceed with the full RAG build, since retrieval quality compounds and the pipeline will be ready when the corpus grows",
+      "Build the vector pipeline but skip reranking and hybrid search initially to fit the effort into a single sprint",
+      "Skip the retrieval pipeline: include the whole FAQ in the prompt with caching, revisiting retrieval only if the corpus outgrows the context",
+      "Replace the FAQ with a fine-tuned model so the knowledge lives in the weights and no retrieval infrastructure is needed at all"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting as future-proofing, but three sprints of pipeline for a corpus that fits comfortably in context is classic over-engineering. Retrieval adds a recall failure mode the direct approach simply does not have; build it when the corpus actually demands it.",
+      "A slimmed pipeline still carries chunking, indexing, and sync machinery — and its retrieval-miss risk — for a corpus small enough to need none of it. Reducing scope does not fix choosing the wrong architecture.",
+      "Correct. When the entire knowledge source is small and stable, the best retrieval strategy is none: load it all with prompt caching to amortize the token cost. The model sees every FAQ on every question, eliminating retrieval misses at near-zero engineering cost.",
+      "Fine-tuning bakes quarterly-changing answers into weights, making every FAQ update a training-and-deployment cycle and inviting outdated responses. It is the highest-friction option for content this small and this mutable."
+    ],
+    "principle": "small stable corpora belong in the (cached) prompt, not a retrieval pipeline",
+    "relatedConcept": "Right-sizing retrieval means recognizing when the simplest strategy — no retrieval — dominates on both quality and cost."
+  },
+  {
+    "id": 330,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A travel platform's assistant answers two kinds of questions: policy questions ('what is the checked-bag fee?') from documents that change quarterly, and availability questions ('is there a window seat on tomorrow's 7am flight?') where data changes minute to minute. Both currently flow through one vector store refreshed nightly, and availability answers are frequently wrong. What is the right architecture?",
+    "options": [
+      "Refresh the entire vector store every five minutes so both policy and availability content stay current in one pipeline",
+      "Keep vector retrieval for policy documents, but serve availability questions through live API calls to the inventory system",
+      "Add timestamps to availability chunks and instruct the model to caveat answers when the retrieved data may be stale",
+      "Move both content types out of the vector store into a relational database the agent queries with generated SQL"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Re-embedding the whole corpus every five minutes is enormous continuous cost, and even five-minute-old seat maps are wrong at booking pace. It forces one pipeline's refresh cadence to chase the fastest-changing data it holds.",
+      "Correct. Freshness requirements segment the retrieval strategy: slow-changing prose fits an embedded index, while real-time operational state must come from the system of record at query time. Each data shape gets the mechanism its volatility demands.",
+      "Tempting because honesty about staleness seems responsible, but a caveated wrong answer still fails the traveler — they need the actual current seat, not a disclaimer. It decorates the mismatch instead of resolving it.",
+      "Moving policy prose into relational tables with generated SQL discards the semantic search that works well for those documents, and inventory already lives in an operational system the agent could call directly. It swaps one uniform mismatch for another."
+    ],
+    "principle": "segment retrieval by data volatility — live systems for live state",
+    "relatedConcept": "A single retrieval mechanism rarely fits a mixed corpus; freshness needs are the cleanest segmentation criterion."
+  },
+  {
+    "id": 331,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A pharmaceutical company has built internal integrations for its document vault, LIMS, and compliance tracker. Employees want to use these capabilities from Claude Code, the Claude desktop app, and a custom internal chat tool — and two more Claude-based clients are planned next year. Each integration is currently custom-wired into one application. How should the architect expose these capabilities going forward?",
+    "options": [
+      "Implement each integration once as an MCP server, letting every current and future client connect through the standard protocol",
+      "Build a shared REST gateway and write a thin custom adapter inside each client application that calls it directly",
+      "Standardize on one client application for all employees so the existing custom integrations only need to be maintained in one place",
+      "Create a central orchestrator agent that owns all three integrations, which other clients reach by delegating requests to it"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is MCP's core value proposition: implement a tool/resource server once and any MCP-compatible client — Claude Code, desktop, custom apps — consumes it without per-client integration code. Reuse across a growing client ecosystem is exactly the selection criterion that favors MCP.",
+      "A shared gateway centralizes the backend but still demands a hand-written adapter in every client, and each new client repeats that work. It rebuilds, poorly, the client-integration layer MCP standardizes.",
+      "Tempting because it eliminates the N-clients problem by decree, but users chose different clients because their workflows differ — developers live in Claude Code, others in chat. Constraining the organization to save integration effort inverts the priority.",
+      "An orchestrator agent adds a model-mediated hop — extra latency, cost, and nondeterminism — in front of what are simple tool calls. Agent-to-agent delegation suits handing off complex reasoning tasks, not proxying basic capability access."
+    ],
+    "principle": "MCP: implement an integration once, reuse it across every client",
+    "relatedConcept": "Protocol choice is a build-once-versus-build-per-client decision as much as a technical one."
+  },
+  {
+    "id": 332,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A logistics startup runs a nightly Python job that sends each day's delivery-exception reports to Claude for classification and writes results to a database. There is no interactive client, no other consumer of this capability, and the pipeline's steps are fixed. A new engineer proposes wrapping the classification step in an MCP server 'for architectural consistency'. How should the architect respond?",
+    "options": [
+      "Approve it, since standardizing every Claude touchpoint on MCP reduces long-term maintenance across the company",
+      "Approve it but require the MCP server to also expose the database writes, so the whole pipeline becomes tool-driven",
+      "Suggest agent-to-agent delegation instead, wrapping the pipeline as an agent other systems can eventually call",
+      "Decline it: a code-orchestrated batch job should call the API directly, and MCP adds server surface with no consumer to justify it"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Consistency for its own sake is not an architectural benefit; a protocol earns its place by serving a need. With one programmatic consumer and no interactive clients, MCP adds a server to build, secure, and operate with zero added value.",
+      "This doubles down on the unnecessary layer, moving deterministic pipeline steps behind tool interfaces where the fixed control flow gains nothing. It converts a simple script into a distributed system for no consumer.",
+      "Tempting as future-proofing, but wrapping a fixed batch job as an agent adds nondeterminism and cost to a pipeline whose steps never vary. Speculative reuse ('eventually') is not a requirement; it is how accidental complexity gets approved.",
+      "Correct. Direct API integration is the right mechanism when code orchestrates a fixed workflow with a single consumer: simplest to build, debug, and operate. MCP pays off when tools must be discovered and reused across clients — conditions absent here."
+    ],
+    "principle": "one code-orchestrated consumer → direct API; save MCP for reuse",
+    "relatedConcept": "Integration mechanisms are chosen by consumer count and orchestration style, not by fashion or uniformity."
+  },
+  {
+    "id": 333,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A university's enrollment assistant handles course registration well, but financial-aid questions require multi-step reasoning over regulations that a separate team already encodes in its own production financial-aid agent, complete with its own tools and guardrails. The enrollment team must add financial-aid support and debates how to connect. Which integration approach fits best?",
+    "options": [
+      "Import the financial-aid team's tool definitions into the enrollment assistant so one agent can handle both domains end to end",
+      "Have the enrollment assistant call the financial-aid team's underlying APIs directly, reimplementing the regulatory reasoning in its own prompts",
+      "Delegate financial-aid questions to the existing financial-aid agent and relay its conclusions back through the enrollment assistant",
+      "Expose the financial-aid agent's tools through an MCP server so the enrollment assistant can invoke them individually as needed"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Importing the tools transfers capability but not competence: the regulatory reasoning, prompts, and guardrails that make those tools safe live in the other team's agent. The enrollment assistant would wield instruments it was never engineered to use, and now two teams' logic must co-evolve in one agent.",
+      "Reimplementing another team's domain reasoning duplicates their hardest work and guarantees drift as regulations change. It couples the enrollment team to a domain they do not own — the maintenance burden lands on the wrong team permanently.",
+      "Correct. When a complete, owned agent already encapsulates the expertise — tools, reasoning, and guardrails together — agent-to-agent delegation reuses the whole package while preserving team ownership boundaries. The enrollment assistant hands off the task and integrates the result.",
+      "Tempting because MCP is the reuse protocol, but MCP shares tools, and tools are the wrong unit here: the value is in the financial-aid agent's orchestration and safeguards around those tools. Exposing raw tools recreates option one's competence gap over a standard protocol."
+    ],
+    "principle": "delegate to the agent that owns the expertise; don't transplant its tools",
+    "relatedConcept": "Agent-to-agent is the integration mechanism for reusing judgment and guardrails, not just capabilities."
+  },
+  {
+    "id": 334,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A large bank runs an internal platform where dozens of product teams independently publish new data and action capabilities for AI assistants every month. The assistant team is tired of shipping a code release each time a capability appears, and wants assistants to pick up newly published capabilities without redeployment. Which property of which mechanism addresses this requirement?",
+    "options": [
+      "Direct API integration with a shared client library, because a centrally versioned SDK keeps every assistant's capabilities aligned",
+      "MCP's dynamic discovery, because clients enumerate a server's currently available tools at connection time rather than at build time",
+      "Agent-to-agent delegation, because a router agent can be retrained on new capabilities faster than application code can be released",
+      "CLI integration, because assistants can shell out to new command-line tools the moment platform teams install them on shared hosts"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "A shared SDK still binds capabilities at build time: each new capability means a library version bump and a redeploy of every assistant. It streamlines the release treadmill rather than removing it.",
+      "Correct. MCP clients list a server's tools dynamically at runtime, so a capability published to the server becomes visible to every connected assistant with no client release. Runtime discovery is precisely the decoupling between publishers and consumers this organization needs.",
+      "Tempting because a router agent is flexible, but it must still learn about new capabilities somehow — through configuration or tooling updates — and it inserts model-mediated latency and failure modes into every capability call. It relocates the update problem rather than solving it.",
+      "Shelling out to shared hosts technically allows runtime pickup, but it offers no schemas, no structured discovery, and a serious security and operations story to invent from scratch. It is an unmanaged imitation of what MCP provides natively."
+    ],
+    "principle": "runtime tool discovery decouples capability publishers from client releases",
+    "relatedConcept": "In large organizations, the integration protocol determines whether the capability catalog can grow without coordinated deployments."
+  },
+  {
+    "id": 335,
+    "domain": "Integration",
+    "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+    "type": "single",
+    "question": "An enterprise IT-operations agent has accumulated connectors to 14 systems, injecting roughly 300 tool definitions into every conversation. Baseline context consumption is huge before the user types a word, and evaluations show tool-selection accuracy declining as connectors were added. Most conversations use tools from only one or two systems. What context strategy should the architect adopt?",
+    "options": [
+      "Compress each tool definition to a one-line description so all 300 still load upfront but consume far fewer tokens",
+      "Cache the 300 tool definitions with prompt caching so the recurring token cost of the monolithic block is largely amortized",
+      "Split the agent into 14 single-system agents and require users to pick the right one before starting a conversation",
+      "Load a small core toolset plus a discovery mechanism that pulls in each system's tool definitions only when the task needs them"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Compression cuts tokens but strips the descriptive detail the model needs to choose and parameterize tools correctly — likely worsening the selection accuracy that is already declining. It shrinks the bloat while sharpening its harm.",
+      "Tempting because caching genuinely reduces cost and latency for stable prefixes, but cached definitions still occupy the context window and still dilute attention across 300 options. Caching fixes the price of monolithic context, not its accuracy penalty.",
+      "Per-system agents fix context size but push the routing problem onto users, who often do not know which system a task touches — and cross-system tasks, the hardest ones, become impossible. It solves the architect's problem by creating the user's.",
+      "Correct. Progressive discovery loads capabilities on demand: a lean core context, with tool definitions fetched when relevant to the task at hand. Since most conversations touch one or two systems, the agent pays discovery round-trips rarely while reclaiming attention and tokens on every request."
+    ],
+    "principle": "load capabilities on demand when the catalog is large and usage is sparse",
+    "relatedConcept": "Progressive discovery treats the context window as a scarce runtime resource rather than a static configuration dump."
+  },
+  {
+    "id": 336,
+    "domain": "Integration",
+    "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+    "type": "single",
+    "question": "A food-delivery company's order-support agent uses exactly six stable tools (order lookup, refund, courier status, address update, escalation, FAQ search), all invoked constantly throughout the day. An architect returning from a conference proposes rebuilding it with a tool-discovery layer that loads each definition on demand, citing context-efficiency best practices. What is the correct assessment?",
+    "options": [
+      "Keep upfront loading: six stable, heavily used definitions cost little context, while discovery would add round-trip latency and machinery for no benefit",
+      "Adopt discovery, because context efficiency compounds at scale and the agent will inevitably accumulate more tools over time",
+      "Adopt discovery for the four less-frequent tools and preload the two most common, tuning the split from usage telemetry",
+      "Keep upfront loading but remove the two least-used tools entirely, achieving the same context savings without new infrastructure"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Progressive discovery earns its complexity when catalogs are large or usage is sparse; six constantly used definitions are neither. Upfront loading (with the stable block prompt-cached) is simpler, faster, and equally accurate — the small stable toolset is the textbook case for monolithic context.",
+      "Tempting because the principle is real, but it is being applied without its preconditions: the token and attention costs of six definitions are negligible, so there is nothing meaningful for discovery to save. Speculative scale ('inevitably') is not a current requirement.",
+      "A hybrid split adds the discovery machinery and its latency for tools that are still used many times daily — every 'less-frequent' invocation now pays a round-trip. It buys trivial context savings at the cost of two loading paths to operate and debug.",
+      "Removing tools the workflow genuinely needs breaks those support cases outright; the tools are less used, not unused. It confuses trimming capability with managing context, harming users to save a handful of tokens."
+    ],
+    "principle": "small stable toolsets justify upfront loading — discovery must earn its complexity",
+    "relatedConcept": "Context strategies are sized to catalog scale and usage patterns, not adopted as universal best practices."
+  },
+  {
+    "id": 337,
+    "domain": "Integration",
+    "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+    "type": "single",
+    "question": "A legal-tech firm's contract assistant currently loads a client's entire document set — often 300,000+ tokens across dozens of contracts — into context at session start, because 'the model should see everything.' Sessions are slow to start, expensive, and accuracy on clause-specific questions has measurably dropped on large matters. Most questions concern one or two contracts. What should the architect change?",
+    "options": [
+      "Keep full loading but order documents by predicted relevance so the most likely contracts sit earliest in the context window",
+      "Start sessions with a document index (titles, parties, dates) and have the assistant fetch specific contracts or sections as questions require them",
+      "Summarize every contract to a fixed 500-token digest at ingestion and load all digests instead of the full documents",
+      "Shard each matter across parallel model calls that each receive a slice of the documents, then merge their answers"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Relevance ordering may help marginally with attention position effects, but every session still pays the full token cost and slow start, and 300,000 tokens of mostly irrelevant contracts still dilute attention on the clause in question.",
+      "Correct. This is progressive discovery applied to data: a lightweight catalog upfront, with full content pulled on demand as the task reveals what it needs. Since most questions touch one or two contracts, sessions start fast, costs drop, and the model's attention concentrates on the material that matters.",
+      "Tempting because digests are compact, but clause-level legal questions turn on exact language that uniform 500-token summaries necessarily discard. The assistant would answer from lossy paraphrases in a domain where wording is the substance.",
+      "Sharding processes everything in parallel rather than avoiding the unnecessary reading; total token cost rises, and cross-contract synthesis across shards adds a fragile merge step. It scales the waste instead of eliminating it."
+    ],
+    "principle": "provide an index upfront; load full content on demand",
+    "relatedConcept": "Progressive discovery applies to data payloads exactly as it does to tool definitions — catalogs first, content when needed."
+  },
+  {
+    "id": 338,
+    "domain": "Integration",
+    "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+    "type": "single",
+    "question": "A consultancy is defining platform guidance for when internal agent teams should use progressive discovery versus loading everything upfront. One workshop group insists discovery is always superior because context is expensive; another notes discovery's round-trips add latency and failure modes. The architect must write the decision rule. Which formulation is correct?",
+    "options": [
+      "Prefer discovery whenever the agent has more than ten tools, since selection accuracy degrades measurably beyond that threshold",
+      "Prefer upfront loading whenever latency matters, since discovery round-trips necessarily violate interactive SLAs",
+      "Prefer discovery when the full catalog is large relative to what a typical task uses; prefer upfront loading when a small, stable set is used routinely",
+      "Prefer whichever strategy the team can operate reliably, since the two approaches converge in cost once prompt caching is enabled"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "A fixed tool-count threshold ignores what actually drives the trade-off: definition sizes, usage concentration, and task diversity. Ten tiny, heavily used tools load fine upfront; eight enormous, rarely used ones may not.",
+      "Tempting because discovery does add round-trips, but a lookup is typically fast relative to model generation, and monolithic context inflicts its own latency by inflating prompt processing. Latency alone does not pick a winner; the usage-to-catalog ratio does.",
+      "Correct. The decision rule is the ratio of catalog size to per-task usage: when tasks touch a small slice of a large catalog, discovery's round-trip cost buys large token and attention savings; when a compact stable set is used constantly, upfront loading is simpler and discovery saves nothing. Both groups' concerns are honored in their proper regimes.",
+      "Prompt caching reduces the recurring cost of stable prefixes but does not restore attention diluted across a bloated context, and cached tokens still fill the window. The strategies do not converge; the trade-off remains real and must be decided."
+    ],
+    "principle": "decide by the ratio of catalog size to per-task usage",
+    "relatedConcept": "Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer."
+  }
+]

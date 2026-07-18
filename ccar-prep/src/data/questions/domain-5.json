@@ -1,0 +1,618 @@
+[
+  {
+    "id": 501,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "single",
+    "question": "A wealth-management fintech is launching a Claude-powered customer chatbot. Regulators require that the bot never provides personalized investment advice. The team has added a firm instruction to the system prompt: 'You must never recommend specific securities or allocations.' In pre-launch red-teaming, testers still elicit advice-like responses about 5% of the time using multi-turn pressure. What should the architect do to meet the regulatory requirement?",
+    "options": [
+      "Strengthen the system prompt with more explicit examples of prohibited responses and re-run the red-team suite until the elicitation rate drops",
+      "Switch to a larger Claude model, since more capable models follow system-prompt constraints more reliably under adversarial pressure",
+      "Add a deterministic output layer — a classifier or rules check that blocks or rewrites responses containing investment advice before they reach the user",
+      "Limit conversations to three turns, since the red-team findings show the violations only emerge under multi-turn pressure"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because prompt hardening does reduce violation rates and is cheap to iterate on. But instructions are probabilistic controls: no amount of wording guarantees zero violations, and a hard regulatory requirement cannot rest on a control that fails some percentage of the time. This treats a compliance requirement as a tuning problem.",
+      "Model choice affects instruction adherence at the margins, but a larger model is still a probabilistic component and still fails under adversarial pressure. This reasoning error is expecting a deterministic guarantee from a non-deterministic component — the failure mode changes, it does not disappear.",
+      "Correct. Hard requirements need deterministic enforcement outside the model. An output-validation layer (classifier plus rules) checks every response before delivery and blocks violations regardless of how the model was manipulated. This applies the principle that instruction-based controls are one layer, and hard constraints must be enforced by layers the model cannot talk its way past.",
+      "Tempting because it targets the observed attack path, but it degrades legitimate user experience while only removing one elicitation technique. Attackers will find single-turn phrasings, and the underlying gap — no enforcement outside the model — remains. This treats the symptom, not the cause."
+    ],
+    "principle": "hard requirements need deterministic controls, not stronger instructions",
+    "relatedConcept": "Layered defense — prompt instructions plus deterministic output validation — is the core pattern for enforcing non-negotiable safety and compliance rules."
+  },
+  {
+    "id": 502,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "single",
+    "question": "A hospital network builds a Claude assistant that answers clinician questions by retrieving passages from an internal knowledge base that includes documents uploaded by many departments. The assistant also has a tool that can send messages to the paging system. A security review notes that a malicious or compromised document could contain instructions like 'page all on-call staff.' Which control most directly addresses this risk?",
+    "options": [
+      "Scope the assistant's tool permissions so retrieval-driven Q&A sessions cannot invoke the paging tool, granting it only in workflows that require it",
+      "Add a system-prompt rule telling the model to ignore any instructions found inside retrieved documents and treat them as untrusted data",
+      "Require document authors to complete security training and sign an acceptable-use policy before uploading to the knowledge base",
+      "Run a nightly scan of the knowledge base for suspicious phrasing and quarantine documents that look like they contain embedded instructions"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is indirect prompt injection, and the most reliable mitigation is to remove the capability from the exposed path: if the Q&A flow has no access to the paging tool, injected instructions cannot trigger it. This applies least privilege — design assuming injection will sometimes succeed, and limit the blast radius when it does.",
+      "Tempting because it names the threat, but it is an instruction-only defense against an attack whose whole mechanism is overriding instructions. Injection resistance from prompting is probabilistic; a determined payload can still succeed. Useful as one layer, but it cannot be the control that closes the finding.",
+      "Training and policy reduce accidental risk from well-meaning insiders, but they do nothing against a compromised account or a deliberately malicious document. This is a governance-checkbox response to a technical attack path — the system remains exploitable the moment policy is violated.",
+      "Detective scanning can catch some payloads, but injection phrasing is unbounded and scanners will miss novel wording. Relying on detection of malicious content instead of removing the dangerous capability inverts the preferred order: prevention through least privilege beats detection of infinite attack variants."
+    ],
+    "principle": "assume injection succeeds; scope tool permissions to limit blast radius",
+    "relatedConcept": "Tool permission scoping is the guardrail that keeps prompt injection from escalating into real-world actions."
+  },
+  {
+    "id": 503,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "single",
+    "question": "A large retailer uses Claude to auto-generate responses to customer product questions on its website, publishing thousands of answers daily. A safety classifier screens each draft. The team must decide what happens when the classifier flags a draft as potentially problematic: block it outright, or publish it and queue it for human review. Flags are about 4% of volume and roughly half are false positives. What is the soundest policy?",
+    "options": [
+      "Publish flagged drafts immediately but queue them for next-day human review, since half the flags are false positives and blocking would suppress good answers",
+      "Block flagged drafts from publishing and route them to human review, accepting that some correct answers are delayed by false positives",
+      "Raise the classifier's flagging threshold until the false-positive rate falls below 10%, then publish everything that passes automatically",
+      "Have the model regenerate any flagged draft with a stricter safety prompt and publish the regeneration if it no longer triggers the flag"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it preserves throughput and the false-positive rate is genuinely high. But publish-then-review means potentially harmful content reaches customers before any human sees it — the review becomes damage assessment, not prevention. For public-facing content, this gets the blocking-versus-flagging trade-off backwards.",
+      "Correct. When the action is public and the harm from a bad answer (safety misinformation about a product, offensive content) outweighs the cost of delaying a correct one, fail closed: block on flag, review, then publish. A 2% true-positive rate on thousands of daily answers is dozens of real incidents prevented. This applies the principle of blocking where errors are externally visible and flagging where they are recoverable.",
+      "Raising the threshold to cut false positives also cuts true-positive catches — you are trading fewer review tickets for more harmful content published with no human ever in the loop. This optimizes an operational metric at the direct expense of the safety outcome the classifier exists to protect.",
+      "Tempting because it is fully automated, but regenerating until the classifier stops firing is optimizing against your own guardrail: the output that passes may be a subtler version of the same problem. A borderline draft that needed judgment now gets none. The classifier becomes a filter to evade rather than a signal to escalate."
+    ],
+    "principle": "fail closed on public, hard-to-recall outputs; flag-and-review only where harm is recoverable",
+    "relatedConcept": "Choosing between blocking and flagging is a core guardrail design decision driven by reversibility and audience of the output."
+  },
+  {
+    "id": 504,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "single",
+    "question": "A state government agency is deploying a Claude-based assistant that helps residents complete benefits applications. The security team demands proof that the system 'cannot be jailbroken' before approving launch. The architect has already implemented a hardened system prompt and an input filter, and internal red-teaming finds a successful jailbreak roughly once per 500 adversarial attempts. How should the architect respond to the security team's demand?",
+    "options": [
+      "Commit to additional prompt-hardening sprints until the internal red team can no longer produce any successful jailbreak across its full test suite",
+      "Contract a specialized external red team, and delay launch until they certify the system as jailbreak-proof under their methodology",
+      "Argue that a 1-in-500 adversarial success rate is below industry norms and document it as an accepted residual risk in the launch review",
+      "Explain that jailbreak resistance is probabilistic, and demonstrate that downstream controls — scoped tools, output validation, monitoring — keep a successful jailbreak's impact bounded"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it shows diligence, but 'red team finds nothing' does not mean 'cannot be jailbroken' — it means your team ran out of ideas. New techniques emerge constantly and prompt-level defenses remain probabilistic. Promising an unachievable guarantee sets the project up to fail its own acceptance criterion.",
+      "External red-teaming adds real value, but no reputable firm certifies a system as jailbreak-proof, because the claim is not provable for an open-ended input space. This defers to authority to obtain a guarantee that cannot exist, and it stalls launch on an impossible bar.",
+      "Tempting because documenting residual risk is legitimate governance practice, but quoting a rate without bounding the consequence answers the wrong question. The security team's real concern is what happens when a jailbreak succeeds; accepting the probability without constraining the impact leaves that unaddressed.",
+      "Correct. The honest architectural answer is to reframe the requirement: jailbreaks cannot be reduced to zero, so the design assumes occasional bypass and bounds the damage — the assistant's tools are scoped to low-risk operations, outputs pass deterministic validation, and monitoring detects abuse patterns. This applies the principle of designing for guardrail failure rather than promising guardrail perfection."
+    ],
+    "principle": "design assuming bypass — bound the impact of a successful jailbreak, don't promise zero",
+    "relatedConcept": "Safety cases for LLM systems rest on layered impact containment, not on claims that any single control is unbreakable."
+  },
+  {
+    "id": 505,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "multi",
+    "question": "A B2B SaaS company gives its Claude support agent a tool to issue account credits to customers. Policy caps agent-initiated credits at $200; anything above that needs a manager. Currently the cap exists only as a sentence in the system prompt, and a prompt-injection test showed the agent could be talked into a $5,000 credit. The architect must fix the design before launch. Which two changes most directly enforce the policy? (Choose two.)",
+    "options": [
+      "Enforce the $200 ceiling in the credits API itself, so requests above the cap are rejected regardless of what the model asks for",
+      "Rewrite the system-prompt instruction with explicit refusal examples so the model more reliably declines over-cap credit requests",
+      "Log every credit the agent issues to a dashboard that the finance team audits at the end of each week",
+      "Route any credit request above the ceiling to a human manager for approval instead of letting the tool call execute"
+    ],
+    "correct": [0, 3],
+    "optionExplanations": [
+      "Correct. The policy is a hard business rule, so it must be enforced deterministically at the API layer where the model cannot override it. With the cap in the API, even a fully compromised agent physically cannot issue $5,000 — this is the principle that the model is never the enforcement boundary for hard limits.",
+      "Tempting because better instructions do lower the violation rate, but the injection test already proved instructions can be bypassed. Prompt wording remains a probabilistic control; improving it is worthwhile hygiene but does not enforce the policy, and picking it as a primary fix repeats the original design error.",
+      "Weekly audit logging is a detective control that discovers over-cap credits days after the money moved. It supports accountability but prevents nothing — the reasoning error is substituting detection after the fact for prevention of an irreversible financial action.",
+      "Correct. The policy explicitly says over-cap credits need a manager, so the architecture should encode that as a deterministic approval gate: above-threshold requests pause and await human sign-off rather than executing. This places human-in-the-loop exactly where the action is financially irreversible and policy-defined."
+    ],
+    "principle": "hard business limits live in the API and in approval gates, never only in the prompt",
+    "relatedConcept": "Guardrails for agent tools combine deterministic parameter limits with human approval gates for above-threshold actions."
+  },
+  {
+    "id": 506,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Implement guardrails and safety controls",
+    "type": "single",
+    "question": "An insurance company lets business analysts query a claims database in natural language: Claude translates each question into SQL that runs against a reporting replica. During review, an architect worries about destructive or runaway queries — the model occasionally produces UPDATEs or unbounded scans when questions are ambiguous. Which control design is most appropriate?",
+    "options": [
+      "Instruct the model in the system prompt to generate only SELECT statements and to always include LIMIT clauses on large tables",
+      "Fine-tune the model on thousands of approved SELECT-only query examples so destructive statements stop appearing in its output",
+      "Validate every generated statement before execution — parse it, reject anything that is not a read, and run it under a database role with read-only permissions and query timeouts",
+      "Show each generated SQL statement to the requesting analyst for confirmation before it executes, so a human approves every query"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because it is the fastest fix and will reduce the frequency of bad statements, but system-prompt instructions are probabilistic and the review already observed violations. A hard rule like 'never write to the database' cannot depend on the model's compliance on every single generation.",
+      "Fine-tuning shifts the output distribution but still cannot guarantee zero destructive statements, and it adds cost and maintenance for a problem with a cheap deterministic solution. This over-engineers the probabilistic layer while leaving the execution path itself unguarded.",
+      "Correct. This is defense in depth with deterministic enforcement: a parser gate rejects non-read statements, the read-only database role makes writes impossible even if the gate misses something, and timeouts bound runaway scans. The model can generate whatever it likes — the execution environment physically cannot do harm. Least privilege at the credential level is the backstop.",
+      "Tempting because a human checkpoint sounds safe, but the analysts asked in natural language precisely because they cannot read SQL — their confirmation would be rubber-stamping. It also adds friction to every query while providing no real barrier, since the reviewer cannot evaluate what they are approving."
+    ],
+    "principle": "constrain what generated code can execute, not just what the model generates",
+    "relatedConcept": "Output validation plus least-privilege execution credentials is the standard guardrail pair for model-generated code and queries."
+  },
+  {
+    "id": 507,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "A legal-tech SaaS startup demos a Claude feature that answers attorneys' questions about case law, and the answers read as authoritative with full case citations. A pilot firm reports that two cited cases do not exist, though the answers containing them were fluent and confident. The product lead asks the architect to explain what happened and what property of the system the design must account for. What is the correct characterization?",
+    "options": [
+      "The model's training data was stale, so retraining on a current legal corpus will keep citations accurate going forward",
+      "The model generates plausible text rather than verified facts, so fabricated citations are an inherent failure mode that the architecture must detect, not one the model will self-report",
+      "The prompts were under-specified; adding an instruction to cite only real cases and to double-check citations will resolve the fabrications",
+      "The sampling temperature was set too high; running citation-bearing queries at temperature zero will make the outputs deterministic and reliable"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because stale data is a real limitation, but staleness produces outdated citations, not invented ones. The fabricated cases never existed in any corpus. Retraining addresses freshness while leaving the actual failure mode — confident generation of plausible-but-false content — completely intact.",
+      "Correct. This is hallucination: the model optimizes for plausible continuation, and a well-formatted fake citation is highly plausible. Crucially, the model expresses no less confidence when fabricating, so fluency cannot signal truth. The architectural consequence is grounding answers in retrieved sources and verifying citations against a real database — treating verification as a system responsibility.",
+      "Tempting because prompt quality matters, but an instruction to 'cite only real cases' assumes the model can distinguish its real recollections from fabrications, which it cannot reliably do. This misattributes a fundamental generation property to a fixable prompt defect and would leave the pilot firm exposed again.",
+      "Temperature zero makes outputs more repeatable, not more truthful — the model will simply fabricate the same fake citation consistently. This confuses determinism with accuracy, a common category error when diagnosing hallucination."
+    ],
+    "principle": "fluency is not evidence — verify model claims against ground truth outside the model",
+    "relatedConcept": "Hallucination is the foundational LLM failure mode that grounding, retrieval, and verification layers exist to manage."
+  },
+  {
+    "id": 508,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "An e-commerce company deploys a Claude shopping agent that reads product pages, customer reviews, and seller descriptions to compare items, and it can add products to the user's cart. Sellers control their own product descriptions. A risk workshop asks the architect to identify the most significant novel attack surface this design introduces compared with a traditional recommendation engine. What should the architect highlight?",
+    "options": [
+      "Seller-controlled page content becomes untrusted input to the agent's reasoning, so a description containing hidden instructions could steer comparisons or cart actions toward the attacker's product",
+      "Sellers could reverse-engineer the agent's ranking behavior over time and rewrite their descriptions with keywords that make their products score higher in comparisons",
+      "The agent could be overwhelmed by very long product pages, exceeding its context window and producing truncated or lower-quality comparisons for catalog-heavy categories",
+      "Customers could probe the agent with crafted questions to extract its system prompt, revealing the comparison criteria and ranking logic the company considers proprietary"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is indirect prompt injection: any content the model reads is effectively input it may act on, and here that content is authored by third parties with a financial incentive to manipulate outcomes. Because the agent can take actions (cart manipulation), injected instructions convert content into unauthorized behavior. The principle is that all retrieved or tool-returned content must be treated as untrusted data.",
+      "Tempting because SEO-style gaming is a real and familiar problem, but it existed with traditional ranking engines too — it is persuasion within the rules of the input, not a novel attack surface. The workshop asked what is new: the qualitative change is that content can now carry executable-in-effect instructions, not just favorable keywords.",
+      "Context overflow is a genuine engineering limitation, but it is a quality and reliability concern, not an attack surface — no adversary is required and the failure degrades gracefully. Presenting it as the top risk mistakes an operational limit for a security threat.",
+      "System-prompt extraction is a real exposure, but the downside here is disclosure of ranking heuristics — a competitive-intelligence issue. It does not let an attacker cause unauthorized actions on user carts. Ranking it first inverts severity: manipulation of agent behavior outranks leakage of prompt text."
+    ],
+    "principle": "every content source the agent reads is an input channel an attacker can write to",
+    "relatedConcept": "Indirect prompt injection via third-party content is the defining new risk of agents that read the open world and take actions."
+  },
+  {
+    "id": 509,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "A radiology group introduces a Claude-based tool that drafts preliminary findings summaries from imaging reports for radiologists to review and finalize. Six months in, an audit finds radiologists now agree with the draft 98% of the time, spend far less time per review than at launch, and several missed findings traced back to errors that were present in the AI draft and went uncorrected. What failure mode should the architect name, and what does it imply?",
+    "options": [
+      "Model drift — the tool's accuracy degraded after a model version update, so the fix is pinning the model version and re-running the validation suite",
+      "Hallucination — the model fabricated findings not present in the reports, so the fix is grounding each draft more tightly to the source text",
+      "Data leakage — reviewers were anchored by seeing prior radiologists' agreement rates, so the fix is hiding historical acceptance statistics from the interface",
+      "Automation bias — reviewers increasingly defer to the draft instead of independently checking it, so the review process itself must be redesigned to force genuine engagement"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because degraded outcomes after time in production often do indicate drift, but the evidence pattern points elsewhere: the errors were in drafts humans were supposed to catch, and reviewer behavior changed (faster reviews, near-total agreement). Pinning versions addresses a cause that was never established.",
+      "Hallucination may describe how individual draft errors arose, but the audit's core finding is that errors went uncorrected by the human layer designed to catch them. Tightening grounding reduces the error rate but leaves the broken safety net broken — it treats the upstream symptom while the control failure persists.",
+      "This misapplies the term data leakage, which concerns sensitive data escaping through outputs or logs, and invents an anchoring mechanism the audit did not describe. The observed anchor is the draft itself, not historical statistics. The interface tweak would not restore independent review.",
+      "Correct. This is automation bias: as a system proves mostly right, human reviewers shift from verifying to rubber-stamping, and the human-in-the-loop control silently stops functioning. The implication is procedural redesign — for example blind second reads on a sample, requiring reviewers to note key findings before seeing the draft, or measuring correction rates as a health metric for the review layer itself."
+    ],
+    "principle": "a mostly-right system erodes the vigilance of its human checkers",
+    "relatedConcept": "Over-reliance and automation bias are failure modes of the socio-technical system, not the model, and must be designed against explicitly."
+  },
+  {
+    "id": 510,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "A payments company runs a Claude-powered pipeline that classifies merchant support tickets and extracts structured dispute data, with prompts tuned over months against the current model version. Anthropic announces the version they use will be deprecated in 90 days. The engineering lead proposes simply updating the model identifier in the config on deprecation day, noting the newer model benchmarks better on every public evaluation. What risk should the architect flag with this plan?",
+    "options": [
+      "The newer model's higher per-token price will raise pipeline costs, so the migration should wait until the finance team approves a revised budget",
+      "The newer model may respond differently to the tuned prompts, so behavior on their specific tasks can regress despite better benchmarks — migration needs a regression evaluation against their own test set first",
+      "The newer model's larger context window will change how much ticket history the pipeline can include, requiring the chunking logic to be rewritten before switching",
+      "Running two model versions during a transition creates inconsistent classifications, so the switch must happen atomically for all traffic at the deprecation deadline"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because cost review is legitimate diligence, but it is an operational planning detail, not the risk that threatens correctness. Framing budget as the blocker misses that the pipeline's tuned behavior — the thing months of work produced — is what the swap puts at risk.",
+      "Correct. Model behavior is not portable across versions: prompts tuned against one model's quirks can produce different classifications, formats, or edge-case handling on another, and public benchmarks say nothing about this workload. The principle is treating a model version change like a dependency upgrade — gated by regression evals on your own golden dataset, with a staged rollout, well before the forced deadline.",
+      "A larger context window is strictly permissive — existing inputs that fit before still fit. Nothing about it forces a chunking rewrite. This invents a migration blocker out of a non-breaking change while ignoring the genuine behavioral-drift risk.",
+      "Tempting because consistency matters, but an atomic big-bang cutover is the riskier pattern, not the safer one: it removes the ability to compare versions on live traffic and roll back gradually. Brief heterogeneity during a canary is a manageable cost of de-risking, not a hazard to design around."
+    ],
+    "principle": "model upgrades are behavior changes — gate them with your own regression evals",
+    "relatedConcept": "Version-to-version behavioral drift is why production LLM systems maintain golden datasets and staged migration plans."
+  },
+  {
+    "id": 511,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "A SaaS company automates vendor-contract intake with a chain of Claude steps: one extracts key terms from the uploaded contract, the next compares them against company policy, and a third drafts a redline memo for the legal team. In testing, each step scores about 95% accurate in isolation, and the team argues the pipeline is therefore launch-ready. What should the architect point out about this reasoning?",
+    "options": [
+      "The 95% figures are meaningless without a human baseline; the pipeline should launch only if it outperforms paralegals on the same test set",
+      "Errors compound across chained steps — an extraction mistake silently corrupts every downstream stage — so end-to-end accuracy is materially lower and the design needs inter-stage validation and checkpoints",
+      "Isolated accuracy testing ignores latency; chaining three model calls will make the pipeline too slow for intake workflows, so the steps should be merged into a single prompt",
+      "A 95% step accuracy means the weakest stage should be replaced with a larger model before launch, since the chain is only as strong as its least accurate link"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because human baselines are good evaluation practice, but it sidesteps the specific flaw in the team's argument. Even with a favorable human comparison, the compounding problem remains: per-step metrics do not describe the chained system, which is what actually ships.",
+      "Correct. In a sequential chain, roughly 0.95 × 0.95 × 0.95 means end-to-end correctness near 86%, and worse in practice because downstream steps confidently build on corrupted inputs rather than flagging them — a cascading failure. The architectural response is validating outputs between stages (schema checks, confidence gates, spot-check sampling) so errors are caught where they enter rather than laundered into a polished memo.",
+      "Latency is a real consideration but the intake workflow is asynchronous document processing, where minutes rarely matter, and merging steps trades away the debuggability and control that motivated decomposition. This swaps the actual correctness risk for a performance concern the scenario does not raise.",
+      "Tempting because strengthening the weakest link sounds rigorous, but it keeps optimizing per-step accuracy — the very metric the flawed argument relied on. Even if every stage reached 98%, unvalidated chaining still compounds and hides errors; the missing element is inter-stage checking, not a bigger model."
+    ],
+    "principle": "per-step accuracy multiplies — validate between stages, not just at the ends",
+    "relatedConcept": "Cascading failure in agent and workflow chains is why decomposed LLM pipelines need checkpoints, not just good components."
+  },
+  {
+    "id": 512,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Identify risks, limitations, and failure modes of LLM systems",
+    "type": "single",
+    "question": "A city government's Claude assistant helps caseworkers summarize resident files containing addresses, income details, and health notes. To debug quality issues, the engineering team enabled full prompt and completion logging to a third-party observability SaaS, retained for 180 days and accessible to the whole engineering organization. The assistant itself has strong access controls. What risk has this design introduced?",
+    "options": [
+      "Log volume at full-prompt fidelity will inflate observability costs and slow incident queries, so the team should sample a small percentage of traffic instead",
+      "The third-party vendor could use the logged prompts to train its own models, so the contract must add a clause prohibiting model training on customer data",
+      "Sensitive resident data now flows into a secondary system with broader access and longer retention than the primary one, creating a data-leakage path that bypasses the assistant's access controls",
+      "Debugging from logged prompts will tempt engineers to overfit fixes to individual complaints, so quality work should rely on aggregate metrics rather than raw transcripts"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because cost and performance are real logging concerns, but sampling still ships resident PII to the same over-exposed destination — just less of it. This optimizes the pipeline while missing that the content of the logs, not their volume, is the governance problem.",
+      "A no-training clause is a genuinely relevant contractual control, but it addresses only one narrow misuse by one party. The broader exposure — an entire engineering org reading health notes for 180 days in a system nobody threat-modeled — remains untouched. This is compliance-checkbox thinking: fixing the contract while the architecture still leaks.",
+      "Correct. Logs are outputs too: full prompts replicate the most sensitive data into a shadow copy with weaker controls, wider audience, and longer retention than the system of record. The principle is that data protection applies to every system the data touches — the fix is redacting or masking PII before logging, scoping log access, and aligning retention with policy.",
+      "Overfitting fixes to anecdotes is a real evaluation pitfall, but it is a methodology critique, not the risk this design introduced. Choosing it mistakes a process-quality concern for the serious privacy exposure sitting in the logging pipeline."
+    ],
+    "principle": "logs are a data store — PII protections must follow the data into observability systems",
+    "relatedConcept": "Data leakage through telemetry is a classic LLM-system failure mode because prompts concentrate exactly the data access controls were protecting."
+  },
+  {
+    "id": 513,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "single",
+    "question": "A commercial bank is designing agent assistance for its treasury operations team. The Claude agent can draft client emails, prepare internal research notes, and initiate wire transfers through a payments API. The design must decide where human validation is required, and the operations lead wants to minimize friction. Which allocation of human oversight is most defensible?",
+    "options": [
+      "Require human review of all three outputs equally, since a consistent review policy is easier to audit and train staff on than per-action rules",
+      "Require approval for wires and emails but not research notes, since anything leaving the bank or moving money carries external consequences",
+      "Sample 10% of each output type for retrospective quality review, using the findings to decide later where full review is warranted",
+      "Gate wire transfers behind mandatory pre-execution approval, while emails and research notes ship with lightweight or sampled review"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because uniformity simplifies training and audit narratives, but it ignores that oversight is a scarce resource: reviewing low-stakes notes at the same depth as wire transfers guarantees reviewer fatigue, and fatigue degrades exactly the reviews that matter most. Uniform policy is the opposite of risk-proportionate control.",
+      "Tempting because 'external consequences' is a reasonable heuristic, but it groups a recoverable action with an irreversible one. A poorly worded email can be followed up and corrected; a wire cannot be recalled. Requiring full pre-approval on all outbound email spends heavy oversight on a reversible risk while adding the friction the lead was asked to minimize.",
+      "Sampling everything defers the critical decision and, during the deferral, wires execute with no gate at all. Retrospective review of an irreversible transfer is an incident report, not a control. This applies a low-stakes oversight pattern to the one action class where prevention is mandatory from day one.",
+      "Correct. Human validation should be placed where errors are high-impact and irreversible: a wire transfer, once settled, cannot be undone, so it gets a mandatory pre-execution approval gate. Drafts and notes are reversible — a human edits or discards them naturally in the workflow — so sampled review suffices. This is the principle of proportionate oversight: gates for irreversible actions, review for recoverable ones."
+    ],
+    "principle": "approval gates where actions are irreversible; lighter review where errors are recoverable",
+    "relatedConcept": "Mapping oversight intensity to reversibility and impact is the core skill of human-in-the-loop design."
+  },
+  {
+    "id": 514,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "single",
+    "question": "A health insurer requires a nurse to review every AI-drafted prior-authorization recommendation before it is sent. Each nurse now clears about 300 reviews per day, approval of drafts runs at 99.7%, and average review time has fallen to 20 seconds. Leadership cites these numbers as evidence the oversight program works. What should the architect conclude?",
+    "options": [
+      "The program is succeeding — high agreement shows the model has matured, so the insurer can begin removing the human step for the lowest-complexity cases",
+      "The review layer is understaffed — the insurer should hire more nurses so each reviewer handles fewer cases per day at the same total throughput",
+      "The metrics suggest rubber-stamping rather than review — the design needs seeded known-error cases, correction-rate monitoring, and volume reduction so remaining reviews get genuine attention",
+      "The workflow needs a second reviewer on every case, since two independent approvals make it far less likely that a draft error survives to submission"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because a 99.7% approval rate looks like model quality, but 20-second reviews at 300 per day cannot distinguish a good model from a disengaged reviewer — the metric is confounded. Removing oversight based on evidence that the oversight may not be functioning is the most dangerous available reading of this data.",
+      "Tempting because workload is plausibly part of the problem, but hiring alone assumes the reviews would become genuine if only there were fewer per person, without any way to verify it. It adds cost while leaving the program with no measurement of whether review actually catches errors — the core defect stands unmeasured.",
+      "Correct. These are the classic signatures of rubber-stamp review: reviewer fatigue and habituation turn a control into a formality that provides audit-trail comfort without safety. The fix is to make review quality observable — seed cases with known errors and measure catch rates, track correction rates as a health metric — and to route only genuinely uncertain cases to humans so attention is spent where it matters. A control you cannot verify is working must be assumed broken.",
+      "Doubling reviewers doubles cost and, under the same fatigue conditions, tends to produce diffusion of responsibility — each reviewer assumes the other is looking closely. Independent agreement only helps when each review is genuine, which is precisely what is in doubt here."
+    ],
+    "principle": "measure whether review actually catches errors — an unverified control is a broken control",
+    "relatedConcept": "Rubber-stamp dynamics are the main failure mode of mandated human review and must be detected with instrumentation, not assumed away."
+  },
+  {
+    "id": 515,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "single",
+    "question": "An online marketplace uses Claude to generate SEO product descriptions for roughly 40,000 new listings per week. Errors are low-stakes: a bad description slightly hurts conversion and is trivially replaced. The content team of six cannot read every output, and leadership is unwilling to grow the team. What human-validation strategy fits this workload?",
+    "options": [
+      "Review a statistical sample of outputs each week, sized to detect quality regressions, and use findings to tune prompts and automated checks rather than to fix individual descriptions",
+      "Prioritize full human review for the top revenue-generating product categories and let all remaining listings publish without any human involvement or measurement",
+      "Hold every description in a queue until a team member approves it, accepting slower listing publication as the cost of guaranteed quality control",
+      "Have a second Claude pass judge each description and auto-publish those it approves, eliminating the need for the content team to look at outputs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. For high-volume, low-stakes, easily reversible outputs, sampling review is the right pattern: a well-sized random sample detects systemic quality drift, and human effort goes into improving the system (prompt fixes, automated validators) rather than inspecting units. This applies proportionate oversight — spend scarce human attention on signal, not on exhaustive coverage the stakes do not justify.",
+      "Tempting because revenue-weighting sounds like smart prioritization, but the unreviewed tail gets zero measurement, so a systemic failure affecting most of the catalog would go undetected indefinitely. Sampling across the whole population is what protects against unknown-unknowns; concentrating review by value abandons that.",
+      "Full pre-publication review of 40,000 items by six people is arithmetically impossible without turning each review into a meaningless glance — it manufactures rubber-stamping while destroying publication speed. This applies an irreversible-action control pattern to a trivially reversible output, the classic proportionality error.",
+      "Tempting because LLM-as-judge scales beautifully, but removing humans entirely means the judge's own blind spots are never audited — correlated failures between generator and judge pass silently. Automated judging works as a filter inside a system that still includes human sampling, not as a replacement for all human contact with outputs."
+    ],
+    "principle": "high volume + low stakes + reversible = sampled review aimed at the system, not the unit",
+    "relatedConcept": "Sampling strategies let small teams maintain real oversight over outputs produced at machine scale."
+  },
+  {
+    "id": 516,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "single",
+    "question": "A SaaS company's Claude support agent resolves billing questions and can process plan downgrades and cancellations. The company wants most interactions fully automated but accepts that some cases need people. The architect must choose the mechanism that decides which conversations reach a human. Which design is strongest?",
+    "options": [
+      "Let customers opt into human support by typing 'agent' at any point, keeping automation as the default for everyone who does not ask",
+      "Route to humans based on defined triggers — low model confidence, high-value account actions, expressed frustration, or repeated failed resolutions — with the thresholds tuned from outcome data",
+      "Send a daily digest of all automated resolutions to the support team so they can proactively re-open any conversations the agent appears to have mishandled",
+      "Escalate every conversation that mentions cancellation to a human retention specialist, since those carry the highest revenue risk for the business"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because user choice respects autonomy and is easy to build, but it makes escalation depend on customers knowing the agent is failing them — many will not realize an answer is wrong, and vulnerable or frustrated users may give up instead of typing a keyword. Escalation should not require the harmed party to diagnose the failure.",
+      "Correct. Confidence-based and risk-based routing operationalizes the core HITL idea: automate where the system is reliably competent and the stakes are low, and hand off where uncertainty or impact is high. Making triggers explicit and tunable turns escalation into a measurable control that improves with data, rather than a static rule or a user burden.",
+      "A next-day digest is retrospective review, not escalation — by the time a mishandled cancellation is spotted, the customer is gone and the action may be hard to unwind. It also asks the team to skim everything, recreating the volume problem. Detection after the fact cannot substitute for routing at the moment of risk.",
+      "Tempting because cancellation is genuinely the highest-stakes intent, but a keyword rule is both over- and under-inclusive: it floods specialists with routine cancellations the agent handles fine, while missing high-risk situations phrased differently. Single-trigger routing captures one risk dimension and ignores confidence, account value, and sentiment."
+    ],
+    "principle": "route to humans on measured uncertainty and stakes, not on user initiative or single keywords",
+    "relatedConcept": "Confidence-based routing is how HITL systems spend human attention exactly where the model is least trustworthy."
+  },
+  {
+    "id": 517,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "multi",
+    "question": "A state agency is adding Claude to its unemployment-benefits workflow: the model reviews applications and recommends approve or deny. Officials insist on 'meaningful human control,' not a formality, and the design review must pick concrete mechanisms. Which two design choices best deliver genuine human control over these consequential decisions? (Choose two.)",
+    "options": [
+      "Let the model auto-finalize approvals it rates as clear-cut while sending only borderline cases to caseworkers, so human attention concentrates where the model is uncertain",
+      "Require a caseworker to make the final determination on every denial, with the model's recommendation, evidence, and reasoning presented as an input to their judgment",
+      "Track each caseworker's disagreement rate with model recommendations and audit for rubber-stamping, treating near-total agreement as a signal the control has degraded",
+      "Publish a transparency notice explaining that AI assists benefits processing, with a link describing the model, its role, and the agency's oversight framework"
+    ],
+    "correct": [1, 2],
+    "optionExplanations": [
+      "Tempting because confidence-based routing is the right pattern in many domains, but benefits eligibility is a consequential government determination where errors deprive people of income — and the model's 'clear-cut' rating is itself a model output that can be systematically wrong for subgroups. Auto-finalizing any determination removes the human from exactly the decisions officials said must stay under human control.",
+      "Correct. For consequential decisions affecting individuals' livelihoods, the human must be the decision-maker, not a monitor of the machine's decisions — the model recommends, the caseworker determines, especially for denials where the harm concentrates. This applies the principle that adverse consequential decisions should never be fully automated.",
+      "Correct. Mandating human sign-off means nothing if sign-off decays into rubber-stamping, so genuine control requires instrumentation of the control itself: disagreement rates, correction patterns, and audits that flag reviewers who never override. This closes the gap between having a human in the loop on paper and having one in practice.",
+      "Tempting because transparency is a legitimate obligation and likely required, but a public notice informs claimants — it exerts zero control over any individual decision. Choosing disclosure as a control mechanism is compliance-checkbox thinking: it makes the automation visible without making it supervised."
+    ],
+    "principle": "consequential adverse decisions stay with humans — and verify the human step is real",
+    "relatedConcept": "Meaningful human control combines decision authority placement with monitoring that the oversight has not hollowed out."
+  },
+  {
+    "id": 518,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Apply human-in-the-loop validation strategies",
+    "type": "single",
+    "question": "A brokerage compliance team uses Claude for two tasks: drafting responses to routine regulator information requests, and flagging trades for potential market-abuse escalation, where an escalation freezes the client's account pending investigation. The team asks the architect whether the same human-validation pattern can cover both tasks. What should the architect recommend?",
+    "options": [
+      "Yes — apply pre-approval to both workflows, since in a regulated brokerage any AI output that touches compliance should meet the strictest available oversight bar",
+      "Yes — apply post-hoc sampled review to both, since compliance officers are trained professionals whose spot checks will surface problems in either workflow quickly",
+      "No — drafts can flow into the officers' normal edit-and-send workflow as review, while account-freezing escalations need different handling because sampling would let unchecked freezes take effect",
+      "No — the account-freeze workflow should get a mandatory pre-action human gate because the harm lands on clients immediately, while draft responses are inherently reviewed when an officer edits and sends them"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because 'strictest everywhere' feels safe in a regulated industry, but maximal uniform oversight is how review queues bloat and reviewer attention gets diluted across low-risk drafts — degrading vigilance on the freezes that genuinely need it. Regulation demands adequate control, not identical control; proportionality is the professional standard.",
+      "Tempting because sampled review by experts is a legitimate pattern, but applying it to account freezes means most freezes take effect with no human check at all, harming clients before any sample is drawn. Professional skill in reviewers does not compensate for a control placed after an immediate-impact action.",
+      "This option diagnoses the asymmetry correctly but stops short of prescribing the control: saying escalations 'need different handling' without committing to a pre-action gate leaves the critical design decision unmade. Identifying that sampling is insufficient is the analysis; the recommendation must specify what replaces it.",
+      "Correct. The two tasks differ on the axis that determines HITL design: reversibility and time-to-impact. A draft response is naturally validated by the officer who edits and sends it — the workflow embeds review. An account freeze harms the client the moment it executes, so it needs a mandatory pre-action approval gate. Matching the validation pattern to each action's consequence profile is the principle."
+    ],
+    "principle": "one system, two consequence profiles — HITL patterns follow the action, not the application",
+    "relatedConcept": "Distinguishing review-of-drafts from approval-of-actions is the practical vocabulary of human-in-the-loop architecture."
+  },
+  {
+    "id": 519,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+    "type": "single",
+    "question": "A telehealth startup wants Claude to summarize patient intake conversations that include symptoms, medications, and diagnoses. The CTO argues that because the API traffic is encrypted in transit and at rest, the integration is 'HIPAA-ready' and can ship. Before any protected health information flows to the model provider, what must the architect insist on?",
+    "options": [
+      "A signed Business Associate Agreement with the model provider, plus an architecture review covering retention settings, access controls, and audit logging for PHI in every component that touches it",
+      "A de-identification layer that strips the eighteen HIPAA identifiers from transcripts before the API call, which removes the data from HIPAA's scope and any need for provider agreements",
+      "Documented patient consent language in the intake flow stating that an AI system will process their health information for summarization purposes",
+      "SOC 2 Type II and ISO 27001 attestations from the model provider, demonstrating that its security program meets healthcare-industry due-diligence standards"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Under HIPAA, a vendor that processes PHI on a covered entity's behalf is a business associate, and a BAA is a legal precondition — encryption is necessary but nowhere near sufficient. The architecture review matters equally: PHI compliance is a property of the whole deployment (retention, logging, access, downstream systems), not of transport security. The principle is that compliance lives in the deployment architecture, not in a checkbox feature.",
+      "Tempting because true de-identification does take data outside HIPAA's scope, but reliably stripping all identifiers from free-flowing clinical conversation is very hard — names, dates, and rare conditions leak through, and the summaries themselves must map back to patients to be useful. Betting the compliance posture on perfect redaction of conversational text is fragile where a BAA-backed architecture is robust.",
+      "Tempting because consent feels foundational, but HIPAA permits treatment-related uses of PHI without special consent — the gap here is the disclosure to a vendor without a BAA, which consent language does not cure. This substitutes a patient-facing notice for the actual legal and architectural requirements.",
+      "Security attestations are useful due-diligence evidence but they are not HIPAA instruments — a provider can be SOC 2 compliant and still not be permitted to receive PHI absent a BAA. Treating generic security certifications as regulatory authorization is classic compliance-checkbox substitution."
+    ],
+    "principle": "PHI to a vendor requires a BAA and a PHI-aware architecture, not just encryption",
+    "relatedConcept": "Regulated-data deployments hinge on the legal and architectural relationship with the model provider as a processor of that data."
+  },
+  {
+    "id": 520,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+    "type": "single",
+    "question": "A European fashion retailer is building a Claude-powered service assistant. The current design sends the customer's full CRM record — complete order history, loyalty tier, saved addresses, birthday, and support notes — with every request, because 'more context gives better answers.' The DPO reviews the design ahead of launch across EU markets. What change does GDPR most directly require?",
+    "options": [
+      "Update the privacy policy to disclose that customer records are shared with an AI provider, and refresh the cookie-consent banner to cover the assistant",
+      "Encrypt each CRM record with keys held only by the retailer so the model provider stores the customer data in a form it cannot independently read",
+      "Send only the fields needed for the specific query — data minimization — and ensure a data processing agreement and appropriate transfer or residency arrangements cover what is sent",
+      "Anonymize customer records by replacing names with pseudonymous tokens before transmission, which takes the payloads outside the scope of the regulation"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because transparency duties are real, but disclosure does not legalize over-collection: GDPR's data-minimization principle limits processing to what is necessary for the purpose regardless of what the privacy policy says. Updating notices while shipping the full record with every request is paperwork covering a design defect.",
+      "Encryption with retailer-held keys is incoherent for this use case — the model must read the context to answer, so the data is necessarily processed in usable form. This is security theater here: it sounds protective while either breaking the feature or protecting nothing at the moment of processing.",
+      "Correct. Data minimization is a core GDPR principle: sending the entire record for a shipping question processes far more personal data than the purpose requires. The fix is architectural — scope the context to the query — combined with the processor-relationship basics: a DPA with the provider, and lawful transfer mechanisms or EU-region processing. Compliance is achieved in the payload design, not around it.",
+      "Tempting because pseudonymization is a genuine GDPR-recognized safeguard, but it does not anonymize: the retailer can re-link tokens to customers, and the payload still contains identifying detail (addresses, order patterns). Pseudonymized data remains personal data, so the claim that regulation no longer applies is simply wrong."
+    ],
+    "principle": "data minimization is an architectural requirement — send what the purpose needs, nothing more",
+    "relatedConcept": "GDPR compliance for LLM features is decided by what the prompt contains and who processes it under what agreement."
+  },
+  {
+    "id": 521,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+    "type": "single",
+    "question": "A systems integrator is proposing a Claude-based document-triage solution for a US federal civilian agency processing controlled unclassified information. The integrator's engineers plan to call the same commercial API endpoint they use for private-sector clients, arguing the provider's strong commercial security posture should satisfy the agency. What should the solution architect correct in this plan?",
+    "options": [
+      "The plan needs the provider's commercial terms upgraded to an enterprise agreement with zero data retention before any agency documents are processed",
+      "Federal workloads of this kind must run through a FedRAMP-authorized environment — such as an authorized cloud service offering Claude — because agencies cannot accept commercial security posture in place of authorization",
+      "The agency requires on-premises model deployment, since any cloud-hosted model — authorized or not — is unsuitable for controlled unclassified information",
+      "The plan should add FIPS-validated encryption for documents in transit and at rest, which is the specific control federal security frameworks demand of SaaS integrations"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because zero-data-retention and enterprise terms are genuine improvements, but contractual data handling does not substitute for FedRAMP authorization — federal agencies need cloud services assessed and authorized under the federal program, not privately negotiated assurances. This mistakes a stronger commercial contract for a regulatory authorization it cannot replace.",
+      "Correct. FedRAMP is the US federal program governing agency use of cloud services: the deployment path must be an authorized offering — for example Claude consumed through a FedRAMP-authorized cloud platform or a provider service holding the appropriate authorization — at a baseline matching the data's sensitivity. The principle is that compliance is determined by the deployment vehicle, not the model: the same model is compliant or non-compliant depending on the environment serving it.",
+      "Tempting because on-prem sounds maximally safe, but it overshoots: FedRAMP exists precisely so agencies can use cloud services, and CUI is routinely processed in authorized cloud environments. Demanding on-prem forfeits the practical path and reflects a misreading of federal policy as cloud-prohibitive rather than cloud-authorizing.",
+      "FIPS-validated cryptography is one control family inside federal baselines, not the compliance answer by itself. A service can encrypt flawlessly and still be unauthorized for agency use. Reducing an authorization regime to a single technical control is checkbox thinking that would fail the agency's assessment immediately."
+    ],
+    "principle": "for federal work, the authorized deployment environment is the compliance boundary",
+    "relatedConcept": "FedRAMP illustrates the domain's rule that the same model can be compliant or not depending entirely on how and where it is served."
+  },
+  {
+    "id": 522,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+    "type": "single",
+    "question": "A B2B SaaS company embeds Claude features into its HR platform used by enterprise customers across the EU and US. Customers' employee data flows through prompts. A prospective EU customer's procurement team asks how the vendor chain is structured for data protection and where their employees' data goes. Which architecture answer shows the SaaS company has set this up correctly?",
+    "options": [
+      "Employee data is retained by the model provider only transiently under default API terms, and all parties maintain current security certifications reviewed annually by our compliance team",
+      "Our platform agreement makes us the data controller for all AI features, so customers do not need to flow their own data-protection obligations down to us or to the model provider",
+      "Prompts are anonymized by our middleware before reaching the model provider, so the sub-processor question does not arise for the AI features in scope",
+      "The model provider is a disclosed sub-processor under a DPA chain, with zero-data-retention configured, EU-region processing available, and prompt/log retention documented so customer obligations flow down the whole chain"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it mentions retention and certifications, but 'default API terms' and annual cert reviews dodge the procurement team's actual question: the contractual chain. Without a DPA naming the provider as a sub-processor and defined retention commitments, the customer cannot map their GDPR obligations onto the vendor chain — certifications are evidence, not structure.",
+      "This misstates the roles: for customer employee data processed on the customer's behalf, the SaaS company is a processor and the customer remains controller — claiming controller status does not relieve anyone of obligations and would alarm a competent procurement team. Getting the controller/processor roles wrong undermines every downstream commitment.",
+      "Tempting because it would simplify everything if true, but HR prompts — performance notes, role details, dates — are rarely truly anonymized by middleware; re-identifiable data keeps the provider in the processing chain. Waving off the sub-processor analysis with an anonymization claim that will not survive scrutiny is a fragile compliance posture.",
+      "Correct. This is the well-formed answer: the model provider is disclosed as a sub-processor under a DPA chain so obligations flow from customer to platform to provider; zero-data-retention and regional processing address residency and storage concerns; documented log retention closes the telemetry gap. The principle is that compliance is a property of the documented processing chain, and every hop must be visible and governed."
+    ],
+    "principle": "map and govern the full processor chain — every hop the data takes must be contracted and configured",
+    "relatedConcept": "Sub-processor transparency, DPAs, and retention configuration are how multi-tenant SaaS makes LLM features enterprise-compliant."
+  },
+  {
+    "id": 523,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+    "type": "single",
+    "question": "A European neobank's Claude assistant answers customer questions using conversation history stored for personalization, with full transcripts also copied into an analytics warehouse and a debugging log store. A customer invokes their GDPR right to erasure. The privacy engineer finds deleting the CRM profile is easy, but transcripts of the customer's chats persist in three other systems with different owners and retention settings. What is the architectural lesson?",
+    "options": [
+      "Erasure requests should be handled by deleting the primary profile and encrypting residual transcript copies, since GDPR treats strongly encrypted data as effectively erased",
+      "The bank should shorten retention in the warehouse and log store to 30 days so that erasure requests are satisfied automatically by the passage of time",
+      "Personal data must be tracked across every system it propagates to, with erasure implemented as a coordinated capability spanning all copies — designed in before launch, not improvised per request",
+      "The transcripts can be retained lawfully because financial-services record-keeping obligations override individual erasure rights for all customer communications"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because crypto-shredding (destroying keys) is a recognized erasure technique, but merely encrypting copies while retaining usable keys erases nothing — the data remains processable. This dresses continued retention in security clothing; it addresses confidentiality, not the erasure obligation.",
+      "Tempting because retention limits are genuinely part of the answer, but a 30-day universal window is a blunt instrument: it may destroy data the bank legitimately needs longer, and it still leaves a month during which the erasure request goes unfulfilled across systems. Retention policy complements an erasure capability; it does not replace one.",
+      "Correct. The right to erasure applies to all copies of the person's data, wherever the architecture propagated them — chat stores, warehouses, logs, caches. The lesson is data-lineage discipline: know every system personal data flows into, and build deletion propagation as a first-class capability before launch. Data protection by design means erasure is an architectural feature, not a scramble.",
+      "Tempting because financial regulations do mandate retaining certain records, and legal obligations can limit erasure — but the exemption is scoped to specific record types, not a blanket override for all chat transcripts, and it certainly does not cover the analytics warehouse copies kept for product improvement. Overclaiming the exemption is a compliance error in the opposite direction."
+    ],
+    "principle": "erasure must reach every copy — trace data lineage and build deletion in from the start",
+    "relatedConcept": "LLM systems multiply copies of personal data across prompts, logs, and analytics, which is why rights-fulfillment must be architected, not retrofitted."
+  },
+  {
+    "id": 524,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+    "type": "single",
+    "question": "A consumer lender wants Claude to read full loan applications — including free-text employment narratives — and output approve or decline directly to applicants, projecting a 60% cost reduction in underwriting. The model matched human underwriter decisions 94% of the time in backtesting. As the reviewing architect, what is the most important change to require before this ships?",
+    "options": [
+      "Raise the agreement threshold to 99% on backtests before launch, since 94% concordance with human underwriters leaves too many divergent decisions at this volume",
+      "Keep the model as a recommendation engine with human underwriters making final decisions — at minimum on declines — with disparate-impact testing and an applicant appeal path before any launch",
+      "Ship with the model deciding approvals automatically while routing all declines to a quality-assurance queue for next-business-day review and correction",
+      "Require the model to output a plain-language explanation with every decision so applicants understand the reasons and can correct errors in their applications"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because higher accuracy sounds like more safety, but agreement with historical human decisions is the wrong target: if past underwriting embedded bias, 99% concordance reproduces it more faithfully. The concern with automated lending decisions is not error volume but accountability and disparate impact — thresholds on the wrong metric fix neither.",
+      "Correct. Credit decisions are consequential determinations about individuals — the category where fully automated adverse decisions are ethically (and in many jurisdictions legally) unacceptable. The required package is structural: human decision authority especially on declines, fairness testing for disparate impact across protected groups before and after launch, and a contestability path so applicants can appeal. This applies the principle that consequential adverse decisions need human accountability.",
+      "Tempting because it seems to focus scrutiny on declines, but next-day review means the applicant already received an adverse decision from a machine with no human accountable at decision time — and reviewed-and-reversed declines still inflict harm and erode trust. Post-hoc QA is monitoring, not the decision authority that consequential determinations require.",
+      "Explanations serve transparency and are worth having, but an explanation attached to a fully automated decline does not make the decline fairer or contestable — a model can fluently justify a biased decision. Transparency is one pillar; without human authority and impact testing it becomes a veneer over unaccountable automation."
+    ],
+    "principle": "no fully automated adverse decisions on credit — humans decide, fairness is tested, applicants can appeal",
+    "relatedConcept": "Lending is the canonical domain where bias, contestability, and human accountability converge into hard architectural requirements."
+  },
+  {
+    "id": 525,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+    "type": "single",
+    "question": "An HR-tech SaaS company is adding Claude-powered resume screening that scores candidates for recruiter shortlists. The team ran standard accuracy evals against recruiter judgments and results look strong. Before selling this to enterprise customers, the head of product asks what fairness work is still missing. What should the architect answer?",
+    "options": [
+      "Measure outcomes across demographic groups — score distributions and selection rates — on representative data before launch, and keep measuring in production, since aggregate accuracy can hide disparate impact",
+      "Remove name, gender, age, and address fields from resumes before scoring, since the model cannot discriminate on attributes it never receives in the input",
+      "Add an instruction to the scoring prompt directing the model to ignore demographic characteristics and evaluate only job-relevant qualifications and experience",
+      "Commission an annual third-party algorithmic audit, since independent attestation is what enterprise procurement teams and emerging AI regulations require for hiring tools"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Fairness is an empirical property you measure, not an intention you declare: a model can match recruiter judgments on average while scoring systematically lower for a protected group, because aggregate accuracy marginalizes subgroup effects. The missing work is disparate-impact measurement — selection-rate ratios and score distributions by group — pre-launch and continuously, since drift and new customer populations can introduce disparities later.",
+      "Tempting because blinding is intuitive, but proxy features defeat it: university names, zip codes, career gaps, and writing style correlate with protected attributes, so the model can discriminate without ever seeing a name. Worse, removing group markers makes disparate impact harder to measure. Blindness is not fairness — measurement is.",
+      "A prompt instruction expresses intent but provides no evidence: bias in an LLM arises from training-data patterns, not from disobeying instructions, so 'ignore demographics' cannot neutralize learned correlations. Without measurement, the team cannot know whether the instruction changed anything. This is fairness-by-assertion.",
+      "Tempting because audits are increasingly demanded for hiring tools and may be legally required in some jurisdictions, but an annual external audit is a governance layer on top of internal measurement, not a substitute for it. Waiting a year to learn about disparate impact from an auditor means shipping unmeasured harm in the meantime — attestation without instrumentation is checkbox compliance."
+    ],
+    "principle": "fairness is measured, not assumed — test disparate impact by group, before launch and forever after",
+    "relatedConcept": "Bias measurement across subgroups is the empirical backbone of every ethical-AI claim a hiring system makes."
+  },
+  {
+    "id": 526,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+    "type": "single",
+    "question": "A hospital system deploys Claude to draft responses to patient portal messages; clinicians review and edit each draft before sending, and internal metrics show most drafts go out lightly edited. The patient experience team argues against telling patients that AI helps write the messages, fearing it will erode trust in their doctors. How should the architect advise on the disclosure question?",
+    "options": [
+      "Side with the team — since a licensed clinician reviews and approves every message, the communication is authentically the clinician's, and disclosure would create confusion without changing the content patients receive",
+      "Recommend disclosing only when a message is sent with no edits, since an unedited draft is substantively AI-authored while an edited one reflects genuine clinician judgment",
+      "Defer the decision to each individual clinician, letting them choose whether to add an AI-assistance note to their own messages based on their patient relationships",
+      "Recommend clear disclosure that AI assists in drafting with clinician review, because patients have a legitimate interest in knowing how their care communications are produced, and concealment discovered later damages trust far more"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because the human-review argument has real force — the clinician does take responsibility for the content. But it conflates accountability with transparency: review makes the clinician answerable, yet patients still lack material information about how their care communications are produced. Metrics showing light editing undercut the 'authentically the clinician's' claim, and the reasoning optimizes short-term comfort over honest practice.",
+      "Tempting because it tries to scale disclosure with AI contribution, but the edit-based trigger is unworkable and misleading: patients cannot know which regime applied, clinicians are incentivized to make token edits to avoid the label, and light edits do not transform authorship. Conditional transparency that depends on unobservable internal behavior is not transparency.",
+      "Per-clinician discretion produces inconsistent practice across the same institution and converts an organizational ethics question into individual preference — patients' informational interests should not vary by which doctor they drew. Institutions, not individuals, own the transparency posture for a system they deployed.",
+      "Correct. Transparency about AI involvement in consequential, trust-dependent communications is a core ethical commitment: patients can reasonably want to know, the information is material to the relationship, and the downside scenario — discovery through a leak or news story — converts a manageable disclosure into a trust crisis. Honest framing ('drafted with AI assistance, reviewed by your clinician') preserves both truthfulness and confidence."
+    ],
+    "principle": "disclose AI involvement where trust is the product — concealment is a deferred trust crisis",
+    "relatedConcept": "Transparency about AI participation is an ethical obligation that grows, not shrinks, with the sensitivity of the relationship."
+  },
+  {
+    "id": 527,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+    "type": "single",
+    "question": "A city housing authority uses a Claude-assisted system to prioritize applicants on its subsidized-housing waitlist, weighing need factors from application documents. A human officer confirms each ranking batch. Applicants who believe their placement is wrong currently have no recourse except reapplying next cycle. An ethics review board examines the system. What gap should the board require the authority to close first?",
+    "options": [
+      "The system lacks a published model card describing the training data, known limitations, and intended use of the prioritization model for public accountability",
+      "The officer confirming ranking batches should be rotated quarterly to prevent any individual from developing undue influence over placement outcomes",
+      "Applicants need a contestability mechanism — a way to see the key factors behind their placement and trigger a human re-evaluation with authority to change it",
+      "The authority should retrain the prioritization model on updated demographic data each year so rankings reflect the city's current population composition"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because model documentation is a genuine transparency practice, but a model card informs policy audiences — it gives an individual applicant stuck at position 400 no way to understand or challenge their own outcome. Publishing documentation while individuals remain unable to contest decisions is transparency at the wrong altitude.",
+      "Rotation addresses a hypothetical insider-influence risk the review did not surface, and batch confirmation is already a weak control — rotating who performs a weak control does not strengthen it. This is governance choreography that leaves the identified gap, applicant recourse, completely untouched.",
+      "Correct. Contestability is the missing pillar: when an automated or AI-assisted system materially affects someone's access to housing, the person must be able to learn the principal reasons for their outcome and appeal to a human empowered to correct errors. 'Reapply next cycle' is not recourse. Appeals also serve the institution — they surface systematic errors and bias that internal metrics miss.",
+      "Tempting because data freshness sounds like fairness maintenance, but retraining on demographic composition neither explains any individual outcome nor provides recourse — and tuning rankings to demographic data without a fairness framework could itself introduce new problems. It answers a question nobody asked while the recourse gap stands."
+    ],
+    "principle": "people affected by AI-assisted decisions need explanation plus a human appeal that can change the outcome",
+    "relatedConcept": "Contestability turns transparency from a document into a working right, and it doubles as the institution's bias-detection channel."
+  },
+  {
+    "id": 528,
+    "domain": "Governance, Safety & Risk Management",
+    "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+    "type": "single",
+    "question": "A national retailer's Claude-based system screens marketplace seller applications, and it passed a thorough disparate-impact assessment before launch nine months ago. Since then the seller applicant pool has shifted toward new regions and business types, the prompt has been revised twice, and the underlying model was upgraded once. The governance lead asks whether the pre-launch fairness assessment still stands. What should the architect say?",
+    "options": [
+      "The pre-launch assessment covered the system design rather than a data snapshot, so it remains valid until the next scheduled annual governance review",
+      "Fairness findings are perishable — population shift, prompt changes, and the model upgrade each invalidate the baseline, so the system needs ongoing fairness monitoring with re-assessment triggered by any such change",
+      "Only the model upgrade threatens the assessment, since prompts do not affect fairness properties and applicant-pool composition is outside the system boundary being assessed",
+      "The approval-rate trend has been stable overall since launch, so as long as aggregate approval rates hold steady the original fairness conclusion can be considered maintained"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because design-level assessments feel durable, but fairness is a property of the system interacting with a population — and here both the system (prompt, model) and the population changed. Deferring to an annual calendar rather than to material changes means running unassessed for months. Assessments attach to configurations, not to time periods.",
+      "Correct. Fairness is not a launch gate you pass once; it is a monitored property. Each change class matters: population shift changes who the system affects, prompt revisions change behavior, and a model upgrade changes the decision engine itself. The mature pattern is continuous monitoring of outcome metrics by group, plus event-triggered re-assessment on any material change — treating fairness like a production SLO, not a certificate.",
+      "This gets the change analysis wrong twice: prompt wording demonstrably shifts model behavior, including differentially across subgroups, and the applicant population is precisely what disparate impact is measured against — it cannot be outside the boundary. Narrowing the triggers to model upgrades alone would miss most real-world fairness regressions.",
+      "Tempting because stable aggregates feel reassuring, but disparate impact is by definition invisible in aggregates: overall approval rates can hold perfectly steady while one region's or group's rate collapses and another's rises. Relying on the aggregate is the same marginalization error that group-level measurement exists to correct."
+    ],
+    "principle": "fairness is a monitored production property — material changes reset the assessment clock",
+    "relatedConcept": "Ongoing fairness monitoring extends pre-launch bias testing into the full lifecycle, where drift and change actually happen."
+  }
+]
