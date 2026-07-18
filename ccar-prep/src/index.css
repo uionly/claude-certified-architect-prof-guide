@@ -1,8 +1,97 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
 
+/*
+ * TO THE NEW design-system tokens, mapped onto the Tailwind palette this app
+ * already uses (stone/indigo/emerald/rose/amber/teal) so every existing
+ * utility class picks up the brand colors without a component rewrite.
+ * Source: claude.ai/design project fc09a330-ebeb-497c-8eab-228d8a88911b
+ * (tokens/colors.css, tokens/typography.css, tokens/effects.css).
+ */
 @theme {
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-sans: 'Montserrat', system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* TTN has a single brand family (Montserrat); hierarchy comes from weight,
+     not a serif/sans split, so headings that used font-serif adopt it too. */
+  --font-serif: 'Montserrat', system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Neutrals — TTN ink/gray ramp (replaces default Tailwind stone) */
+  --color-stone-50: #f8f8fa;
+  --color-stone-100: #f2f2f5;
+  --color-stone-200: #e6e6ea;
+  --color-stone-300: #d0d0d7;
+  --color-stone-400: #a8a8b2;
+  --color-stone-500: #7c7c88;
+  --color-stone-600: #595964;
+  --color-stone-700: #404049;
+  --color-stone-800: #212127;
+  --color-stone-900: #1a1a1e;
+
+  /* Brand primary — TTN magenta (replaces default Tailwind indigo) */
+  --color-indigo-50: #fde5f1;
+  --color-indigo-100: #fbb9da;
+  --color-indigo-200: #f88ac0;
+  --color-indigo-300: #f45aa6;
+  --color-indigo-400: #f03391;
+  --color-indigo-500: #ec0b7c;
+  --color-indigo-600: #cc0a6b;
+  --color-indigo-700: #a30857;
+  --color-indigo-800: #6a0539;
+  --color-indigo-900: #490427;
+
+  /* Brand accent — TTN cyan (replaces default Tailwind teal) */
+  --color-teal-50: #e2f7fd;
+  --color-teal-100: #b3ecfa;
+  --color-teal-200: #81dff5;
+  --color-teal-300: #4fd2f0;
+  --color-teal-400: #2ac8ec;
+  --color-teal-500: #05bee7;
+  --color-teal-600: #04a1c4;
+  --color-teal-700: #037e99;
+  --color-teal-800: #025263;
+  --color-teal-900: #013945;
+
+  /* Status: success — anchored on TTN's --status-success (replaces emerald) */
+  --color-emerald-50: #eff8f4;
+  --color-emerald-100: #d9eee4;
+  --color-emerald-200: #aedcc7;
+  --color-emerald-300: #82c8a8;
+  --color-emerald-400: #4cb182;
+  --color-emerald-500: #1f9d63;
+  --color-emerald-600: #1b8a57;
+  --color-emerald-700: #167147;
+  --color-emerald-800: #125b39;
+  --color-emerald-900: #0e472d;
+
+  /* Status: error — anchored on TTN's --ttn-red-500 / --status-error (replaces rose) */
+  --color-rose-50: #feeff1;
+  --color-rose-100: #fcd9de;
+  --color-rose-200: #f8afba;
+  --color-rose-300: #f48293;
+  --color-rose-400: #ef4d65;
+  --color-rose-500: #eb203e;
+  --color-rose-600: #cf1c37;
+  --color-rose-700: #a9172d;
+  --color-rose-800: #881324;
+  --color-rose-900: #6a0e1c;
+
+  /* Status: warning — anchored on TTN's --ttn-orange-500 / --status-warning (replaces amber) */
+  --color-amber-50: #fef9f0;
+  --color-amber-100: #fdf0da;
+  --color-amber-200: #fbdfb0;
+  --color-amber-300: #f9cd84;
+  --color-amber-400: #f7b84f;
+  --color-amber-500: #f5a623;
+  --color-amber-600: #d8921f;
+  --color-amber-700: #b07819;
+  --color-amber-800: #8e6014;
+  --color-amber-900: #6e4b10;
+
+  /* Corner radius — TTN's modest geometric scale */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Shadows — TTN's soft, neutral (ink-tinted, not gray-tinted) elevation */
+  --shadow-sm: 0 1px 3px rgba(26, 26, 30, 0.08), 0 1px 2px rgba(26, 26, 30, 0.06);
 }
 
 html {
