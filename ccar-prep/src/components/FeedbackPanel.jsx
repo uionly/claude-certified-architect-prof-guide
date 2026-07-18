@@ -84,6 +84,11 @@ export default function FeedbackPanel({ question, selected }) {
         </div>
       </div>
 
+      <div className="mt-4 rounded-md border border-indigo-200 bg-indigo-50 p-3 text-sm">
+        <span className="font-semibold text-indigo-900">Overall explanation: </span>
+        <span className="text-indigo-800">{question.overallExplanation}</span>
+      </div>
+
       <button
         type="button"
         onClick={() => setGoDeeper((v) => !v)}

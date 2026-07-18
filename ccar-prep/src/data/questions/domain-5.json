@@ -19,7 +19,8 @@
       "Tempting because it targets the observed attack path, but it degrades legitimate user experience while only removing one elicitation technique. Attackers will find single-turn phrasings, and the underlying gap — no enforcement outside the model — remains. This treats the symptom, not the cause."
     ],
     "principle": "hard requirements need deterministic controls, not stronger instructions",
-    "relatedConcept": "Layered defense — prompt instructions plus deterministic output validation — is the core pattern for enforcing non-negotiable safety and compliance rules."
+    "relatedConcept": "Layered defense — prompt instructions plus deterministic output validation — is the core pattern for enforcing non-negotiable safety and compliance rules.",
+    "overallExplanation": "Hard requirements need deterministic controls, not stronger instructions. Layered defense — prompt instructions plus deterministic output validation — is the core pattern for enforcing non-negotiable safety and compliance rules."
   },
   {
     "id": 502,
@@ -41,7 +42,8 @@
       "Detective scanning can catch some payloads, but injection phrasing is unbounded and scanners will miss novel wording. Relying on detection of malicious content instead of removing the dangerous capability inverts the preferred order: prevention through least privilege beats detection of infinite attack variants."
     ],
     "principle": "assume injection succeeds; scope tool permissions to limit blast radius",
-    "relatedConcept": "Tool permission scoping is the guardrail that keeps prompt injection from escalating into real-world actions."
+    "relatedConcept": "Tool permission scoping is the guardrail that keeps prompt injection from escalating into real-world actions.",
+    "overallExplanation": "Assume injection succeeds; scope tool permissions to limit blast radius. Tool permission scoping is the guardrail that keeps prompt injection from escalating into real-world actions."
   },
   {
     "id": 503,
@@ -63,7 +65,8 @@
       "Tempting because it is fully automated, but regenerating until the classifier stops firing is optimizing against your own guardrail: the output that passes may be a subtler version of the same problem. A borderline draft that needed judgment now gets none. The classifier becomes a filter to evade rather than a signal to escalate."
     ],
     "principle": "fail closed on public, hard-to-recall outputs; flag-and-review only where harm is recoverable",
-    "relatedConcept": "Choosing between blocking and flagging is a core guardrail design decision driven by reversibility and audience of the output."
+    "relatedConcept": "Choosing between blocking and flagging is a core guardrail design decision driven by reversibility and audience of the output.",
+    "overallExplanation": "Fail closed on public, hard-to-recall outputs; flag-and-review only where harm is recoverable. Choosing between blocking and flagging is a core guardrail design decision driven by reversibility and audience of the output."
   },
   {
     "id": 504,
@@ -85,7 +88,8 @@
       "Correct. The honest architectural answer is to reframe the requirement: jailbreaks cannot be reduced to zero, so the design assumes occasional bypass and bounds the damage — the assistant's tools are scoped to low-risk operations, outputs pass deterministic validation, and monitoring detects abuse patterns. This applies the principle of designing for guardrail failure rather than promising guardrail perfection."
     ],
     "principle": "design assuming bypass — bound the impact of a successful jailbreak, don't promise zero",
-    "relatedConcept": "Safety cases for LLM systems rest on layered impact containment, not on claims that any single control is unbreakable."
+    "relatedConcept": "Safety cases for LLM systems rest on layered impact containment, not on claims that any single control is unbreakable.",
+    "overallExplanation": "Design assuming bypass — bound the impact of a successful jailbreak, don't promise zero. Safety cases for LLM systems rest on layered impact containment, not on claims that any single control is unbreakable."
   },
   {
     "id": 505,
@@ -107,7 +111,8 @@
       "Correct. The policy explicitly says over-cap credits need a manager, so the architecture should encode that as a deterministic approval gate: above-threshold requests pause and await human sign-off rather than executing. This places human-in-the-loop exactly where the action is financially irreversible and policy-defined."
     ],
     "principle": "hard business limits live in the API and in approval gates, never only in the prompt",
-    "relatedConcept": "Guardrails for agent tools combine deterministic parameter limits with human approval gates for above-threshold actions."
+    "relatedConcept": "Guardrails for agent tools combine deterministic parameter limits with human approval gates for above-threshold actions.",
+    "overallExplanation": "Hard business limits live in the API and in approval gates, never only in the prompt. Guardrails for agent tools combine deterministic parameter limits with human approval gates for above-threshold actions."
   },
   {
     "id": 506,
@@ -129,7 +134,8 @@
       "Tempting because a human checkpoint sounds safe, but the analysts asked in natural language precisely because they cannot read SQL — their confirmation would be rubber-stamping. It also adds friction to every query while providing no real barrier, since the reviewer cannot evaluate what they are approving."
     ],
     "principle": "constrain what generated code can execute, not just what the model generates",
-    "relatedConcept": "Output validation plus least-privilege execution credentials is the standard guardrail pair for model-generated code and queries."
+    "relatedConcept": "Output validation plus least-privilege execution credentials is the standard guardrail pair for model-generated code and queries.",
+    "overallExplanation": "Constrain what generated code can execute, not just what the model generates. Output validation plus least-privilege execution credentials is the standard guardrail pair for model-generated code and queries."
   },
   {
     "id": 507,
@@ -151,7 +157,8 @@
       "Temperature zero makes outputs more repeatable, not more truthful — the model will simply fabricate the same fake citation consistently. This confuses determinism with accuracy, a common category error when diagnosing hallucination."
     ],
     "principle": "fluency is not evidence — verify model claims against ground truth outside the model",
-    "relatedConcept": "Hallucination is the foundational LLM failure mode that grounding, retrieval, and verification layers exist to manage."
+    "relatedConcept": "Hallucination is the foundational LLM failure mode that grounding, retrieval, and verification layers exist to manage.",
+    "overallExplanation": "Fluency is not evidence — verify model claims against ground truth outside the model. Hallucination is the foundational LLM failure mode that grounding, retrieval, and verification layers exist to manage."
   },
   {
     "id": 508,
@@ -173,7 +180,8 @@
       "System-prompt extraction is a real exposure, but the downside here is disclosure of ranking heuristics — a competitive-intelligence issue. It does not let an attacker cause unauthorized actions on user carts. Ranking it first inverts severity: manipulation of agent behavior outranks leakage of prompt text."
     ],
     "principle": "every content source the agent reads is an input channel an attacker can write to",
-    "relatedConcept": "Indirect prompt injection via third-party content is the defining new risk of agents that read the open world and take actions."
+    "relatedConcept": "Indirect prompt injection via third-party content is the defining new risk of agents that read the open world and take actions.",
+    "overallExplanation": "Every content source the agent reads is an input channel an attacker can write to. Indirect prompt injection via third-party content is the defining new risk of agents that read the open world and take actions."
   },
   {
     "id": 509,
@@ -195,7 +203,8 @@
       "Correct. This is automation bias: as a system proves mostly right, human reviewers shift from verifying to rubber-stamping, and the human-in-the-loop control silently stops functioning. The implication is procedural redesign — for example blind second reads on a sample, requiring reviewers to note key findings before seeing the draft, or measuring correction rates as a health metric for the review layer itself."
     ],
     "principle": "a mostly-right system erodes the vigilance of its human checkers",
-    "relatedConcept": "Over-reliance and automation bias are failure modes of the socio-technical system, not the model, and must be designed against explicitly."
+    "relatedConcept": "Over-reliance and automation bias are failure modes of the socio-technical system, not the model, and must be designed against explicitly.",
+    "overallExplanation": "A mostly-right system erodes the vigilance of its human checkers. Over-reliance and automation bias are failure modes of the socio-technical system, not the model, and must be designed against explicitly."
   },
   {
     "id": 510,
@@ -217,7 +226,8 @@
       "Tempting because consistency matters, but an atomic big-bang cutover is the riskier pattern, not the safer one: it removes the ability to compare versions on live traffic and roll back gradually. Brief heterogeneity during a canary is a manageable cost of de-risking, not a hazard to design around."
     ],
     "principle": "model upgrades are behavior changes — gate them with your own regression evals",
-    "relatedConcept": "Version-to-version behavioral drift is why production LLM systems maintain golden datasets and staged migration plans."
+    "relatedConcept": "Version-to-version behavioral drift is why production LLM systems maintain golden datasets and staged migration plans.",
+    "overallExplanation": "Model upgrades are behavior changes — gate them with your own regression evals. Version-to-version behavioral drift is why production LLM systems maintain golden datasets and staged migration plans."
   },
   {
     "id": 511,
@@ -239,7 +249,8 @@
       "Tempting because strengthening the weakest link sounds rigorous, but it keeps optimizing per-step accuracy — the very metric the flawed argument relied on. Even if every stage reached 98%, unvalidated chaining still compounds and hides errors; the missing element is inter-stage checking, not a bigger model."
     ],
     "principle": "per-step accuracy multiplies — validate between stages, not just at the ends",
-    "relatedConcept": "Cascading failure in agent and workflow chains is why decomposed LLM pipelines need checkpoints, not just good components."
+    "relatedConcept": "Cascading failure in agent and workflow chains is why decomposed LLM pipelines need checkpoints, not just good components.",
+    "overallExplanation": "Per-step accuracy multiplies — validate between stages, not just at the ends. Cascading failure in agent and workflow chains is why decomposed LLM pipelines need checkpoints, not just good components."
   },
   {
     "id": 512,
@@ -261,7 +272,8 @@
       "Overfitting fixes to anecdotes is a real evaluation pitfall, but it is a methodology critique, not the risk this design introduced. Choosing it mistakes a process-quality concern for the serious privacy exposure sitting in the logging pipeline."
     ],
     "principle": "logs are a data store — PII protections must follow the data into observability systems",
-    "relatedConcept": "Data leakage through telemetry is a classic LLM-system failure mode because prompts concentrate exactly the data access controls were protecting."
+    "relatedConcept": "Data leakage through telemetry is a classic LLM-system failure mode because prompts concentrate exactly the data access controls were protecting.",
+    "overallExplanation": "Logs are a data store — PII protections must follow the data into observability systems. Data leakage through telemetry is a classic LLM-system failure mode because prompts concentrate exactly the data access controls were protecting."
   },
   {
     "id": 513,
@@ -283,7 +295,8 @@
       "Correct. Human validation should be placed where errors are high-impact and irreversible: a wire transfer, once settled, cannot be undone, so it gets a mandatory pre-execution approval gate. Drafts and notes are reversible — a human edits or discards them naturally in the workflow — so sampled review suffices. This is the principle of proportionate oversight: gates for irreversible actions, review for recoverable ones."
     ],
     "principle": "approval gates where actions are irreversible; lighter review where errors are recoverable",
-    "relatedConcept": "Mapping oversight intensity to reversibility and impact is the core skill of human-in-the-loop design."
+    "relatedConcept": "Mapping oversight intensity to reversibility and impact is the core skill of human-in-the-loop design.",
+    "overallExplanation": "Approval gates where actions are irreversible; lighter review where errors are recoverable. Mapping oversight intensity to reversibility and impact is the core skill of human-in-the-loop design."
   },
   {
     "id": 514,
@@ -305,7 +318,8 @@
       "Doubling reviewers doubles cost and, under the same fatigue conditions, tends to produce diffusion of responsibility — each reviewer assumes the other is looking closely. Independent agreement only helps when each review is genuine, which is precisely what is in doubt here."
     ],
     "principle": "measure whether review actually catches errors — an unverified control is a broken control",
-    "relatedConcept": "Rubber-stamp dynamics are the main failure mode of mandated human review and must be detected with instrumentation, not assumed away."
+    "relatedConcept": "Rubber-stamp dynamics are the main failure mode of mandated human review and must be detected with instrumentation, not assumed away.",
+    "overallExplanation": "Measure whether review actually catches errors — an unverified control is a broken control. Rubber-stamp dynamics are the main failure mode of mandated human review and must be detected with instrumentation, not assumed away."
   },
   {
     "id": 515,
@@ -327,7 +341,8 @@
       "Tempting because LLM-as-judge scales beautifully, but removing humans entirely means the judge's own blind spots are never audited — correlated failures between generator and judge pass silently. Automated judging works as a filter inside a system that still includes human sampling, not as a replacement for all human contact with outputs."
     ],
     "principle": "high volume + low stakes + reversible = sampled review aimed at the system, not the unit",
-    "relatedConcept": "Sampling strategies let small teams maintain real oversight over outputs produced at machine scale."
+    "relatedConcept": "Sampling strategies let small teams maintain real oversight over outputs produced at machine scale.",
+    "overallExplanation": "High volume + low stakes + reversible = sampled review aimed at the system, not the unit. Sampling strategies let small teams maintain real oversight over outputs produced at machine scale."
   },
   {
     "id": 516,
@@ -349,7 +364,8 @@
       "Tempting because cancellation is genuinely the highest-stakes intent, but a keyword rule is both over- and under-inclusive: it floods specialists with routine cancellations the agent handles fine, while missing high-risk situations phrased differently. Single-trigger routing captures one risk dimension and ignores confidence, account value, and sentiment."
     ],
     "principle": "route to humans on measured uncertainty and stakes, not on user initiative or single keywords",
-    "relatedConcept": "Confidence-based routing is how HITL systems spend human attention exactly where the model is least trustworthy."
+    "relatedConcept": "Confidence-based routing is how HITL systems spend human attention exactly where the model is least trustworthy.",
+    "overallExplanation": "Route to humans on measured uncertainty and stakes, not on user initiative or single keywords. Confidence-based routing is how HITL systems spend human attention exactly where the model is least trustworthy."
   },
   {
     "id": 517,
@@ -371,7 +387,8 @@
       "Tempting because transparency is a legitimate obligation and likely required, but a public notice informs claimants — it exerts zero control over any individual decision. Choosing disclosure as a control mechanism is compliance-checkbox thinking: it makes the automation visible without making it supervised."
     ],
     "principle": "consequential adverse decisions stay with humans — and verify the human step is real",
-    "relatedConcept": "Meaningful human control combines decision authority placement with monitoring that the oversight has not hollowed out."
+    "relatedConcept": "Meaningful human control combines decision authority placement with monitoring that the oversight has not hollowed out.",
+    "overallExplanation": "Consequential adverse decisions stay with humans — and verify the human step is real. Meaningful human control combines decision authority placement with monitoring that the oversight has not hollowed out."
   },
   {
     "id": 518,
@@ -393,7 +410,8 @@
       "Correct. The two tasks differ on the axis that determines HITL design: reversibility and time-to-impact. A draft response is naturally validated by the officer who edits and sends it — the workflow embeds review. An account freeze harms the client the moment it executes, so it needs a mandatory pre-action approval gate. Matching the validation pattern to each action's consequence profile is the principle."
     ],
     "principle": "one system, two consequence profiles — HITL patterns follow the action, not the application",
-    "relatedConcept": "Distinguishing review-of-drafts from approval-of-actions is the practical vocabulary of human-in-the-loop architecture."
+    "relatedConcept": "Distinguishing review-of-drafts from approval-of-actions is the practical vocabulary of human-in-the-loop architecture.",
+    "overallExplanation": "One system, two consequence profiles — HITL patterns follow the action, not the application. Distinguishing review-of-drafts from approval-of-actions is the practical vocabulary of human-in-the-loop architecture."
   },
   {
     "id": 519,
@@ -415,7 +433,8 @@
       "Security attestations are useful due-diligence evidence but they are not HIPAA instruments — a provider can be SOC 2 compliant and still not be permitted to receive PHI absent a BAA. Treating generic security certifications as regulatory authorization is classic compliance-checkbox substitution."
     ],
     "principle": "PHI to a vendor requires a BAA and a PHI-aware architecture, not just encryption",
-    "relatedConcept": "Regulated-data deployments hinge on the legal and architectural relationship with the model provider as a processor of that data."
+    "relatedConcept": "Regulated-data deployments hinge on the legal and architectural relationship with the model provider as a processor of that data.",
+    "overallExplanation": "PHI to a vendor requires a BAA and a PHI-aware architecture, not just encryption. Regulated-data deployments hinge on the legal and architectural relationship with the model provider as a processor of that data."
   },
   {
     "id": 520,
@@ -437,7 +456,8 @@
       "Tempting because pseudonymization is a genuine GDPR-recognized safeguard, but it does not anonymize: the retailer can re-link tokens to customers, and the payload still contains identifying detail (addresses, order patterns). Pseudonymized data remains personal data, so the claim that regulation no longer applies is simply wrong."
     ],
     "principle": "data minimization is an architectural requirement — send what the purpose needs, nothing more",
-    "relatedConcept": "GDPR compliance for LLM features is decided by what the prompt contains and who processes it under what agreement."
+    "relatedConcept": "GDPR compliance for LLM features is decided by what the prompt contains and who processes it under what agreement.",
+    "overallExplanation": "Data minimization is an architectural requirement — send what the purpose needs, nothing more. GDPR compliance for LLM features is decided by what the prompt contains and who processes it under what agreement."
   },
   {
     "id": 521,
@@ -459,7 +479,8 @@
       "FIPS-validated cryptography is one control family inside federal baselines, not the compliance answer by itself. A service can encrypt flawlessly and still be unauthorized for agency use. Reducing an authorization regime to a single technical control is checkbox thinking that would fail the agency's assessment immediately."
     ],
     "principle": "for federal work, the authorized deployment environment is the compliance boundary",
-    "relatedConcept": "FedRAMP illustrates the domain's rule that the same model can be compliant or not depending entirely on how and where it is served."
+    "relatedConcept": "FedRAMP illustrates the domain's rule that the same model can be compliant or not depending entirely on how and where it is served.",
+    "overallExplanation": "For federal work, the authorized deployment environment is the compliance boundary. FedRAMP illustrates the domain's rule that the same model can be compliant or not depending entirely on how and where it is served."
   },
   {
     "id": 522,
@@ -481,7 +502,8 @@
       "Correct. This is the well-formed answer: the model provider is disclosed as a sub-processor under a DPA chain so obligations flow from customer to platform to provider; zero-data-retention and regional processing address residency and storage concerns; documented log retention closes the telemetry gap. The principle is that compliance is a property of the documented processing chain, and every hop must be visible and governed."
     ],
     "principle": "map and govern the full processor chain — every hop the data takes must be contracted and configured",
-    "relatedConcept": "Sub-processor transparency, DPAs, and retention configuration are how multi-tenant SaaS makes LLM features enterprise-compliant."
+    "relatedConcept": "Sub-processor transparency, DPAs, and retention configuration are how multi-tenant SaaS makes LLM features enterprise-compliant.",
+    "overallExplanation": "Map and govern the full processor chain — every hop the data takes must be contracted and configured. Sub-processor transparency, DPAs, and retention configuration are how multi-tenant SaaS makes LLM features enterprise-compliant."
   },
   {
     "id": 523,
@@ -503,7 +525,8 @@
       "Tempting because financial regulations do mandate retaining certain records, and legal obligations can limit erasure — but the exemption is scoped to specific record types, not a blanket override for all chat transcripts, and it certainly does not cover the analytics warehouse copies kept for product improvement. Overclaiming the exemption is a compliance error in the opposite direction."
     ],
     "principle": "erasure must reach every copy — trace data lineage and build deletion in from the start",
-    "relatedConcept": "LLM systems multiply copies of personal data across prompts, logs, and analytics, which is why rights-fulfillment must be architected, not retrofitted."
+    "relatedConcept": "LLM systems multiply copies of personal data across prompts, logs, and analytics, which is why rights-fulfillment must be architected, not retrofitted.",
+    "overallExplanation": "Erasure must reach every copy — trace data lineage and build deletion in from the start. LLM systems multiply copies of personal data across prompts, logs, and analytics, which is why rights-fulfillment must be architected, not retrofitted."
   },
   {
     "id": 524,
@@ -525,7 +548,8 @@
       "Explanations serve transparency and are worth having, but an explanation attached to a fully automated decline does not make the decline fairer or contestable — a model can fluently justify a biased decision. Transparency is one pillar; without human authority and impact testing it becomes a veneer over unaccountable automation."
     ],
     "principle": "no fully automated adverse decisions on credit — humans decide, fairness is tested, applicants can appeal",
-    "relatedConcept": "Lending is the canonical domain where bias, contestability, and human accountability converge into hard architectural requirements."
+    "relatedConcept": "Lending is the canonical domain where bias, contestability, and human accountability converge into hard architectural requirements.",
+    "overallExplanation": "No fully automated adverse decisions on credit — humans decide, fairness is tested, applicants can appeal. Lending is the canonical domain where bias, contestability, and human accountability converge into hard architectural requirements."
   },
   {
     "id": 525,
@@ -547,7 +571,8 @@
       "Tempting because audits are increasingly demanded for hiring tools and may be legally required in some jurisdictions, but an annual external audit is a governance layer on top of internal measurement, not a substitute for it. Waiting a year to learn about disparate impact from an auditor means shipping unmeasured harm in the meantime — attestation without instrumentation is checkbox compliance."
     ],
     "principle": "fairness is measured, not assumed — test disparate impact by group, before launch and forever after",
-    "relatedConcept": "Bias measurement across subgroups is the empirical backbone of every ethical-AI claim a hiring system makes."
+    "relatedConcept": "Bias measurement across subgroups is the empirical backbone of every ethical-AI claim a hiring system makes.",
+    "overallExplanation": "Fairness is measured, not assumed — test disparate impact by group, before launch and forever after. Bias measurement across subgroups is the empirical backbone of every ethical-AI claim a hiring system makes."
   },
   {
     "id": 526,
@@ -569,7 +594,8 @@
       "Correct. Transparency about AI involvement in consequential, trust-dependent communications is a core ethical commitment: patients can reasonably want to know, the information is material to the relationship, and the downside scenario — discovery through a leak or news story — converts a manageable disclosure into a trust crisis. Honest framing ('drafted with AI assistance, reviewed by your clinician') preserves both truthfulness and confidence."
     ],
     "principle": "disclose AI involvement where trust is the product — concealment is a deferred trust crisis",
-    "relatedConcept": "Transparency about AI participation is an ethical obligation that grows, not shrinks, with the sensitivity of the relationship."
+    "relatedConcept": "Transparency about AI participation is an ethical obligation that grows, not shrinks, with the sensitivity of the relationship.",
+    "overallExplanation": "Disclose AI involvement where trust is the product — concealment is a deferred trust crisis. Transparency about AI participation is an ethical obligation that grows, not shrinks, with the sensitivity of the relationship."
   },
   {
     "id": 527,
@@ -591,7 +617,8 @@
       "Tempting because data freshness sounds like fairness maintenance, but retraining on demographic composition neither explains any individual outcome nor provides recourse — and tuning rankings to demographic data without a fairness framework could itself introduce new problems. It answers a question nobody asked while the recourse gap stands."
     ],
     "principle": "people affected by AI-assisted decisions need explanation plus a human appeal that can change the outcome",
-    "relatedConcept": "Contestability turns transparency from a document into a working right, and it doubles as the institution's bias-detection channel."
+    "relatedConcept": "Contestability turns transparency from a document into a working right, and it doubles as the institution's bias-detection channel.",
+    "overallExplanation": "People affected by AI-assisted decisions need explanation plus a human appeal that can change the outcome. Contestability turns transparency from a document into a working right, and it doubles as the institution's bias-detection channel."
   },
   {
     "id": 528,
@@ -613,6 +640,7 @@
       "Tempting because stable aggregates feel reassuring, but disparate impact is by definition invisible in aggregates: overall approval rates can hold perfectly steady while one region's or group's rate collapses and another's rises. Relying on the aggregate is the same marginalization error that group-level measurement exists to correct."
     ],
     "principle": "fairness is a monitored production property — material changes reset the assessment clock",
-    "relatedConcept": "Ongoing fairness monitoring extends pre-launch bias testing into the full lifecycle, where drift and change actually happen."
+    "relatedConcept": "Ongoing fairness monitoring extends pre-launch bias testing into the full lifecycle, where drift and change actually happen.",
+    "overallExplanation": "Fairness is a monitored production property — material changes reset the assessment clock. Ongoing fairness monitoring extends pre-launch bias testing into the full lifecycle, where drift and change actually happen."
   }
 ]

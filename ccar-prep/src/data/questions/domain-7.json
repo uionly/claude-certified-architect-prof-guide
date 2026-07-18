@@ -19,7 +19,8 @@
       "Tempting because review is a real safety net, but it treats the symptom downstream instead of fixing the cause upstream. Developers would keep burning time correcting the agent and reviewers would keep catching the same violations that a shared memory file would prevent."
     ],
     "principle": "encode team knowledge where the tool reads it",
-    "relatedConcept": "Shared, version-controlled configuration is the foundation of consistent team-wide agentic tooling adoption."
+    "relatedConcept": "Shared, version-controlled configuration is the foundation of consistent team-wide agentic tooling adoption.",
+    "overallExplanation": "Encode team knowledge where the tool reads it. Shared, version-controlled configuration is the foundation of consistent team-wide agentic tooling adoption."
   },
   {
     "id": 702,
@@ -41,7 +42,8 @@
       "Correct. Claude Code's shared project settings (checked into the repo) support deny rules that block reading sensitive paths like .env, allowlists for known-safe commands, and prompts for anything else. This applies least privilege consistently to every developer while keeping routine work frictionless."
     ],
     "principle": "least privilege, enforced in shared project settings",
-    "relatedConcept": "Permission policy for agentic tools is an access-control decision and belongs in version-controlled, team-level configuration."
+    "relatedConcept": "Permission policy for agentic tools is an access-control decision and belongs in version-controlled, team-level configuration.",
+    "overallExplanation": "Least privilege, enforced in shared project settings. Permission policy for agentic tools is an access-control decision and belongs in version-controlled, team-level configuration."
   },
   {
     "id": 703,
@@ -63,7 +65,8 @@
       "Tempting because training and access control sound prudent after an incident, but this treats a configuration-governance problem as a people problem. Restricting users reduces the productivity benefit without fixing the root cause: nothing in the environment enforced a consistent, safe baseline."
     ],
     "principle": "configuration in version control beats configuration in people's heads",
-    "relatedConcept": "Eliminating per-developer configuration drift is central to operating agentic developer tools at team scale."
+    "relatedConcept": "Eliminating per-developer configuration drift is central to operating agentic developer tools at team scale.",
+    "overallExplanation": "Configuration in version control beats configuration in people's heads. Eliminating per-developer configuration drift is central to operating agentic developer tools at team scale."
   },
   {
     "id": 704,
@@ -85,7 +88,8 @@
       "Tempting because CI is indeed the final gate, but relying on it alone pushes feedback hours downstream: the failure surfaces long after the session ends, and someone must re-engage to fix it. Enforcing at the point of edit keeps the feedback loop tight and the failure cheap."
     ],
     "principle": "deterministic hooks for must-happen behaviors, prompts for preferences",
-    "relatedConcept": "Choosing between probabilistic instructions and deterministic enforcement is a recurring design decision when configuring agentic environments."
+    "relatedConcept": "Choosing between probabilistic instructions and deterministic enforcement is a recurring design decision when configuring agentic environments.",
+    "overallExplanation": "Deterministic hooks for must-happen behaviors, prompts for preferences. Choosing between probabilistic instructions and deterministic enforcement is a recurring design decision when configuring agentic environments."
   },
   {
     "id": 705,
@@ -107,7 +111,8 @@
       "Tempting because it automates freshness, but CLAUDE.md is for stable project conventions, not a dumping ground for summarized external systems. Nightly summaries are still up to a day stale, lossy, and consume context in every session whether relevant or not."
     ],
     "principle": "connect the agent to live sources of truth via MCP, not stale copies",
-    "relatedConcept": "Integrating internal systems through standard protocols is how team environments scale beyond what fits in static project files."
+    "relatedConcept": "Integrating internal systems through standard protocols is how team environments scale beyond what fits in static project files.",
+    "overallExplanation": "Connect the agent to live sources of truth via MCP, not stale copies. Integrating internal systems through standard protocols is how team environments scale beyond what fits in static project files."
   },
   {
     "id": 706,
@@ -129,7 +134,8 @@
       "Tempting because it targets heavy coders, but speeding up the non-bottleneck stage of a pipeline does not increase throughput — it increases work-in-progress piling up at review. Theory-of-constraints reasoning says improvement anywhere but the bottleneck is largely wasted."
     ],
     "principle": "target the workflow bottleneck, not tool adoption for its own sake",
-    "relatedConcept": "Workflow-first adoption is the core discipline separating productive AI enablement from mandate-driven tool rollouts."
+    "relatedConcept": "Workflow-first adoption is the core discipline separating productive AI enablement from mandate-driven tool rollouts.",
+    "overallExplanation": "Target the workflow bottleneck, not tool adoption for its own sake. Workflow-first adoption is the core discipline separating productive AI enablement from mandate-driven tool rollouts."
   },
   {
     "id": 707,
@@ -151,7 +157,8 @@
       "Tempting because it produces a dollar-friendly number, but the formula is fiction: lines-per-hour assumptions don't survive contact with reality, and it ignores time spent reviewing, correcting, and maintaining AI output. A precise-looking number built on a vanity metric is still a vanity metric."
     ],
     "principle": "measure delivery outcomes, not tool activity",
-    "relatedConcept": "Choosing outcome metrics over vanity metrics determines whether an enablement program can prove and improve its value."
+    "relatedConcept": "Choosing outcome metrics over vanity metrics determines whether an enablement program can prove and improve its value.",
+    "overallExplanation": "Measure delivery outcomes, not tool activity. Choosing outcome metrics over vanity metrics determines whether an enablement program can prove and improve its value."
   },
   {
     "id": 708,
@@ -173,7 +180,8 @@
       "Tempting because AI-assisted review is genuinely useful as a first pass, but using AI to check unowned AI output deepens the accountability gap that caused the incident. Automated review augments human judgment; it cannot substitute for a human who answers for the change."
     ],
     "principle": "a human is always accountable for merged code",
-    "relatedConcept": "Preserving human ownership and review discipline is the guardrail that lets teams capture AI velocity safely."
+    "relatedConcept": "Preserving human ownership and review discipline is the guardrail that lets teams capture AI velocity safely.",
+    "overallExplanation": "A human is always accountable for merged code. Preserving human ownership and review discipline is the guardrail that lets teams capture AI velocity safely."
   },
   {
     "id": 709,
@@ -195,7 +203,8 @@
       "Correct. Custom slash commands and Skills turn refined prompts and multi-step procedures into named, version-controlled workflows invoked directly inside Claude Code. The best-known method becomes the default method for everyone, survives team changes, and improves through normal code review."
     ],
     "principle": "capture proven workflows as executable, version-controlled commands",
-    "relatedConcept": "Converting individual prompting expertise into shared tool-level workflows is how teams compound productivity gains."
+    "relatedConcept": "Converting individual prompting expertise into shared tool-level workflows is how teams compound productivity gains.",
+    "overallExplanation": "Capture proven workflows as executable, version-controlled commands. Converting individual prompting expertise into shared tool-level workflows is how teams compound productivity gains."
   },
   {
     "id": 710,
@@ -217,7 +226,8 @@
       "Tempting because organic adoption does correlate with engagement, but fully decentralized adoption produces inconsistent security configuration, no comparable measurements, and uneven outcomes — exactly the ungoverned variance a scrutinized public program cannot defend."
     ],
     "principle": "pilot on real work, measure against a baseline, then scale",
-    "relatedConcept": "Managed, measured rollouts are how organizations de-risk AI tooling adoption while building the case for expansion."
+    "relatedConcept": "Managed, measured rollouts are how organizations de-risk AI tooling adoption while building the case for expansion.",
+    "overallExplanation": "Pilot on real work, measure against a baseline, then scale. Managed, measured rollouts are how organizations de-risk AI tooling adoption while building the case for expansion."
   },
   {
     "id": 711,
@@ -239,7 +249,8 @@
       "Tempting because pre-approved automation is a worthy end state, but full runbook automation is a long program, and it forfeits the assistant's most immediate value: ad-hoc investigation of novel incidents that no runbook anticipates. This delays a safe, high-value capability waiting for a distant one."
     ],
     "principle": "read-only for diagnosis, human approval for action",
-    "relatedConcept": "Splitting agent permissions along the observe/act boundary is the standard guardrail for AI-assisted incident response."
+    "relatedConcept": "Splitting agent permissions along the observe/act boundary is the standard guardrail for AI-assisted incident response.",
+    "overallExplanation": "Read-only for diagnosis, human approval for action. Splitting agent permissions along the observe/act boundary is the standard guardrail for AI-assisted incident response."
   },
   {
     "id": 712,
@@ -261,7 +272,8 @@
       "Tempting because human authorship feels safer, but who typed the patch is irrelevant to whether it is correct — a hand-written fix deployed without a reproducing test carries the same risk. This substitutes provenance for verification and wastes time re-deriving work that only needed testing."
     ],
     "principle": "verify the fix against the reproduced failure, not the explanation",
-    "relatedConcept": "Empirical verification of AI-proposed fixes is the discipline that makes AI-assisted debugging production-safe."
+    "relatedConcept": "Empirical verification of AI-proposed fixes is the discipline that makes AI-assisted debugging production-safe.",
+    "overallExplanation": "Verify the fix against the reproduced failure, not the explanation. Empirical verification of AI-proposed fixes is the discipline that makes AI-assisted debugging production-safe."
   },
   {
     "id": 713,
@@ -283,7 +295,8 @@
       "Tempting because it sounds systematic, but the model's self-reported confidence is not calibrated evidence — it will happily rank three fabrications. Structuring a guessing process does not convert guesses into knowledge, and it defers the escalation the situation already warrants."
     ],
     "principle": "recognize when the assistant is guessing and escalate to humans",
-    "relatedConcept": "Knowing the failure signatures of AI-assisted debugging — and when to exit to human escalation — is a core operational skill."
+    "relatedConcept": "Knowing the failure signatures of AI-assisted debugging — and when to exit to human escalation — is a core operational skill.",
+    "overallExplanation": "Recognize when the assistant is guessing and escalate to humans. Knowing the failure signatures of AI-assisted debugging — and when to exit to human escalation — is a core operational skill."
   },
   {
     "id": 714,
@@ -305,6 +318,7 @@
       "Correct. Claude Code runs headless for programmatic, non-interactive use — exactly the CI-and-pipeline pattern this calls for. Per-alert-class prompts keep each run scoped, read-only permissions bound the blast radius of an unattended agent, and the structured summary lands where responders work."
     ],
     "principle": "headless invocation with scoped, least-privilege permissions for unattended automation",
-    "relatedConcept": "Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact."
+    "relatedConcept": "Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact.",
+    "overallExplanation": "Headless invocation with scoped, least-privilege permissions for unattended automation. Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact."
   }
 ]

@@ -19,7 +19,8 @@
       "A use-case menu sounds structured, but it is still solution-first — it asks executives to pick a technology deliverable rather than articulate a problem. Voting also privileges whoever is loudest over where the measurable business pain actually is."
     ],
     "principle": "start discovery from the business problem and its metric, not the requested technology",
-    "relatedConcept": "Problem-first discovery is the foundation of every later lifecycle phase, because a solution scoped to the wrong problem cannot be rescued by good engineering."
+    "relatedConcept": "Problem-first discovery is the foundation of every later lifecycle phase, because a solution scoped to the wrong problem cannot be rescued by good engineering.",
+    "overallExplanation": "Start discovery from the business problem and its metric, not the requested technology. Problem-first discovery is the foundation of every later lifecycle phase, because a solution scoped to the wrong problem cannot be rescued by good engineering."
   },
   {
     "id": 602,
@@ -41,7 +42,8 @@
       "Build-vs-buy analysis is a reasonable diligence step, but it does not address the core flaw: whatever gets built or bought will be specified from a single stakeholder's perspective. Fixing coverage of voices comes before validating the sourcing decision."
     ],
     "principle": "map and engage the full stakeholder set — sponsor, users, IT, security, compliance — before requirements are frozen",
-    "relatedConcept": "Stakeholder mapping during discovery determines whose constraints shape the design, and missing voices resurface later as blockers rather than requirements."
+    "relatedConcept": "Stakeholder mapping during discovery determines whose constraints shape the design, and missing voices resurface later as blockers rather than requirements.",
+    "overallExplanation": "Map and engage the full stakeholder set — sponsor, users, IT, security, compliance — before requirements are frozen. Stakeholder mapping during discovery determines whose constraints shape the design, and missing voices resurface later as blockers rather than requirements."
   },
   {
     "id": 603,
@@ -63,7 +65,8 @@
       "Correct. This distinguishes the stated want (automate everything) from the underlying need (reduce handling load), and shapes scope from the workflow data. Automating the high-volume templated majority captures most of the value while keeping regulated edge cases with humans."
     ],
     "principle": "distinguish stated wants from underlying needs and scope from workflow evidence",
-    "relatedConcept": "Requirement gathering is interpretation, not transcription — the architect converts what stakeholders ask for into what the business measurably needs."
+    "relatedConcept": "Requirement gathering is interpretation, not transcription — the architect converts what stakeholders ask for into what the business measurably needs.",
+    "overallExplanation": "Distinguish stated wants from underlying needs and scope from workflow evidence. Requirement gathering is interpretation, not transcription — the architect converts what stakeholders ask for into what the business measurably needs."
   },
   {
     "id": 604,
@@ -85,7 +88,8 @@
       "Delegating sounds efficient, but the sponsor's own definition of success is what the project will ultimately be judged by. A delegate's metrics that the VP never internalized will not protect the project when the VP's undefined expectations go unmet."
     ],
     "principle": "define measurable success criteria and explicit non-goals with the sponsor before design starts",
-    "relatedConcept": "Success criteria agreed in discovery become the shared yardstick that expectation management and pilot evaluation rely on for the rest of the lifecycle."
+    "relatedConcept": "Success criteria agreed in discovery become the shared yardstick that expectation management and pilot evaluation rely on for the rest of the lifecycle.",
+    "overallExplanation": "Define measurable success criteria and explicit non-goals with the sponsor before design starts. Success criteria agreed in discovery become the shared yardstick that expectation management and pilot evaluation rely on for the rest of the lifecycle."
   },
   {
     "id": 605,
@@ -107,7 +111,8 @@
       "Legal agreements matter for execution, but they govern access rather than establish whether the data can support the use case. A signed agreement over an unusable corpus still produces a design built on an unverified assumption."
     ],
     "principle": "verify data availability and quality firsthand before designing around it",
-    "relatedConcept": "Discovery exists to replace stakeholder assumptions with observed facts, and data readiness is the assumption most often wrong in RAG-style engagements."
+    "relatedConcept": "Discovery exists to replace stakeholder assumptions with observed facts, and data readiness is the assumption most often wrong in RAG-style engagements.",
+    "overallExplanation": "Verify data availability and quality firsthand before designing around it. Discovery exists to replace stakeholder assumptions with observed facts, and data readiness is the assumption most often wrong in RAG-style engagements."
   },
   {
     "id": 606,
@@ -129,7 +134,8 @@
       "Correct. Workflow and data mapping reveals what the assistant must actually do, where the exceptions are, and whether the data to support automation exists and is reachable. Exception paths are where returns processes hide their cost, so skipping them scopes the easy 80% and misses the value."
     ],
     "principle": "discovery prioritizes the target metric and the real workflow over early building",
-    "relatedConcept": "Structured discovery front-loads the two facts — what to move and what exists today — that every downstream lifecycle phase depends on."
+    "relatedConcept": "Structured discovery front-loads the two facts — what to move and what exists today — that every downstream lifecycle phase depends on.",
+    "overallExplanation": "Discovery prioritizes the target metric and the real workflow over early building. Structured discovery front-loads the two facts — what to move and what exists today — that every downstream lifecycle phase depends on."
   },
   {
     "id": 607,
@@ -151,7 +157,8 @@
       "Recommendation-only briefings hide the trade-offs executives are there to weigh, turning a governance decision into a rubber stamp. When something later goes wrong, the committee can fairly say the risks were never communicated to them."
     ],
     "principle": "tailor decision framing to the audience — value and risk for executives, technical rationale for engineers",
-    "relatedConcept": "Communicating a decision means translating one set of trade-offs into the terms each stakeholder group uses to make judgments."
+    "relatedConcept": "Communicating a decision means translating one set of trade-offs into the terms each stakeholder group uses to make judgments.",
+    "overallExplanation": "Tailor decision framing to the audience — value and risk for executives, technical rationale for engineers. Communicating a decision means translating one set of trade-offs into the terms each stakeholder group uses to make judgments."
   },
   {
     "id": 608,
@@ -173,7 +180,8 @@
       "Correct. This applies the decision-record principle: durable communication of an architectural choice includes the alternatives, the rejection rationale, and revisit triggers. New joiners can read why fine-tuning lost, and the team knows what changed circumstances would legitimately reopen the question."
     ],
     "principle": "record decisions with options considered, rejection rationale, and revisit conditions",
-    "relatedConcept": "Decision records turn architectural reasoning into an organizational asset that outlives meetings, emails, and individual team members."
+    "relatedConcept": "Decision records turn architectural reasoning into an organizational asset that outlives meetings, emails, and individual team members.",
+    "overallExplanation": "Record decisions with options considered, rejection rationale, and revisit conditions. Decision records turn architectural reasoning into an organizational asset that outlives meetings, emails, and individual team members."
   },
   {
     "id": 609,
@@ -195,7 +203,8 @@
       "Handing the director a vague 'cheaper but less capable' framing looks like respecting their authority, but qualitative trade-offs cannot be weighed — how much cheaper, how much less capable? It delegates the decision while withholding the information needed to make it."
     ],
     "principle": "quantify trade-offs with eval evidence instead of communicating vague directional claims",
-    "relatedConcept": "Trade-off communication is only as good as the measurements behind it; numbers turn opinions into decisions stakeholders can own."
+    "relatedConcept": "Trade-off communication is only as good as the measurements behind it; numbers turn opinions into decisions stakeholders can own.",
+    "overallExplanation": "Quantify trade-offs with eval evidence instead of communicating vague directional claims. Trade-off communication is only as good as the measurements behind it; numbers turn opinions into decisions stakeholders can own."
   },
   {
     "id": 610,
@@ -217,7 +226,8 @@
       "Handing over the data sounds respectful of the executive's ownership, but the architect remains the technical authority whose silence endorses whatever claim gets made. Professional responsibility for accurate representation of system limits cannot be delegated to the person motivated to overstate them."
     ],
     "principle": "never promise zero errors — communicate measured ranges plus the safeguards that manage residual risk",
-    "relatedConcept": "Honest limitation framing is the trust foundation that every later expectation-management and SLA conversation depends on."
+    "relatedConcept": "Honest limitation framing is the trust foundation that every later expectation-management and SLA conversation depends on.",
+    "overallExplanation": "Never promise zero errors — communicate measured ranges plus the safeguards that manage residual risk. Honest limitation framing is the trust foundation that every later expectation-management and SLA conversation depends on."
   },
   {
     "id": 611,
@@ -239,7 +249,8 @@
       "Escalation has its place, but escalating before presenting the evidence wastes the architect's actual leverage: this conflict is resolvable with data the architect already holds. Kicking it upstairs unframed just moves the same argument to a bigger room."
     ],
     "principle": "convert stakeholder conflicts into quantified trade-off decisions the business can own",
-    "relatedConcept": "Most stakeholder conflicts over AI systems are unpriced trade-offs; the architect's job is to price them, not to referee them."
+    "relatedConcept": "Most stakeholder conflicts over AI systems are unpriced trade-offs; the architect's job is to price them, not to referee them.",
+    "overallExplanation": "Convert stakeholder conflicts into quantified trade-off decisions the business can own. Most stakeholder conflicts over AI systems are unpriced trade-offs; the architect's job is to price them, not to referee them."
   },
   {
     "id": 612,
@@ -261,7 +272,8 @@
       "Omitting limitations is tempting when confidence feels fragile, but it is over-promising by curation, and an auditor's role is precisely to find what was left out. Directors keep confidence in architects who surface limitations with mitigations, and lose it in those caught hiding them."
     ],
     "principle": "communicate decisions with quantified evidence and a durable written record of alternatives",
-    "relatedConcept": "Effective decision communication pairs measurement with documentation so the reasoning survives scrutiny from every audience it must serve."
+    "relatedConcept": "Effective decision communication pairs measurement with documentation so the reasoning survives scrutiny from every audience it must serve.",
+    "overallExplanation": "Communicate decisions with quantified evidence and a durable written record of alternatives. Effective decision communication pairs measurement with documentation so the reasoning survives scrutiny from every audience it must serve."
   },
   {
     "id": 613,
@@ -283,7 +295,8 @@
       "Compressing evaluation to protect the date is tempting because it looks responsive, but rushed evals on convenient data reproduce the demo problem with extra steps. When the timeline drives the evidence rather than the reverse, the expectation being managed is the calendar's, not reality's."
     ],
     "principle": "anchor expectations to measured baselines, not demos",
-    "relatedConcept": "The demo-to-production expectation gap is the most common source of stakeholder disappointment in AI engagements, and pilots exist to close it with evidence."
+    "relatedConcept": "The demo-to-production expectation gap is the most common source of stakeholder disappointment in AI engagements, and pilots exist to close it with evidence.",
+    "overallExplanation": "Anchor expectations to measured baselines, not demos. The demo-to-production expectation gap is the most common source of stakeholder disappointment in AI engagements, and pilots exist to close it with evidence."
   },
   {
     "id": 614,
@@ -305,7 +318,8 @@
       "Correct. This applies the principle that SLAs must reflect what the architecture measurably delivers. Reworking the terms — honest percentiles, or metrics like time-to-first-token that match how LLM services actually behave — gives the client commitments the company can keep, which is what protects the relationship."
     ],
     "principle": "define SLAs the architecture can measurably meet, using metrics that fit how the system behaves",
-    "relatedConcept": "SLA design is expectation management with contractual teeth, so it must be grounded in measured performance rather than sales optimism."
+    "relatedConcept": "SLA design is expectation management with contractual teeth, so it must be grounded in measured performance rather than sales optimism.",
+    "overallExplanation": "Define SLAs the architecture can measurably meet, using metrics that fit how the system behaves. SLA design is expectation management with contractual teeth, so it must be grounded in measured performance rather than sales optimism."
   },
   {
     "id": 615,
@@ -327,7 +341,8 @@
       "Walking away is tempting as the 'honest' answer, but it treats the stated want (a model that never errs) as the actual need (records that are reliably correct). The need is achievable with a human-in-the-loop design; abandoning the engagement forfeits real value to avoid an expectations conversation."
     ],
     "principle": "set accuracy expectations as evidenced ranges and design the workflow to absorb residual error",
-    "relatedConcept": "Expectation alignment often means redirecting an impossible demand on the model into an achievable requirement on the end-to-end system."
+    "relatedConcept": "Expectation alignment often means redirecting an impossible demand on the model into an achievable requirement on the end-to-end system.",
+    "overallExplanation": "Set accuracy expectations as evidenced ranges and design the workflow to absorb residual error. Expectation alignment often means redirecting an impossible demand on the model into an achievable requirement on the end-to-end system."
   },
   {
     "id": 616,
@@ -349,7 +364,8 @@
       "Interviews sound thorough, but monthly consolidated impressions arrive slowly, detached from specific cases, and filtered through a coordinator's summary. The pilot needs case-linked signal on a tight cadence, not a lagging digest of recollections."
     ],
     "principle": "build feedback capture into the workflow and review it on a fixed cadence with a defined cohort",
-    "relatedConcept": "Structured feedback loops are how pilots convert user experience into design changes instead of into an unread complaints channel."
+    "relatedConcept": "Structured feedback loops are how pilots convert user experience into design changes instead of into an unread complaints channel.",
+    "overallExplanation": "Build feedback capture into the workflow and review it on a fixed cadence with a defined cohort. Structured feedback loops are how pilots convert user experience into design changes instead of into an unread complaints channel."
   },
   {
     "id": 617,
@@ -371,7 +387,8 @@
       "Quietly deferring one item is tempting triage, but unilateral, uncommunicated scope decisions surface eventually — usually at launch, as a broken expectation the sponsor believes was agreed. Silent deferral is expectation misalignment manufactured by the architect."
     ],
     "principle": "route every scope addition through explicit change control against agreed success criteria",
-    "relatedConcept": "Scope creep is an expectation-alignment failure in slow motion; change control keeps the sponsor's expectations and the delivery plan describing the same project."
+    "relatedConcept": "Scope creep is an expectation-alignment failure in slow motion; change control keeps the sponsor's expectations and the delivery plan describing the same project.",
+    "overallExplanation": "Route every scope addition through explicit change control against agreed success criteria. Scope creep is an expectation-alignment failure in slow motion; change control keeps the sponsor's expectations and the delivery plan describing the same project."
   },
   {
     "id": 618,
@@ -393,7 +410,8 @@
       "Correct. This applies evidence-gated expectation management: overexcitement is handled the same way as disappointment, by returning to pre-agreed measures. Sustained quality over a defined window and volume becomes the objective trigger for scaling and for revisiting oversight, converting enthusiasm into a plan rather than a leap."
     ],
     "principle": "manage overexcitement like disappointment — tie changes to pre-agreed evidence gates, not sentiment",
-    "relatedConcept": "Expectation alignment cuts both ways; stakeholder euphoria after early wins is as dangerous to a deployment as stakeholder disillusionment."
+    "relatedConcept": "Expectation alignment cuts both ways; stakeholder euphoria after early wins is as dangerous to a deployment as stakeholder disillusionment.",
+    "overallExplanation": "Manage overexcitement like disappointment — tie changes to pre-agreed evidence gates, not sentiment. Expectation alignment cuts both ways; stakeholder euphoria after early wins is as dangerous to a deployment as stakeholder disillusionment."
   },
   {
     "id": 619,
@@ -415,7 +433,8 @@
       "Sprint-level task plans are tempting because they look actionable, but sequencing work is the engineering team's competence and the plan will be obsolete by sprint three. The architect's irreplaceable contribution is design intent and rationale, not project management artifacts."
     ],
     "principle": "a handoff package succeeds when the receiving team can execute without the architect present",
-    "relatedConcept": "Documentation is the mechanism by which architectural knowledge survives the architect's departure, which is the ultimate test of a consulting engagement."
+    "relatedConcept": "Documentation is the mechanism by which architectural knowledge survives the architect's departure, which is the ultimate test of a consulting engagement.",
+    "overallExplanation": "A handoff package succeeds when the receiving team can execute without the architect present. Documentation is the mechanism by which architectural knowledge survives the architect's departure, which is the ultimate test of a consulting engagement."
   },
   {
     "id": 620,
@@ -437,7 +456,8 @@
       "A paste-after-edit document is tempting because it is easy to adopt, but voluntary manual logging fails silently the first time someone is rushed — which is precisely when changes are riskiest. It also lacks review, diffing, and any link between a version and its verified quality."
     ],
     "principle": "treat prompts and configs as versioned, reviewed artifacts traceable to eval results",
-    "relatedConcept": "Prompt and configuration versioning extends documentation discipline to the artifacts that actually determine an LLM system's behavior in production."
+    "relatedConcept": "Prompt and configuration versioning extends documentation discipline to the artifacts that actually determine an LLM system's behavior in production.",
+    "overallExplanation": "Treat prompts and configs as versioned, reviewed artifacts traceable to eval results. Prompt and configuration versioning extends documentation discipline to the artifacts that actually determine an LLM system's behavior in production."
   },
   {
     "id": 621,
@@ -459,7 +479,8 @@
       "Correct. This applies the runbook principle: operational documentation translates the architect's diagnostic knowledge into symptom-to-action procedures — what degraded quality looks like, what to check, what safe mitigations exist, and when to escalate. It is written before handoff, because incidents do not wait."
     ],
     "principle": "runbooks convert the architect's diagnostic knowledge into actions an unfamiliar team can execute",
-    "relatedConcept": "Implementation guidance includes operating guidance; a system is not truly handed off until the team supporting it knows what to do when it misbehaves."
+    "relatedConcept": "Implementation guidance includes operating guidance; a system is not truly handed off until the team supporting it knows what to do when it misbehaves.",
+    "overallExplanation": "Runbooks convert the architect's diagnostic knowledge into actions an unfamiliar team can execute. Implementation guidance includes operating guidance; a system is not truly handed off until the team supporting it knows what to do when it misbehaves."
   },
   {
     "id": 622,
@@ -481,7 +502,8 @@
       "Co-locating docs with code is a genuinely useful enabler and often part of the solution, but location alone does not cause updates — a repo can hold a stale document as easily as a wiki can. Without a process rule tying doc changes to system changes, the drift continues in a new venue."
     ],
     "principle": "documentation stays alive only when updating it is a required step of every change",
-    "relatedConcept": "Living documentation is what keeps the handoff package trustworthy across the iteration phase, long after the original architect has moved on."
+    "relatedConcept": "Living documentation is what keeps the handoff package trustworthy across the iteration phase, long after the original architect has moved on.",
+    "overallExplanation": "Documentation stays alive only when updating it is a required step of every change. Living documentation is what keeps the handoff package trustworthy across the iteration phase, long after the original architect has moved on."
   },
   {
     "id": 623,
@@ -503,7 +525,8 @@
       "Collaborative threat modeling is a legitimate practice, but running it against a three-box pitch diagram produces a threat model of an abstraction. The prerequisite artifact is still the detailed data-flow view; arriving without it converts the review into discovery of the architect's own system."
     ],
     "principle": "match the documentation artifact to the audience — security reviews need data flows and trust boundaries",
-    "relatedConcept": "Architecture documentation is a family of views on one system, and knowing which view each stakeholder needs is part of the architect's communication craft."
+    "relatedConcept": "Architecture documentation is a family of views on one system, and knowing which view each stakeholder needs is part of the architect's communication craft.",
+    "overallExplanation": "Match the documentation artifact to the audience — security reviews need data flows and trust boundaries. Architecture documentation is a family of views on one system, and knowing which view each stakeholder needs is part of the architect's communication craft."
   },
   {
     "id": 624,
@@ -525,7 +548,8 @@
       "Parallel design-and-discovery is tempting because it looks like progress on both fronts, but design decisions made before findings arrive anchor the architecture — late-arriving discoveries then face a built-in bias toward whatever is already drawn. Sequencing exists precisely to keep evidence ahead of commitment."
     ],
     "principle": "compress lifecycle phases under pressure, but never skip the outputs they exist to produce",
-    "relatedConcept": "Lifecycle management is about ensuring each phase's essential outputs exist before the next phase consumes them, whatever the calendar looks like."
+    "relatedConcept": "Lifecycle management is about ensuring each phase's essential outputs exist before the next phase consumes them, whatever the calendar looks like.",
+    "overallExplanation": "Compress lifecycle phases under pressure, but never skip the outputs they exist to produce. Lifecycle management is about ensuring each phase's essential outputs exist before the next phase consumes them, whatever the calendar looks like."
   },
   {
     "id": 625,
@@ -547,7 +571,8 @@
       "An indefinite retainer is tempting because expertise stays reachable, but it removes the forcing function for ownership to actually transfer — the team calls the consultant instead of developing judgment. Handoff succeeds when the dependency ends on purpose, not when it becomes permanent."
     ],
     "principle": "handoff is a supported transition with overlap and a defined end, not a document drop",
-    "relatedConcept": "The handoff phase determines whether all earlier lifecycle investment survives contact with the team that must live with the system."
+    "relatedConcept": "The handoff phase determines whether all earlier lifecycle investment survives contact with the team that must live with the system.",
+    "overallExplanation": "Handoff is a supported transition with overlap and a defined end, not a document drop. The handoff phase determines whether all earlier lifecycle investment survives contact with the team that must live with the system."
   },
   {
     "id": 626,
@@ -569,7 +594,8 @@
       "Correct. This applies the monitoring-phase principle: monitoring is a practice, not an artifact. Dashboards create the possibility of insight; a scheduled review cadence with a named owner, and a defined path from findings into the iteration backlog, is what converts measurement into action before users feel the problem."
     ],
     "principle": "monitoring is an operating rhythm that feeds iteration, not a set of dashboards",
-    "relatedConcept": "The monitoring phase only closes the lifecycle loop when its findings are reviewed on a cadence and routed into iteration decisions."
+    "relatedConcept": "The monitoring phase only closes the lifecycle loop when its findings are reviewed on a cadence and routed into iteration decisions.",
+    "overallExplanation": "Monitoring is an operating rhythm that feeds iteration, not a set of dashboards. The monitoring phase only closes the lifecycle loop when its findings are reviewed on a cadence and routed into iteration decisions."
   },
   {
     "id": 627,
@@ -591,7 +617,8 @@
       "Re-examining metrics is tempting because mixed workloads do complicate measurement, but redefining the metric would improve the number without helping a single customer with a refund. The metric is faithfully reporting a real capability gap; changing it treats the messenger."
     ],
     "principle": "recurring fixes that decay under a shifted workload signal redesign, not more tuning",
-    "relatedConcept": "The iteration phase includes knowing its own limits — recognizing when accumulated change has invalidated design assumptions and the lifecycle must loop back."
+    "relatedConcept": "The iteration phase includes knowing its own limits — recognizing when accumulated change has invalidated design assumptions and the lifecycle must loop back.",
+    "overallExplanation": "Recurring fixes that decay under a shifted workload signal redesign, not more tuning. The iteration phase includes knowing its own limits — recognizing when accumulated change has invalidated design assumptions and the lifecycle must loop back."
   },
   {
     "id": 628,
@@ -613,6 +640,7 @@
       "Vendor validation is tempting to lean on, but 'improved overall' is a claim about aggregate benchmarks, not about this agency's certified behaviors — model version changes routinely shift outputs in ways that matter locally. Certification exists precisely because general claims do not transfer to specific workloads."
     ],
     "principle": "treat model deprecation as the start of a planned, eval-verified migration — not a deadline to approach",
-    "relatedConcept": "Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles."
+    "relatedConcept": "Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles.",
+    "overallExplanation": "Treat model deprecation as the start of a planned, eval-verified migration — not a deadline to approach. Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles."
   }
 ]

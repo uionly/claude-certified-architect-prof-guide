@@ -19,7 +19,8 @@
       "More data improves confidence in the 92% number, but the problem is not statistical noise — it is that the metric itself cannot see hallucinated dosages. This treats a measurement-validity problem as a sample-size problem."
     ],
     "principle": "measure the failure mode that matters, not a proxy aggregate score",
-    "relatedConcept": "Choosing metrics that capture domain-specific risks is the foundation on which all downstream evaluation and monitoring work rests."
+    "relatedConcept": "Choosing metrics that capture domain-specific risks is the foundation on which all downstream evaluation and monitoring work rests.",
+    "overallExplanation": "Measure the failure mode that matters, not a proxy aggregate score. Choosing metrics that capture domain-specific risks is the foundation on which all downstream evaluation and monitoring work rests."
   },
   {
     "id": 402,
@@ -41,7 +42,8 @@
       "Setting thresholds at whatever the system already achieves is metric-gaming in reverse: the bar is defined by current performance instead of business need. If analysts need 95% precision to trust the tool, discovering the system delivers 70% should fail it, not calibrate it."
     ],
     "principle": "define pass criteria before you build, derived from the business requirement",
-    "relatedConcept": "Up-front success criteria are what turn evaluation from a retrospective report into the engine that steers iteration."
+    "relatedConcept": "Up-front success criteria are what turn evaluation from a retrospective report into the engine that steers iteration.",
+    "overallExplanation": "Define pass criteria before you build, derived from the business requirement. Up-front success criteria are what turn evaluation from a retrospective report into the engine that steers iteration."
   },
   {
     "id": 403,
@@ -63,7 +65,8 @@
       "Correct. Averages systematically hide tail behavior; a 1.8s mean is fully compatible with severe p95/p99 degradation at peak, and time-to-first-token captures perceived responsiveness for streamed replies. This applies the principle that SLAs must be defined and measured on percentiles, not means."
     ],
     "principle": "users live in the tail — define latency SLAs on percentiles, not averages",
-    "relatedConcept": "Percentile-based latency metrics connect evaluation practice directly to the user-perceived performance the SLA is meant to protect."
+    "relatedConcept": "Percentile-based latency metrics connect evaluation practice directly to the user-perceived performance the SLA is meant to protect.",
+    "overallExplanation": "Users live in the tail — define latency SLAs on percentiles, not averages. Percentile-based latency metrics connect evaluation practice directly to the user-perceived performance the SLA is meant to protect."
   },
   {
     "id": 404,
@@ -85,7 +88,8 @@
       "Post-launch incident counts are a lagging metric: they only move after residents have already been harmed, which is exactly what the security team's pre-launch gate exists to prevent. This confuses monitoring after the fact with evaluation before release."
     ],
     "principle": "measure security with leading, adversarial tests — not lagging incident counts",
-    "relatedConcept": "Security metrics belong in the same pre-launch evaluation gate as accuracy and latency, tested against the deployed system rather than the bare model."
+    "relatedConcept": "Security metrics belong in the same pre-launch evaluation gate as accuracy and latency, tested against the deployed system rather than the bare model.",
+    "overallExplanation": "Measure security with leading, adversarial tests — not lagging incident counts. Security metrics belong in the same pre-launch evaluation gate as accuracy and latency, tested against the deployed system rather than the bare model."
   },
   {
     "id": 405,
@@ -107,7 +111,8 @@
       "Incentives may raise caution, but without a fast, attributable metric the team still has nothing to validate against — and tying goals to a slow composite metric invites gaming rather than measurement. It addresses motivation while the actual gap is instrumentation."
     ],
     "principle": "iterate on leading metrics, validate with lagging ones",
-    "relatedConcept": "Pairing fast eval-based signals with slow business outcomes is what allows a two-week release cadence to remain evidence-driven."
+    "relatedConcept": "Pairing fast eval-based signals with slow business outcomes is what allows a two-week release cadence to remain evidence-driven.",
+    "overallExplanation": "Iterate on leading metrics, validate with lagging ones. Pairing fast eval-based signals with slow business outcomes is what allows a two-week release cadence to remain evidence-driven."
   },
   {
     "id": 406,
@@ -129,7 +134,8 @@
       "Output caps bound spend per call but do nothing about failure-driven retries and manual rework, and truncating extractions could increase failures. This controls a visible cost while the hidden cost — failed completions — keeps growing."
     ],
     "principle": "compare cost per successful outcome, not cost per token",
-    "relatedConcept": "Task-level cost accounting is what lets accuracy, retry, and human-review effects show up honestly in cost-performance decisions."
+    "relatedConcept": "Task-level cost accounting is what lets accuracy, retry, and human-review effects show up honestly in cost-performance decisions.",
+    "overallExplanation": "Compare cost per successful outcome, not cost per token. Task-level cost accounting is what lets accuracy, retry, and human-review effects show up honestly in cost-performance decisions."
   },
   {
     "id": 407,
@@ -151,7 +157,8 @@
       "PM-written queries capture intended use, but users reliably deviate from intent, and an eval set built from imagined usage inherits the team's blind spots. It is a reasonable supplement but a poor foundation when real traffic is available."
     ],
     "principle": "evaluate on the distribution you serve, not the one you imagine",
-    "relatedConcept": "Golden sets grounded in production traffic are the backbone that makes every later eval score meaningful."
+    "relatedConcept": "Golden sets grounded in production traffic are the backbone that makes every later eval score meaningful.",
+    "overallExplanation": "Evaluate on the distribution you serve, not the one you imagine. Golden sets grounded in production traffic are the backbone that makes every later eval score meaningful."
   },
   {
     "id": 408,
@@ -173,7 +180,8 @@
       "Correct. Matching methodology to output type is the core of mixed-methodology eval design: deterministic outputs get code-graded checks, open-ended outputs get an LLM judge constrained by a rubric, and the judge itself is validated against human (clinician) labels before being trusted."
     ],
     "principle": "match the grading method to the output type — deterministic checks for verifiable answers, validated judges for open-ended ones",
-    "relatedConcept": "Mixed grading methodologies let one eval framework cover both structured extraction and free-form generation without compromising either."
+    "relatedConcept": "Mixed grading methodologies let one eval framework cover both structured extraction and free-form generation without compromising either.",
+    "overallExplanation": "Match the grading method to the output type — deterministic checks for verifiable answers, validated judges for open-ended ones. Mixed grading methodologies let one eval framework cover both structured extraction and free-form generation without compromising either."
   },
   {
     "id": 409,
@@ -195,7 +203,8 @@
       "Anchoring the judge on prior scores manufactures consistency rather than validity — it suppresses legitimate score changes and propagates past errors forward. Stable-but-wrong is worse than noisy, because the drift becomes invisible."
     ],
     "principle": "an LLM judge is a model too — constrain it with a rubric and validate it against human labels",
-    "relatedConcept": "Judge reliability determines whether automated evaluation accelerates iteration or silently misleads it."
+    "relatedConcept": "Judge reliability determines whether automated evaluation accelerates iteration or silently misleads it.",
+    "overallExplanation": "An LLM judge is a model too — constrain it with a rubric and validate it against human labels. Judge reliability determines whether automated evaluation accelerates iteration or silently misleads it."
   },
   {
     "id": 410,
@@ -217,7 +226,8 @@
       "Monitoring is essential but is a complement, not a substitute: relying on production traffic to find failures means residents become the test suite. Abandoning offline evals removes the pre-release safety gate rather than fixing its weakness."
     ],
     "principle": "a small eval passing 100% measures the eval, not the system",
-    "relatedConcept": "Eval set size and stratified coverage determine how much a pass rate can actually be trusted before release."
+    "relatedConcept": "Eval set size and stratified coverage determine how much a pass rate can actually be trusted before release.",
+    "overallExplanation": "A small eval passing 100% measures the eval, not the system. Eval set size and stratified coverage determine how much a pass rate can actually be trusted before release."
   },
   {
     "id": 411,
@@ -239,7 +249,8 @@
       "Correct. The golden set has drifted from the served distribution: it predates two major feature areas and a user-mix shift. Golden sets are living artifacts that must be refreshed from current traffic on a cadence, then re-baselined — evaluate on the distribution you serve today."
     ],
     "principle": "a golden set is a living artifact — refresh it as the product and users change",
-    "relatedConcept": "Dataset drift is the quiet way eval suites decay from safety gates into false reassurance."
+    "relatedConcept": "Dataset drift is the quiet way eval suites decay from safety gates into false reassurance.",
+    "overallExplanation": "A golden set is a living artifact — refresh it as the product and users change. Dataset drift is the quiet way eval suites decay from safety gates into false reassurance."
   },
   {
     "id": 412,
@@ -261,7 +272,8 @@
       "Lenient grading would depress real quality at any score, but it does not explain why offline and online numbers diverged after weeks of tuning specifically. The signature here — eval climbing while generalization falls — points to optimization against the measurement itself."
     ],
     "principle": "any eval you optimize against stops measuring generalization — keep a held-out set",
-    "relatedConcept": "Held-out data is what separates genuine capability gains from memorized answers to your own test."
+    "relatedConcept": "Held-out data is what separates genuine capability gains from memorized answers to your own test.",
+    "overallExplanation": "Any eval you optimize against stops measuring generalization — keep a held-out set. Held-out data is what separates genuine capability gains from memorized answers to your own test."
   },
   {
     "id": 413,
@@ -283,7 +295,8 @@
       "Judge rationales explain why an output scored as it did, not which upstream change altered the output. Attribution requires controlled comparison of system versions; narrative explanations of scores cannot substitute for isolating the experimental variable."
     ],
     "principle": "change one variable at a time so every effect has an owner",
-    "relatedConcept": "Controlled, single-variable iteration is what turns eval results into causal knowledge instead of correlations."
+    "relatedConcept": "Controlled, single-variable iteration is what turns eval results into causal knowledge instead of correlations.",
+    "overallExplanation": "Change one variable at a time so every effect has an owner. Controlled, single-variable iteration is what turns eval results into causal knowledge instead of correlations."
   },
   {
     "id": 414,
@@ -305,7 +318,8 @@
       "Internal dogfooding surfaces some issues, but employees ask different questions than customers and a quarter-long gate slows iteration to a crawl. It substitutes an unrepresentative population and an arbitrary duration for a controlled, metric-gated ramp."
     ],
     "principle": "validate offline first, then canary with guardrails — blast radius should grow only with evidence",
-    "relatedConcept": "Staged rollout discipline is how A/B testing delivers learning without gambling the production experience."
+    "relatedConcept": "Staged rollout discipline is how A/B testing delivers learning without gambling the production experience.",
+    "overallExplanation": "Validate offline first, then canary with guardrails — blast radius should grow only with evidence. Staged rollout discipline is how A/B testing delivers learning without gambling the production experience."
   },
   {
     "id": 415,
@@ -327,7 +341,8 @@
       "Correct. The disciplined move is to run the test until the observed difference clears a pre-defined significance threshold, while guardrail metrics (latency, cost, safety, error rate) confirm nothing else degraded. This applies the principle of statistical significance over eyeballing — and business deadlines do not change the math."
     ],
     "principle": "an underpowered A/B test read early is a coin flip with a dashboard",
-    "relatedConcept": "Statistical discipline in online testing protects the iteration loop from shipping noise as improvement."
+    "relatedConcept": "Statistical discipline in online testing protects the iteration loop from shipping noise as improvement.",
+    "overallExplanation": "An underpowered A/B test read early is a coin flip with a dashboard. Statistical discipline in online testing protects the iteration loop from shipping noise as improvement."
   },
   {
     "id": 416,
@@ -349,7 +364,8 @@
       "A staged rollout still exposes real clinicians to unvalidated outputs from day one at the volunteer clinic, and relies on humans reporting problems as the detection mechanism. It sequences the risk over time rather than eliminating it as compliance requires."
     ],
     "principle": "when unvalidated output must never reach users, shadow the traffic instead of serving it",
-    "relatedConcept": "Shadow deployments extend the A/B toolkit to high-stakes domains where online exposure is not an acceptable price for evidence."
+    "relatedConcept": "Shadow deployments extend the A/B toolkit to high-stakes domains where online exposure is not an acceptable price for evidence.",
+    "overallExplanation": "When unvalidated output must never reach users, shadow the traffic instead of serving it. Shadow deployments extend the A/B toolkit to high-stakes domains where online exposure is not an acceptable price for evidence."
   },
   {
     "id": 417,
@@ -371,7 +387,8 @@
       "Tempting because it reacts instantly, but regenerating after a thumbs-down helps only the next message in that one conversation, costs more on every retry, and teaches the team nothing about why fares fail. It automates a workaround while the failure pattern persists for every new user."
     ],
     "principle": "close the loop — production failures should become permanent eval cases",
-    "relatedConcept": "Feedback-driven iteration is the mechanism that turns monitoring signals into compounding quality improvements."
+    "relatedConcept": "Feedback-driven iteration is the mechanism that turns monitoring signals into compounding quality improvements.",
+    "overallExplanation": "Close the loop — production failures should become permanent eval cases. Feedback-driven iteration is the mechanism that turns monitoring signals into compounding quality improvements."
   },
   {
     "id": 418,
@@ -393,7 +410,8 @@
       "Temperature zero makes outputs deterministic, not grounded — the model will fabricate the same plausible clause number every time instead of varied ones. This confuses reducing randomness with adding factual grounding."
     ],
     "principle": "hallucination under missing context is a retrieval problem wearing a generation costume",
-    "relatedConcept": "Reading traces to locate where grounding broke is the difference between fixing hallucinations and papering over them."
+    "relatedConcept": "Reading traces to locate where grounding broke is the difference between fixing hallucinations and papering over them.",
+    "overallExplanation": "Hallucination under missing context is a retrieval problem wearing a generation costume. Reading traces to locate where grounding broke is the difference between fixing hallucinations and papering over them."
   },
   {
     "id": 419,
@@ -415,7 +433,8 @@
       "Correct. The evidence is a textbook prompt failure: conflicting instructions accreted without ownership. The fix is to resolve the contradiction at its source — one schema, one style directive, a single owner for the prompt — because a model given incompatible goals cannot be reliable no matter what surrounds it."
     ],
     "principle": "when instructions conflict, no model tier or retry loop can make the output reliable",
-    "relatedConcept": "Distinguishing prompt failure from model limitation prevents spending capability budget on problems that editing text would solve."
+    "relatedConcept": "Distinguishing prompt failure from model limitation prevents spending capability budget on problems that editing text would solve.",
+    "overallExplanation": "When instructions conflict, no model tier or retry loop can make the output reliable. Distinguishing prompt failure from model limitation prevents spending capability budget on problems that editing text would solve."
   },
   {
     "id": 420,
@@ -437,7 +456,8 @@
       "Majority voting over high-temperature samples helps when the model is sometimes right by reasoning, but on tasks beyond capability the errors are systematic, so the majority converges on confident wrong answers. It multiplies cost per task while averaging over the same ceiling."
     ],
     "principle": "when strong prompting plateaus and a bigger model passes, the task is above the tier — route up, stop prompting",
-    "relatedConcept": "Recognizing capability ceilings early saves weeks of prompt iteration that no amount of wording can win."
+    "relatedConcept": "Recognizing capability ceilings early saves weeks of prompt iteration that no amount of wording can win.",
+    "overallExplanation": "When strong prompting plateaus and a bigger model passes, the task is above the tier — route up, stop prompting. Recognizing capability ceilings early saves weeks of prompt iteration that no amount of wording can win."
   },
   {
     "id": 421,
@@ -459,7 +479,8 @@
       "Hallucination means generating claims unsupported by available grounding, but here the grounding is present in context and simply not being honored. Adding retrieval gates addresses a failure mode the system does not have while leaving instruction placement untouched."
     ],
     "principle": "instruction-following that decays with context length is a placement problem, not a wording problem",
-    "relatedConcept": "Long-running agent sessions make context management a first-class failure category alongside prompts and model choice."
+    "relatedConcept": "Long-running agent sessions make context management a first-class failure category alongside prompts and model choice.",
+    "overallExplanation": "Instruction-following that decays with context length is a placement problem, not a wording problem. Long-running agent sessions make context management a first-class failure category alongside prompts and model choice."
   },
   {
     "id": 422,
@@ -481,7 +502,8 @@
       "Swapping the model first is changing the most expensive variable on no evidence — the traces might show retrieval returning garbage, which no model upgrade fixes. 'Eliminate variables by replacement' inverts the method: observation should narrow the search before anything is replaced."
     ],
     "principle": "reproduce, trace, isolate — diagnose with evidence before changing anything",
-    "relatedConcept": "Systematic root-cause analysis is what separates targeted fixes from the shotgun debugging that stalls LLM systems."
+    "relatedConcept": "Systematic root-cause analysis is what separates targeted fixes from the shotgun debugging that stalls LLM systems.",
+    "overallExplanation": "Reproduce, trace, isolate — diagnose with evidence before changing anything. Systematic root-cause analysis is what separates targeted fixes from the shotgun debugging that stalls LLM systems."
   },
   {
     "id": 423,
@@ -503,7 +525,8 @@
       "Correct. A large, byte-identical prefix resent on every call is the textbook prompt-caching case: cached prefix tokens are billed at a small fraction of the base input rate, latency improves, and generated outputs are unaffected. It exploits the structure of the spend — optimize the biggest term with the least behavioral risk."
     ],
     "principle": "a stable prefix resent on every call is cache material, not a cost of doing business",
-    "relatedConcept": "Prompt caching is usually the first optimization to evaluate because it cuts cost and latency without changing model behavior."
+    "relatedConcept": "Prompt caching is usually the first optimization to evaluate because it cuts cost and latency without changing model behavior.",
+    "overallExplanation": "A stable prefix resent on every call is cache material, not a cost of doing business. Prompt caching is usually the first optimization to evaluate because it cuts cost and latency without changing model behavior."
   },
   {
     "id": 424,
@@ -525,7 +548,8 @@
       "Bundling all three confounds attribution — if latency improves, no one knows which change mattered or which can be reverted — and some changes (model swap, prompt trim) carry quality risk that now cannot be isolated. It violates both measure-first and one-variable-at-a-time."
     ],
     "principle": "profile before you optimize — the bottleneck is an empirical fact, not a vote",
-    "relatedConcept": "Latency attribution is the evaluation discipline that keeps optimization effort pointed at the stage that actually dominates."
+    "relatedConcept": "Latency attribution is the evaluation discipline that keeps optimization effort pointed at the stage that actually dominates.",
+    "overallExplanation": "Profile before you optimize — the bottleneck is an empirical fact, not a vote. Latency attribution is the evaluation discipline that keeps optimization effort pointed at the stage that actually dominates."
   },
   {
     "id": 425,
@@ -547,7 +571,8 @@
       "Volume discounts reduce the unit price of an architecture that overpays on most requests — a discounted mismatch is still a mismatch. It also caps future savings at the negotiated rate, whereas routing compounds with every other optimization."
     ],
     "principle": "route by difficulty — pay for top-tier capability only where the task demands it",
-    "relatedConcept": "Model routing is the primary structural lever for moving a system toward the cost-performance frontier."
+    "relatedConcept": "Model routing is the primary structural lever for moving a system toward the cost-performance frontier.",
+    "overallExplanation": "Route by difficulty — pay for top-tier capability only where the task demands it. Model routing is the primary structural lever for moving a system toward the cost-performance frontier."
   },
   {
     "id": 426,
@@ -569,7 +594,8 @@
       "Parallelizing pre-generation stages attacks under one second of a twelve-second budget: the trace already localized the time in generation. This optimizes the measured non-bottleneck — the precise mistake latency attribution exists to prevent."
     ],
     "principle": "output tokens are the latency you pay for twice — stream them and generate fewer of them",
-    "relatedConcept": "Perceived latency is a first-class optimization target, and streaming plus output-length control are its cheapest levers."
+    "relatedConcept": "Perceived latency is a first-class optimization target, and streaming plus output-length control are its cheapest levers.",
+    "overallExplanation": "Output tokens are the latency you pay for twice — stream them and generate fewer of them. Perceived latency is a first-class optimization target, and streaming plus output-length control are its cheapest levers."
   },
   {
     "id": 427,
@@ -591,7 +617,8 @@
       "Correct. This workload is the canonical batch case: high volume, fully asynchronous, with a many-hour tolerance window before curators arrive. Batch APIs price tokens at roughly half the synchronous rate precisely for such jobs, so matching the API modality to the workload's latency tolerance converts slack time directly into savings."
     ],
     "principle": "price follows urgency — workloads that can wait should never pay real-time rates",
-    "relatedConcept": "Matching API modality to workload latency tolerance is a structural cost lever independent of prompts and model choice."
+    "relatedConcept": "Matching API modality to workload latency tolerance is a structural cost lever independent of prompts and model choice.",
+    "overallExplanation": "Price follows urgency — workloads that can wait should never pay real-time rates. Matching API modality to workload latency tolerance is a structural cost lever independent of prompts and model choice."
   },
   {
     "id": 428,
@@ -613,7 +640,8 @@
       "Feedback flows surface incidents users notice, but detection is not reconstruction: a flag without the underlying prompt and completion still leaves nothing to review. It also misses every wrong answer customers fail to recognize as wrong — often the most dangerous ones."
     ],
     "principle": "you cannot debug what you did not record — log the content, not just the status code",
-    "relatedConcept": "Content-level structured logging is the foundation every other monitoring, evaluation, and audit capability builds upon."
+    "relatedConcept": "Content-level structured logging is the foundation every other monitoring, evaluation, and audit capability builds upon.",
+    "overallExplanation": "You cannot debug what you did not record — log the content, not just the status code. Content-level structured logging is the foundation every other monitoring, evaluation, and audit capability builds upon."
   },
   {
     "id": 429,
@@ -635,7 +663,8 @@
       "Correct. Automated scoring of sampled outputs — an LLM judge or checks against the eval rubric — plus drift detection on inputs and outputs turns quality into a continuously monitored, alertable signal. A knowledge-base migration is exactly the distribution shift drift detection exists to flag within days, not weeks."
     ],
     "principle": "operational dashboards cannot see quality — monitor it directly, with machines for coverage and humans for truth",
-    "relatedConcept": "Quality observability pairs automated scoring at scale with sampled human review, closing the blind spot operational metrics leave open."
+    "relatedConcept": "Quality observability pairs automated scoring at scale with sampled human review, closing the blind spot operational metrics leave open.",
+    "overallExplanation": "Operational dashboards cannot see quality — monitor it directly, with machines for coverage and humans for truth. Quality observability pairs automated scoring at scale with sampled human review, closing the blind spot operational metrics leave open."
   },
   {
     "id": 430,
@@ -657,7 +686,8 @@
       "Validation alerts catch structurally malformed outputs quickly, but a wrong eligibility determination can be perfectly schema-valid — and an alert only says that a run failed, never which of twelve steps caused it. Detection without localization leaves the core investigative problem intact."
     ],
     "principle": "in a multi-step agent, the unit of observability is the step, not the run",
-    "relatedConcept": "Trace-level visibility into agent chains is what converts intermittent multi-step failures from mysteries into diagnoses."
+    "relatedConcept": "Trace-level visibility into agent chains is what converts intermittent multi-step failures from mysteries into diagnoses.",
+    "overallExplanation": "In a multi-step agent, the unit of observability is the step, not the run. Trace-level visibility into agent chains is what converts intermittent multi-step failures from mysteries into diagnoses."
   },
   {
     "id": 431,
@@ -679,7 +709,8 @@
       "Moving pages to a channel lowers urgency without adding discrimination — the same noise arrives in a place engineers are even freer to ignore, and diffuse collective ownership means a genuine outage may sit unclaimed. It relocates alert fatigue rather than resolving it."
     ],
     "principle": "alert on sustained rates against SLOs, not individual events — a page nobody reads protects nothing",
-    "relatedConcept": "Threshold and SLO-based alerting is what keeps monitoring signals trusted enough to act on when it matters."
+    "relatedConcept": "Threshold and SLO-based alerting is what keeps monitoring signals trusted enough to act on when it matters.",
+    "overallExplanation": "Alert on sustained rates against SLOs, not individual events — a page nobody reads protects nothing. Threshold and SLO-based alerting is what keeps monitoring signals trusted enough to act on when it matters."
   },
   {
     "id": 432,
@@ -701,6 +732,7 @@
       "Correct. The described pattern is dataset drift in production: the served query distribution has walked away from the evaluated baseline. Statistical drift detection on inputs and outputs surfaces that divergence within days, and the alert triggers the right responses — refresh the eval set, extend the corpus, re-baseline — before complaints accumulate."
     ],
     "principle": "drift is invisible week-to-week and obvious year-to-year — only continuous baseline comparison catches it in between",
-    "relatedConcept": "Drift detection is the monitoring layer that tells you when yesterday's evaluation no longer describes today's system."
+    "relatedConcept": "Drift detection is the monitoring layer that tells you when yesterday's evaluation no longer describes today's system.",
+    "overallExplanation": "Drift is invisible week-to-week and obvious year-to-year — only continuous baseline comparison catches it in between. Drift detection is the monitoring layer that tells you when yesterday's evaluation no longer describes today's system."
   }
 ]

@@ -19,7 +19,8 @@
       "Splitting tools multiplies the catalog and worsens the exact problem being diagnosed. It confuses precision of individual tools with clarity of the overall set; more near-duplicate options increases selection ambiguity."
     ],
     "principle": "fewer, well-scoped tools beat a large overlapping catalog",
-    "relatedConcept": "Tool catalog curation is the integration-side counterpart of context engineering: every definition competes for the model's attention."
+    "relatedConcept": "Tool catalog curation is the integration-side counterpart of context engineering: every definition competes for the model's attention.",
+    "overallExplanation": "Fewer, well-scoped tools beat a large overlapping catalog. Tool catalog curation is the integration-side counterpart of context engineering: every definition competes for the model's attention."
   },
   {
     "id": 302,
@@ -41,7 +42,8 @@
       "Human approval of every statement destroys the efficiency the agent was meant to provide and reviewers fatigue quickly on raw SQL. It compensates for excessive capability with process rather than removing the excess capability."
     ],
     "principle": "unneeded capability is attack surface — scope tools to the task",
-    "relatedConcept": "Capability bloat evaluation asks what the agent must do, not what it might someday do, before granting any tool."
+    "relatedConcept": "Capability bloat evaluation asks what the agent must do, not what it might someday do, before granting any tool.",
+    "overallExplanation": "Unneeded capability is attack surface — scope tools to the task. Capability bloat evaluation asks what the agent must do, not what it might someday do, before granting any tool."
   },
   {
     "id": 303,
@@ -63,7 +65,8 @@
       "Correct. Tool descriptions are prompt engineering: the model chooses and parameterizes tools based on what the definitions say. Precise descriptions with disambiguation guidance and parameter semantics are the cheapest, most direct fix for wrong-tool and wrong-argument errors."
     ],
     "principle": "tool descriptions are prompt engineering",
-    "relatedConcept": "An agent's effective capability is bounded by how clearly its tool interfaces are described, not just what they can do."
+    "relatedConcept": "An agent's effective capability is bounded by how clearly its tool interfaces are described, not just what they can do.",
+    "overallExplanation": "Tool descriptions are prompt engineering. An agent's effective capability is bounded by how clearly its tool interfaces are described, not just what they can do."
   },
   {
     "id": 304,
@@ -85,7 +88,8 @@
       "Distinct names do not remove the underlying overlap: both tools still claim the same job, so the model still has to guess. The ambiguity is in capability, not naming."
     ],
     "principle": "consolidate overlapping tools to one canonical capability",
-    "relatedConcept": "When multiple integration teams contribute tools, someone must own deduplicating the combined catalog the agent actually sees."
+    "relatedConcept": "When multiple integration teams contribute tools, someone must own deduplicating the combined catalog the agent actually sees.",
+    "overallExplanation": "Consolidate overlapping tools to one canonical capability. When multiple integration teams contribute tools, someone must own deduplicating the combined catalog the agent actually sees."
   },
   {
     "id": 305,
@@ -107,7 +111,8 @@
       "Models do not refuse based on tool count, so the premise is wrong. Sharding tools across agents adds orchestration complexity while each agent still carries a bloated, unfocused catalog; it redistributes the problem rather than curating it."
     ],
     "principle": "minimum viable tool set per agent, not maximum coverage",
-    "relatedConcept": "Auto-exposing an entire API surface as tools is the integration equivalent of granting an employee every permission on day one."
+    "relatedConcept": "Auto-exposing an entire API surface as tools is the integration equivalent of granting an employee every permission on day one.",
+    "overallExplanation": "Minimum viable tool set per agent, not maximum coverage. Auto-exposing an entire API surface as tools is the integration equivalent of granting an employee every permission on day one."
   },
   {
     "id": 306,
@@ -129,7 +134,8 @@
       "Correct. The model must never be the authorization boundary; access must be enforced deterministically downstream. Per-user scoped tokens mean even a prompt-injected or confused agent physically cannot retrieve records outside the clinician's permissions."
     ],
     "principle": "the model is never the authorization boundary",
-    "relatedConcept": "Every agent integration should be designed so a fully compromised prompt still cannot exceed the calling user's real permissions."
+    "relatedConcept": "Every agent integration should be designed so a fully compromised prompt still cannot exceed the calling user's real permissions.",
+    "overallExplanation": "The model is never the authorization boundary. Every agent integration should be designed so a fully compromised prompt still cannot exceed the calling user's real permissions."
   },
   {
     "id": 307,
@@ -151,7 +157,8 @@
       "Summary quality is an accuracy concern for evaluation work, not a security gap. Focusing on it confuses model output quality with the authorization exposure created by the integration design."
     ],
     "principle": "untrusted content + over-privileged tools = confused deputy",
-    "relatedConcept": "Threat modeling agent integrations means tracing where untrusted data enters the context and what credentials it can reach."
+    "relatedConcept": "Threat modeling agent integrations means tracing where untrusted data enters the context and what credentials it can reach.",
+    "overallExplanation": "Untrusted content + over-privileged tools = confused deputy. Threat modeling agent integrations means tracing where untrusted data enters the context and what credentials it can reach."
   },
   {
     "id": 308,
@@ -173,7 +180,8 @@
       "Per-API service accounts tell you which service called, which investigators already knew. It refines system-level attribution while leaving the actual requirement — user-level attribution — unmet."
     ],
     "principle": "propagate end-user identity; shared accounts erase attribution",
-    "relatedConcept": "Audit trails for agent systems are only as granular as the identity that reaches the systems of record."
+    "relatedConcept": "Audit trails for agent systems are only as granular as the identity that reaches the systems of record.",
+    "overallExplanation": "Propagate end-user identity; shared accounts erase attribution. Audit trails for agent systems are only as granular as the identity that reaches the systems of record."
   },
   {
     "id": 309,
@@ -195,7 +203,8 @@
       "Per-office keys reduce blast radius somewhat but every advisor in a branch still shares one identity over all of that branch's clients. It is coarse-grained partitioning where per-user scoping is both required and available."
     ],
     "principle": "per-user OAuth scope beats shared credentials, however hardened",
-    "relatedConcept": "MCP server authentication design determines whether least privilege is even possible for every agent built on top of it."
+    "relatedConcept": "MCP server authentication design determines whether least privilege is even possible for every agent built on top of it.",
+    "overallExplanation": "Per-user OAuth scope beats shared credentials, however hardened. MCP server authentication design determines whether least privilege is even possible for every agent built on top of it."
   },
   {
     "id": 310,
@@ -217,7 +226,8 @@
       "Correct. Consequential, irreversible actions triggered from untrusted content need a check the model cannot be talked out of: deterministic validation or human confirmation outside the model. This enforces that authorization for high-impact actions lives beyond the prompt."
     ],
     "principle": "gate irreversible actions with deterministic checks outside the model",
-    "relatedConcept": "Prompt injection defenses layer, but the load-bearing layer for high-impact tools must be non-probabilistic."
+    "relatedConcept": "Prompt injection defenses layer, but the load-bearing layer for high-impact tools must be non-probabilistic.",
+    "overallExplanation": "Gate irreversible actions with deterministic checks outside the model. Prompt injection defenses layer, but the load-bearing layer for high-impact tools must be non-probabilistic."
   },
   {
     "id": 311,
@@ -239,7 +249,8 @@
       "Order-status answers are per-customer and time-varying, so exact-response caching has low hit rates and staleness risk. It optimizes averages while p95 — the SLA metric — stays dominated by uncached heavy-path requests."
     ],
     "principle": "match model tier and pipeline depth to per-use-case difficulty and SLA",
-    "relatedConcept": "Tiered routing is how production systems buy accuracy only where the workload actually demands it."
+    "relatedConcept": "Tiered routing is how production systems buy accuracy only where the workload actually demands it.",
+    "overallExplanation": "Match model tier and pipeline depth to per-use-case difficulty and SLA. Tiered routing is how production systems buy accuracy only where the workload actually demands it."
   },
   {
     "id": 312,
@@ -261,7 +272,8 @@
       "Two fast drafts doubles cost without ensuring either reaches the accuracy a stronger single configuration would. It also pushes the burden of error detection onto clinicians, the failure mode the system should minimize."
     ],
     "principle": "spend a loose latency budget on accuracy, not speed nobody asked for",
-    "relatedConcept": "Accuracy-latency decisions start from the use case's real SLA and risk profile, not from default settings."
+    "relatedConcept": "Accuracy-latency decisions start from the use case's real SLA and risk profile, not from default settings.",
+    "overallExplanation": "Spend a loose latency budget on accuracy, not speed nobody asked for. Accuracy-latency decisions start from the use case's real SLA and risk profile, not from default settings."
   },
   {
     "id": 313,
@@ -283,7 +295,8 @@
       "The requirement tolerates multi-second completions, so forcing everything under one second overshoots and costs accuracy. This misreads which latency metric matters: first token, not last."
     ],
     "principle": "optimize the latency metric users actually feel — time to first token",
-    "relatedConcept": "Streaming and parallelism often deliver the perceived-latency win that teams mistakenly buy with model downgrades."
+    "relatedConcept": "Streaming and parallelism often deliver the perceived-latency win that teams mistakenly buy with model downgrades.",
+    "overallExplanation": "Optimize the latency metric users actually feel — time to first token. Streaming and parallelism often deliver the perceived-latency win that teams mistakenly buy with model downgrades."
   },
   {
     "id": 314,
@@ -305,7 +318,8 @@
       "Correct. Accuracy-latency changes should be justified with measurement: sweep the parameter, quantify quality at each setting, and choose the cheapest configuration that meets the bar. This is the eval-driven configuration principle in action."
     ],
     "principle": "justify configuration changes with evals, not anecdotes",
-    "relatedConcept": "Every knob in a retrieval pipeline is an accuracy-latency trade that deserves a measured curve, not a guess."
+    "relatedConcept": "Every knob in a retrieval pipeline is an accuracy-latency trade that deserves a measured curve, not a guess.",
+    "overallExplanation": "Justify configuration changes with evals, not anecdotes. Every knob in a retrieval pipeline is an accuracy-latency trade that deserves a measured curve, not a guess."
   },
   {
     "id": 315,
@@ -327,7 +341,8 @@
       "Finishing faster has no value when the deadline is 8 a.m. either way, and it does nothing about error rates. It optimizes a metric nobody is constrained by while the real complaint is accuracy."
     ],
     "principle": "in batch pipelines, convert latency headroom into accuracy",
-    "relatedConcept": "The accuracy-latency dial turns both ways; architects should notice when a workload leaves speed on the table."
+    "relatedConcept": "The accuracy-latency dial turns both ways; architects should notice when a workload leaves speed on the table.",
+    "overallExplanation": "In batch pipelines, convert latency headroom into accuracy. The accuracy-latency dial turns both ways; architects should notice when a workload leaves speed on the table."
   },
   {
     "id": 316,
@@ -349,7 +364,8 @@
       "On-demand debug logging captures nothing from the past, and most LLM incidents are discovered after the fact from user reports. Failures that cannot be reproduced on command would remain permanently invisible."
     ],
     "principle": "metrics for all, sampled traces plus guaranteed capture of failures",
-    "relatedConcept": "Observability at scale is a sampling-design problem: decide up front which conversations you must be able to replay."
+    "relatedConcept": "Observability at scale is a sampling-design problem: decide up front which conversations you must be able to replay.",
+    "overallExplanation": "Metrics for all, sampled traces plus guaranteed capture of failures. Observability at scale is a sampling-design problem: decide up front which conversations you must be able to replay."
   },
   {
     "id": 317,
@@ -371,7 +387,8 @@
       "A prompt instruction affects what the model says, not what the system logs — the user's own messages containing PHI would still be persisted verbatim. It also relies on probabilistic compliance for a control that must be deterministic."
     ],
     "principle": "minimize PII at ingestion and govern access to what remains",
-    "relatedConcept": "Logs are a second copy of your most sensitive data flows and deserve the same protection as the primary systems."
+    "relatedConcept": "Logs are a second copy of your most sensitive data flows and deserve the same protection as the primary systems.",
+    "overallExplanation": "Minimize PII at ingestion and govern access to what remains. Logs are a second copy of your most sensitive data flows and deserve the same protection as the primary systems."
   },
   {
     "id": 318,
@@ -393,7 +410,8 @@
       "Correct. Multi-step agents need trace-level observability: a correlated view of the plan, every tool call with inputs and outputs, and each intermediate model response. Distributed-tracing discipline applied to agent workflows turns days of guessing into minutes of replay."
     ],
     "principle": "multi-step agents require correlated end-to-end traces, not siloed logs",
-    "relatedConcept": "An agent run is a distributed transaction; debugging it demands the same trace propagation discipline as microservices."
+    "relatedConcept": "An agent run is a distributed transaction; debugging it demands the same trace propagation discipline as microservices.",
+    "overallExplanation": "Multi-step agents require correlated end-to-end traces, not siloed logs. An agent run is a distributed transaction; debugging it demands the same trace propagation discipline as microservices."
   },
   {
     "id": 319,
@@ -415,7 +433,8 @@
       "Tempting because golden queries give a controlled baseline, but a fixed replay set covers a sliver of real traffic and can miss degradation concentrated in migrated catalog areas users actually hit. It complements, but cannot substitute for, measuring quality on live conversations."
     ],
     "principle": "operational dashboards don't measure quality — add production eval signals",
-    "relatedConcept": "Mature LLM observability treats answer quality as a first-class monitored metric alongside latency and cost."
+    "relatedConcept": "Mature LLM observability treats answer quality as a first-class monitored metric alongside latency and cost.",
+    "overallExplanation": "Operational dashboards don't measure quality — add production eval signals. Mature LLM observability treats answer quality as a first-class monitored metric alongside latency and cost."
   },
   {
     "id": 320,
@@ -437,7 +456,8 @@
       "A blanket downgrade trades quality across every program to offset costs nobody has localized. Without per-program visibility, the team cannot even tell whether the downgrade targeted the actual driver of growth."
     ],
     "principle": "cost accountability starts with per-tenant token and cost attribution",
-    "relatedConcept": "Token metrics tagged by feature and tenant are the FinOps backbone of any shared LLM platform."
+    "relatedConcept": "Token metrics tagged by feature and tenant are the FinOps backbone of any shared LLM platform.",
+    "overallExplanation": "Cost accountability starts with per-tenant token and cost attribution. Token metrics tagged by feature and tenant are the FinOps backbone of any shared LLM platform."
   },
   {
     "id": 321,
@@ -459,7 +479,8 @@
       "Cautious answering may reduce confident errors but adjusters still do not get correct coverage determinations. It asks the model to work around broken retrieval instead of fixing the pipeline that feeds it."
     ],
     "principle": "chunk along semantic and structural boundaries, not arbitrary token counts",
-    "relatedConcept": "The retrieval unit defines what the model can ever see intact; chunking is where RAG accuracy is won or lost first."
+    "relatedConcept": "The retrieval unit defines what the model can ever see intact; chunking is where RAG accuracy is won or lost first.",
+    "overallExplanation": "Chunk along semantic and structural boundaries, not arbitrary token counts. The retrieval unit defines what the model can ever see intact; chunking is where RAG accuracy is won or lost first."
   },
   {
     "id": 322,
@@ -481,7 +502,8 @@
       "Correct. This is contextual retrieval: enriching each chunk with its surrounding document context — product, version, section — before embedding, so chunks are both retrievable and interpretable on their own. It fixes the isolated-chunk problem at ingestion time."
     ],
     "principle": "chunks must carry their context — enrich at ingestion (contextual retrieval)",
-    "relatedConcept": "A chunk stripped of its document context is ambiguous to both the retriever and the model reading it."
+    "relatedConcept": "A chunk stripped of its document context is ambiguous to both the retriever and the model reading it.",
+    "overallExplanation": "Chunks must carry their context — enrich at ingestion (contextual retrieval). A chunk stripped of its document context is ambiguous to both the retriever and the model reading it."
   },
   {
     "id": 323,
@@ -503,7 +525,8 @@
       "Correct. When relevant chunks retrieve but rank poorly, a reranker — which scores each candidate directly against the query with a stronger model — fixes the ordering before context assembly. Rerankers are the standard precision layer over a high-recall hybrid candidate pool."
     ],
     "principle": "hybrid lexical+vector recall, then rerank for precision",
-    "relatedConcept": "Robust RAG stacks recall-oriented retrieval and precision-oriented reranking rather than betting on one mechanism."
+    "relatedConcept": "Robust RAG stacks recall-oriented retrieval and precision-oriented reranking rather than betting on one mechanism.",
+    "overallExplanation": "Hybrid lexical+vector recall, then rerank for precision. Robust RAG stacks recall-oriented retrieval and precision-oriented reranking rather than betting on one mechanism."
   },
   {
     "id": 324,
@@ -525,7 +548,8 @@
       "Source citation improves transparency but arrives after the wrong content has already shaped the answer. It shifts quality control onto busy clinical users instead of preventing the retrieval error."
     ],
     "principle": "metadata filters do what similarity can't — enforce category and freshness",
-    "relatedConcept": "A production vector index is a database: schema, filters, and versioning matter as much as the embeddings."
+    "relatedConcept": "A production vector index is a database: schema, filters, and versioning matter as much as the embeddings.",
+    "overallExplanation": "Metadata filters do what similarity can't — enforce category and freshness. A production vector index is a database: schema, filters, and versioning matter as much as the embeddings."
   },
   {
     "id": 325,
@@ -547,7 +571,8 @@
       "Iterative self-retrieval can work in agentic designs, but it adds a round-trip per gap, depends on the model noticing what it cannot see, and leaves first-pass answers incomplete. It outsources a pipeline design flaw to runtime behavior."
     ],
     "principle": "decouple the matching unit from the reading unit (small-to-big retrieval)",
-    "relatedConcept": "Chunk size tensions between precision and completeness dissolve when retrieval and context assembly use different granularities."
+    "relatedConcept": "Chunk size tensions between precision and completeness dissolve when retrieval and context assembly use different granularities.",
+    "overallExplanation": "Decouple the matching unit from the reading unit (small-to-big retrieval). Chunk size tensions between precision and completeness dissolve when retrieval and context assembly use different granularities."
   },
   {
     "id": 326,
@@ -569,7 +594,8 @@
       "Pre-written summaries only answer the questions someone anticipated, go stale within days, and still cannot support arbitrary filters or exact arithmetic. It adds a lossy derivative layer where a direct query would be exact."
     ],
     "principle": "structured data calls for SQL/API retrieval, not vector search",
-    "relatedConcept": "The first retrieval question is always the data's shape; embeddings are one tool, not the default."
+    "relatedConcept": "The first retrieval question is always the data's shape; embeddings are one tool, not the default.",
+    "overallExplanation": "Structured data calls for SQL/API retrieval, not vector search. The first retrieval question is always the data's shape; embeddings are one tool, not the default."
   },
   {
     "id": 327,
@@ -591,7 +617,8 @@
       "Correct. Query patterns dictate retrieval: keyword-heavy, identifier-style queries favor lexical/exact matching, while semantic paraphrase queries favor embeddings. Routing by detected query pattern gives each segment the mechanism it is best served by."
     ],
     "principle": "identifier queries favor lexical matching; paraphrase queries favor embeddings",
-    "relatedConcept": "Analyzing real query logs is how architects discover which retrieval mechanisms a workload actually needs."
+    "relatedConcept": "Analyzing real query logs is how architects discover which retrieval mechanisms a workload actually needs.",
+    "overallExplanation": "Identifier queries favor lexical matching; paraphrase queries favor embeddings. Analyzing real query logs is how architects discover which retrieval mechanisms a workload actually needs."
   },
   {
     "id": 328,
@@ -613,7 +640,8 @@
       "The direction is right but the fix is self-defeating: a weekly-refreshed index reintroduces worse staleness than the vector store it replaces. Live tools querying the current working tree are the point of the agentic approach."
     ],
     "principle": "fast-changing, exact-match corpora favor agentic search over pre-built indexes",
-    "relatedConcept": "Freshness requirements and query exactness together often disqualify pre-indexed retrieval before quality is even measured."
+    "relatedConcept": "Freshness requirements and query exactness together often disqualify pre-indexed retrieval before quality is even measured.",
+    "overallExplanation": "Fast-changing, exact-match corpora favor agentic search over pre-built indexes. Freshness requirements and query exactness together often disqualify pre-indexed retrieval before quality is even measured."
   },
   {
     "id": 329,
@@ -635,7 +663,8 @@
       "Fine-tuning bakes quarterly-changing answers into weights, making every FAQ update a training-and-deployment cycle and inviting outdated responses. It is the highest-friction option for content this small and this mutable."
     ],
     "principle": "small stable corpora belong in the (cached) prompt, not a retrieval pipeline",
-    "relatedConcept": "Right-sizing retrieval means recognizing when the simplest strategy — no retrieval — dominates on both quality and cost."
+    "relatedConcept": "Right-sizing retrieval means recognizing when the simplest strategy — no retrieval — dominates on both quality and cost.",
+    "overallExplanation": "Small stable corpora belong in the (cached) prompt, not a retrieval pipeline. Right-sizing retrieval means recognizing when the simplest strategy — no retrieval — dominates on both quality and cost."
   },
   {
     "id": 330,
@@ -657,7 +686,8 @@
       "Moving policy prose into relational tables with generated SQL discards the semantic search that works well for those documents, and inventory already lives in an operational system the agent could call directly. It swaps one uniform mismatch for another."
     ],
     "principle": "segment retrieval by data volatility — live systems for live state",
-    "relatedConcept": "A single retrieval mechanism rarely fits a mixed corpus; freshness needs are the cleanest segmentation criterion."
+    "relatedConcept": "A single retrieval mechanism rarely fits a mixed corpus; freshness needs are the cleanest segmentation criterion.",
+    "overallExplanation": "Segment retrieval by data volatility — live systems for live state. A single retrieval mechanism rarely fits a mixed corpus; freshness needs are the cleanest segmentation criterion."
   },
   {
     "id": 331,
@@ -679,7 +709,8 @@
       "An orchestrator agent adds a model-mediated hop — extra latency, cost, and nondeterminism — in front of what are simple tool calls. Agent-to-agent delegation suits handing off complex reasoning tasks, not proxying basic capability access."
     ],
     "principle": "MCP: implement an integration once, reuse it across every client",
-    "relatedConcept": "Protocol choice is a build-once-versus-build-per-client decision as much as a technical one."
+    "relatedConcept": "Protocol choice is a build-once-versus-build-per-client decision as much as a technical one.",
+    "overallExplanation": "MCP: implement an integration once, reuse it across every client. Protocol choice is a build-once-versus-build-per-client decision as much as a technical one."
   },
   {
     "id": 332,
@@ -701,7 +732,8 @@
       "Correct. Direct API integration is the right mechanism when code orchestrates a fixed workflow with a single consumer: simplest to build, debug, and operate. MCP pays off when tools must be discovered and reused across clients — conditions absent here."
     ],
     "principle": "one code-orchestrated consumer → direct API; save MCP for reuse",
-    "relatedConcept": "Integration mechanisms are chosen by consumer count and orchestration style, not by fashion or uniformity."
+    "relatedConcept": "Integration mechanisms are chosen by consumer count and orchestration style, not by fashion or uniformity.",
+    "overallExplanation": "One code-orchestrated consumer → direct API; save MCP for reuse. Integration mechanisms are chosen by consumer count and orchestration style, not by fashion or uniformity."
   },
   {
     "id": 333,
@@ -723,7 +755,8 @@
       "Tempting because MCP is the reuse protocol, but MCP shares tools, and tools are the wrong unit here: the value is in the financial-aid agent's orchestration and safeguards around those tools. Exposing raw tools recreates option one's competence gap over a standard protocol."
     ],
     "principle": "delegate to the agent that owns the expertise; don't transplant its tools",
-    "relatedConcept": "Agent-to-agent is the integration mechanism for reusing judgment and guardrails, not just capabilities."
+    "relatedConcept": "Agent-to-agent is the integration mechanism for reusing judgment and guardrails, not just capabilities.",
+    "overallExplanation": "Delegate to the agent that owns the expertise; don't transplant its tools. Agent-to-agent is the integration mechanism for reusing judgment and guardrails, not just capabilities."
   },
   {
     "id": 334,
@@ -745,7 +778,8 @@
       "Shelling out to shared hosts technically allows runtime pickup, but it offers no schemas, no structured discovery, and a serious security and operations story to invent from scratch. It is an unmanaged imitation of what MCP provides natively."
     ],
     "principle": "runtime tool discovery decouples capability publishers from client releases",
-    "relatedConcept": "In large organizations, the integration protocol determines whether the capability catalog can grow without coordinated deployments."
+    "relatedConcept": "In large organizations, the integration protocol determines whether the capability catalog can grow without coordinated deployments.",
+    "overallExplanation": "Runtime tool discovery decouples capability publishers from client releases. In large organizations, the integration protocol determines whether the capability catalog can grow without coordinated deployments."
   },
   {
     "id": 335,
@@ -767,7 +801,8 @@
       "Correct. Progressive discovery loads capabilities on demand: a lean core context, with tool definitions fetched when relevant to the task at hand. Since most conversations touch one or two systems, the agent pays discovery round-trips rarely while reclaiming attention and tokens on every request."
     ],
     "principle": "load capabilities on demand when the catalog is large and usage is sparse",
-    "relatedConcept": "Progressive discovery treats the context window as a scarce runtime resource rather than a static configuration dump."
+    "relatedConcept": "Progressive discovery treats the context window as a scarce runtime resource rather than a static configuration dump.",
+    "overallExplanation": "Load capabilities on demand when the catalog is large and usage is sparse. Progressive discovery treats the context window as a scarce runtime resource rather than a static configuration dump."
   },
   {
     "id": 336,
@@ -789,7 +824,8 @@
       "Removing tools the workflow genuinely needs breaks those support cases outright; the tools are less used, not unused. It confuses trimming capability with managing context, harming users to save a handful of tokens."
     ],
     "principle": "small stable toolsets justify upfront loading — discovery must earn its complexity",
-    "relatedConcept": "Context strategies are sized to catalog scale and usage patterns, not adopted as universal best practices."
+    "relatedConcept": "Context strategies are sized to catalog scale and usage patterns, not adopted as universal best practices.",
+    "overallExplanation": "Small stable toolsets justify upfront loading — discovery must earn its complexity. Context strategies are sized to catalog scale and usage patterns, not adopted as universal best practices."
   },
   {
     "id": 337,
@@ -811,7 +847,8 @@
       "Sharding processes everything in parallel rather than avoiding the unnecessary reading; total token cost rises, and cross-contract synthesis across shards adds a fragile merge step. It scales the waste instead of eliminating it."
     ],
     "principle": "provide an index upfront; load full content on demand",
-    "relatedConcept": "Progressive discovery applies to data payloads exactly as it does to tool definitions — catalogs first, content when needed."
+    "relatedConcept": "Progressive discovery applies to data payloads exactly as it does to tool definitions — catalogs first, content when needed.",
+    "overallExplanation": "Provide an index upfront; load full content on demand. Progressive discovery applies to data payloads exactly as it does to tool definitions — catalogs first, content when needed."
   },
   {
     "id": 338,
@@ -833,6 +870,7 @@
       "Prompt caching reduces the recurring cost of stable prefixes but does not restore attention diluted across a bloated context, and cached tokens still fill the window. The strategies do not converge; the trade-off remains real and must be decided."
     ],
     "principle": "decide by the ratio of catalog size to per-task usage",
-    "relatedConcept": "Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer."
+    "relatedConcept": "Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer.",
+    "overallExplanation": "Decide by the ratio of catalog size to per-task usage. Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer."
   }
 ]

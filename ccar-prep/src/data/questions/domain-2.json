@@ -19,7 +19,8 @@
       "Extended thinking is off by default and irrelevant here, so this option quietly defaults to a mid-tier model without justification. It sounds like a balanced compromise but pays a Sonnet premium on 400,000 daily requests that the pilot data says is unnecessary."
     ],
     "principle": "match model tier to measured task complexity, not perceived stakes",
-    "relatedConcept": "Model selection is the first cost-quality-latency lever an architect pulls, and pilot data should drive it rather than intuition about risk."
+    "relatedConcept": "Model selection is the first cost-quality-latency lever an architect pulls, and pilot data should drive it rather than intuition about risk.",
+    "overallExplanation": "Match model tier to measured task complexity, not perceived stakes. Model selection is the first cost-quality-latency lever an architect pulls, and pilot data should drive it rather than intuition about risk."
   },
   {
     "id": 202,
@@ -41,7 +42,8 @@
       "Self-reported uncertainty is unreliable precisely on the hardest cases: a model that misses a subtle conflict typically does not know it missed it. Routing on model confidence treats the symptom while leaving the capability gap that caused the misses unaddressed."
     ],
     "principle": "pay for top-tier capability when error cost is high and volume is low",
-    "relatedConcept": "Tier selection is a risk-weighted economic decision, and low-volume high-stakes reasoning is the canonical case where the premium tier wins."
+    "relatedConcept": "Tier selection is a risk-weighted economic decision, and low-volume high-stakes reasoning is the canonical case where the premium tier wins.",
+    "overallExplanation": "Pay for top-tier capability when error cost is high and volume is low. Tier selection is a risk-weighted economic decision, and low-volume high-stakes reasoning is the canonical case where the premium tier wins."
   },
   {
     "id": 203,
@@ -63,7 +65,8 @@
       "Correct. This applies tiered routing: match each traffic segment to the cheapest tier that meets its quality bar. Haiku absorbs the high-volume simple 80% cheaply, Sonnet keeps the middle, and Opus lifts the visible 5%, addressing cost and quality simultaneously."
     ],
     "principle": "route each traffic segment to the cheapest tier that meets its quality bar",
-    "relatedConcept": "Tiered routing turns model selection from a single global choice into a per-request decision, which is how production systems reconcile cost and quality."
+    "relatedConcept": "Tiered routing turns model selection from a single global choice into a per-request decision, which is how production systems reconcile cost and quality.",
+    "overallExplanation": "Route each traffic segment to the cheapest tier that meets its quality bar. Tiered routing turns model selection from a single global choice into a per-request decision, which is how production systems reconcile cost and quality."
   },
   {
     "id": 204,
@@ -85,7 +88,8 @@
       "Running Opus temporarily wastes a quarter of premium spend at 10,000 requests per day for a perception benefit clinicians could not detect in blind review, and the covert downgrade creates a trust risk if discovered. It is spend as theater rather than engineering."
     ],
     "principle": "match model tier to task complexity, not brand prestige",
-    "relatedConcept": "Blinded quality evaluations give architects the evidence to resist tier inflation driven by stakeholder perception rather than measured outcomes."
+    "relatedConcept": "Blinded quality evaluations give architects the evidence to resist tier inflation driven by stakeholder perception rather than measured outcomes.",
+    "overallExplanation": "Match model tier to task complexity, not brand prestige. Blinded quality evaluations give architects the evidence to resist tier inflation driven by stakeholder perception rather than measured outcomes."
   },
   {
     "id": 205,
@@ -107,7 +111,8 @@
       "A larger output ceiling does not cause the model to reason more carefully; it only permits longer responses. The failure is skipped reasoning steps, not truncated ones, so this treats a symptom that was never observed."
     ],
     "principle": "spend extended-thinking budget where the failure mode is multi-step reasoning and latency has slack",
-    "relatedConcept": "Extended thinking is a per-request capability dial that lets architects buy reasoning depth without permanently changing tiers."
+    "relatedConcept": "Extended thinking is a per-request capability dial that lets architects buy reasoning depth without permanently changing tiers.",
+    "overallExplanation": "Spend extended-thinking budget where the failure mode is multi-step reasoning and latency has slack. Extended thinking is a per-request capability dial that lets architects buy reasoning depth without permanently changing tiers."
   },
   {
     "id": 206,
@@ -129,7 +134,8 @@
       "Correct. Dispatcher Q&A is interactive and latency-sensitive, which favors Sonnet's speed, and a trial tests whether Opus-level reasoning was ever needed. This is evidence-based right-sizing of the second workload rather than an assumption in either direction."
     ],
     "principle": "audit each workload separately and right-size its tier with evidence",
-    "relatedConcept": "Cost realignment starts by decomposing spend per workload, because different tasks sharing one premium tier is the most common source of model-cost waste."
+    "relatedConcept": "Cost realignment starts by decomposing spend per workload, because different tasks sharing one premium tier is the most common source of model-cost waste.",
+    "overallExplanation": "Audit each workload separately and right-size its tier with evidence. Cost realignment starts by decomposing spend per workload, because different tasks sharing one premium tier is the most common source of model-cost waste."
   },
   {
     "id": 207,
@@ -151,7 +157,8 @@
       "Compressing the instructions sacrifices the formatting requirements the team actually needs, and a one-line instruction before an 80-page document is just as far from the generation point. The issue is placement, not instruction length."
     ],
     "principle": "put long documents before the instructions and question, not after",
-    "relatedConcept": "Prompt structure, especially the ordering of documents versus task instructions, is a core system-prompt design decision that directly drives instruction adherence."
+    "relatedConcept": "Prompt structure, especially the ordering of documents versus task instructions, is a core system-prompt design decision that directly drives instruction adherence.",
+    "overallExplanation": "Put long documents before the instructions and question, not after. Prompt structure, especially the ordering of documents versus task instructions, is a core system-prompt design decision that directly drives instruction adherence."
   },
   {
     "id": 208,
@@ -173,7 +180,8 @@
       "Correct. This applies the principle of separating stable instructions from variable content: one versioned, reviewable system prompt eliminates the drifting copies, and templated per-request data in the user turn keeps dynamic content out of the instruction text entirely."
     ],
     "principle": "separate stable instructions from variable content and version the stable part once",
-    "relatedConcept": "Prompt templating is what makes system prompts maintainable artifacts that can be reviewed, versioned, and reused instead of regenerated ad hoc."
+    "relatedConcept": "Prompt templating is what makes system prompts maintainable artifacts that can be reviewed, versioned, and reused instead of regenerated ad hoc.",
+    "overallExplanation": "Separate stable instructions from variable content and version the stable part once. Prompt templating is what makes system prompts maintainable artifacts that can be reviewed, versioned, and reused instead of regenerated ad hoc."
   },
   {
     "id": 209,
@@ -195,7 +203,8 @@
       "System prompts persist across the conversation without per-turn repetition, so the stated mechanism is mistaken, and even perfect instruction visibility yields probabilistic compliance. Repetition adds tokens to every turn without creating an enforcement boundary."
     ],
     "principle": "guardrails need deterministic validation outside the model, not just instructions inside it",
-    "relatedConcept": "Instruction-level guardrails and external output validation are complementary layers, and regulated outputs always require the deterministic layer."
+    "relatedConcept": "Instruction-level guardrails and external output validation are complementary layers, and regulated outputs always require the deterministic layer.",
+    "overallExplanation": "Guardrails need deterministic validation outside the model, not just instructions inside it. Instruction-level guardrails and external output validation are complementary layers, and regulated outputs always require the deterministic layer."
   },
   {
     "id": 210,
@@ -217,7 +226,8 @@
       "A meta-rule leaves both contradictory directives in place and adds a third instruction the model must juggle, growing the very instruction debt that caused the problem. If precedence is known, the losing rule should simply be removed or scoped."
     ],
     "principle": "resolve instruction conflicts at the source; never stack rules on top of contradictions",
-    "relatedConcept": "System prompts are governed artifacts, and unowned multi-team accretion is the most common way production prompts become self-contradictory."
+    "relatedConcept": "System prompts are governed artifacts, and unowned multi-team accretion is the most common way production prompts become self-contradictory.",
+    "overallExplanation": "Resolve instruction conflicts at the source; never stack rules on top of contradictions. System prompts are governed artifacts, and unowned multi-team accretion is the most common way production prompts become self-contradictory."
   },
   {
     "id": 211,
@@ -239,7 +249,8 @@
       "Placing untrusted customer text in the system prompt elevates its authority rather than reducing it, since system-level content is what the model treats as most trustworthy. This inverts the trust hierarchy and makes injection strictly easier."
     ],
     "principle": "delimit untrusted input with explicit structure and label it as data, not instructions",
-    "relatedConcept": "XML-tagged prompt structure is the primary in-prompt mechanism for keeping the instruction channel and the data channel from bleeding into each other."
+    "relatedConcept": "XML-tagged prompt structure is the primary in-prompt mechanism for keeping the instruction channel and the data channel from bleeding into each other.",
+    "overallExplanation": "Delimit untrusted input with explicit structure and label it as data, not instructions. XML-tagged prompt structure is the primary in-prompt mechanism for keeping the instruction channel and the data channel from bleeding into each other."
   },
   {
     "id": 212,
@@ -261,7 +272,8 @@
       "Correct. This applies the principle that capable models often need zero or few examples for simple tasks: a tone rewrite is well within zero-shot range, and if any examples are kept, a small diverse set shapes style without the cost, latency, and topical overfitting of 22 homogeneous ones."
     ],
     "principle": "start zero-shot with capable models; add few examples only when outputs prove it necessary",
-    "relatedConcept": "Technique selection starts from the simplest approach that works, because every example and reasoning token is paid for on every single request."
+    "relatedConcept": "Technique selection starts from the simplest approach that works, because every example and reasoning token is paid for on every single request.",
+    "overallExplanation": "Start zero-shot with capable models; add few examples only when outputs prove it necessary. Technique selection starts from the simplest approach that works, because every example and reasoning token is paid for on every single request."
   },
   {
     "id": 213,
@@ -283,7 +295,8 @@
       "Temperature zero makes outputs more repeatable, but a model that has never seen how a two-procedure note should be encoded will now fail the same way every time. Determinism does not create coverage the prompt never provided."
     ],
     "principle": "few-shot examples must span the edge cases, not just the happy path",
-    "relatedConcept": "Example selection quality and diversity, not example count, is what determines few-shot reliability on real-world input distributions."
+    "relatedConcept": "Example selection quality and diversity, not example count, is what determines few-shot reliability on real-world input distributions.",
+    "overallExplanation": "Few-shot examples must span the edge cases, not just the happy path. Example selection quality and diversity, not example count, is what determines few-shot reliability on real-world input distributions."
   },
   {
     "id": 214,
@@ -305,7 +318,8 @@
       "A higher output ceiling permits longer answers but does not elicit them; the model was never instructed to reason, so it will keep emitting bare verdicts. This adjusts capacity when the missing ingredient is an explicit reasoning instruction."
     ],
     "principle": "use chain-of-thought when failures come from multi-step reasoning and latency has slack",
-    "relatedConcept": "Chain-of-thought trades tokens and latency for reasoning reliability, a trade that asynchronous high-stakes review workflows are ideally positioned to accept."
+    "relatedConcept": "Chain-of-thought trades tokens and latency for reasoning reliability, a trade that asynchronous high-stakes review workflows are ideally positioned to accept.",
+    "overallExplanation": "Use chain-of-thought when failures come from multi-step reasoning and latency has slack. Chain-of-thought trades tokens and latency for reasoning reliability, a trade that asynchronous high-stakes review workflows are ideally positioned to accept."
   },
   {
     "id": 215,
@@ -327,7 +341,8 @@
       "Reasoning that appears after the answer cannot influence the answer, so this preserves all the token cost while removing even the theoretical benefit. It misunderstands why chain-of-thought works: the deliberation must precede the conclusion it is meant to improve."
     ],
     "principle": "drop chain-of-thought when experiments show the task gains nothing from it",
-    "relatedConcept": "Every prompting technique has a token price, and A/B evidence is how architects decide which techniques have stopped paying rent."
+    "relatedConcept": "Every prompting technique has a token price, and A/B evidence is how architects decide which techniques have stopped paying rent.",
+    "overallExplanation": "Drop chain-of-thought when experiments show the task gains nothing from it. Every prompting technique has a token price, and A/B evidence is how architects decide which techniques have stopped paying rent."
   },
   {
     "id": 216,
@@ -349,7 +364,8 @@
       "Correct. This applies the show-don't-tell principle of few-shot prompting: three to five diverse transcript-to-minutes pairs let the model infer section order, phrasing register, and date format directly from demonstrations, which is the most reliable way to pin down a rigid output format."
     ],
     "principle": "demonstrate rigid output formats with few-shot examples instead of describing them in prose",
-    "relatedConcept": "Choosing between describing and demonstrating is the core few-shot decision, and strict format requirements are the clearest case for demonstrating."
+    "relatedConcept": "Choosing between describing and demonstrating is the core few-shot decision, and strict format requirements are the clearest case for demonstrating.",
+    "overallExplanation": "Demonstrate rigid output formats with few-shot examples instead of describing them in prose. Choosing between describing and demonstrating is the core few-shot decision, and strict format requirements are the clearest case for demonstrating."
   },
   {
     "id": 217,
@@ -371,7 +387,8 @@
       "Aggressive abbreviation degrades the source text the model must quote terms from, risking new errors, while still sending an enormous mostly-irrelevant payload on every call. It optimizes token density when the problem is token relevance."
     ],
     "principle": "context capacity is not a reason to fill it; send only what the request needs",
-    "relatedConcept": "The decision of what belongs in context at all is the foundation of context engineering, ahead of any ordering or compression tactic."
+    "relatedConcept": "The decision of what belongs in context at all is the foundation of context engineering, ahead of any ordering or compression tactic.",
+    "overallExplanation": "Context capacity is not a reason to fill it; send only what the request needs. The decision of what belongs in context at all is the foundation of context engineering, ahead of any ordering or compression tactic."
   },
   {
     "id": 218,
@@ -393,7 +410,8 @@
       "Pushing memory work onto the member creates a poor experience in a health context and yields unreliable state, since members forget or reframe earlier guidance. It abandons an engineering problem the system can solve deterministically with summarization."
     ],
     "principle": "summarize durable conversational state structurally instead of resending or truncating raw history",
-    "relatedConcept": "Structured summarization is the standard mechanism for keeping long-running sessions coherent inside a finite context window."
+    "relatedConcept": "Structured summarization is the standard mechanism for keeping long-running sessions coherent inside a finite context window.",
+    "overallExplanation": "Summarize durable conversational state structurally instead of resending or truncating raw history. Structured summarization is the standard mechanism for keeping long-running sessions coherent inside a finite context window."
   },
   {
     "id": 219,
@@ -415,7 +433,8 @@
       "Combining customers multiplies per-request input size and only amortizes the 4K instruction block, the smallest component, while adding cross-customer confusion and data-isolation risk. The arithmetic saves pennies where the logs cost dollars."
     ],
     "principle": "profile the token budget and attack the dominant term, usually machine-generated input",
-    "relatedConcept": "Token budgeting means measuring where tokens actually go per request before choosing which optimization is worth engineering."
+    "relatedConcept": "Token budgeting means measuring where tokens actually go per request before choosing which optimization is worth engineering.",
+    "overallExplanation": "Profile the token budget and attack the dominant term, usually machine-generated input. Token budgeting means measuring where tokens actually go per request before choosing which optimization is worth engineering."
   },
   {
     "id": 220,
@@ -437,7 +456,8 @@
       "Correct. This applies context hygiene: filtering each result to the relevant records before it enters the conversation and compacting older exchanges into summaries keeps the window dense with signal, which fixes both the quality drop and the redundant re-searching that came from useful facts drowning in noise."
     ],
     "principle": "curate what enters an agent's context; filter tool output and compact stale history",
-    "relatedConcept": "Context rot from accumulated irrelevant content is the dominant failure mode of long agentic sessions, and pruning is its primary treatment."
+    "relatedConcept": "Context rot from accumulated irrelevant content is the dominant failure mode of long agentic sessions, and pruning is its primary treatment.",
+    "overallExplanation": "Curate what enters an agent's context; filter tool output and compact stale history. Context rot from accumulated irrelevant content is the dominant failure mode of long agentic sessions, and pruning is its primary treatment."
   },
   {
     "id": 221,
@@ -459,7 +479,8 @@
       "Splitting returns re-architects the pipeline, introduces cross-request merging of deduction data, and creates its own consistency failure modes, all to avoid measuring one limit. It is over-engineering when the root cause is a single misconfigured parameter."
     ],
     "principle": "size output token limits from the measured worst-case response, not defaults",
-    "relatedConcept": "Managing token usage includes the output side of the budget, where an unmeasured max_tokens ceiling silently truncates the largest, most valuable responses."
+    "relatedConcept": "Managing token usage includes the output side of the budget, where an unmeasured max_tokens ceiling silently truncates the largest, most valuable responses.",
+    "overallExplanation": "Size output token limits from the measured worst-case response, not defaults. Managing token usage includes the output side of the budget, where an unmeasured max_tokens ceiling silently truncates the largest, most valuable responses."
   },
   {
     "id": 222,
@@ -481,7 +502,8 @@
       "Tempting because it reduces prefix churn, but the cache would still break every hour and the design still hides a variable value ahead of 20K stable tokens. It is a partial mitigation of a defect that correct ordering eliminates completely."
     ],
     "principle": "order prompts stable-first; any change in the cached prefix invalidates the cache",
-    "relatedConcept": "Prompt caching economics depend entirely on prefix stability, which makes prompt ordering a first-class architectural decision."
+    "relatedConcept": "Prompt caching economics depend entirely on prefix stability, which makes prompt ordering a first-class architectural decision.",
+    "overallExplanation": "Order prompts stable-first; any change in the cached prefix invalidates the cache. Prompt caching economics depend entirely on prefix stability, which makes prompt ordering a first-class architectural decision."
   },
   {
     "id": 223,
@@ -503,7 +525,8 @@
       "Correct. With the guide first, the breakpoint must sit at the boundary between stable and variable content so the cached prefix contains only the shared guide. Together with the reorder, this makes every steady-traffic request after the first a cheap cache read."
     ],
     "principle": "cache reuse requires stable content first and the breakpoint at the stable-variable boundary",
-    "relatedConcept": "Effective caching is a two-part contract, prefix ordering plus breakpoint placement, and missing either half silently forfeits the savings."
+    "relatedConcept": "Effective caching is a two-part contract, prefix ordering plus breakpoint placement, and missing either half silently forfeits the savings.",
+    "overallExplanation": "Cache reuse requires stable content first and the breakpoint at the stable-variable boundary. Effective caching is a two-part contract, prefix ordering plus breakpoint placement, and missing either half silently forfeits the savings."
   },
   {
     "id": 224,
@@ -525,7 +548,8 @@
       "Tempting because it guarantees freshness, but runtime fetching injects untested prompt text directly into production the moment anyone edits a wiki page, bypassing review and rollback, and the ever-changing early content undermines prompt caching. Propagation needs versioned release control, not a live wire."
     ],
     "principle": "share prompt blocks as versioned modules with one source of truth, like code libraries",
-    "relatedConcept": "Modular prompt architecture is what lets an organization govern shared instructions across many assistants the way it governs shared code."
+    "relatedConcept": "Modular prompt architecture is what lets an organization govern shared instructions across many assistants the way it governs shared code.",
+    "overallExplanation": "Share prompt blocks as versioned modules with one source of truth, like code libraries. Modular prompt architecture is what lets an organization govern shared instructions across many assistants the way it governs shared code."
   },
   {
     "id": 225,
@@ -547,7 +571,8 @@
       "Few-shot examples demonstrate format but cannot carry an 8K procedure's edge rules or its reference templates, and the examples would still sit in every prompt, re-creating the bloat in a lossier form. It swaps explicit instructions for incomplete implicit ones."
     ],
     "principle": "package occasional-use instructions as Skills loaded on demand instead of resident prompt text",
-    "relatedConcept": "Skills extend prompt reuse with progressive disclosure, keeping specialized expertise out of the context window until the task calls for it."
+    "relatedConcept": "Skills extend prompt reuse with progressive disclosure, keeping specialized expertise out of the context window until the task calls for it.",
+    "overallExplanation": "Package occasional-use instructions as Skills loaded on demand instead of resident prompt text. Skills extend prompt reuse with progressive disclosure, keeping specialized expertise out of the context window until the task calls for it."
   },
   {
     "id": 226,
@@ -569,6 +594,7 @@
       "Per-document content is seen exactly once, so caching it pays the write premium 3,000 times and never collects a single read. Caching value comes from repetition, which lives entirely in the shared 30K prefix, the exact opposite of this allocation."
     ],
     "principle": "cache TTL slides with each use, so sequential batches keep shared prefixes warm",
-    "relatedConcept": "Judging where caching pays requires reasoning about repetition patterns and TTL refresh behavior, not just raw gaps between runs."
+    "relatedConcept": "Judging where caching pays requires reasoning about repetition patterns and TTL refresh behavior, not just raw gaps between runs.",
+    "overallExplanation": "Cache TTL slides with each use, so sequential batches keep shared prefixes warm. Judging where caching pays requires reasoning about repetition patterns and TTL refresh behavior, not just raw gaps between runs."
   }
 ]

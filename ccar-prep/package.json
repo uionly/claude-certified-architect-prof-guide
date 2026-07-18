@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "validate": "node scripts/validate-content.mjs"
+    "validate": "node scripts/validate-content.mjs",
+    "export:csv": "node scripts/export-practice-sets.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

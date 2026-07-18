@@ -19,7 +19,8 @@
       "Tempting as a caution against complexity, but it treats a scoping question as a blocker. Mixed pipelines that pair LLM stages with deterministic stages are the normal, recommended architecture; waiting for full digitization forfeits value the extraction use case can deliver now."
     ],
     "principle": "use the LLM only for the parts of the problem that need language understanding",
-    "relatedConcept": "Translating business problems starts with separating language-understanding subtasks from deterministic logic before any architecture is drawn."
+    "relatedConcept": "Translating business problems starts with separating language-understanding subtasks from deterministic logic before any architecture is drawn.",
+    "overallExplanation": "Use the LLM only for the parts of the problem that need language understanding. Translating business problems starts with separating language-understanding subtasks from deterministic logic before any architecture is drawn."
   },
   {
     "id": 102,
@@ -41,7 +42,8 @@
       "Tempting because variability is a genuine argument for agency, but it commits the same error as option B: selecting an architecture before the problem's success measures are framed. Agency also raises cost and error surface, which cannot be justified against an undefined target."
     ],
     "principle": "define measurable success criteria before choosing architecture",
-    "relatedConcept": "Business-problem translation makes success measurable first so every later architectural trade-off has something to be weighed against."
+    "relatedConcept": "Business-problem translation makes success measurable first so every later architectural trade-off has something to be weighed against.",
+    "overallExplanation": "Define measurable success criteria before choosing architecture. Business-problem translation makes success measurable first so every later architectural trade-off has something to be weighed against."
   },
   {
     "id": 103,
@@ -63,7 +65,8 @@
       "Correct. It applies MVP scoping: pick the slice with high volume (real impact), objectively checkable outcomes (measurable success), and contained blast radius, then expand with the evaluation muscle built on that slice. Scope by measurable value, not by breadth or wow factor."
     ],
     "principle": "scope the MVP to a narrow, high-volume use case with objectively measurable outcomes",
-    "relatedConcept": "Good problem translation resists breadth pressure and sequences use cases by measurability and value density."
+    "relatedConcept": "Good problem translation resists breadth pressure and sequences use cases by measurability and value density.",
+    "overallExplanation": "Scope the MVP to a narrow, high-volume use case with objectively measurable outcomes. Good problem translation resists breadth pressure and sequences use cases by measurability and value density."
   },
   {
     "id": 104,
@@ -85,7 +88,8 @@
       "Tempting because model tiering is a real cost technique, but it optimizes the wrong decision. Choosing a cheaper model for the field checks still leaves a probabilistic component doing work that should not involve a model at all; the split should be code versus model, not model versus model."
     ],
     "principle": "deterministic rules belong in code, not in a model",
-    "relatedConcept": "A core translation skill is recognizing which subtasks are rule evaluation in disguise and keeping the model out of them."
+    "relatedConcept": "A core translation skill is recognizing which subtasks are rule evaluation in disguise and keeping the model out of them.",
+    "overallExplanation": "Deterministic rules belong in code, not in a model. A core translation skill is recognizing which subtasks are rule evaluation in disguise and keeping the model out of them."
   },
   {
     "id": 105,
@@ -107,7 +111,8 @@
       "Tempting because volume looks like opportunity, but those tickets are already solvable by existing deterministic tools — the gap is discoverability or routing, not capability. Applying an LLM there is a tech-led answer to a process problem and adds cost where a redirect suffices."
     ],
     "principle": "segment the problem and apply the LLM only where it is the cheapest adequate mechanism",
-    "relatedConcept": "Translating a vague cost complaint into an architecture requires decomposing the demand data before selecting any AI component."
+    "relatedConcept": "Translating a vague cost complaint into an architecture requires decomposing the demand data before selecting any AI component.",
+    "overallExplanation": "Segment the problem and apply the LLM only where it is the cheapest adequate mechanism. Translating a vague cost complaint into an architecture requires decomposing the demand data before selecting any AI component."
   },
   {
     "id": 106,
@@ -129,7 +134,8 @@
       "Tempting because a workflow is humbler than an agent, but it still runs matching logic through model calls. ID matching done by a model can silently mismatch records in an audit-critical process; a prompt chain is the simplest LLM pattern, yet the requirement barely needs an LLM at all."
     ],
     "principle": "add model involvement, and especially agency, only where the task actually requires it",
-    "relatedConcept": "Part of problem translation is converting a stakeholder's solution language ('an agent') back into requirements before designing anything."
+    "relatedConcept": "Part of problem translation is converting a stakeholder's solution language ('an agent') back into requirements before designing anything.",
+    "overallExplanation": "Add model involvement, and especially agency, only where the task actually requires it. Part of problem translation is converting a stakeholder's solution language ('an agent') back into requirements before designing anything."
   },
   {
     "id": 107,
@@ -151,7 +157,8 @@
       "Tempting because self-verification is a real technique for fuzzy criteria, but here validity is a database membership question, not a judgment call. A second probabilistic pass can still confirm a nonexistent code; it adds a model call where a deterministic lookup is strictly better."
     ],
     "principle": "validate model output deterministically before it enters a system of record",
-    "relatedConcept": "End-to-end design places hard validation at the output boundary so probabilistic components never write unchecked into downstream systems."
+    "relatedConcept": "End-to-end design places hard validation at the output boundary so probabilistic components never write unchecked into downstream systems.",
+    "overallExplanation": "Validate model output deterministically before it enters a system of record. End-to-end design places hard validation at the output boundary so probabilistic components never write unchecked into downstream systems."
   },
   {
     "id": 108,
@@ -173,7 +180,8 @@
       "Correct. Garbage in, garbage out: the architecture needs input validation before the processing stage. A quality gate keeps unrecoverable documents out of the model path and routes them to a channel that can actually fix them, which is the standard preprocessing pattern for pipelines fed by lossy capture steps."
     ],
     "principle": "validate and gate input quality before the model stage",
-    "relatedConcept": "End-to-end architecture assigns each failure mode to the stage that can actually correct it, starting at input."
+    "relatedConcept": "End-to-end architecture assigns each failure mode to the stage that can actually correct it, starting at input.",
+    "overallExplanation": "Validate and gate input quality before the model stage. End-to-end architecture assigns each failure mode to the stage that can actually correct it, starting at input."
   },
   {
     "id": 109,
@@ -195,7 +203,8 @@
       "Routing by category is a plausible refinement, but it is a guess at the cause. Without analyzing the captured edits, the team cannot know whether errors stem from category confusion, stale retrieval, or prompt gaps; restructuring first is optimizing blind."
     ],
     "principle": "capture human corrections as a feedback signal that improves the system",
-    "relatedConcept": "A complete architecture treats human edits and eval results as inputs to the next iteration, not as terminal byproducts."
+    "relatedConcept": "A complete architecture treats human edits and eval results as inputs to the next iteration, not as terminal byproducts.",
+    "overallExplanation": "Capture human corrections as a feedback signal that improves the system. A complete architecture treats human edits and eval results as inputs to the next iteration, not as terminal byproducts."
   },
   {
     "id": 110,
@@ -217,7 +226,8 @@
       "Tempting because intake triage feels efficient, but a human deciding entry cannot foresee what the workflow will conclude or how much money it will move. The risk lives at the action, so the control belongs at the action; gating only at intake leaves refund execution unaccountable."
     ],
     "principle": "place human gates at high-impact, irreversible actions in proportion to risk",
-    "relatedConcept": "End-to-end design treats human review as a scarce architectural resource positioned by risk, not applied uniformly."
+    "relatedConcept": "End-to-end design treats human review as a scarce architectural resource positioned by risk, not applied uniformly.",
+    "overallExplanation": "Place human gates at high-impact, irreversible actions in proportion to risk. End-to-end design treats human review as a scarce architectural resource positioned by risk, not applied uniformly."
   },
   {
     "id": 111,
@@ -239,7 +249,8 @@
       "Correct. Subtle transcription errors have no mechanical oracle, so the right control is targeted human review: confidence-based routing concentrates attention where errors are likely, and sampling provides an ongoing quality signal — a feedback loop — without reviewing everything and stalling throughput."
     ],
     "principle": "pair deterministic gates for checkable errors with targeted human review for fuzzy ones",
-    "relatedConcept": "Robust pipelines layer different validation mechanisms by error type rather than seeking one control that catches everything."
+    "relatedConcept": "Robust pipelines layer different validation mechanisms by error type rather than seeking one control that catches everything.",
+    "overallExplanation": "Pair deterministic gates for checkable errors with targeted human review for fuzzy ones. Robust pipelines layer different validation mechanisms by error type rather than seeking one control that catches everything."
   },
   {
     "id": 112,
@@ -261,7 +272,8 @@
       "Correct. The corrections staff already make are ground-truth labels; capturing them closes the feedback loop. The labeled set identifies systematic confusions, supplies few-shot examples and prompt clarifications, and becomes a regression eval so fixes are verified and protected. Improvement requires routing real-world signal back into the system."
     ],
     "principle": "turn user corrections into labeled data that feeds prompts and evals",
-    "relatedConcept": "Feedback loops are a designed pipeline stage with capture, analysis, and redeployment — not an assumption that systems improve on their own."
+    "relatedConcept": "Feedback loops are a designed pipeline stage with capture, analysis, and redeployment — not an assumption that systems improve on their own.",
+    "overallExplanation": "Turn user corrections into labeled data that feeds prompts and evals. Feedback loops are a designed pipeline stage with capture, analysis, and redeployment — not an assumption that systems improve on their own."
   },
   {
     "id": 113,
@@ -283,7 +295,8 @@
       "Tempting because one call is simple to build, but cramming three distinct steps into one prompt sacrifices the per-step quality gates and the step-level traceability the stem requires. When intermediate checkpoints matter, chaining beats a monolithic prompt despite the extra calls."
     ],
     "principle": "when steps are fixed and checkable, chain prompts under code control",
-    "relatedConcept": "Pattern selection starts by asking whether the task's steps are predictable in advance; here they demonstrably are."
+    "relatedConcept": "Pattern selection starts by asking whether the task's steps are predictable in advance; here they demonstrably are.",
+    "overallExplanation": "When steps are fixed and checkable, chain prompts under code control. Pattern selection starts by asking whether the task's steps are predictable in advance; here they demonstrably are."
   },
   {
     "id": 114,
@@ -305,7 +318,8 @@
       "Tempting because an agent would implicitly route via tool choice, but this buys the dispatch decision at the price of an autonomous loop: more tokens, variable latency, and less predictable handling of sensitive paths like cancellations. When categories are clean and enumerable, explicit routing is the simpler, more controllable mechanism."
     ],
     "principle": "route distinct input categories to specialized paths instead of one conflicted prompt",
-    "relatedConcept": "The named workflow patterns each solve a specific structural problem; recognizing category interference as routing's signature is a core selection skill."
+    "relatedConcept": "The named workflow patterns each solve a specific structural problem; recognizing category interference as routing's signature is a core selection skill.",
+    "overallExplanation": "Route distinct input categories to specialized paths instead of one conflicted prompt. The named workflow patterns each solve a specific structural problem; recognizing category interference as routing's signature is a core selection skill."
   },
   {
     "id": 115,
@@ -327,7 +341,8 @@
       "Correct. This is the profile that justifies agency: steps unpredictable in advance, each observation informing the next action, and value high enough to absorb agent cost and latency. Read-only tools bound the blast radius, satisfying the guardrail side of the more-autonomy-more-risk trade-off."
     ],
     "principle": "use an agent when the solution path cannot be predicted and must emerge from observations",
-    "relatedConcept": "Agency is the pattern of last resort in the taxonomy, earned only when workflows' predefined steps demonstrably cannot cover the task."
+    "relatedConcept": "Agency is the pattern of last resort in the taxonomy, earned only when workflows' predefined steps demonstrably cannot cover the task.",
+    "overallExplanation": "Use an agent when the solution path cannot be predicted and must emerge from observations. Agency is the pattern of last resort in the taxonomy, earned only when workflows' predefined steps demonstrably cannot cover the task."
   },
   {
     "id": 116,
@@ -349,7 +364,8 @@
       "An agent browsing step by step suits questions whose answer location is unknown and must be discovered. Here the data is the company's own catalog, which can simply be indexed — iterative tool use per query recreates retrieval expensively, with variable latency shoppers will feel."
     ],
     "principle": "prefer the augmented LLM until the task proves it needs more",
-    "relatedConcept": "The taxonomy is an escalation ladder — single augmented call, then workflows, then agents — and most production tasks resolve on its first rung."
+    "relatedConcept": "The taxonomy is an escalation ladder — single augmented call, then workflows, then agents — and most production tasks resolve on its first rung.",
+    "overallExplanation": "Prefer the augmented LLM until the task proves it needs more. The taxonomy is an escalation ladder — single augmented call, then workflows, then agents — and most production tasks resolve on its first rung."
   },
   {
     "id": 117,
@@ -371,7 +387,8 @@
       "Tempting because tool-checking terms sounds rigorous, but translation is a predictable transform, not an open-ended problem needing autonomous direction. A workflow loop under code control achieves the same generate-critique-revise cycle with more predictability and less cost than a self-directing agent."
     ],
     "principle": "use evaluator-optimizer when clear criteria exist and iteration demonstrably improves output",
-    "relatedConcept": "Each workflow pattern has stated preconditions; matching a scenario's evidence to those preconditions is how patterns are selected defensibly."
+    "relatedConcept": "Each workflow pattern has stated preconditions; matching a scenario's evidence to those preconditions is how patterns are selected defensibly.",
+    "overallExplanation": "Use evaluator-optimizer when clear criteria exist and iteration demonstrably improves output. Each workflow pattern has stated preconditions; matching a scenario's evidence to those preconditions is how patterns are selected defensibly."
   },
   {
     "id": 118,
@@ -393,7 +410,8 @@
       "Tempting because streaming improves perceived responsiveness, but a partial answer is not the contracted answer, and p95 completion still runs 8 to 20 seconds. This treats the symptom at the UX layer while the architecture continues to violate the stated requirement."
     ],
     "principle": "hard latency SLAs demand patterns with bounded, predictable call structure",
-    "relatedConcept": "Latency, cost, and reliability constraints can override quality preferences in pattern selection — the taxonomy is chosen under constraints, not in the abstract."
+    "relatedConcept": "Latency, cost, and reliability constraints can override quality preferences in pattern selection — the taxonomy is chosen under constraints, not in the abstract.",
+    "overallExplanation": "Hard latency SLAs demand patterns with bounded, predictable call structure. Latency, cost, and reliability constraints can override quality preferences in pattern selection — the taxonomy is chosen under constraints, not in the abstract."
   },
   {
     "id": 119,
@@ -415,7 +433,8 @@
       "Correct. When each request needs a bounded, predictable slice of capability, a single agent with well-designed tools beats a multi-agent system: no coordination overhead, no context duplication, no cost multiplication, one thing to evaluate and debug. Multi-agent is justified by scale or parallel breadth, not by tidy org-chart decomposition of data sources."
     ],
     "principle": "a single agent with good tools beats multiple agents for bounded tasks",
-    "relatedConcept": "The first multi-agent design decision is whether to be multi-agent at all — tool boundaries usually suffice where people reflexively draw agent boundaries."
+    "relatedConcept": "The first multi-agent design decision is whether to be multi-agent at all — tool boundaries usually suffice where people reflexively draw agent boundaries.",
+    "overallExplanation": "A single agent with good tools beats multiple agents for bounded tasks. The first multi-agent design decision is whether to be multi-agent at all — tool boundaries usually suffice where people reflexively draw agent boundaries."
   },
   {
     "id": 120,
@@ -437,7 +456,8 @@
       "Tempting because memory management is the lighter-touch fix, but it addresses only the context ceiling, not throughput: one agent working serially still cannot cover dozens of questions in 48 hours. Summarization eviction also risks discarding details that later questions require."
     ],
     "principle": "orchestrator-workers with isolated contexts for parallel, independent research",
-    "relatedConcept": "Multi-agent designs earn their cost when breadth and parallelism are the bottleneck, and context isolation is what keeps parallel workers cheap and clean."
+    "relatedConcept": "Multi-agent designs earn their cost when breadth and parallelism are the bottleneck, and context isolation is what keeps parallel workers cheap and clean.",
+    "overallExplanation": "Orchestrator-workers with isolated contexts for parallel, independent research. Multi-agent designs earn their cost when breadth and parallelism are the bottleneck, and context isolation is what keeps parallel workers cheap and clean."
   },
   {
     "id": 121,
@@ -459,7 +479,8 @@
       "Tempting because live reassignment sounds robust, but a region's feed being down fails whichever agent touches it — reassignment to a peer just relocates the same error. Adding a supervisory agent introduces new coordination machinery and cost without addressing the actual failure mode."
     ],
     "principle": "contain worker failures at the orchestrator and degrade to partial results gracefully",
-    "relatedConcept": "Multi-agent orchestration is as much about designing for subagent failure as for subagent success."
+    "relatedConcept": "Multi-agent orchestration is as much about designing for subagent failure as for subagent success.",
+    "overallExplanation": "Contain worker failures at the orchestrator and degrade to partial results gracefully. Multi-agent orchestration is as much about designing for subagent failure as for subagent success."
   },
   {
     "id": 122,
@@ -481,7 +502,8 @@
       "Tempting because fewer retries is a real effect of stronger models, but the workload is high-volume scanning where Haiku already suffices — Opus pricing across all workers would raise spend dramatically against a hard budget. This is over-provisioning capability where the task does not demand it."
     ],
     "principle": "control multi-agent cost through model tiering by role and minimal isolated contexts",
-    "relatedConcept": "Token cost in multi-agent systems multiplies by agent count and context size, so both levers must be designed deliberately."
+    "relatedConcept": "Token cost in multi-agent systems multiplies by agent count and context size, so both levers must be designed deliberately.",
+    "overallExplanation": "Control multi-agent cost through model tiering by role and minimal isolated contexts. Token cost in multi-agent systems multiplies by agent count and context size, so both levers must be designed deliberately."
   },
   {
     "id": 123,
@@ -503,7 +525,8 @@
       "Correct. Parallel workers need isolated contexts and non-overlapping ownership, with coordination expressed as explicit interface contracts defined up front rather than as a shared stream of chatter. This is context isolation plus boundary design: each agent sees only what its subtask needs, and integration happens at defined seams."
     ],
     "principle": "coordinate parallel agents through explicit interfaces, not shared mutable context",
-    "relatedConcept": "Shared context versus isolation is the central multi-agent design axis, and isolation with defined contracts is the default for parallel work."
+    "relatedConcept": "Shared context versus isolation is the central multi-agent design axis, and isolation with defined contracts is the default for parallel work.",
+    "overallExplanation": "Coordinate parallel agents through explicit interfaces, not shared mutable context. Shared context versus isolation is the central multi-agent design axis, and isolation with defined contracts is the default for parallel work."
   },
   {
     "id": 124,
@@ -525,7 +548,8 @@
       "Peer round-robin has no owner of the plan or of completion: agents duplicate effort, context accumulates as the contract circulates, and 'one judges the work complete' makes termination itself nondeterministic. Peer patterns suit negotiation-style tasks, not conditional coverage of specialist subtasks."
     ],
     "principle": "use an orchestrator when the needed subtasks emerge only from inspecting each input",
-    "relatedConcept": "Choosing an orchestration strategy hinges on whether the subtask set is static (pipeline) or input-dependent (dynamic orchestrator)."
+    "relatedConcept": "Choosing an orchestration strategy hinges on whether the subtask set is static (pipeline) or input-dependent (dynamic orchestrator).",
+    "overallExplanation": "Use an orchestrator when the needed subtasks emerge only from inspecting each input. Choosing an orchestration strategy hinges on whether the subtask set is static (pipeline) or input-dependent (dynamic orchestrator)."
   },
   {
     "id": 125,
@@ -547,7 +571,8 @@
       "Tempting because voting raises confidence, but each vote is still a whole-document pass that suffers the stated mid-document blindness — three correlated weak reviews do not make a strong one. Majority filtering also discards findings that a single pass legitimately catches, trading recall away in a risk review."
     ],
     "principle": "decompose along the artifact's natural structural boundaries",
-    "relatedConcept": "Effective decomposition follows the seams already present in documents and processes rather than imposing arbitrary cuts."
+    "relatedConcept": "Effective decomposition follows the seams already present in documents and processes rather than imposing arbitrary cuts.",
+    "overallExplanation": "Decompose along the artifact's natural structural boundaries. Effective decomposition follows the seams already present in documents and processes rather than imposing arbitrary cuts."
   },
   {
     "id": 126,
@@ -569,7 +594,8 @@
       "Tempting because confidence thresholds feel like rigor, but one call still only surfaces what that single pass happened to notice, and thresholding then suppresses findings — raising miss risk, the exact cost the stem says is unacceptable. Self-reported confidence is also a weak signal to gate on."
     ],
     "principle": "use voting-style parallelization when misses are costly and single passes are inconsistent",
-    "relatedConcept": "Sectioning and voting are both parallelization, but they answer different problems — coverage of a large input versus confidence on a hard judgment."
+    "relatedConcept": "Sectioning and voting are both parallelization, but they answer different problems — coverage of a large input versus confidence on a hard judgment.",
+    "overallExplanation": "Use voting-style parallelization when misses are costly and single passes are inconsistent. Sectioning and voting are both parallelization, but they answer different problems — coverage of a large input versus confidence on a hard judgment."
   },
   {
     "id": 127,
@@ -591,7 +617,8 @@
       "Correct. Decomposition boundaries must pay for themselves in measurable quality, reliability, or checkability; here the extra nine steps add latency and failure surface with no quality gain over the 3-step baseline. The remedy is consolidation — the simplest structure that meets the requirement, validated step boundary by step boundary."
     ],
     "principle": "every decomposition boundary must earn its latency and failure cost",
-    "relatedConcept": "Over-decomposition is the mirror-image failure of monolithic prompting, and the corrective test is measured quality per added step."
+    "relatedConcept": "Over-decomposition is the mirror-image failure of monolithic prompting, and the corrective test is measured quality per added step.",
+    "overallExplanation": "Every decomposition boundary must earn its latency and failure cost. Over-decomposition is the mirror-image failure of monolithic prompting, and the corrective test is measured quality per added step."
   },
   {
     "id": 128,
@@ -613,7 +640,8 @@
       "Tempting because an evaluator adds a quality signal, but post-hoc guessing at which stage inside an opaque call failed is exactly backwards: the architecture should make stages observable, not hire a model to speculate about them. It adds cost while leaving the entangled structure intact."
     ],
     "principle": "chain at process boundaries and gate programmatically between dependent stages",
-    "relatedConcept": "Decomposition converts opaque end-to-end behavior into stages that can be gated, tested, and debugged independently."
+    "relatedConcept": "Decomposition converts opaque end-to-end behavior into stages that can be gated, tested, and debugged independently.",
+    "overallExplanation": "Chain at process boundaries and gate programmatically between dependent stages. Decomposition converts opaque end-to-end behavior into stages that can be gated, tested, and debugged independently."
   },
   {
     "id": 129,
@@ -635,7 +663,8 @@
       "Tempting because majority voting can lift accuracy a little, but three runs of the same conflated task share the same structural blindness, and disagreement tells you something went wrong without saying where. It triples cost while leaving the diagnostic question — extraction or reasoning? — exactly as unanswerable."
     ],
     "principle": "split perception from judgment so each stage is independently checkable",
-    "relatedConcept": "The most valuable decomposition boundaries are the ones that make a validated intermediate representation possible."
+    "relatedConcept": "The most valuable decomposition boundaries are the ones that make a validated intermediate representation possible.",
+    "overallExplanation": "Split perception from judgment so each stage is independently checkable. The most valuable decomposition boundaries are the ones that make a validated intermediate representation possible."
   },
   {
     "id": 130,
@@ -657,7 +686,8 @@
       "Faster turnaround is real, but 'performance' as a pillar concerns meeting defined SLAs and service commitments, and the stem states no SLA target being met or missed. Turnaround here is one component of the efficiency story, not a distinct pillar being served."
     ],
     "principle": "efficiency is the same work done cheaper and faster; name the pillar the numbers actually support",
-    "relatedConcept": "Classifying a design's value pillar correctly determines which metrics prove success and keeps executive expectations honest."
+    "relatedConcept": "Classifying a design's value pillar correctly determines which metrics prove success and keeps executive expectations honest.",
+    "overallExplanation": "Efficiency is the same work done cheaper and faster; name the pillar the numbers actually support. Classifying a design's value pillar correctly determines which metrics prove success and keeps executive expectations honest."
   },
   {
     "id": 131,
@@ -679,7 +709,8 @@
       "Correct. The SLA is the requirement; the design must be derived from it, not defended against it. A faster model with a bounded single-pass flow can be engineered to the p95 target, and the stem confirms the quality trade is acceptable for routine questions — the performance pillar directs this choice, and patient preference corroborates it."
     ],
     "principle": "SLAs are binding design constraints that drive model and pattern choices",
-    "relatedConcept": "Performance-pillar alignment means engineering to the contracted metric first and optimizing quality within that envelope."
+    "relatedConcept": "Performance-pillar alignment means engineering to the contracted metric first and optimizing quality within that envelope.",
+    "overallExplanation": "SLAs are binding design constraints that drive model and pattern choices. Performance-pillar alignment means engineering to the contracted metric first and optimizing quality within that envelope."
   },
   {
     "id": 132,
@@ -701,7 +732,8 @@
       "Tempting because competitive intelligence sounds diligent, but competitors' deployments cannot supply this company's value case: their processes, baselines, and economics are theirs. Benchmarking in service of 'they are doing agents' launders the original tech-led rationale rather than replacing it."
     ],
     "principle": "no architecture without a named value pillar, metric, and owner",
-    "relatedConcept": "Value-pillar alignment is the architect's defense against technology-led initiatives that consume budget without a measurable case."
+    "relatedConcept": "Value-pillar alignment is the architect's defense against technology-led initiatives that consume budget without a measurable case.",
+    "overallExplanation": "No architecture without a named value pillar, metric, and owner. Value-pillar alignment is the architect's defense against technology-led initiatives that consume budget without a measurable case."
   },
   {
     "id": 133,
@@ -723,7 +755,8 @@
       "Tempting because near-zero marginal cost is a real and attractive property, but it describes the economics of delivering the new capability, not the pillar the initiative serves. Leading the board with a cost framing undersells — and mismeasures — a revenue-creating transformation."
     ],
     "principle": "transformation is a new capability or revenue stream, not a cheaper version of old work",
-    "relatedConcept": "Distinguishing transformation from efficiency and productivity determines how an initiative is measured, funded, and defended."
+    "relatedConcept": "Distinguishing transformation from efficiency and productivity determines how an initiative is measured, funded, and defended.",
+    "overallExplanation": "Transformation is a new capability or revenue stream, not a cheaper version of old work. Distinguishing transformation from efficiency and productivity determines how an initiative is measured, funded, and defended."
   },
   {
     "id": 134,
@@ -745,6 +778,7 @@
       "Correct. This attacks both cost drivers in proportion to the workload's actual shape: model tiering matches capability to ticket difficulty, and per-ticket retrieval replaces paying for the whole knowledge base on every request. Cost targets are met by removing spend that buys no quality — the cost pillar served without sacrificing the floor."
     ],
     "principle": "hit cost targets by matching model tier and context size to each request's actual needs",
-    "relatedConcept": "Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope."
+    "relatedConcept": "Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope.",
+    "overallExplanation": "Hit cost targets by matching model tier and context size to each request's actual needs. Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope."
   }
 ]

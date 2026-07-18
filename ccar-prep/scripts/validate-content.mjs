@@ -59,6 +59,8 @@ for (const domain of blueprint.domains) {
     });
     if (typeof q.principle !== 'string' || !q.principle) errors.push(`${tag}: missing principle`);
     if (typeof q.relatedConcept !== 'string' || !q.relatedConcept) errors.push(`${tag}: missing relatedConcept`);
+    if (typeof q.overallExplanation !== 'string' || q.overallExplanation.length < 40)
+      errors.push(`${tag}: missing/too short overallExplanation`);
     const all = JSON.stringify(q);
     if (PLACEHOLDER.test(all)) errors.push(`${tag}: contains placeholder text (TODO/TBD/...)`);
   });
