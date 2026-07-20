@@ -1,0 +1,97 @@
+{
+  "domain": 4,
+  "title": "Workflow Integration and Solution Design",
+  "weight": 16,
+  "intro": "This domain tests whether you can move beyond one-off chats and make Claude part of how work actually gets done: analyzing a process before proposing a solution, using research mode and planning support effectively, iterating designs with features like Artifacts and Projects, fitting Claude into live workflows without breaking their safeguards, and telling stakeholders the truth about what the tool can and cannot do. Exam questions put you in a named role with a concrete workflow decision and ask which action reflects sound integration judgment.",
+  "objectives": [
+    {
+      "objective": "Apply Claude to analyze requirements and use cases",
+      "explanation": "Before Claude can improve a process, someone has to understand what the process actually requires — its inputs, exceptions, success criteria, and the people who depend on it. Associates use Claude to accelerate that analysis rather than skip it. The core moves are: describe the current process or share the raw material you have (interview notes, process documents, support tickets) and ask Claude to summarize recurring themes, identify requirements and edge cases, flag ambiguities or conflicts between sources, and generate clarifying questions to take back to stakeholders.\n\nThe discipline that questions test is sequencing: analysis comes before solution design. A tempting failure mode is asking Claude for a finished proposal, an automation plan, or a savings estimate before the requirements are understood. Claude will happily produce all of these, and they will be plausible and largely invented — it has no access to your real volumes, constraints, or exception rates unless you provide them.\n\nEqually important is what Claude's analysis output is: a set of hypotheses and questions, not conclusions. The gaps it flags and the pain points it summarizes must be validated with the stakeholders who live the process, because written documentation rarely captures the unwritten rules that make or break a use case.",
+      "whyItMatters": "Most failed Claude initiatives fail at this stage — a solution gets built for the documented process instead of the real one, or for a use case nobody validated. Associates are the people positioned to catch that early, because they sit between the business need and the tool.",
+      "examples": [
+        {
+          "title": "Turning interview notes into a requirements picture",
+          "body": "An HR lead evaluating an onboarding-assistant use case pastes fifteen pages of store-manager interview notes into a chat and asks Claude to (1) summarize the recurring questions new hires ask, (2) compare those against the official onboarding manual, and (3) list every place the manual is silent or contradictory. Claude surfaces that the three most common questions concern scheduling exceptions the manual never addresses. The lead now knows the knowledge base needs new content before the assistant can work — a discovery that would otherwise have surfaced as user complaints after launch."
+        }
+      ],
+      "pitfalls": [
+        "Asking Claude for a finished solution or proposal before the requirements have been analyzed and validated",
+        "Asking Claude for precise figures (cost savings, volumes, error rates) it has no data to compute — the numbers will be fabricated",
+        "Treating Claude's summary of stakeholder input as final truth instead of taking its clarifying questions back to the stakeholders",
+        "Assuming requirements will 'emerge from usage' and skipping upfront analysis entirely"
+      ]
+    },
+    {
+      "objective": "Leverage Claude for research, planning, and process optimization",
+      "explanation": "Claude supports three related kinds of thinking work. For research, the key judgment is matching the task to the right capability: questions about current events, recent regulations, or fast-moving markets need research mode, which searches for current information and cites sources — plain chat answers draw on training data with a cutoff and can be stale. Either way, research output is a sourced draft: verify the claims that will drive decisions against the cited sources before you brief anyone.\n\nFor planning, Claude turns constraints into structure fast: give it the goal, timeline, resources, and known risks, and ask for a draft plan, milestone breakdown, or risk list to react to. The value is speed to a reviewable draft, not authority — the plan is a starting point you refine with what you know about your organization.\n\nFor process optimization, Claude can only analyze the process you describe. Walk it through the workflow step by step — handoffs, wait times, rework loops — and ask it to identify bottlenecks and propose alternatives. Then validate the proposals with the people who operate the process, because they hold the unwritten constraints (compliance rules, system quirks, staffing realities) that determine which suggestions are actually feasible.",
+      "whyItMatters": "Research, planning, and optimization are where Claude shifts a professional from executing tasks to improving how tasks get done — the leverage the credential is named for. Done carelessly, the same activities produce stale facts in briefings and process redesigns that ignore operational reality.",
+      "examples": [
+        {
+          "title": "Regulatory landscape briefing with research mode",
+          "body": "A strategy analyst needs a current comparison of content regulations in three markets. She uses research mode, which returns an organized summary with cited sources, several published within the past few months. Before briefing leadership she opens the citations behind the four claims her recommendation depends on and confirms each one; two minor points cite older articles, so she notes them as needing legal confirmation. Leadership gets current, sourced material with the confidence level of each claim made explicit."
+        },
+        {
+          "title": "Finding the real bottleneck in a claims workflow",
+          "body": "An operations analyst describes a six-handoff claims-correction workflow to Claude, including queue times he pulled from the ticketing system. Claude points out that two of the six steps re-check the same data and proposes merging them. The affected team confirms the duplication exists but explains one check is a regulatory requirement — so the final redesign merges the queues while keeping both checks, cutting turnaround without touching compliance. The tool found the candidate; the operators shaped the fix."
+        }
+      ],
+      "pitfalls": [
+        "Using plain chat from training data for currency-sensitive research where recent changes matter",
+        "Briefing decision-makers on research-mode output without verifying the claims that drive the decision",
+        "Writing the conclusion first and asking Claude to find supporting sources afterward",
+        "Adopting Claude's process-optimization suggestions without validating them against operational and compliance constraints"
+      ]
+    },
+    {
+      "objective": "Use Claude to support solution design, development, and iteration",
+      "explanation": "Solution work with Claude is a loop, not a transaction: generate a first version, review it against the real requirement, give specific feedback, and refine until it is ready. Artifacts make this loop concrete for tangible deliverables — documents, checklists, one-page tools, structured content — because each version is visible beside the conversation and each follow-up request reshapes it. The first output is a draft by design; expecting a publishable result from a single perfect prompt misunderstands how design converges, and generating many one-shot versions and picking a favorite replaces iteration with a lottery.\n\nProjects support the development side: once a solution stabilizes, its instructions, templates, and reference knowledge move into a Project so the design persists and the whole team can use and improve it.\n\nThe second judgment this objective tests is scope. Associates design solutions from built-in claude.ai capabilities — Projects, Artifacts, research mode, connectors, chat. When a design requires custom system integrations, API development, or agentic automation, the right move is to deliver the portion built-in features support and escalate the technical component to the organization's developers or to Claude Developer/Architect practitioners. Improvising technical implementation, and abandoning the whole design because one component is out of scope, are both errors.",
+      "whyItMatters": "The iterate-with-feedback loop is the difference between deliverables that fit the need and plausible-looking drafts that miss it. And knowing where Associate scope ends protects both the project and the organization — an improvised integration is a reliability and security risk no productivity gain justifies.",
+      "examples": [
+        {
+          "title": "Iterating an onboarding checklist in Artifacts",
+          "body": "A training coordinator asks Claude to draft a first-week compliance checklist as an artifact, providing the role description and three policy documents. The first version is generically corporate. She responds with specifics: 'New hires must complete the KYC module before touching customer data — make that the first item, and group tasks by day.' Three refinement rounds later, the checklist matches the real onboarding sequence. She then adds it to the team's onboarding Project so future updates happen in one place instead of in someone's downloads folder."
+        }
+      ],
+      "pitfalls": [
+        "Publishing the first generated version without reviewing it against the actual requirement",
+        "Giving vague feedback ('make it better') instead of specific direction about what is wrong and what good looks like",
+        "Attempting custom integrations or technical implementation that belongs with Developers and Architects",
+        "Abandoning a viable design because one component exceeds built-in features, instead of delivering the rest and escalating that piece"
+      ]
+    },
+    {
+      "objective": "Integrate Claude into existing workflows to augment or redesign them",
+      "explanation": "Integration means changing how a recurring workflow runs, not just using Claude near it. The proven entry pattern is incremental augmentation: pick one well-defined, high-friction step — usually drafting, summarizing, or first-pass analysis — insert Claude there, and keep the workflow's existing review and approval steps intact. The review steps are your safety net while the team learns where Claude helps and where it fails; removing them at the same moment you introduce the tool maximizes risk exactly when understanding is lowest. For customer-facing or high-stakes outputs, the draft-plus-review pattern is the default: Claude drafts, a human reviews and personalizes, and accountability never leaves the team.\n\nStandardization is the second half of integration. Repeated setup — the task explanation, the template, the tone rules, the reference documents — belongs in a shared Project, so every team member gets consistent output without re-explaining the task, and improvements land in one place. Four people improvising prompts weekly is individual usage, not integration.\n\nOnce augmentation proves itself, teams can consider redesign — restructuring the workflow around what Claude makes cheap (drafts, summaries, comparisons) rather than bolting it onto steps designed for manual work. Redesign is earned with evidence from augmentation, not assumed on day one.",
+      "whyItMatters": "Integration quality determines whether Claude's value survives contact with real operations. Augmenting with review intact catches errors while trust is being earned; big-bang replacement sends unvetted output to customers and executives and can end a program on its first visible mistake.",
+      "examples": [
+        {
+          "title": "Support-email team adopts draft-plus-review",
+          "body": "A retail support manager integrates Claude at the drafting step: Claude produces a reply from the customer's email and the policy guide, and the agent reviews, corrects, and personalizes before sending. Average handling time drops, and reply consistency improves because drafts start from the same policy grounding. Two months of review notes show Claude reliably mishandles one refund edge case — that rule gets added to the Project instructions, and the team now has evidence-based grounds to discuss lightening review for the simplest ticket categories."
+        }
+      ],
+      "pitfalls": [
+        "Removing human review at the same time Claude is introduced, before its failure modes are known",
+        "Automating customer-facing sends with after-the-fact sampling instead of review before send",
+        "Leaving every team member to improvise prompts instead of standardizing shared setup in a Project",
+        "Bolting Claude onto every step at once rather than starting where friction is highest and evidence can accumulate"
+      ]
+    },
+    {
+      "objective": "Communicate Claude's value and limitations to stakeholders",
+      "explanation": "Associates are often the bridge between what Claude actually does and what colleagues and executives believe it does — in both directions. To enthusiasts, the message is calibration: Claude drafts, summarizes, analyzes, and accelerates, but it can produce confident, plausible errors, so human review and accountability remain in the loop for consequential outputs. To skeptics, the message is evidence: measured pilot results, concrete examples, and a clear account of the safeguards that contain the known risks.\n\nThe reliable formula for reporting results is value plus limitations, both grounded in data: 'drafting time fell 40%, and review still catches roughly one material correction per ten letters, so review stays.' Overselling — hiding limitations, promising error elimination, crediting the tool for quality that human review produced — buys short-term enthusiasm at the cost of credibility when the first visible error lands. It can also lead stakeholders to cut the very safeguard the results depended on.\n\nWhen a stakeholder requests something inappropriate — fully automating expert judgment, removing legal or clinical review — the skill is reframing rather than flat refusal or silent compliance: explain what Claude genuinely accelerates in that domain (summarizing, flagging, organizing) and where human judgment must stay, then propose that scoped version. Ducking the question or issuing blanket prohibitions both misinform the stakeholder.",
+      "whyItMatters": "Programs live and die on expectations. Accurate communication keeps support intact through the inevitable first error, protects review steps from being cut by executives who were told the tool is flawless, and stops inappropriate automation requests before they become commitments.",
+      "examples": [
+        {
+          "title": "Reporting a pilot to a mixed executive audience",
+          "body": "After a three-month pilot drafting policy-renewal letters, an operations lead presents: drafting time per letter down from 25 to 9 minutes, reviewer corrections logged on 8% of drafts, zero errors reaching customers because review is in place. She states plainly that the zero-error record belongs to the draft-plus-review workflow, not to Claude alone, and recommends expansion with review retained. The skeptical CFO, hearing limitations acknowledged unprompted, becomes the program's sponsor — the honesty was the persuasion."
+        }
+      ],
+      "pitfalls": [
+        "Hiding limitations from skeptical audiences, which converts the first visible error into a credibility crisis",
+        "Crediting Claude for quality outcomes that the human review step actually produced, inviting stakeholders to cut that step",
+        "Agreeing to automate expert judgment (legal, clinical, personnel) because a senior stakeholder asked for it",
+        "Responding to overreach with blanket prohibitions instead of reframing to the appropriate human-accountable use"
+      ]
+    }
+  ]
+}

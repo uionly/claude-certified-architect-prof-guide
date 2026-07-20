@@ -1,0 +1,48 @@
+[
+  {
+    "id": 301,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "single",
+    "question": "Priya, a senior engineer at a logistics SaaS company, is rolling out Claude Code to her team. She wants shared conventions — build commands, code style rules, and architecture notes — applied automatically for everyone who opens the repository, while still letting each developer keep personal preferences (like their favorite shell aliases) that apply across all of their own projects. How should she structure this?",
+    "options": [
+      "Put team conventions in a CLAUDE.md at the repository root and commit it, and have each developer keep personal preferences in their user-level CLAUDE.md in their home directory",
+      "Have every developer paste the team conventions into their first message at the start of each session so the instructions are always freshest in context",
+      "Store both team conventions and personal preferences in each developer's settings.json, since settings files override CLAUDE.md content when they conflict",
+      "Create a custom slash command containing the conventions that developers must remember to run before starting any task in the repository"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Claude Code reads CLAUDE.md files hierarchically: a committed project-root CLAUDE.md gives every teammate the same shared instructions automatically, while a user-level CLAUDE.md in the home directory carries personal preferences across all of that developer's projects. This is exactly the separation of scopes the hierarchy is designed for.",
+      "Tempting because pasted instructions do land in context, but this relies on every developer remembering to do it every session, and the instructions are lost on session restart. It rebuilds by hand and unreliably what the CLAUDE.md hierarchy provides automatically and consistently.",
+      "settings.json configures tool permissions, hooks, environment variables, and similar operational settings — it is not the place for natural-language project instructions, and it does not 'override' CLAUDE.md guidance. This confuses configuration management with instruction management.",
+      "A custom slash command is useful for repeatable, on-demand workflows, but conventions that must always apply should not depend on someone remembering to invoke a command. This turns an automatic guarantee into an easily forgotten manual step."
+    ],
+    "principle": "use the CLAUDE.md hierarchy to scope instructions: project-level for the team, user-level for the individual",
+    "relatedConcept": "Claude Code layers memory from enterprise, user, and project CLAUDE.md files so instructions apply at the right scope without manual repetition.",
+    "overallExplanation": "Use the CLAUDE.md hierarchy to scope instructions: a committed project CLAUDE.md for team conventions, a user-level one for personal preferences. Claude Code layers these memory files automatically so the right instructions apply without manual repetition."
+  },
+  {
+    "id": 302,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "single",
+    "question": "Marco, a platform engineer at a healthcare analytics firm, wants a nightly CI job that runs Claude Code against the repository to triage new lint failures and open a summary issue — with no human at a terminal. Interactive sessions are not an option in the pipeline. Which Claude Code capability should the job use?",
+    "options": [
+      "Headless mode, invoking Claude Code with a prompt flag from the CI script so it runs non-interactively and returns programmatically consumable output",
+      "A built-in slash command executed in an interactive session, since slash commands are the supported way to automate recurring maintenance work",
+      "Agent Memory, so Claude Code remembers the nightly task and re-runs it automatically on its own schedule without any pipeline integration",
+      "Session resumption, restoring the previous night's interactive session in the pipeline so the accumulated context makes triage more accurate"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Headless mode (invoking the CLI non-interactively with a prompt, e.g. via the -p flag) is designed for scripts, CI pipelines, and automation where no human drives the session, and its output can be captured and parsed by the surrounding job. This matches the requirement exactly.",
+      "Slash commands package reusable prompts, but they run inside a session — they are an ergonomic shortcut for a user or agent, not a scheduling or CI mechanism by themselves. This confuses a workflow shortcut with a non-interactive execution mode.",
+      "Agent Memory persists useful knowledge across sessions; it does not give Claude Code a scheduler or the ability to launch itself. Assuming memory implies autonomous recurring execution invents a capability the feature does not have — the pipeline must still invoke Claude Code.",
+      "Session management lets you resume prior conversations, but the job's problem is running without a human, not lacking context. Resuming a long-lived session also accumulates stale context across nights, which works against clean, repeatable triage runs."
+    ],
+    "principle": "headless mode is the mechanism for non-interactive, scripted, and CI-driven Claude Code runs",
+    "relatedConcept": "Claude Code's operating modes — interactive sessions, headless mode, and streaming — are chosen based on whether a human, a script, or a UI consumes the output.",
+    "overallExplanation": "Headless mode is the mechanism for non-interactive, scripted, and CI-driven Claude Code runs. Choose the operating mode — interactive, headless, or streaming — based on whether a human, a script, or a UI is consuming the output."
+  }
+]

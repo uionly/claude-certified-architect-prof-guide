@@ -1,0 +1,136 @@
+{
+  "domain": 2,
+  "title": "Output Evaluation and Validation",
+  "weight": 21,
+  "intro": "This is the heaviest-weighted domain on the exam, and for good reason: the professional value of Claude depends on what you do after the output appears. This domain covers judging outputs for accuracy and completeness, spotting hallucinations and bias, fact-checking with techniques that actually verify, deciding when human experts must review, adapting content for its real audience, and choosing the right container — inline chat, artifact, or structured data — for each piece of work. The recurring theme: fluency is not evidence, and verification effort should scale with consequence.",
+  "objectives": [
+    {
+      "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+      "explanation": "Claude's outputs read fluently whether or not they are right, so evaluation can never rest on how polished a response looks. Evaluation has two distinct axes. Accuracy asks: are the claims true to the source material or to reality? Completeness asks: does the output cover everything the task required? An output can pass one and fail the other — a contract summary can be accurate in every sentence yet omit the termination clause, or cover every clause while misstating a penalty amount.\n\nChecking accuracy means going back to the source: compare the summary to the document, the totals to the spreadsheet, the quoted commitment to the meeting notes. Having given Claude the source file reduces errors but does not eliminate them — models can misread, mis-aggregate, or merge two discussions — so \"it had the document\" is not a verification. And a single confirmed error changes the status of the whole output: if one departmental total is wrong, the remaining figures are unverified until spot-checked.\n\nChecking completeness means comparing the output to the original ask, not to itself. List what the task required — the questions the executives asked, the clauses that decide the negotiation — and confirm each is present. Asking Claude \"did you miss anything?\" can surface useful additions, but a model that missed something usually does not know it missed it, so self-assessment supplements rather than replaces the human check.",
+      "whyItMatters": "Professionals who forward Claude's outputs unexamined eventually circulate a wrong number or a summary missing the clause that mattered — often to executives, boards, or customers. Evaluation is the step that converts a fast draft into a trustworthy deliverable, and the exam's most common wrong answers are all variations of trusting fluency, trusting self-checks, or trusting source access.",
+      "examples": [
+        {
+          "title": "Two-axis check on a contract summary",
+          "body": "An operations analyst has Claude summarize a 40-page supplier contract before a renewal meeting. Instead of admiring the fluent summary, she runs both checks: for accuracy, she opens the contract and confirms the summary's statements about pricing tiers and penalty terms match the actual clauses; for completeness, she lists the four issues the renewal decision hinges on and confirms each appears. The summary turns out accurate but silent on the auto-renewal notice window — a completeness failure that source-checking alone would not have exposed."
+        },
+        {
+          "title": "One wrong total widens the check",
+          "body": "A hospital administrator notices one departmental total in Claude's staffing analysis doesn't match his memory of the spreadsheet. He verifies against the file: Claude merged two departments' headcounts. Rather than fixing that one figure and moving on, he treats the error as evidence about the whole output and spot-checks the remaining totals, finding a second aggregation slip. One demonstrated error means the rest of the output is unverified until sampled — that inference is the difference between evaluation and proofreading."
+        }
+      ],
+      "pitfalls": [
+        "Treating fluency, confidence, or good organization as evidence of accuracy — models write smoothly whether or not they captured the source correctly.",
+        "Assuming output grounded in an uploaded document must be right; source access lowers error rates but models still misread and mis-aggregate.",
+        "Checking accuracy but not completeness — an output can be true in everything it says while omitting what the task most needed.",
+        "Relying on \"did you miss anything?\" as the completeness check; the model's blind spots apply to its self-review too.",
+        "Fixing a single caught error without widening verification, when one confirmed mistake means the rest is unverified."
+      ]
+    },
+    {
+      "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+      "explanation": "Hallucinations are confident fabrications: the model generates details that look real — report titles, publication numbers, statistics, quotes, section references — with the same fluent precision it uses for true facts. The danger is that specificity feels like credibility. A citation with a plausible title and document number is exactly what a hallucination looks like, so the rule is: an unfindable source is presumed fabricated until the actual document is located. Never treat the model's own follow-up (a provided URL, a restated confirmation) as corroboration, because the system that fabricated the detail can fabricate its supporting evidence too.\n\nInconsistencies are internal contradictions — a number that changes between paragraphs, a recommendation that conflicts with the analysis above it, dates that don't line up. They matter both directly and as a signal: an output that contradicts itself was not reliably tracking the material, so the rest deserves closer scrutiny.\n\nBias appears as systematic skew that the source material does not justify: candidate write-ups that describe some groups more warmly, analyses that consistently favor one framing, summaries that amplify certain voices from the notes. Detecting it requires comparison across outputs and against sources — a single output rarely proves a pattern. When outputs feed consequential decisions such as hiring, the response is to audit the batch against the source material and insert human review, not to ask the model whether it is biased (it is an unreliable auditor of itself) and not to flatten all outputs into identical language, which hides the problem while destroying informational value.",
+      "whyItMatters": "These three failure modes are how AI-assisted work goes publicly wrong: a fabricated citation in an official document, contradictory figures in a board pack, or systematically skewed candidate summaries in a hiring file. Recognizing the signatures — unverifiable specificity, internal contradiction, unjustified patterns — is the certified associate's core defensive skill.",
+      "examples": [
+        {
+          "title": "The unfindable government report",
+          "body": "A state agency communications officer asks Claude about accessibility requirements and receives a citation to a specific report with a title and publication number. Searches of the agency site and the web find nothing. Instead of reasoning that the report must be poorly indexed, he applies the correct presumption: a specific-looking citation that cannot be located is likely hallucinated. He asks Claude for the general legal framework instead, then verifies the actual requirements against the statute text on the official legislature site before publishing anything."
+        },
+        {
+          "title": "Spotting skew in candidate write-ups",
+          "body": "An HR manager notices Claude's interview summaries describe some candidates with warmer, more confident language than others, in ways the raw notes don't support. She audits the batch: for each write-up she compares adjectives and framing to what interviewers actually recorded, confirming a pattern of unjustified tone differences. She adds a human review step before write-ups reach hiring panels and revises the prompt to require that every evaluative statement quote the supporting note — making skew visible and checkable rather than hidden in style."
+        }
+      ],
+      "pitfalls": [
+        "Treating specificity — exact titles, numbers, section references — as evidence of authenticity, when precision is exactly what hallucinations look like.",
+        "Asking the model to confirm its own questionable claim and treating the confirmation (or a generated URL) as independent evidence.",
+        "Assuming tone or framing differences across outputs reflect real differences when the source material doesn't support them.",
+        "Trying to fix bias by forcing identical language across outputs, which hides skew and destroys legitimate distinctions instead of removing unjustified ones."
+      ]
+    },
+    {
+      "objective": "Apply fact-checking and validation techniques",
+      "explanation": "Fact-checking techniques differ in one crucial property: whether they are independent of the model. Asking Claude to double-check itself, asking it to rate its confidence, or comparing its answer to another chatbot's all measure plausibility — the model's internal consistency or agreement between similar systems — not truth. Two models can share the same mistake, and a model re-examining its own output runs on the same knowledge that produced any errors. Real validation goes outside the model to where the ground truth lives.\n\nWhere the ground truth lives determines the technique. Public factual claims — statistics, regulations, published research — trace to authoritative primary sources: the agency that publishes the data, the actual regulation text, the original study. Claims about your own materials — summaries of internal notes, analyses of your spreadsheets — validate against those internal documents directly; a web search cannot corroborate what happened in your operations meeting. Citations validate by locating the actual cited document, never by how plausible the citation looks.\n\nValidation effort is also a budget to allocate. Under time pressure, verify the highest-consequence claims first: the figures, dates, and commitments people will act on, the statistics going on a board slide, the claim that drives the recommendation. A tiered habit — verify everything decision-critical, spot-check the rest, and let one caught error trigger wider checking — delivers most of the protection at a fraction of the effort of checking every sentence.",
+      "whyItMatters": "Without a repertoire of genuine validation techniques, users default to rituals that feel like diligence — self-checks, cross-model agreement, disclaimers — while fabricated details pass through untouched. Knowing which technique matches which kind of claim, and where to spend limited checking time, is what makes AI-assisted work defensible to the people who rely on it.",
+      "examples": [
+        {
+          "title": "Sourcing statistics for a board presentation",
+          "body": "A community college curriculum director gets plausible enrollment and completion statistics from Claude for a board deck. She treats them as leads, not facts: for each figure she finds the education department's published dataset or the college's own institutional research numbers, corrects two that were outdated, and cites the primary source on each slide. The deck is now both accurate and credible — the citation trail is itself the product of proper validation, and no board member has to take an AI-generated number on faith."
+        },
+        {
+          "title": "One hour to validate an internal readout",
+          "body": "A logistics analyst has one hour to validate Claude's leadership readout summarizing a quarter of internal meeting notes. Web searching is useless — the ground truth is the notes themselves. He triages: first he verifies every number, date, and recorded commitment in the readout against the notes, since leadership will act on those; then he spot-checks one claim per section. He catches a merged discussion that attributed a decision to the wrong team — an error a coherence read-through would never have surfaced, because the readout was perfectly fluent about it."
+        }
+      ],
+      "pitfalls": [
+        "Treating model self-checks or confidence self-ratings as verification — the same process that made the error re-examines it.",
+        "Using agreement between two AI chatbots as confirmation; consensus between similar systems measures plausibility, not truth.",
+        "Web-searching claims whose ground truth is internal, or trusting internal summaries without opening the source documents.",
+        "Attaching a disclaimer instead of verifying, which transfers the checking burden to readers with less access to the sources.",
+        "Spreading checking effort evenly instead of prioritizing the figures, dates, and commitments people will actually act on."
+      ]
+    },
+    {
+      "objective": "Determine when human review or additional verification is required",
+      "explanation": "Not every output needs the same scrutiny, and treating all outputs alike fails in both directions: rubber-stamping high-stakes content is dangerous, while routing icebreaker ideas through formal review makes AI adoption insufferable. The organizing principle is that review intensity scales with the cost of an error, not with how good the draft looks or how much AI was involved.\n\nCertain categories carry an automatic requirement for accountable expert review before use: content with legal or contractual weight (customer-facing policy notifications, terms language), regulatory and compliance material (billing rules, required disclosures), medical or safety guidance (patient discharge instructions), and significant financial content. In these categories, accuracy to the source you provided is not the bar — the internal memo's author and Claude may both have missed a required disclosure, and only the humans professionally accountable for that risk (legal, compliance, clinical staff) can clear it. Asking Claude to review its own draft \"as a lawyer\" is still the model reviewing itself, with no accountability behind it.\n\nAt the other end, low-stakes outputs whose errors are cheap and self-evident — brainstorm lists, internal formatting tasks, meeting-room tables — are fully judgeable by the person using them. The associate's job is triage: know your organization's escalation categories, route consequential outputs to the accountable experts, and let trivial ones flow. Extra verification (rather than expert review) is the middle tier: outputs that inform decisions but don't carry professional-liability weight get source-checking by the author before circulation.",
+      "whyItMatters": "This judgment is the safety valve of responsible AI use: it is how organizations get speed on routine work without letting an unreviewed draft create legal exposure, a compliance breach, or patient harm. Exam scenarios probe both directions — recognizing when polish isn't enough, and recognizing when formal review is wasteful overkill.",
+      "examples": [
+        {
+          "title": "The polished notification that still needs legal",
+          "body": "An insurance operations lead drafts a customer notification about coverage-term changes with Claude, grounded in the official internal change memo. The draft is accurate and professional — and still not sendable. Coverage notifications carry contractual and regulatory weight: required disclosures, mandated wording, and timing rules that neither the memo nor the model is accountable for. She routes it to compliance review, which adds a required disclosure paragraph. The lesson: the trigger for expert review is the document's consequences, not its quality."
+        },
+        {
+          "title": "Triage across a hospital team's outputs",
+          "body": "A hospital operations team uses Claude for discharge-instruction language, regulatory billing summaries, meeting icebreakers, and room-booking tables. The team's triage: discharge instructions go to clinical review (patient safety), the regulatory summary goes to compliance with the actual regulation text attached (hallucinated rules are a known failure mode), while the icebreakers and booking table are used directly — their errors are cheap and self-evident. Review effort lands exactly where an error would be expensive, and nowhere else."
+        }
+      ],
+      "pitfalls": [
+        "Letting draft quality substitute for expert review — a polished, memo-accurate document can still create legal or regulatory exposure.",
+        "Treating Claude's self-review in an expert persona (\"review this as a lawyer\") as equivalent to accountable professional review.",
+        "Applying uniform review gates to everything, burying reviewers in trivial outputs and stalling adoption without reducing real risk.",
+        "Confusing proofreading with substantive review — a typo pass by a colleague is review at the wrong level for high-stakes content."
+      ]
+    },
+    {
+      "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+      "explanation": "An output that is accurate but mismatched to its readers has still failed. Audience adaptation is the skill of taking correct content and re-expressing it for the people who will actually read it — customers instead of engineers, a board instead of a project team, sixth-grade reading level instead of policy prose.\n\nThe effective technique is constrained regeneration, not subtraction: ask Claude to rewrite for the new audience while specifying the reader, the reading level, the tone, and the facts that must survive the translation. Simply deleting the technical sections from an expert-oriented document leaves a document still organized for experts, with holes where the substance was. And doing the rewrite fully by hand abandons the tool's main leverage — Claude adapts register and structure quickly when the constraints are explicit, leaving the human to review the adaptation rather than produce it.\n\nComparing candidate outputs is the same discipline pointed at selection. When you have two versions of an email or report, derive explicit criteria from the audience and the goal — is the offer clear, is the tone right for this segment, is the call to action strong — and judge both drafts against that rubric. The common traps are proxies and abdications: picking the longer draft (volume is not quality), merging everything from both (concatenation, not comparison), or asking Claude to pick its own winner (useful input, but the final audience judgment belongs to the human who knows the brand, the history, and the readers).",
+      "whyItMatters": "Most professional communication fails on fit rather than fact: the accurate incident report that customers can't parse, the board memo written like a project log. Audience adaptation is where AI-assisted work either earns its place in real communication workflows or gets quietly rewritten by hand every time — and rubric-based comparison is what makes choosing between drafts defensible rather than arbitrary.",
+      "examples": [
+        {
+          "title": "One incident, two audiences",
+          "body": "A software company's communications specialist has an accurate, jargon-dense incident summary written for engineers and needs a customer version. He prompts: \"Rewrite for affected customers: non-technical reading level, calm and accountable tone. Must preserve: which service was affected, the outage window, that no payment data was exposed, and the credit process.\" The result keeps every load-bearing fact while transforming structure and register — impact and resolution first, mechanism omitted. His review confirms the must-keep facts survived; that check is the human's remaining job."
+        },
+        {
+          "title": "Choosing between two campaign drafts with a rubric",
+          "body": "A meal-kit marketing lead has two Claude-generated re-engagement emails for lapsed customers. Before reading either closely, she writes the rubric: offer clarity within the first two sentences, tone that doesn't guilt-trip a lapsed subscriber, one unmistakable call to action. Version A wins on offer clarity, version B on tone; the rubric makes the trade-off explicit, so she selects A and asks Claude to soften its opening in B's style. Comparison against criteria produced both a decision and the specific refinement request."
+        }
+      ],
+      "pitfalls": [
+        "Sending expert-oriented content to a general audience because it is 'the most accurate version' — fitness for the reader is part of quality.",
+        "Adapting by deleting technical sections instead of re-expressing the same facts for the new reader.",
+        "Choosing between drafts by length or merging both wholesale, instead of judging each against audience-derived criteria.",
+        "Delegating the final pick to Claude, discarding the brand, history, and audience context only the human has."
+      ]
+    },
+    {
+      "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+      "explanation": "Claude offers several output containers, and choosing well is a matter of matching the container to the content's lifecycle — how the output will be used, revised, and shared after it is generated.\n\nInline chat responses suit quick, conversational, one-off content: a clarified policy term, a confirmed date, a short explanation read once and acted on. Wrapping such answers in heavier containers adds friction without value. Artifacts suit substantial, self-contained content that will be revisited, revised, or shared: guides, reports, plans, drafts that evolve over feedback rounds. An artifact keeps the work as a single coherent document that updates in place, instead of fragmenting into partial copies scattered through conversation scroll-back. Structured data — tables with consistent columns, CSV-style output — suits content headed into another tool: figures destined for a spreadsheet, records for a tracker, anything a downstream system must parse predictably.\n\nCuration is the companion skill: deciding what information belongs in the deliverable at all, and in what order. A readout organized around the decisions readers must make beats a chronological dump; a table with the five columns the spreadsheet needs beats one with twelve. The classic mismatches to recognize on the exam: a long evolving document regenerated as chat text every session (fragmenting versions, no authoritative copy), an artifact wrapped around a one-line answer (overhead without payoff), and free-prose paragraphs delivered where a downstream tool needed rows and columns.",
+      "whyItMatters": "Format mismatches quietly tax whole teams: hours lost scavenging scroll-back for the latest version of a document, hand-reformatting prose into spreadsheet rows, or navigating a document container to read one sentence. Choosing the container by the content's lifecycle — read-once, evolving, or machine-bound — is a small decision that compounds across every task.",
+      "examples": [
+        {
+          "title": "An onboarding guide that stays whole",
+          "body": "An education foundation program officer is building a multi-section grantee onboarding guide she will refine over several feedback rounds and then share with her team. She requests it as an artifact. Each revision updates the same standalone document, so there is always exactly one current version; when a section needs rework she points at it and the rest stays intact. Had she worked inline, every fix would have produced another partial copy in the chat history, and assembling the final guide would mean scavenging scroll-back for the newest version of each section."
+        },
+        {
+          "title": "Three outputs, three containers",
+          "body": "A retail distributor's operations coordinator handles three requests in one afternoon: a question about a shipping-policy term, inventory figures for the planning spreadsheet, and an update to the warehouse onboarding checklist. She takes the policy answer inline — read once, done. The inventory goes out as a structured table whose columns match the spreadsheet, pasting in cleanly with no reformatting. The checklist lives in its artifact from last month, updated in place. Each container matches its content's lifecycle, and nothing gets reformatted twice."
+        }
+      ],
+      "pitfalls": [
+        "Regenerating a long evolving document as inline chat text each session, fragmenting versions with no single authoritative copy.",
+        "Requesting prose paragraphs for data a spreadsheet or tracker must consume, forcing manual reformatting downstream.",
+        "Wrapping trivial one-line answers in artifacts, adding container overhead to content with a read-once lifecycle.",
+        "Dumping everything Claude produced into the deliverable instead of curating what the audience needs and ordering it around their decisions."
+      ]
+    }
+  ]
+}

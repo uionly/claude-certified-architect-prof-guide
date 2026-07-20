@@ -1,0 +1,209 @@
+[
+  {
+    "id": 601,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Nadia, an administrator at a regional hospital network, is compiling a list of candidate Claude use cases for her department. Which of the following is the most appropriate use case for her to put forward?",
+    "options": [
+      "Drafting internal staff newsletters and meeting summaries from her notes, with her review before distribution",
+      "Generating final answers to patients' clinical questions through the hospital's patient portal without clinician involvement",
+      "Deciding which nursing candidates advance to interviews based on Claude's ranking of their résumés",
+      "Producing the official interpretation of new health regulations for the compliance department to adopt without legal review"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Low-stakes internal drafting from the user's own source material, with human review before anything is distributed, is the archetype of an appropriate use case: real time savings, contained consequences, and clear human accountability for the final product.",
+      "Tempting because patient-portal automation promises major efficiency, but unreviewed clinical answers put patient safety behind a tool that can produce confident errors. Health guidance to patients requires clinician judgment and accountability — this is a canonical inappropriate use.",
+      "Tempting because résumé screening is tedious, but delegating consequential decisions about people to an AI ranking raises fairness and bias concerns and removes the human judgment such decisions require. Claude can organize application materials; humans must make the calls.",
+      "Tempting because Claude summarizes regulations fluently, but adopting an AI interpretation as the official compliance position without legal review treats a draft as an authority. Regulatory interpretation is exactly where expert validation is mandatory."
+    ],
+    "principle": "appropriate use pairs low-stakes assistance with human accountability",
+    "relatedConcept": "Use-case fitness depends on the stakes of the output and whether qualified humans review and own the result.",
+    "overallExplanation": "Appropriate use pairs assistance with human accountability: internal drafting reviewed before distribution is a fit, while unreviewed clinical answers, hiring decisions, and official regulatory interpretations are not."
+  },
+  {
+    "id": 602,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "multi",
+    "question": "Diego works in operations at a retail bank whose AI policy permits Claude for internal productivity tasks but prohibits AI-driven decisions affecting customer accounts. Which two of the following use cases are appropriate under this policy? (Choose two.)",
+    "options": [
+      "Summarizing newly published regulatory guidance into an internal awareness briefing that the compliance team verifies before circulation",
+      "Brainstorming ways to streamline the branch-opening checklist his team maintains internally",
+      "Having Claude decide which flagged transactions to close as false positives so analysts only see the remainder",
+      "Generating personalized investment recommendations that relationship managers forward directly to clients"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Summarizing public guidance for internal awareness, with verification by the accountable team before circulation, is squarely within 'internal productivity' — the human check handles the accuracy risk, and no customer-affecting decision is delegated.",
+      "Correct. Brainstorming improvements to an internal checklist is low-stakes ideation about the team's own process — a textbook internal productivity use with no customer data or customer-affecting decision involved.",
+      "Tempting because it reduces analyst workload dramatically, but closing flagged transactions is a decision that directly affects customer accounts and risk controls, which the policy explicitly prohibits delegating. Efficiency does not override the policy line.",
+      "Tempting because managers forward the output, but a pass-through send is not meaningful review, and personalized investment advice is a regulated, customer-affecting output. This fails both the policy test and the human-accountability test."
+    ],
+    "principle": "policy lines define the boundary, not efficiency gains",
+    "relatedConcept": "Appropriate use cases stay inside the organization's stated boundaries — internal assistance yes, delegated customer-affecting decisions no.",
+    "overallExplanation": "Policy lines define the boundary, not efficiency gains: internal summarization and brainstorming fit the bank's policy, while delegating transaction decisions or client-bound advice crosses the customer-impact line it draws."
+  },
+  {
+    "id": 603,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Chloe, a talent-acquisition manager at a fast-growing SaaS company, faces a backlog of 400 applications. A colleague suggests having Claude score every application and automatically reject the bottom half. What is the most appropriate role for Claude in this hiring process?",
+    "options": [
+      "Helping draft the job descriptions and structure consistent evaluation criteria, while trained humans review applications and make all advancement decisions",
+      "Scoring and auto-rejecting applicants as suggested, provided the prompt instructs Claude to be objective and ignore demographic characteristics",
+      "Auto-rejecting only the bottom quarter instead of the bottom half, keeping a wider margin of safety around the automated cutoff",
+      "Avoiding Claude anywhere near the hiring process, including drafting postings, because employment is too sensitive for any AI involvement"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Claude appropriately supports the hiring process — drafting postings, structuring criteria, organizing materials — while consequential decisions about people remain with accountable humans. This keeps the efficiency gains without delegating judgment that carries fairness and legal weight.",
+      "Tempting because the instruction sounds like a safeguard, but telling a model to 'be objective' does not remove bias from its judgments, and automated rejection is still a consequential employment decision made without human review. An instruction is not a fairness control.",
+      "Tempting because it feels more conservative, but shrinking the automated slice does not change its nature: candidates are still rejected by an unreviewed AI judgment. Adjusting the threshold tunes the volume of an inappropriate practice rather than fixing it.",
+      "Tempting as maximal caution, but a blanket ban conflates assistance with decision-making. Drafting postings and structuring criteria are low-risk supports that improve consistency; prohibiting them forfeits value without adding any protection candidates actually need."
+    ],
+    "principle": "assist the process; never delegate decisions about people",
+    "relatedConcept": "Consequential decisions about individuals — hiring, discipline, credit — stay with humans regardless of workload pressure.",
+    "overallExplanation": "Assist the process, never delegate decisions about people: Claude can draft postings and structure criteria, but scoring-and-rejecting applicants hands a consequential employment judgment to an unaccountable tool."
+  },
+  {
+    "id": 604,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "single",
+    "question": "Elena, a student-services coordinator at a university, wants Claude's help finding patterns in a spreadsheet of support-request data that includes student names, ID numbers, and disability-accommodation details. University policy classifies student records as protected data with restricted sharing. What should she do?",
+    "options": [
+      "Remove or anonymize the names, ID numbers, and other identifying details before uploading, so the pattern analysis proceeds without exposing protected records",
+      "Upload the spreadsheet as-is, since the analysis is for internal student-support purposes rather than external sharing",
+      "Upload the full spreadsheet but begin the chat by instructing Claude to keep the contents confidential and forget them afterward",
+      "Analyze the spreadsheet entirely by hand, since protected student data means no part of the task can involve Claude"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Anonymizing or removing protected identifiers before upload is the standard data-sensitivity safeguard: the analytical value — patterns in request types and timing — survives, while the regulated personal details never leave the university's controlled systems.",
+      "Tempting because internal purpose feels safe, but the policy restricts sharing protected records regardless of intent — the classification governs the data, not the motive. 'It's internal' is the most common rationalization behind privacy violations.",
+      "Tempting because the instruction sounds like a control, but telling Claude to keep data confidential does not satisfy a policy restriction on sharing the data in the first place. The exposure happens at upload; a conversational request is not a data-protection mechanism.",
+      "Tempting as the zero-risk option, but abandoning the analysis is unnecessary when anonymization removes the protected elements. The reasoning error is treating a solvable data-preparation step as a prohibition on the whole task."
+    ],
+    "principle": "anonymize protected identifiers before the data leaves controlled systems",
+    "relatedConcept": "Data-sensitivity practice preserves the task's analytical value while stripping what regulation and policy protect.",
+    "overallExplanation": "Anonymize protected identifiers before upload: the pattern analysis needs the structure of the data, not the students' identities, and the policy restriction applies regardless of internal intent."
+  },
+  {
+    "id": 605,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "single",
+    "question": "Karim, a fraud analyst at a payments fintech, wants Claude's help drafting a report on transaction-fraud trends. His company provides an approved enterprise Claude workspace with data-handling agreements in place, but Karim finds his personal free claude.ai account more familiar. The report draws on customer transaction records. Where should he do this work?",
+    "options": [
+      "In the company's approved enterprise workspace, following its data-classification rules about what may be included",
+      "In his personal account, since the output is an internal report and the account choice does not change the analysis",
+      "In his personal account, but pasting the transaction records a few rows at a time to limit how much data is exposed in any one message",
+      "In neither, because fraud-related topics are too sensitive to ever discuss with an AI assistant in any environment"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Regulated customer data belongs in the environment the organization approved, where contractual data-handling terms and governance apply — and even there, data-classification rules determine what may be included. Familiarity with a personal account is not a factor.",
+      "Tempting because the deliverable is the same either way, but the account determines the data-handling terms that apply to what he pastes. Putting regulated customer records into a personal consumer account bypasses every agreement the company put in place — the destination matters, not the output.",
+      "Tempting because it feels like risk reduction, but drip-feeding the data changes the pace of the exposure, not the fact of it. All the records still end up in an unapproved environment; volume-splitting is a rationalization, not a safeguard.",
+      "Tempting as maximal caution, but the company approved an enterprise workspace precisely so this category of work can happen under proper terms. Refusing the sanctioned path forfeits legitimate value without adding protection."
+    ],
+    "principle": "sensitive data goes only through the approved environment",
+    "relatedConcept": "Which workspace you use is itself a data-protection decision, governed by policy rather than personal convenience.",
+    "overallExplanation": "Sensitive data goes only through the approved environment: the enterprise workspace exists so regulated records are handled under the company's agreements, and personal-account convenience never overrides that."
+  },
+  {
+    "id": 606,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "multi",
+    "question": "Yuki, a program manager at an insurance company, is standing up a new Claude use case that will summarize claims correspondence for her team. The company has an AI policy and a governance review process. Which two actions align with organizational AI governance standards? (Choose two.)",
+    "options": [
+      "Checking the AI policy's approved-tool and data-classification requirements against her use case before building anything",
+      "Submitting the use case to the governance review process, since claims correspondence contains customer information",
+      "Building the workflow quietly in a personal account first, so she has a working demo before anyone in governance can raise objections",
+      "Skipping the review because her team will read every summary, and human review of outputs makes governance approval redundant"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Governance starts with knowing what the policy requires of your specific use case — which tools are approved and how the data involved is classified. Checking before building prevents the common failure of discovering a violation after the workflow is embedded.",
+      "Correct. A use case touching customer information is exactly what governance review processes exist for. Routing it through review before deployment is the compliant path and typically surfaces data-handling requirements the team would not have identified alone.",
+      "Tempting because a working demo is persuasive, but building with customer data in a personal account is itself a policy violation, and structuring work to avoid governance scrutiny is shadow AI by definition. The demo strategy compounds the violation it is meant to bypass.",
+      "Tempting because human review does mitigate output risk, but governance covers more than output quality — data handling, tool approval, and regulatory exposure are input-side concerns review of summaries cannot address. Output review complements governance; it does not replace it."
+    ],
+    "principle": "check the policy first and route sensitive use cases through review",
+    "relatedConcept": "Governance standards apply before deployment — output review does not substitute for data-handling and approval requirements.",
+    "overallExplanation": "Check the policy first and route sensitive use cases through review: governance covers data handling and tool approval before deployment, which reading the outputs afterward cannot substitute for."
+  },
+  {
+    "id": 607,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "single",
+    "question": "Petra, a procurement specialist at a utilities company, wants to upload vendor contracts to Claude to speed up comparison of renewal terms. She reads the company's AI policy and finds it addresses customer data clearly but says nothing about vendor contracts, which contain confidentiality clauses. What should she do?",
+    "options": [
+      "Ask the policy owner or legal team how confidential vendor material should be handled before uploading anything",
+      "Proceed with the uploads, since the policy's silence on vendor contracts means the use case is permitted by default",
+      "Proceed, but only with contracts from vendors she personally considers unlikely to object to AI-assisted review",
+      "Drop the idea permanently, since any use case a policy does not explicitly authorize must be treated as prohibited forever"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. When policy is silent on material that is plainly sensitive — contracts with confidentiality clauses — the governance-aligned move is to ask the people who own the policy before acting. This gets a real answer, often gets the policy improved, and keeps her on the right side of obligations she may not fully see.",
+      "Tempting because 'not forbidden' reads as 'allowed', but policy silence on an obviously sensitive category is a gap, not a permission. Confidentiality clauses create contractual obligations that exist independently of the AI policy's coverage.",
+      "Tempting because it feels like proportionate judgment, but a personal guess about which counterparties would object is not a governance standard — the confidentiality obligations are contractual, not a matter of vendor temperament. This substitutes intuition for the required consultation.",
+      "Tempting as the conservative reading, but treating every policy gap as a permanent prohibition blocks legitimate value and gives the organization no chance to decide. The right response to ambiguity is a question, not indefinite abandonment."
+    ],
+    "principle": "policy silence on sensitive material means ask, not assume",
+    "relatedConcept": "Governance maturity shows in how people handle cases the policy has not yet addressed.",
+    "overallExplanation": "Policy silence on sensitive material means ask, not assume: confidential vendor contracts sit in a policy gap, and the governance-aligned move is consulting the policy owner before uploading."
+  },
+  {
+    "id": 608,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Tessa, the development director at an environmental nonprofit, has started using Claude to draft personalized thank-you letters and impact updates to major donors. A board member asks whether donors are being treated ethically. Which practice best addresses the ethical concern?",
+    "options": [
+      "Ensuring a staff member reviews and takes responsibility for every letter, and following the organization's standards on disclosing how communications are produced",
+      "Keeping Claude's role permanently secret from the board and donors, since transparency about AI drafting would only create needless controversy",
+      "Discontinuing AI drafting entirely, since sending any AI-assisted text to donors is inherently deceptive regardless of review",
+      "Adding a line to each letter stating it was written entirely by hand, to preserve the personal warmth donors expect"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The ethical core is accountability and honesty: a human reviews and owns each message, and the organization follows its own disclosure standards rather than hiding the practice. Assistance with drafting is ethically sound when responsibility stays human and no one is deceived.",
+      "Tempting because it avoids an awkward conversation, but institutional secrecy about how donor communications are produced is itself the ethical problem — it converts a defensible practice into a concealed one and destroys trust if discovered. Concealment is not a substitute for a considered disclosure standard.",
+      "Tempting because it eliminates the question, but the premise is wrong: reviewed, human-owned AI-assisted drafting is not inherently deceptive, any more than using templates or professional writers is. Blanket abandonment mistakes the tool for the ethical issue, which is honesty and accountability.",
+      "Tempting because it protects the warm feeling, but it does so with an outright false statement — an active deception that is ethically worse than the concern it papers over. Fabricating provenance is the clearest violation on the list."
+    ],
+    "principle": "ethical AI use rests on human accountability and honesty about the practice",
+    "relatedConcept": "Transparency norms and human ownership of outputs are what separate assistance from deception.",
+    "overallExplanation": "Ethical AI use rests on human accountability and honesty: staff review and own every donor letter, and the organization follows real disclosure standards instead of concealing or misrepresenting the practice."
+  },
+  {
+    "id": 609,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Andre, a city government analyst, uses Claude to summarize thousands of resident comments on a proposed transit plan; the summaries will influence which neighborhoods get service changes. Some comments are in other languages, and some come from communities that submit fewer, shorter comments. What is the most important ethical safeguard for this workflow?",
+    "options": [
+      "Check whether the summaries represent all communities fairly — including translated and low-volume voices — and keep humans accountable for the final prioritization",
+      "Ask Claude to certify at the end of each summary that its analysis was unbiased before the results go to the planning committee",
+      "Exclude the non-English comments from the analysis so that translation variability cannot distort the comparison between neighborhoods",
+      "Present Claude's summaries directly as the voice of residents, since removing human interpretation eliminates staff bias from the process"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. When AI output influences decisions about communities, the ethical safeguards are representational fairness checks — do quieter and translated voices survive the summarization? — and human accountability for the decision. Bias review plus human ownership is the core of responsible use in public-sector analysis.",
+      "Tempting because a certification sounds like assurance, but a model's self-assessment of its own bias is not a reliable signal — it will produce a confident affirmation either way. Verification must come from humans examining the outputs against the inputs, not from the tool grading itself.",
+      "Tempting because it removes a source of noise, but it does so by silencing exactly the residents most at risk of being underrepresented — an equity failure far worse than translation variability. Excluding voices to simplify analysis inverts the ethical priority.",
+      "Tempting because staff bias is real, but AI summarization has its own distortions, and presenting them as the unmediated voice of residents removes the accountability a public decision requires. Substituting unexamined machine bias for examined human judgment is not neutrality."
+    ],
+    "principle": "check outputs for representational bias and keep humans accountable",
+    "relatedConcept": "Ethical implications sharpen when AI output shapes decisions about people — fairness review and human ownership are the safeguards.",
+    "overallExplanation": "Check outputs for representational bias and keep humans accountable: summaries that shape public decisions must be examined for whose voices they amplify or drop, with the final judgment owned by people."
+  }
+]

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Tag from './Tag.jsx'
-import { domainIdForQuestion, slugify } from '../data/loader.js'
+import { slugify } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
 import { isCorrectSelection } from '../lib/quiz.js'
 
 const LETTERS = ['A', 'B', 'C', 'D']
@@ -32,13 +33,14 @@ function ExplanationBlock({ label, indices, question, tone }) {
 // The visual centerpiece of practice mode: shown immediately after every
 // answer in learn mode and per question in the post-exam review.
 export default function FeedbackPanel({ question, selected }) {
+  const { cert, domainIdForQuestion } = useCertData()
   const [goDeeper, setGoDeeper] = useState(false)
   const answered = selected.length > 0
   const correct = answered && isCorrectSelection(question, selected)
   const correctSet = new Set(question.correct)
   const wrongPicks = selected.filter((i) => !correctSet.has(i))
   const domainId = domainIdForQuestion(question)
-  const studyLink = `/study/${domainId}#${slugify(question.objective)}`
+  const studyLink = `/${cert.code}/study/${domainId}#${slugify(question.objective)}`
 
   return (
     <div className="rounded-lg border border-stone-300 bg-white p-4 shadow-sm sm:p-5">

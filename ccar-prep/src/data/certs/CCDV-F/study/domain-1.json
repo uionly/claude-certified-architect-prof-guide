@@ -1,0 +1,72 @@
+{
+  "domain": 1,
+  "title": "Agents and Workflows",
+  "weight": 14.7,
+  "intro": "Agents and Workflows is the second-highest-weight domain on the CCDV-F exam. It tests whether you can make the foundational architecture calls of Claude development: when a task deserves a fixed workflow versus an autonomous agent, how supervisor/subagent hierarchies improve execution, how to construct agents with the Claude Agent SDK, custom loops, and hooks, and which design patterns and frameworks (tool-use loops, memory, context management, Strands, LangGraph, PydanticAI) fit a given multi-step task. Expect scenario questions where a team has picked the wrong abstraction and you must name the right one.",
+  "objectives": [
+    {
+      "objective": "Agent Architecture",
+      "explanation": "The first architecture decision in any Claude system is workflow versus agent. A workflow is a sequence of predefined steps — each step may be a Claude call, but the control flow is written by the developer: extract, then classify, then route. An agent hands control flow to the model: given a goal and a set of tools, Claude decides which actions to take, in what order, and when it is done. The decision criterion is predictability. If you can write the steps down in advance, build a workflow — it is cheaper, faster, more testable, and its failures localize to a specific step. If the path through the task genuinely cannot be predetermined (open-ended research, debugging, coding), an agent's dynamic tool-driven exploration earns its extra cost and nondeterminism.\n\nThe second architectural structure to know is the manager/supervisor hierarchy. A supervisor agent decomposes a large task and delegates subtasks to subagents, each running in its own context window and returning only distilled results. This buys two things: context isolation (noisy intermediate output — raw search results, file dumps — burns the subagent's context, not the supervisor's) and parallelism (independent subtasks run concurrently). Subagents improve task execution precisely because the orchestrator's context stays focused on decomposition and synthesis rather than filling with raw material.\n\nOn the exam, watch for over-engineering as much as under-engineering: an autonomous agent wrapped around a three-step deterministic pipeline is as much an architecture error as a rigid workflow forced onto open-ended work.",
+      "whyItMatters": "Choosing the wrong abstraction is expensive in both directions: agents applied to fixed pipelines add nondeterminism, latency, and cost with no benefit, while workflows forced onto open-ended tasks fail on every input that deviates from the script. This decision is made at design time and is painful to reverse after launch, which is why the exam leads with it.",
+      "examples": [
+        {
+          "title": "Invoice pipeline: workflow, not agent",
+          "body": "A logistics company automates invoice intake: extract vendor fields, classify the expense, route to an approval queue. The steps never vary and each output feeds the next, so the right build is a prompt-chained workflow — three focused Claude calls with validation between them. An autonomous agent with a dozen tools would produce the same result less predictably at higher cost, and a failure would be harder to localize than 'the classification step returned an unknown category'."
+        },
+        {
+          "title": "Deep research: supervisor with subagents",
+          "body": "A media analytics firm's single research agent failed on long investigations because its context filled with raw search results until it lost the original question. Restructuring as a supervisor that decomposes the question and delegates searches to subagents fixed it: each subagent spends its own context window on raw results and returns a distilled summary, so the supervisor's context holds only the question, the plan, and the findings. Bigger context windows would have delayed this failure; the hierarchy removed it."
+        }
+      ],
+      "pitfalls": [
+        "Defaulting to an agent because it is the more powerful abstraction — if the steps are known in advance, a workflow is simpler, cheaper, and more debuggable.",
+        "Treating context exhaustion as a capacity problem (buy a bigger window) instead of a structure problem (isolate noisy work in subagents).",
+        "Using redundant peer agents to fix context or reliability problems they don't address — duplicate agents help verify answers, not manage context.",
+        "Forcing a fixed workflow onto genuinely open-ended tasks like coding or research, where the value comes from the model choosing its own path."
+      ]
+    },
+    {
+      "objective": "Agent Construction with Claude",
+      "explanation": "There are several ways to construct a Claude agent, and the exam tests whether you can pick the right one. The Claude Agent SDK is the default starting point: it packages the production agent loop — tool execution, file and shell access, context management, session handling, and hook points — so teams ship in weeks and customize only where their needs are unique. A custom agent loop or harness built on the raw Messages API maximizes control and is the right call when requirements genuinely exceed what the SDK exposes, but it means reimplementing the loop, tool dispatch, context compaction, and permissioning yourself.\n\nDeployment is a separate axis: self-hosted versus Anthropic-hosted managed agents. Self-hosting gives full control over the runtime environment, networking, and infrastructure placement — important for organizations with strict environment requirements. A managed Anthropic-hosted deployment offloads operating the agent's execution environment to the platform, trading some control for far less infrastructure to build, patch, and scale. Hosting changes who operates the runtime, not what the agent can do — tools work in both models.\n\nFinally, hooks are the construction mechanism for deterministic actions. A hook is code that runs at defined points in the agent loop (for example, before a tool executes) and can inspect, block, or transform what the agent does. Because hooks execute outside the model's reasoning, they provide guarantees that prompt instructions never can: a pre-tool-use hook that blocks writes to a production path blocks them every time, no matter what enters the model's context.",
+      "whyItMatters": "Construction choices determine both time-to-ship and safety posture. Teams that rebuild the SDK's loop from scratch burn their schedule on solved problems; teams that put must-hold rules in prompts instead of hooks ship agents whose guardrails are probabilistic. Knowing which layer provides which guarantee is what separates a working demo from a production agent.",
+      "examples": [
+        {
+          "title": "Three weeks to ship: Agent SDK over a custom harness",
+          "body": "A four-person fintech startup needed an internal coding agent — agent loop, file edits, shell execution, long-session context management, permission checks — in three weeks. Building a custom Python harness would have consumed the entire schedule reimplementing what the Claude Agent SDK already provides. Starting from the SDK, the team shipped on time and spent its effort on the parts unique to its codebase: custom tools and permission policy. Custom harnesses are for requirements the SDK cannot meet, not a default posture."
+        },
+        {
+          "title": "Blocking production writes with a hook",
+          "body": "An e-commerce deployment agent occasionally edited files under infra/production/ despite a system prompt saying never to. The fix was not a louder prompt, lower temperature, or a reviewer model — all probabilistic — but a pre-tool-use hook that inspects every file-write action and deterministically blocks any write targeting the protected path. The rule now holds on every run regardless of what enters context, because it is enforced in harness code rather than requested in natural language."
+        }
+      ],
+      "pitfalls": [
+        "Building a custom agent loop from scratch when the Agent SDK already provides the loop, tools, context management, and hooks you need.",
+        "Enforcing must-hold rules through system-prompt instructions — instructions are probabilistic; guarantees require hooks in the harness.",
+        "Confusing the hosting decision with capability — tool execution works in both self-hosted and Anthropic-hosted deployments; the tradeoff is control versus operational burden.",
+        "Assuming self-hosting the agent harness removes API authentication — the harness still calls the Claude API; hosting the runtime is not hosting the model."
+      ]
+    },
+    {
+      "objective": "Agent Patterns and Frameworks",
+      "explanation": "Every agent, whatever framework wraps it, runs the same foundational pattern: the tool-use loop. The client sends messages plus tool definitions; when the model wants a tool it stops with stop_reason \"tool_use\"; the client executes the tool, appends the assistant's tool-use turn and a tool_result message to the same conversation, and calls the API again; the loop repeats until the model signals completion with \"end_turn\". Two facts anchor the pattern: the client, not the model, executes tools, and tool results must be appended to the growing conversation so the loop keeps its state.\n\nOn top of the loop sit the patterns that make agents survive long tasks. Sub-agents isolate noisy subtask context (see Agent Architecture). Memory persists knowledge across sessions or beyond the context window. Context-window management keeps a long-running session healthy: prune stale tool outputs, compact history into summaries of what was learned, and keep the working context small and relevant. An agent that only ever appends grows slow, expensive, and incoherent as accumulated raw output dilutes its attention.\n\nAgentic abstraction frameworks — Strands, LangGraph, PydanticAI — package these patterns with different core abstractions. LangGraph expresses workflows as explicit graphs of nodes and edges, suiting teams that want visible, structured control flow. PydanticAI centers on typed, schema-validated inputs and outputs around model calls. Strands provides an agent-loop abstraction for building agents and workflows. What no framework does: make generation deterministic, or infer your tools for you. Frameworks organize orchestration and state; the model's nature and the design work of defining tools remain yours.",
+      "whyItMatters": "The tool-use loop is the mechanics question you will hit in every custom integration — mishandling stop_reason tool_use is one of the most common first bugs in agent code. Pattern fluency also protects budgets: agents without context management degrade in exactly the long sessions where agents matter most, and framework choices made on hype rather than abstraction fit get rewritten within a quarter.",
+      "examples": [
+        {
+          "title": "The loop that exited too early",
+          "body": "A travel-booking engineer's custom loop called the flight-search tool once, printed the partial text, and exited — because her code treated stop_reason \"tool_use\" as the end of generation. The correct behavior: execute the requested tool, append the assistant tool-use turn plus a tool_result message to the same conversation, and call the API again, looping until stop_reason \"end_turn\". The model pauses for client action mid-task; ending the loop there ships a half-finished turn."
+        },
+        {
+          "title": "Compaction rescues a long contract-review session",
+          "body": "A legal-tech agent grew slow and self-contradictory twenty minutes into each session; traces showed the context dominated by full-text document fetches from every earlier step. Neither a stronger model nor an instruction to 'ignore old outputs' fixes that — both still ship every stale byte to the model on each request. Compacting the conversation, replacing verbose old tool outputs with distilled summaries of the findings, restored speed, cost, and coherence: retain conclusions, drop the raw bulk."
+        }
+      ],
+      "pitfalls": [
+        "Treating stop_reason \"tool_use\" as an error or as final output — it means the model is waiting for the client to run a tool and return a tool_result.",
+        "Sending tool results as a fresh conversation — the result only has meaning inside the conversation that contains the question, the plan, and the tool call.",
+        "Letting context grow by pure appending — long-running agents need active pruning and compaction, or cost, latency, and coherence all degrade.",
+        "Expecting a framework to make agent behavior deterministic or to infer tool definitions — frameworks organize calls and state; sampling stays probabilistic and tool design stays your job.",
+        "Choosing a framework by popularity instead of abstraction fit — graphs (LangGraph), typed contracts (PydanticAI), and agent loops (Strands) suit different teams and control-flow styles."
+      ]
+    }
+  ]
+}

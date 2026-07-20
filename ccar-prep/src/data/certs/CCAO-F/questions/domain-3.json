@@ -1,0 +1,163 @@
+[
+  {
+    "id": 301,
+    "domain": "Product and Model Selection",
+    "objective": "Select appropriate Claude product features (Projects, research mode, chat, artifacts)",
+    "type": "single",
+    "question": "Isabelle, a consultant supporting a hospital system's process redesign, works with Claude daily on the same engagement. In every new chat she re-uploads the client's style guide and background documents and re-types the same instructions about tone and terminology. Which feature best solves this?",
+    "options": [
+      "A Claude Project with the engagement documents added as knowledge and the standing instructions set once",
+      "One continuous chat for the entire engagement so the documents and instructions never leave the conversation",
+      "Artifacts for each deliverable, since artifacts preserve the documents alongside the finished work",
+      "Research mode, since it automatically gathers the background context each new conversation needs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Projects exist precisely for recurring work with shared context: knowledge files and custom instructions are configured once and apply to every chat inside the Project. Isabelle gets a fresh conversation each session without re-uploading or re-explaining anything.",
+      "Tempting because one chat does retain context, but months of unrelated threads in a single conversation degrade focus and eventually strain the context window. Persistent setup belongs in a Project; conversations should stay scoped to their task.",
+      "Artifacts are containers for outputs — documents, reports, drafts — not for the reference material and instructions that shape future conversations. They solve the deliverable problem, not the repeated-setup problem.",
+      "Research mode conducts deeper multi-source investigation of a question; it does not store or recall an engagement's private documents and standing instructions. This confuses gathering new information with persisting known context."
+    ],
+    "principle": "recurring context belongs in a Project",
+    "relatedConcept": "Projects persist knowledge files and instructions across chats, eliminating per-conversation setup for ongoing work.",
+    "overallExplanation": "Recurring context belongs in a Project: Projects persist knowledge files and instructions across chats, eliminating per-conversation setup for ongoing work."
+  },
+  {
+    "id": 302,
+    "domain": "Product and Model Selection",
+    "objective": "Select appropriate Claude product features (Projects, research mode, chat, artifacts)",
+    "type": "multi",
+    "question": "Theo, a strategy analyst at a beverage company, is planning his week of Claude work and wants to match each task to the right product feature. Which two pairings are appropriate? (Choose two.)",
+    "options": [
+      "A deep, multi-source investigation of an unfamiliar market segment — run it in research mode",
+      "A launch plan he will draft, revise across sessions, and share with his team — build it as an artifact",
+      "A single quick question about a date-format convention — set up a dedicated Project for it first",
+      "Team writing standards he applies in every conversation — paste them manually into each new chat"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Research mode is built for exactly this: extended, multi-source investigation that gathers and synthesizes information beyond a single-pass chat answer. An unfamiliar market landscape is the canonical use case for choosing it over standard chat.",
+      "Correct. A substantial document that will be revised over time and shared belongs in an artifact — a standalone, iteratively editable container — rather than scattered across inline chat responses that fragment with every revision.",
+      "Creating a Project for a one-off question inverts the feature's purpose: Projects pay off when context and instructions recur across many chats. For a single quick question, plain chat answers instantly with zero setup overhead.",
+      "Manually pasting standing instructions into every chat is the problem Projects solve, not a solution. Recurring standards belong in Project instructions, set once and applied automatically to every conversation inside the Project."
+    ],
+    "principle": "match the feature to the task's shape",
+    "relatedConcept": "Research mode for deep investigation, artifacts for evolving deliverables, Projects for recurring context, plain chat for quick one-offs.",
+    "overallExplanation": "Match the feature to the task's shape: research mode for deep investigation, artifacts for evolving deliverables, Projects for recurring context, plain chat for quick one-offs."
+  },
+  {
+    "id": 303,
+    "domain": "Product and Model Selection",
+    "objective": "Differentiate between Claude model types (Haiku, Sonnet, Opus)",
+    "type": "single",
+    "question": "Amara, an operations manager at a logistics firm, is briefing her team on Claude's model family before they standardize their workflows. Which characterization of the model types should she give them?",
+    "options": [
+      "Haiku is the fastest and most economical for simple high-volume work; Sonnet balances capability and speed for everyday tasks; Opus is the most capable for complex reasoning",
+      "All three models have the same capability and differ only in response speed, so the choice is purely about patience",
+      "Opus should be the default for all business tasks, with Haiku and Sonnet reserved for casual personal use",
+      "Sonnet is the most capable model, while Opus is a specialized option intended mainly for very long documents"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is the actual shape of the family: Haiku trades depth for speed and economy, making it right for simple, repetitive, high-volume tasks; Sonnet is the balanced everyday choice; Opus offers the deepest reasoning at higher cost, reserved for genuinely complex work.",
+      "Tempting because speed is one visible difference, but the tiers differ in reasoning capability as well as speed. Treating them as interchangeable except for latency leads to using an economical model on work that genuinely needs deeper reasoning, or paying for depth that simple tasks don't require.",
+      "Defaulting everything to the most capable model ignores the trade-off the family exists to offer: most everyday business tasks don't need maximum reasoning depth, and routine work runs faster and cheaper on lighter tiers with no quality loss.",
+      "This inverts the hierarchy: Opus, not Sonnet, is the most capable tier, and its distinction is reasoning depth on complex tasks, not document length. A team briefed this way would systematically misroute its hardest work."
+    ],
+    "principle": "know the tier ladder: economy, balance, capability",
+    "relatedConcept": "Haiku, Sonnet, and Opus form a speed-cost-capability ladder, and accurate mental models of it are the basis for every selection decision.",
+    "overallExplanation": "Know the tier ladder — economy, balance, capability: Haiku, Sonnet, and Opus form a speed-cost-capability ladder, and an accurate mental model of it is the basis for every selection decision."
+  },
+  {
+    "id": 304,
+    "domain": "Product and Model Selection",
+    "objective": "Differentiate between Claude model types (Haiku, Sonnet, Opus)",
+    "type": "single",
+    "question": "Felix, a policy analyst at a transportation authority, must synthesize three lengthy, partially conflicting regulatory documents into a coherent position with the tensions between them reasoned through carefully. It is a one-off, high-stakes deliverable with no time pressure. Which model type fits?",
+    "options": [
+      "Haiku, because a lighter model keeps the long documents processing quickly and affordably",
+      "Opus, because deep multi-document reasoning on a high-stakes, low-volume task is what the most capable tier is for",
+      "Sonnet, because the balanced tier is the recommended choice regardless of the task's difficulty",
+      "Whichever model is most recently released, since newer models supersede the older tiers"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because long documents make cost salient, but Haiku's profile is speed and economy on simple tasks, not careful reasoning across conflicting sources. Saving pennies on a one-off, high-stakes synthesis is the wrong end of the trade-off.",
+      "Correct. This task concentrates everything the top tier exists for: genuinely complex reasoning across multiple conflicting documents, high consequence of error, a single deliverable rather than volume, and no latency pressure. The capability premium is trivial against the stakes.",
+      "Sonnet is the sensible default for everyday work, but a default is a starting point, not a rule. When the task's defining feature is reasoning difficulty and the stakes are high, the differentiated capability of Opus is precisely what the tier structure offers.",
+      "Recency and tier are different dimensions: model families ship in tiers, and a newer light model still targets speed and economy rather than maximum reasoning depth. Selecting by release date ignores the capability characteristics the choice should rest on."
+    ],
+    "principle": "complex reasoning plus high stakes points to the top tier",
+    "relatedConcept": "Differentiating models means recognizing which task profiles genuinely need Opus-level reasoning rather than defaulting by habit or price.",
+    "overallExplanation": "Complex reasoning plus high stakes points to the top tier: differentiating models means recognizing which task profiles genuinely need Opus-level depth rather than defaulting by habit or price."
+  },
+  {
+    "id": 305,
+    "domain": "Product and Model Selection",
+    "objective": "Align model selection with task requirements (cost, speed, quality)",
+    "type": "single",
+    "question": "Nadia, an e-commerce merchandising lead, needs to generate short, formulaic category tags for thousands of product descriptions every day. Speed and cost dominate, the task is simple, and spot checks show light and heavy models tag with equal accuracy. Which selection aligns with the requirements?",
+    "options": [
+      "A fast, economical model suited to simple high-volume work, since measured quality is equivalent across tiers",
+      "The most capable model available, since product data quality ultimately affects revenue",
+      "Alternate between tiers day by day to average out the cost while retaining some top-tier quality",
+      "The balanced mid-tier model, as a hedge in case some product descriptions turn out to be ambiguous"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Aligning model selection with task requirements means choosing the cheapest, fastest tier whose quality meets the bar — and here spot checks show tier-equivalent accuracy on a simple, high-volume task. Paying more would buy nothing the task needs.",
+      "Tempting because revenue impact sounds like a quality mandate, but the spot checks already showed no accuracy difference between tiers on this task. Spending the premium across thousands of daily items purchases zero measured improvement — stakes rhetoric can't override evidence.",
+      "Alternating tiers produces inconsistent latency and cost with no principled basis, and the top-tier days still buy no measured quality gain. Selection should follow the task's requirements, not split the difference between two answers.",
+      "Hedging with the mid-tier pays a permanent premium against a hypothetical, when the evidence in hand says the light model handles the real distribution. If ambiguous cases emerge, the targeted fix is routing those few items upward, not upgrading the entire volume."
+    ],
+    "principle": "cheapest tier that meets the measured quality bar",
+    "relatedConcept": "Cost-speed-quality alignment is evidence-driven: when testing shows tier-equivalent quality on simple high-volume work, the economical model is the correct choice.",
+    "overallExplanation": "Choose the cheapest tier that meets the measured quality bar: when testing shows tier-equivalent quality on simple high-volume work, the economical model is the correct choice."
+  },
+  {
+    "id": 306,
+    "domain": "Product and Model Selection",
+    "objective": "Align model selection with task requirements (cost, speed, quality)",
+    "type": "single",
+    "question": "Ravi, a client communications manager at a wealth-management firm, drafts a steady stream of moderately complex, personalized client letters each day. Quality matters, replies should come back promptly during working sessions, and volume is meaningful but not huge. Which model choice best aligns with these requirements?",
+    "options": [
+      "The balanced mid-tier model, which delivers strong quality at interactive speed for substantial daily volume",
+      "The most capable model for every letter, since financial clients justify maximum quality at any speed",
+      "The fastest, most economical model, since daily volume makes cost the deciding requirement",
+      "The most capable model, but only on letters drafted in the mornings when clients read most carefully"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The task profile — moderate complexity, real quality bar, interactive turnaround, meaningful volume — is exactly the middle of the cost-speed-quality triangle where the balanced tier lives. It meets the quality requirement without paying top-tier cost and latency on every letter.",
+      "Tempting because financial services sounds high-stakes, but these are moderately complex letters, not deep multi-document reasoning. Paying maximum cost and slower turnaround across daily volume for quality headroom the task doesn't use misaligns the selection with the actual requirements.",
+      "Cost is one requirement among three, and this option sacrifices the stated quality bar to optimize it. Moderately complex personalized writing is beyond the simple, formulaic profile where the lightest tier's speed-for-depth trade pays off.",
+      "Reading time has no bearing on which model fits the task's complexity; every letter has the same quality requirement whenever it is drafted. This invents an arbitrary routing rule instead of aligning the tier with the actual cost, speed, and quality needs."
+    ],
+    "principle": "weigh all three requirements, then pick the tier",
+    "relatedConcept": "Alignment means locating the task on the cost-speed-quality triangle — moderate complexity at interactive pace with real volume is the balanced tier's home ground.",
+    "overallExplanation": "Weigh all three requirements, then pick the tier: moderate complexity at interactive pace with meaningful volume is the balanced tier's home ground on the cost-speed-quality triangle."
+  },
+  {
+    "id": 307,
+    "domain": "Product and Model Selection",
+    "objective": "Understand and manage context limitations and memory considerations (when to restart, summarize, or persist)",
+    "type": "single",
+    "question": "Leah, a curriculum designer at an online education company, has spent two weeks in one very long Claude chat designing a course. Responses now drift from decisions made early on, and she keeps re-explaining choices Claude previously acknowledged. What is the best way to manage the situation?",
+    "options": [
+      "Summarize the settled decisions and key constraints, then continue in a fresh chat — moving durable reference material into a Project",
+      "Stay in the long chat and restate the early decisions inside each new message so they remain in view",
+      "Switch the same overloaded conversation to a more capable model so it can better retain the early details",
+      "Keep the chat but write shorter messages from now on, so less new content gets added to the conversation"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. When a conversation outgrows its useful context, the remedy is to distill what matters — decisions, constraints, current state — and restart with that summary, persisting long-lived material in Project knowledge so it survives every future chat. This is the summarize-restart-persist pattern.",
+      "Tempting as a patch, but manually re-injecting decisions into every message fights the underlying limitation instead of managing it, bloats each new message, and still leaves the chat's accumulated clutter degrading the model's focus.",
+      "Context limitations apply across model tiers; a more capable model inherits the same overloaded, drifting conversation. This treats a context-management problem as a capability problem and delays the restart that actually fixes it.",
+      "Shorter messages only slow the growth of an already-overloaded conversation; the drift from early decisions is happening now. Rationing new content doesn't recover the focus the chat has lost."
+    ],
+    "principle": "summarize, restart, and persist what must endure",
+    "relatedConcept": "Long conversations degrade — the management pattern is distilling decisions into a summary for a fresh chat and moving durable context into Project knowledge.",
+    "overallExplanation": "Summarize, restart, and persist what must endure: long conversations degrade, so distill decisions into a summary for a fresh chat and move durable context into Project knowledge."
+  }
+]

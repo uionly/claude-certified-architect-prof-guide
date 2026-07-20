@@ -1,11 +1,24 @@
-# CCAR-P Prep — Study Guide & Question Bank
+# Claude Cert Prep — Study Guides & Question Banks
 
-A study + practice web app for the **Claude Certified Architect – Professional (CCAR-P)** certification. Two cross-linked parts:
+A study + practice web app covering multiple Claude certifications. Each certification gets:
 
 - **Study guide** — one page per exam domain, one section per blueprint objective, each ending with a "Practice this objective" deep link into the question bank.
-- **Question bank** — 200 reasoning-based scenario questions distributed by domain weight, every question tagged with its exact blueprint objective and linking back to the study section that teaches it.
+- **Question bank** — reasoning-based scenario questions distributed by domain weight, every question tagged with its exact blueprint objective and linking back to the study section that teaches it.
 
 No backend: React + Vite + Tailwind, all state client-side, attempt history persisted to `localStorage`.
+
+## Supported certifications
+
+| Code | Name | Content |
+|---|---|---|
+| CCAR-P | Claude Certified Architect – Professional | ✅ complete (200/200 questions, 7/7 study guides) |
+| CCAO-F | Claude Certified Associate – Foundations | ✅ complete (60/60 questions, 7/7 study guides) |
+| CCDV-F | Claude Certified Developer – Foundations | ✅ complete (53/53 questions, 8/8 study guides) |
+| CCAR-F | Claude Certified Architect – Foundations | ✅ complete (60/60 questions, 5/5 study guides) |
+
+Cert codes are the official Anthropic exam codes. The three Foundations blueprints (domains, weights, objective strings) are transcribed from the official exam guides published on the [Anthropic Partner Academy](https://anthropic-partners.skilljar.com/page/partner-certifications) (v1.0, effective July 2026), and each question bank matches the real exam's item count (CCAO-F 60, CCDV-F 53, CCAR-F 60).
+
+Use the cert switcher in the header (or the `/certs` page) to pick a certification. Certs with no content yet still appear in the switcher/picker with a "coming soon" state.
 
 ## Setup
 
@@ -14,26 +27,51 @@ npm install
 npm run dev        # dev server
 npm run build      # production build → dist/
 npm run preview    # serve the production build
-npm run validate   # validate all question/study content against the blueprint
+npm run validate   # validate all certs' question/study content against their blueprints
 ```
 
 ## How it works
 
-- `src/data/blueprint.json` — single source of truth: domains, weights, exact objective strings, per-objective question counts, question id ranges.
-- `src/data/questions/domain-N.json` — one array of questions per domain, merged at build time via `import.meta.glob` in `src/data/loader.js`.
-- `src/data/study/domain-N.json` — study guide content per domain.
-- `scripts/validate-content.mjs` — checks every content file against the blueprint (counts per objective, schema fields, exact objective strings, explanation lengths, no placeholder text). Run it after any content change.
+- `src/data/certs/<CODE>/blueprint.json` — single source of truth per cert: domains, weights, exact objective strings, per-objective question counts, question id ranges.
+- `src/data/certs/<CODE>/questions/domain-N.json` — one array of questions per domain.
+- `src/data/certs/<CODE>/study/domain-N.json` — study guide content per domain.
+- `src/data/loader.js` — `certRegistry` (cheap, eager — every cert's `blueprint.json`, used by the switcher/picker) and `getCertData(certCode)` (async, code-split per cert — merges that cert's blueprint + question files + study files, discovered via `import.meta.glob`). Add a new cert directory under `src/data/certs/` and it's picked up automatically — no manual registration needed, beyond adding it to the switcher's data (also automatic, since the switcher reads `certRegistry`).
+- URL scheme: `/<certCode>/...` (e.g. `/CCAR-P/study`, `/CCAR-P/quiz`). `/` redirects to the last-used cert (or CCAR-P by default). Pre-existing un-prefixed bookmarks (`/study`, `/practice`, `/quiz`, `/results/:id`) redirect the same way.
+- Progress storage is cert-scoped (`cert.<CODE>.attempts.v1` / `cert.<CODE>.active.v1` in `localStorage`); a one-time migration preserves history from the original single-cert version of this app (which used unscoped `ccarp.*` keys) into `cert.CCAR-P.*`.
+- `scripts/validate-content.mjs` — checks every cert's content files against its blueprint (counts per objective, schema fields, exact objective strings, explanation lengths, no placeholder text). Run it after any content change.
 
 ### Modes
 
 - **Learn mode** — untimed; full reasoning shown immediately after every answer, right or wrong. The feedback panel shows your answer + its explanation, the correct answer + its explanation, the principle tag, the related concept, and a "go deeper" toggle with all four option explanations.
-- **Exam mode** — timed at 1.9 min/question; feedback withheld until submission, then full per-question review.
+- **Exam mode** — timed at the cert's minutes-per-question rate; feedback withheld until submission, then full per-question review.
 
 Performance is tracked **per objective tag** (not just per domain) across all attempts, and surfaced on the results screen, the study guide domain pages, and each objective section.
 
+## Blueprint schema
+
+`src/data/certs/<CODE>/blueprint.json`:
+
+```json
+{
+  "cert": { "name": "...", "code": "...", "totalQuestions": 200, "examMinutesPerQuestion": 1.9 },
+  "domains": [
+    {
+      "id": 1,
+      "title": "...",
+      "weight": 17,
+      "questionCount": 34,
+      "idStart": 101,
+      "objectives": [{ "objective": "...", "questions": 6 }]
+    }
+  ]
+}
+```
+
+`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to `totalQuestions`; each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+
 ## Question schema
 
-`src/data/questions/domain-N.json` — one array per file:
+`src/data/certs/<CODE>/questions/domain-N.json` — one array per file:
 
 ```json
 {
@@ -46,34 +84,37 @@ Performance is tracked **per objective tag** (not just per domain) across all at
   "correct": [1],
   "optionExplanations": ["…", "…", "…", "…"],
   "principle": "the model is never the authorization boundary",
-  "relatedConcept": "one-liner connecting to the domain theme"
+  "relatedConcept": "one-liner connecting to the domain theme",
+  "overallExplanation": "summary of the principle + relatedConcept, shown on the feedback panel"
 }
 ```
 
 - `id`: unique; domain N uses the range `N*100 + 1` … (e.g. Domain 3 → 301+).
-- `objective` / `domain`: must match `blueprint.json` **character-for-character** — this is what powers study-guide cross-linking and per-objective stats.
+- `objective` / `domain`: must match that cert's `blueprint.json` **character-for-character** — this is what powers study-guide cross-linking and per-objective stats.
 - `type`: `"single"` (1 correct index) or `"multi"` (≥2 correct indices; stem ends with "(Choose two.)").
 - `correct`: 0-based indices into `options`.
 
 ## Content-generation guidelines
 
-Follow these when adding questions so new items match the existing depth (the validator enforces the mechanical parts):
+Follow these when adding questions for any cert so new items match the existing depth (the validator enforces the mechanical parts):
 
 1. **Scenario-based stem** — a realistic situation with a decision to make, not trivia. A named role at a company in a specific industry faces a concrete choice. Vary industries (fintech, healthcare, retail, public sector, SaaS) and difficulty (straightforward application vs. multi-factor trade-off judgment) within each objective.
-2. **4 options, all plausible** — each option should be pickable by a competent-but-imperfect architect. No joke options, no "all of the above", and the correct option must not be recognizably longer or more detailed than the others.
+2. **4 options, all plausible** — each option should be pickable by a competent-but-imperfect practitioner. No joke options, no "all of the above", and the correct option must not be recognizably longer or more detailed than the others.
 3. **Per-option explanations (2–4 sentences each)** — for the correct option, name the underlying principle; for each wrong option, explain why it's tempting **and** the specific reasoning error (wrong trade-off, treats symptom not cause, violates a named principle, over-engineering, …).
 4. **`principle` tag** — short phrase capturing the rule, e.g. `"least privilege > detective controls"`.
-5. **`objective` tag** — the exact blueprint bullet (copy it from `blueprint.json`).
+5. **`objective` tag** — the exact blueprint bullet (copy it from that cert's `blueprint.json`).
 6. **`relatedConcept`** — one line connecting the question to the broader domain theme.
 7. **Distribute evenly** — roughly 5–6 questions per objective bullet so every objective gets meaningful coverage.
 8. **No stubs** — never commit TODO/placeholder text; the validator rejects it.
-9. Ground content in real Claude/Anthropic concepts (model tiers, prompt caching, MCP, Claude Code, the workflow/agent pattern taxonomy) — don't invent product features or topics outside the blueprint.
+9. Ground content in real Claude/Anthropic concepts (model tiers, prompt caching, MCP, Claude Code, the workflow/agent pattern taxonomy) — don't invent product features or topics outside the blueprint, and match technical depth to the cert's level (Foundations-level certs should be more conceptual than CCAR-P's Professional-level architecture scenarios).
 
-Study guide sections follow the same spirit: plain-language explanation, why it matters in production, 1–2 worked examples, 3–5 pitfalls, documentation tone (no marketing copy). Schema is in any `src/data/study/domain-N.json`.
+Study guide sections follow the same spirit: plain-language explanation, why it matters in production, 1–2 worked examples, 3–5 pitfalls, documentation tone (no marketing copy). Schema is in any `src/data/certs/<CODE>/study/domain-N.json`.
 
-After adding content: `npm run validate` (or `node scripts/validate-content.mjs <domainId>` for one domain).
+After adding content: `npm run validate` (or `node scripts/validate-content.mjs <certCode> [domainId]` to check one cert, optionally one domain).
 
 ## Content progress
+
+### CCAR-P — Claude Certified Architect – Professional
 
 | Domain | Weight | Questions | Study guide |
 |---|---|---|---|
@@ -86,4 +127,42 @@ After adding content: `npm run validate` (or `node scripts/validate-content.mjs 
 | 7. Developer Productivity & Operational Enablement | 7% | ✅ 14/14 | ✅ done |
 | **Total** | 100% | **200/200** | **7/7** |
 
-App shell: ✅ scaffold · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links
+### CCAO-F — Claude Certified Associate – Foundations
+
+| Domain | Weight | Questions | Study guide |
+|---|---|---|---|
+| 1. Prompting and Task Execution | 14% | ✅ 8/8 | ✅ done |
+| 2. Output Evaluation and Validation | 21% | ✅ 13/13 | ✅ done |
+| 3. Product and Model Selection | 12% | ✅ 7/7 | ✅ done |
+| 4. Workflow Integration and Solution Design | 16% | ✅ 10/10 | ✅ done |
+| 5. Configuration and Knowledge Management | 12% | ✅ 7/7 | ✅ done |
+| 6. Governance, Risk, and Responsible Use | 15% | ✅ 9/9 | ✅ done |
+| 7. Troubleshooting and Optimization | 10% | ✅ 6/6 | ✅ done |
+| **Total** | 100% | **60/60** | **7/7** |
+
+### CCDV-F — Claude Certified Developer – Foundations
+
+| Domain | Weight | Questions | Study guide |
+|---|---|---|---|
+| 1. Agents and Workflows | 14.7% | ✅ 8/8 | ✅ done |
+| 2. Applications and Integration | 33.1% | ✅ 17/17 | ✅ done |
+| 3. Claude Code | 3.1% | ✅ 2/2 | ✅ done |
+| 4. Eval, Testing, and Debugging | 2.6% | ✅ 1/1 | ✅ done |
+| 5. Model Selection and Optimization | 16.8% | ✅ 9/9 | ✅ done |
+| 6. Prompt and Context Engineering | 11.0% | ✅ 6/6 | ✅ done |
+| 7. Security and Safety | 8.1% | ✅ 4/4 | ✅ done |
+| 8. Tools and MCPs | 10.6% | ✅ 6/6 | ✅ done |
+| **Total** | 100% | **53/53** | **8/8** |
+
+### CCAR-F — Claude Certified Architect – Foundations
+
+| Domain | Weight | Questions | Study guide |
+|---|---|---|---|
+| 1. Agentic Architecture & Orchestration | 27% | ✅ 16/16 | ✅ done |
+| 2. Tool Design & MCP Integration | 18% | ✅ 11/11 | ✅ done |
+| 3. Claude Code Configuration & Workflows | 20% | ✅ 12/12 | ✅ done |
+| 4. Prompt Engineering & Structured Output | 20% | ✅ 12/12 | ✅ done |
+| 5. Context Management & Reliability | 15% | ✅ 9/9 | ✅ done |
+| **Total** | 100% | **60/60** | **5/5** |
+
+App shell: ✅ scaffold · ✅ multi-cert switcher & picker · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links

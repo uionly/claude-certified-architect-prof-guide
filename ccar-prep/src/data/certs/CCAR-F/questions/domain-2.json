@@ -1,0 +1,255 @@
+[
+  {
+    "id": 201,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Design effective tool interfaces with clear descriptions and boundaries",
+    "type": "single",
+    "question": "In your multi-agent research system, the analysis subagent has two MCP tools, analyze_content (\"Analyzes content and returns insights\") and analyze_document (\"Analyzes documents and returns insights\"). Web search results are routinely routed to the wrong tool, corrupting the analysis stage. What is the most effective fix?",
+    "options": [
+      "Rename analyze_content to extract_web_results and rewrite both descriptions to state each tool's inputs, outputs, and when to use it versus the other",
+      "Add five to eight few-shot examples to the subagent's system prompt demonstrating which tool should handle web results versus documents",
+      "Insert a deterministic routing layer that inspects each payload for URLs before the model turn and pre-selects the appropriate analysis tool",
+      "Merge both tools into a single analyze_input tool with a source_type parameter so the model no longer has to choose between them"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Tool descriptions are the primary mechanism LLMs use for tool selection, and these two are functionally indistinguishable. Renaming to eliminate overlap and rewriting each description with concrete inputs, outputs, and boundary guidance (when to use it versus the similar alternative) fixes the root cause of the misrouting directly and cheaply.",
+      "Tempting because examples do shape behavior, but few-shot routing patterns add ongoing token overhead to compensate for descriptions that remain ambiguous. The model still reads two near-identical descriptions at selection time; the root cause is untouched and novel inputs will still misroute.",
+      "A pre-turn routing layer bypasses the model's natural-language understanding with brittle heuristics — a payload mentioning a URL is not necessarily web content — and adds infrastructure to work around a documentation defect. It is over-engineering when a description rewrite resolves the confusion.",
+      "Consolidation can be a valid architecture, but it hides two distinct contracts behind a parameter the model must still set correctly, relocating the same ambiguity into an argument. It is also a larger change than the situation warrants when differentiated names and descriptions fix selection outright."
+    ],
+    "principle": "descriptions are the tool-selection mechanism — eliminate overlap first",
+    "relatedConcept": "Ambiguous or overlapping tool descriptions cause misrouting; renaming and boundary-rich descriptions fix selection at its root.",
+    "overallExplanation": "Tool descriptions are the primary mechanism LLMs use for tool selection, so overlapping descriptions must be differentiated — rename to purpose-specific names and describe inputs, outputs, and boundaries versus similar tools. Few-shot patches, routing layers, and consolidation all work around the root cause instead of fixing it."
+  },
+  {
+    "id": 202,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Design effective tool interfaces with clear descriptions and boundaries",
+    "type": "single",
+    "question": "Your research system's document subagent exposes one generic analyze_document tool that takes a free-text instructions parameter. Depending on phrasing, it returns summaries, extracted figures, or claim checks in unpredictable shapes, and downstream agents cannot rely on the output structure. What is the best redesign?",
+    "options": [
+      "Split it into purpose-specific tools — extract_data_points, summarize_content, and verify_claim_against_source — each with a defined input/output contract",
+      "Keep the single tool but require callers to phrase the instructions parameter using a documented template that enumerates the allowed request types",
+      "Keep the single tool and attach a strict JSON schema to its output so every response is guaranteed to arrive in one machine-parseable shape",
+      "Wrap the tool in a PostToolUse hook that detects which kind of output came back and reformats it into a normalized envelope for downstream agents"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Splitting a generic tool into purpose-specific tools with defined input/output contracts gives each operation a clear name, a predictable schema, and an unambiguous selection signal. Downstream agents can depend on each tool's shape, and the model selects by purpose instead of encoding intent into free text.",
+      "Tempting because templates constrain phrasing, but the tool still multiplexes three different operations through one text field — the model must compose the template correctly every time, and the output shape still varies by request type. The contract remains implicit where it should be structural.",
+      "A single schema cannot honestly represent three different operations: it either becomes a loose union (downstream agents still branch on what actually arrived) or forces summaries and data extractions into the same shape. Schema rigor is valuable per purpose, which is exactly what splitting provides.",
+      "A normalization hook treats the symptom downstream while the tool interface stays ambiguous: the model still guesses phrasing, the tool still guesses intent, and the hook now guesses which output type it received. Three layers of inference replace one clear contract per operation."
+    ],
+    "principle": "split generic tools into purpose-specific contracts",
+    "relatedConcept": "Purpose-specific tools with defined input/output contracts replace free-text intent guessing with structural clarity for both the model and downstream consumers.",
+    "overallExplanation": "Split generic multiplex tools into purpose-specific tools — extract_data_points, summarize_content, verify_claim_against_source — each with a defined input/output contract. Structural clarity beats templated free text, union schemas, and after-the-fact normalization."
+  },
+  {
+    "id": 203,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Design effective tool interfaces with clear descriptions and boundaries",
+    "type": "multi",
+    "question": "Your support agent calls its knowledge-search tool on nearly every request, even simple order lookups. Its tool descriptions were recently expanded with input formats and example queries, but they say nothing about when to prefer each tool over the others — and the system prompt opens with \"Always search the knowledge base thoroughly before responding.\" Which two changes best restore reliable tool selection? (Choose two.)",
+    "options": [
+      "Add boundary explanations to each description clarifying when to use that tool versus the similar alternatives available to the agent",
+      "Revise the system prompt's keyword-sensitive wording, which is creating an unintended association that overrides the tool descriptions",
+      "Set tool_choice to \"any\" on every request so the model is always forced to invoke some tool rather than defaulting to knowledge search",
+      "Add a regex-based pre-processor that detects order numbers in the user message and forces lookup_order before the model sees the request"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Input formats and example queries are necessary but insufficient — descriptions also need boundary explanations distinguishing each tool from similar alternatives. Without \"use this versus that\" guidance, the model has no basis to prefer lookup_order over a broad knowledge search that superficially covers everything.",
+      "Correct. System prompt wording influences tool selection, and keyword-sensitive instructions like \"always search the knowledge base\" create unintended tool associations strong enough to override well-written descriptions. Reviewing and softening that wording removes the standing directive that biases every turn toward one tool.",
+      "tool_choice \"any\" guarantees that a tool is called, not which one — the agent already calls a tool on every request; it calls the wrong one. This setting addresses conversational-text-instead-of-tool-call failures, which is not the failure mode described.",
+      "Regex pre-routing bypasses the model's language understanding with brittle pattern matching — order numbers appear in messages that are not order lookups — and it papers over the two real defects: missing boundary guidance and a biased system prompt. It adds infrastructure where two text fixes suffice."
+    ],
+    "principle": "boundaries in descriptions, and audit prompts for keyword bias",
+    "relatedConcept": "Tool selection is shaped by both the descriptions and the system prompt — keyword-sensitive instructions can override even well-differentiated tool documentation.",
+    "overallExplanation": "Reliable tool selection needs boundary explanations in descriptions (when to use each tool versus alternatives) and a system prompt free of keyword-sensitive instructions that create unintended tool associations. Both layers shape selection; fixing only one leaves the bias in place."
+  },
+  {
+    "id": 204,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Implement structured error responses for MCP tools",
+    "type": "single",
+    "question": "Every MCP tool behind your support agent returns the same failure payload: isError true with the text \"Operation failed.\" Logs show the agent retrying malformed-input errors that can never succeed while abandoning transient gateway timeouts that a single retry would have resolved. What should the tools return instead?",
+    "options": [
+      "Structured error metadata: an errorCategory such as transient, validation, or permission, an isRetryable boolean, and a human-readable description",
+      "A client-side policy that automatically retries every failed tool call up to three times with exponential backoff before surfacing the error",
+      "Longer, more detailed prose in the error text so the model can infer from the wording whether the failure is worth retrying",
+      "Successful empty results in place of error responses, so the agent continues the conversation instead of getting stuck on failures"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Uniform generic errors prevent the agent from making appropriate recovery decisions. Structured metadata — errorCategory distinguishing transient from validation from permission failures, an explicit isRetryable flag, and a human-readable description — lets the agent retry what can succeed, stop wasting attempts on what cannot, and explain the situation appropriately.",
+      "Tempting because it handles transients without model involvement, but a uniform retry policy is the same mistake in client clothing: it burns three attempts on validation errors that can never succeed and treats permission failures identically to timeouts. Retry decisions need error category information the tools currently withhold.",
+      "Prose forces the model to parse recovery semantics out of natural language, which is exactly the unreliable inference structured fields exist to eliminate. A description is valuable for explanation, but the retryability decision should ride on an explicit boolean, not on wording.",
+      "Returning empty results as success is silent error suppression, a named anti-pattern: the agent now believes queries succeeded with no matches and confidently tells customers their orders do not exist. Hiding failures produces wrong answers, which is strictly worse than visible errors."
+    ],
+    "principle": "structured error metadata enables intelligent recovery",
+    "relatedConcept": "The MCP isError pattern works when paired with errorCategory, isRetryable, and readable descriptions — generic uniform failures leave the agent guessing.",
+    "overallExplanation": "Return structured error metadata — errorCategory (transient/validation/permission), an isRetryable boolean, and a human-readable description — so the agent can make correct recovery decisions. Uniform generic errors, blanket retries, and silent suppression all leave the agent guessing or wrong."
+  },
+  {
+    "id": 205,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Implement structured error responses for MCP tools",
+    "type": "single",
+    "question": "Your research system's search tool returns an empty array both when the search backend times out and when a query genuinely matches nothing. The coordinator keeps re-issuing queries that already completed successfully with no matches, while real outages pass unnoticed as \"no results.\" How should the tool interface change?",
+    "options": [
+      "Distinguish access failures — returned via isError with transient metadata for retry decisions — from valid empty results, which return as successes with zero matches",
+      "Mark every empty response as an error so the coordinator always retries, guaranteeing that genuine outages are never silently mistaken for empty result sets",
+      "Have the coordinator infer the difference from response latency, treating fast empty responses as true no-match results and slow ones as probable timeouts",
+      "Raise the search backend's timeout ceiling so slow queries complete more often, which reduces how frequently the ambiguous empty case occurs at all"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. These are semantically different outcomes that must be structurally different in the interface: an access failure needs a retry decision and should arrive as a structured error (isError with a transient category and isRetryable flag), while a valid empty result is a successful query with no matches and should be reported as such. The coordinator can then act correctly on each.",
+      "Tempting because it makes outages visible, but it does so by falsifying the semantics of successful queries: a legitimate no-match answer is real information, and flagging it as an error triggers the exact wasted retries the scenario describes. Correctness requires distinguishing the cases, not collapsing them the other way.",
+      "Latency is a heuristic, not a signal: caches make failing calls fast, cold starts make successful calls slow, and every inference error either retries a valid result or ignores an outage. The tool knows definitively which case occurred and should say so explicitly in its response structure.",
+      "Longer timeouts shrink one trigger of the ambiguity without resolving it — timeouts still happen, and when they do the coordinator still cannot tell them from empty result sets. The interface defect survives any backend tuning; only structural distinction in the response removes it."
+    ],
+    "principle": "an empty result is not an error — encode the difference",
+    "relatedConcept": "Structured error design separates access failures needing retry decisions from valid empty results representing successful queries with no matches.",
+    "overallExplanation": "Tool interfaces must distinguish access failures (structured errors with retry metadata) from valid empty results (successful queries with no matches). Collapsing the two in either direction produces wasted retries or silently missed outages."
+  },
+  {
+    "id": 206,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Distribute tools appropriately across agents and configure tool choice",
+    "type": "single",
+    "question": "Every subagent in your research system is configured with the full 18-tool catalog. Tool-selection errors have climbed as tools were added, and traces show the synthesis subagent occasionally launching raw web searches mid-synthesis instead of working from the findings it was given. What is the best remediation?",
+    "options": [
+      "Restrict each subagent to the 4-5 tools its role needs, adding a scoped verify_fact tool for the synthesis agent's high-frequency checks and routing complex cases through the coordinator",
+      "Keep the shared 18-tool catalog but rewrite every tool description with sharper boundaries so each subagent can more reliably identify the tools relevant to its role",
+      "Add a rule to each subagent's system prompt listing which of the 18 tools belong to its specialization and instructing it never to call the others",
+      "Upgrade the subagents to a more capable model tier, since stronger models handle large tool catalogs with substantially fewer selection errors"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Too many tools degrades selection reliability by increasing decision complexity, and agents holding tools outside their specialization tend to misuse them — the searching synthesis agent is the textbook case. Scoped access gives each role only its relevant tools, with a constrained cross-role tool (verify_fact) for legitimate high-frequency needs and coordinator routing for everything complex.",
+      "Tempting because descriptions do matter, but even perfectly written descriptions leave every agent choosing among 18 options — the decision complexity that drives the error rate is untouched. Description quality and tool-set scoping are complementary; only scoping removes the wrong choices from the menu.",
+      "A prompt rule is probabilistic guidance layered over a structural problem: the out-of-role tools remain available, and the synthesis agent that already drifts into web searches can drift past an instruction too. Tool restrictions in the agent configuration make out-of-role calls impossible rather than discouraged.",
+      "Model capability shifts the error curve but not its cause — decision complexity scales with catalog size for any model, and the specialization mismatch (a synthesis agent holding search tools) remains. Paying more per token to tolerate a misconfiguration is treating the symptom."
+    ],
+    "principle": "scope tool access to role; fewer tools, better selection",
+    "relatedConcept": "Tool distribution follows specialization: 4-5 role-relevant tools per agent, constrained cross-role tools for high-frequency needs, coordinator routing for the rest.",
+    "overallExplanation": "Restrict each subagent's tool set to its role — a large shared catalog degrades selection reliability, and out-of-role tools invite misuse like a synthesis agent running web searches. Scoped cross-role tools such as verify_fact handle high-frequency needs while complex cases route through the coordinator."
+  },
+  {
+    "id": 207,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Distribute tools appropriately across agents and configure tool choice",
+    "type": "single",
+    "question": "Your structured data extraction pipeline requires extract_metadata to run on every document before any enrichment tool touches it. With tool_choice left at \"auto\", Claude sometimes opens with an enrichment tool or replies in prose about the document instead. How do you guarantee the required first step?",
+    "options": [
+      "Send the first request with tool_choice {\"type\": \"tool\", \"name\": \"extract_metadata\"}, then process the enrichment steps in follow-up turns",
+      "Set tool_choice to \"any\" on the first request so the model must begin with a tool call instead of responding with conversational prose",
+      "State prominently in the system prompt that extract_metadata is always mandatory before enrichment and reinforce it with two worked examples",
+      "Remove the enrichment tools from the platform and run enrichment in a separate downstream service so no ordering decision remains for the model"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Forced tool selection — tool_choice {\"type\": \"tool\", \"name\": \"extract_metadata\"} — makes the required first call a structural certainty rather than a modeled preference. Subsequent enrichment steps then proceed in follow-up turns where the model can choose freely among the enrichment tools with the metadata already in context.",
+      "Tempting because \"any\" does eliminate the prose responses, but it only guarantees that some tool is called — the model can still open with an enrichment tool. The requirement is a specific tool first, which is exactly the case forced selection exists for.",
+      "Prompt instructions and examples raise compliance but remain probabilistic — the failure is already observed under \"auto\", and a hard ordering requirement should not rest on the model usually following directions. The API offers a deterministic mechanism for precisely this; use it.",
+      "This achieves ordering by dismantling the agent's capabilities: enrichment leaves the model's reach entirely, forfeiting its ability to select enrichment tools based on what the metadata reveals. A one-parameter change on the first request achieves the guarantee without amputating the pipeline."
+    ],
+    "principle": "force the specific tool when ordering must be guaranteed",
+    "relatedConcept": "tool_choice spans \"auto\" (text allowed), \"any\" (some tool required), and forced selection (a named tool required) — pick the strength the requirement demands.",
+    "overallExplanation": "When a specific tool must run first, force it with tool_choice {\"type\": \"tool\", \"name\": \"extract_metadata\"} and handle subsequent steps in follow-up turns. \"any\" only guarantees some tool call, and prompt instructions remain probabilistic."
+  },
+  {
+    "id": 208,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Integrate MCP servers into Claude Code and agent workflows",
+    "type": "multi",
+    "question": "Your team wants its GitHub MCP server available to every developer who clones the repository, authenticated with each developer's own token and no secrets committed to version control. One engineer also runs a personal experimental scraper server that should not affect teammates. Which two configuration choices are correct? (Choose two.)",
+    "options": [
+      "Define the GitHub server in the project-scoped .mcp.json, referencing the credential as ${GITHUB_TOKEN} for environment variable expansion",
+      "Configure the experimental scraper in the engineer's user-scoped ~/.claude.json so it stays personal and invisible to the rest of the team",
+      "Define both servers in the project's .mcp.json with tokens inlined, since the repository is private and access is already limited to the team",
+      "Have each developer add the GitHub server to their own ~/.claude.json so the shared tooling never requires changes to the repository"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Project-scoped .mcp.json is the mechanism for shared team tooling: it ships with the repository so every developer who clones it gets the server, and ${GITHUB_TOKEN} environment variable expansion lets each developer authenticate with their own credential without any secret entering version control.",
+      "Correct. User-scoped ~/.claude.json is the home for personal and experimental servers: the scraper stays available to the engineer across her projects while teammates' configurations are untouched. Both scopes' servers are discovered at connection time and available simultaneously.",
+      "Inlining tokens in a committed file is a credential leak regardless of repository visibility — tokens enter git history permanently, survive access changes, and are shared across developers who should each authenticate individually. Environment variable expansion exists precisely to keep secrets out of .mcp.json.",
+      "This distributes shared team tooling through per-user configuration, so every new developer must discover and hand-copy the server definition, and any server change must propagate through every teammate's home directory. Project scope exists so shared tooling is versioned with the project itself."
+    ],
+    "principle": "project scope for shared tooling, user scope for personal; secrets via env vars",
+    "relatedConcept": "MCP server scoping pairs .mcp.json (team-shared, version-controlled, ${ENV_VAR} credentials) with ~/.claude.json (personal and experimental servers).",
+    "overallExplanation": "Shared team MCP servers belong in project-scoped .mcp.json with ${ENV_VAR} expansion for credentials; personal and experimental servers belong in user-scoped ~/.claude.json. This keeps team tooling versioned, secrets uncommitted, and personal experiments isolated."
+  },
+  {
+    "id": 209,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Integrate MCP servers into Claude Code and agent workflows",
+    "type": "single",
+    "question": "Your developer productivity agent integrates an issue-tracker MCP server. Traces show that before answering any question, the agent burns six to ten exploratory list and search tool calls just discovering which projects, components, and issue types exist in the tracker. What server-side change reduces this overhead most directly?",
+    "options": [
+      "Expose the tracker's content catalog — project hierarchy, issue-type summaries, component structure — as MCP resources the agent can consult without tool calls",
+      "Add a search_everything tool that spans projects, components, and issue types so the agent can complete its discovery in a single broad call",
+      "Paste a maintained export of the tracker's project and component structure into the agent's system prompt so discovery is never needed at runtime",
+      "Raise the agent's maximum turn limit so the exploratory phase can always complete without truncating the discovery calls it needs to make"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. MCP resources exist to expose content catalogs — issue summaries, documentation hierarchies, database schemas — giving agents visibility into what data is available without spending exploratory tool calls. The agent starts each task already knowing the tracker's structure and calls tools only to act on it.",
+      "Tempting because it compresses discovery into one call, but it still spends runtime tool calls learning static structure, and a single everything-search returns a large undifferentiated payload the agent must sift in context. It also adds yet another broad tool that competes with the specific ones during selection.",
+      "A hand-maintained system prompt export goes stale the day a project is added, silently misleading the agent, and it charges the full catalog against every conversation's context whether relevant or not. Resources deliver the same visibility from the live server without a manual maintenance chore.",
+      "Raising the turn limit accommodates the waste rather than removing it — every conversation still pays six to ten calls of latency and tokens rediscovering structure that never changed. The overhead is the problem to eliminate, not a constraint to budget around."
+    ],
+    "principle": "expose catalogs as MCP resources, not as exploratory tool calls",
+    "relatedConcept": "MCP resources give agents visibility into available data — catalogs, hierarchies, schemas — so tool calls are spent acting rather than discovering.",
+    "overallExplanation": "Expose content catalogs (project hierarchies, issue summaries, schemas) as MCP resources so agents see what data exists without exploratory tool calls. Broader tools, pasted exports, and bigger turn budgets all accommodate the discovery waste instead of eliminating it."
+  },
+  {
+    "id": 210,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
+    "type": "single",
+    "question": "A developer asks your productivity agent how payment retries work in an unfamiliar 2,000-file codebase, providing only a function name from a stack trace, retryPaymentCapture. Which built-in tool strategy should the agent follow?",
+    "options": [
+      "Grep for retryPaymentCapture and related error messages to find entry points, then Read the matching files to follow imports and trace the flow",
+      "Glob for files whose paths contain \"retry\" or \"payment\" and Read each match, since naming conventions usually locate the relevant modules",
+      "Read the payments directory tree in full before answering, so the explanation rests on complete knowledge rather than sampled fragments",
+      "Run Bash to cat all files under the payments module into one output and reason over the combined dump in a single pass"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Grep is the content-search tool — function names, error messages, import statements — so it finds every definition and caller of retryPaymentCapture regardless of which files they live in. Reading those specific files and following their imports builds understanding incrementally, spending context only on code that is actually on the traced path.",
+      "Tempting because naming conventions often help, but Glob matches file path patterns, not contents: the retry logic may live in capture.ts or queue.ts and never mention \"retry\" in its path. Filename guessing misses the callers and helpers that content search finds directly.",
+      "Reading an entire directory tree up front floods the context with mostly irrelevant code before any question is answered, and 2,000-file codebases do not fit regardless. Effective exploration is incremental: search for entry points, then read along the trace, not exhaustive ingestion first.",
+      "A concatenated dump is the same context flood through a side door, minus the structure: file boundaries blur, the output likely truncates, and purpose-built Grep already exists for locating content. Bash is for executing commands, not for replacing targeted search and reading."
+    ],
+    "principle": "Grep for content, then Read to trace — explore incrementally",
+    "relatedConcept": "Built-in tool selection maps intent to tool: Grep searches file contents, Glob matches file paths, and codebase understanding builds incrementally from entry points.",
+    "overallExplanation": "Start with Grep to find entry points by content — function names, error messages — then Read the matching files to follow imports and trace flows incrementally. Glob matches paths, not contents, and reading everything upfront floods context with irrelevant code."
+  },
+  {
+    "id": 211,
+    "domain": "Tool Design & MCP Integration",
+    "objective": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
+    "type": "single",
+    "question": "Your agent must change one connection block in a generated config file made of dozens of nearly identical stanzas. Every Edit attempt fails because each candidate anchor string appears multiple times, so the tool rejects the replacement as non-unique. What is the most reliable way to complete the modification?",
+    "options": [
+      "Use Read to load the full file contents, apply the change to the correct stanza, and use Write to save the complete corrected file",
+      "Keep retrying Edit with progressively longer anchor strings until one happens to isolate the target stanza uniquely in the file",
+      "Use Bash with sed to replace the matching text globally, since command-line substitution is not subject to Edit's uniqueness restriction",
+      "Use Glob to locate an alternate copy of the configuration that contains fewer duplicate stanzas and apply the Edit there instead"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Read followed by Write is the designated fallback when Edit cannot find unique anchor text: the agent sees the whole file, modifies exactly the intended stanza with full positional context, and writes the complete result. In a file of near-identical blocks, whole-file rewriting is more reliable than hunting for uniqueness that may not exist.",
+      "Tempting because longer anchors sometimes do become unique, but in generated files of near-identical stanzas the repetition can extend beyond any practical anchor length, and each failed retry wastes a turn. When uniqueness is structurally unavailable, the documented fallback is Read + Write, not persistence.",
+      "Global sed substitution replaces every occurrence of the matched text, modifying all the identical stanzas when exactly one should change — the very ambiguity Edit's uniqueness check exists to catch. Escaping Edit's safety property is not the same as satisfying the requirement.",
+      "Glob finds files by path pattern; it cannot conjure a different copy of the file that needs changing, and editing some other configuration would leave the actual target untouched. The task is bound to this file, so the solution must operate on it."
+    ],
+    "principle": "when Edit lacks a unique anchor, fall back to Read + Write",
+    "relatedConcept": "Edit performs targeted modification via unique text matching; when uniqueness is unavailable, Read + Write is the reliable whole-file fallback.",
+    "overallExplanation": "When Edit fails on non-unique text matches, the reliable fallback is Read to load the full file and Write to save the corrected version. Retried anchors may never become unique in repetitive files, and global sed changes every occurrence instead of the one intended."
+  }
+]

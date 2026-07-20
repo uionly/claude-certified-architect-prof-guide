@@ -1,0 +1,301 @@
+[
+  {
+    "id": 201,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Sofia, an operations analyst at a retail chain, asks Claude to summarize a 40-page supplier contract before a renewal meeting. The summary reads fluently and confidently. What is the most appropriate way to evaluate it before relying on it?",
+    "options": [
+      "Check the summary against the original contract, confirming the critical clauses — pricing, termination, penalties — are covered and stated correctly",
+      "Accept it, since a fluent and well-organized summary indicates the source was understood correctly",
+      "Ask Claude whether it missed anything important and rely on its answer as the completeness check",
+      "Compare the summary's length to the contract's length to confirm an appropriate level of detail"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Evaluating an output means checking it against the source and against the task requirements: are the decision-critical clauses present, and are they represented accurately? Fluency is a property of the writing, not evidence about the underlying contract, so verification must go back to the original document.",
+      "Tempting because polished prose feels trustworthy, but fluency and confidence are exactly how a flawed summary presents itself too. Language models write smoothly whether or not they captured the source correctly, so readability is not an accuracy signal.",
+      "Asking the model to audit its own work reuses the same process that produced any errors, and a model that missed a clause typically does not know it missed it. Self-assessment can prompt useful additions but cannot substitute for checking against the source.",
+      "Length is a surface proxy that says nothing about whether the right content survived compression. A summary can be appropriately sized yet omit the termination clause that decides the renewal negotiation."
+    ],
+    "principle": "verify against the source, not against fluency",
+    "relatedConcept": "Evaluating an output means comparing it to the original material and the task's requirements — polish is not proof.",
+    "overallExplanation": "Verify against the source, not against fluency: evaluating an output means comparing it to the original material and the task's requirements, because polish is not proof."
+  },
+  {
+    "id": 202,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Daniel, an administrator at a hospital network, has Claude analyze a staffing spreadsheet. The narrative is insightful, but one departmental total in Claude's analysis doesn't match the figure he remembers from the source file. What should he do first?",
+    "options": [
+      "Trust the analysis, since Claude had direct access to the uploaded spreadsheet when computing totals",
+      "Recheck the figure against the spreadsheet itself, and if it is wrong, treat the other numbers as unverified until spot-checked",
+      "Ask Claude to confirm its own total in the same conversation and proceed if it stands by the number",
+      "Forward the analysis with a general note that some figures may need double-checking later"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because access to the source feels like a guarantee, but models can misread, miscount, or mis-aggregate data they were given. Having the spreadsheet in context lowers error rates; it does not eliminate them, so a suspected discrepancy still demands source verification.",
+      "Correct. One demonstrated numeric error changes the evidence status of the whole output: verification against the source resolves the specific discrepancy, and a confirmed error means the remaining figures need spot-checking before anyone acts on them. This is evaluation driven by the source, not by trust.",
+      "A model asked to confirm its own figure will often restate it confidently, whether right or wrong. Self-confirmation adds no independent evidence; only the spreadsheet itself can settle which number is correct.",
+      "Shipping known-doubtful numbers with a vague disclaimer transfers the verification burden to readers who lack the source file. A caveat does not make an inaccurate figure safe to circulate in a hospital staffing decision."
+    ],
+    "principle": "one caught error means the rest is unverified",
+    "relatedConcept": "Accuracy evaluation treats a single confirmed mistake as a signal to widen checking, and only the source data can adjudicate a numeric discrepancy.",
+    "overallExplanation": "One caught error means the rest is unverified: accuracy evaluation widens checking after a confirmed mistake, and only the source data can adjudicate a numeric discrepancy."
+  },
+  {
+    "id": 203,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "multi",
+    "question": "Lena, a marketing manager at a fintech startup, used Claude to produce a competitive landscape brief for tomorrow's executive meeting. Which two checks are the most appropriate way to evaluate the brief before presenting it? (Choose two.)",
+    "options": [
+      "Verify the specific factual claims and statistics in the brief against the original sources they describe",
+      "Confirm the brief actually answers every question the executives asked for, not just the topics Claude chose to cover",
+      "Ask Claude to rate its own confidence in the brief and present it if the self-rating is high",
+      "Rerun the same prompt and treat matching output across two runs as confirmation of accuracy"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Accuracy evaluation traces checkable claims — market share figures, funding rounds, product capabilities — back to authoritative sources. Fabricated or outdated specifics are precisely the kind of error that survives a fluency read-through and embarrasses a presenter in front of executives.",
+      "Correct. Completeness is measured against the task's requirements, not against the output's internal coherence. A brief can be accurate in everything it says while silently omitting two of the five questions leadership asked, so the evaluation must compare coverage to the original request.",
+      "Self-reported confidence is not a reliable accuracy signal; models express high confidence about fabricated details as readily as about true ones. Treating the model's self-rating as validation outsources the judgment the human evaluator is there to provide.",
+      "Two runs of the same prompt can repeat the same mistake, because both draw on the same model and the same request. Consistency between outputs measures stability, not truth — agreement with reality requires checking against sources."
+    ],
+    "principle": "accuracy against sources, completeness against the ask",
+    "relatedConcept": "A full evaluation has two axes — are the claims true, and does the output cover everything the task required?",
+    "overallExplanation": "Accuracy against sources, completeness against the ask: a full evaluation checks both whether the claims are true and whether the output covers everything the task required."
+  },
+  {
+    "id": 204,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "single",
+    "question": "Yusuf, a communications officer at a state agency, asks Claude about accessibility requirements. Claude cites a specific government report by title and publication number, but Yusuf cannot find the report anywhere on the agency's site or in a web search. What is the most likely explanation, and the right response?",
+    "options": [
+      "The report is probably real but poorly indexed; cite it in his materials and note the search difficulty",
+      "The citation is likely a hallucination — a plausible-looking fabricated detail — so he should not use it unless he can locate the actual document",
+      "The specificity of the title and publication number indicates the reference is genuine, so no further checking is needed",
+      "Ask Claude for a direct link to the report and treat a provided URL as confirmation that it exists"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because indexing gaps do exist, but assuming a document is real when it cannot be found anywhere inverts the burden of proof. Citing an unlocatable source in official communications is exactly the failure mode that hallucinated citations cause.",
+      "Correct. Language models can fabricate specific-looking details — titles, publication numbers, section references — with full fluency. An unfindable citation should be presumed hallucinated until the actual document is located; specificity is a property of the text, not evidence of existence.",
+      "Specificity is precisely what makes hallucinations dangerous: fabricated details are generated with the same precise formatting as real ones. Judging authenticity by how official a citation looks is the reasoning error this objective exists to prevent.",
+      "A model that hallucinated the report can just as easily hallucinate a plausible URL for it. Asking the same system to corroborate its own fabrication adds no independent evidence; verification must come from outside the model."
+    ],
+    "principle": "specific-looking details can still be fabricated",
+    "relatedConcept": "Hallucinated citations are fluent and precisely formatted — existence must be confirmed against the real source, never inferred from specificity.",
+    "overallExplanation": "Specific-looking details can still be fabricated: hallucinated citations are fluent and precisely formatted, so existence must be confirmed against the real source, never inferred from specificity."
+  },
+  {
+    "id": 205,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "single",
+    "question": "Grace, an HR manager at a media company, uses Claude to summarize interview notes into candidate write-ups. Reviewing a batch, she notices the summaries describe some candidates with notably warmer, more confident language than others, in ways the underlying notes don't seem to justify. What should she do?",
+    "options": [
+      "Treat this as potential bias: compare the summaries systematically against the source notes and add human review before the write-ups influence decisions",
+      "Assume the tone differences accurately reflect real differences in how the candidates interviewed",
+      "Ask Claude directly whether its summaries are biased and accept its assessment of its own output",
+      "Standardize the problem away by instructing Claude to describe every candidate in identical positive language"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Systematic tone differences not grounded in the source material are a signature of bias in generated text. The right response is evidence-based: audit outputs against the notes to confirm the skew, and insert human review before the outputs affect hiring decisions, where biased language causes real harm.",
+      "Tempting because interviews do differ, but Grace's observation was that the tone gaps are not supported by the notes. Assuming generated differences reflect reality — when the source material says otherwise — is exactly how bias passes unnoticed into decisions.",
+      "Models are unreliable auditors of their own bias; a self-assessment is generated by the same process being questioned. Bias detection needs comparison against the source material and human judgment, not the model's opinion of itself.",
+      "Forcing identical positive language destroys the write-ups' informational value and hides the problem rather than fixing it. Legitimate, note-supported distinctions between candidates should survive; unsupported skew is what needs to be removed."
+    ],
+    "principle": "audit systematic skew against the source material",
+    "relatedConcept": "Bias in outputs shows up as patterned differences the source doesn't justify, and it warrants human review wherever outputs feed consequential decisions.",
+    "overallExplanation": "Audit systematic skew against the source material: bias shows up as patterned differences the source doesn't justify, and it warrants human review wherever outputs feed consequential decisions."
+  },
+  {
+    "id": 206,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Priyanka, a curriculum director at a community college, asked Claude for enrollment and completion statistics to include in a board presentation. The numbers look plausible. Which fact-checking approach is most appropriate before the slides go to the board?",
+    "options": [
+      "Trace each statistic to an authoritative primary source, such as the education department's published data, and cite that source on the slide",
+      "Ask Claude in the same conversation to double-check its statistics and correct any it identifies as wrong",
+      "Check the numbers against another AI chatbot and treat agreement between the two as verification",
+      "Add a footnote stating the figures are AI-generated so the board can apply its own judgment"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The core fact-checking technique is tracing claims to authoritative primary sources — the organizations that actually publish the data. This both catches fabricated or outdated figures and produces the citation the board presentation needs to be credible.",
+      "Tempting because the model will comply and often adjust something, but a self-check runs on the same knowledge that produced the originals. It cannot reliably distinguish its own accurate figures from its plausible fabrications, so it is not independent verification.",
+      "Two language models can be wrong in similar ways, and agreement between them establishes only that the claim is plausible, not that it is true. Cross-model consensus is not a substitute for checking the actual published data.",
+      "A disclaimer transfers the verification job to board members who have no better means to check the figures than Priyanka does. Fact-checking is the presenter's diligence obligation; labeling unverified numbers does not make them fit for a governance decision."
+    ],
+    "principle": "trace claims to authoritative primary sources",
+    "relatedConcept": "Real validation is independent of the model — self-checks and cross-model agreement measure plausibility, while primary sources establish truth.",
+    "overallExplanation": "Trace claims to authoritative primary sources: real validation is independent of the model, since self-checks and cross-model agreement measure plausibility while primary sources establish truth."
+  },
+  {
+    "id": 207,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Ben, an analyst at a logistics company, has Claude summarize a quarter of internal operations meeting notes into a leadership readout. The source notes are internal documents, and Ben has one hour to validate the readout. How should he spend that validation time?",
+    "options": [
+      "Run a web search on the readout's main claims to see whether external sources corroborate them",
+      "Check the readout's claims directly against the uploaded meeting notes, prioritizing figures, dates, and recorded commitments",
+      "Assume the readout is grounded, since Claude generated it directly from the uploaded source notes",
+      "Read the readout carefully on its own, flagging anything that sounds internally inconsistent or surprising"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because web verification is a standard fact-checking technique, but it is the wrong tool here: internal meeting content does not exist on the public web. Validation technique must match where the ground truth lives, and for internal notes that is the notes themselves.",
+      "Correct. The right technique compares output to its actual source, and with limited time, verification effort goes first to the highest-consequence claims — numbers, dates, and commitments leadership will act on. This is targeted source-checking rather than trust or surface reading.",
+      "Access to source documents reduces but does not eliminate errors: models can misattribute a decision, merge two discussions, or drop a caveat from the notes. \"It had the source\" is an assumption, not a validation technique.",
+      "A standalone read catches internal contradictions but cannot catch confident misstatements of what the notes actually say — the readout can be perfectly coherent and still wrong about who committed to what. Coherence checking supplements source comparison; it cannot replace it."
+    ],
+    "principle": "validate against where the ground truth lives",
+    "relatedConcept": "Choose the verification method that matches the source of truth, and spend limited checking time on the claims with the highest consequences.",
+    "overallExplanation": "Validate against where the ground truth lives: choose the verification method that matches the source of truth, and spend limited checking time on the highest-consequence claims."
+  },
+  {
+    "id": 208,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "single",
+    "question": "Olivia, an operations lead at an insurance company, used Claude to draft a customer-facing notification about changes to policy coverage terms. The draft is accurate to the internal change memo she provided and reads well. What should happen before the notification is sent to customers?",
+    "options": [
+      "Send it, since the draft was grounded in the official internal memo and reads professionally",
+      "Route it through legal or compliance review, because it is an external communication with regulatory and contractual implications",
+      "Have a colleague proofread it for typos and formatting, then send it to the customer list",
+      "Ask Claude to review the draft from a lawyer's perspective and incorporate its suggested edits"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because grounding in the memo handles factual accuracy, but accuracy to an internal document is not the bar for this output. Coverage-change notifications carry legal obligations about wording, required disclosures, and timing that the memo's author and Claude may both have missed.",
+      "Correct. The trigger for expert human review is consequence, not quality: external communications with regulatory, contractual, or legal weight require review by the humans accountable for those risks, no matter how polished the draft. Claude accelerates the drafting; it does not absorb the accountability.",
+      "Proofreading checks surface quality, but the risk in this document is substantive — whether the wording creates legal exposure or omits a required disclosure. A typo pass by a colleague is review at the wrong level for the stakes involved.",
+      "A lawyer-persona review is still the model reviewing itself, with no professional accountability and no knowledge of the company's specific regulatory posture. Simulated expertise is useful for pre-review tightening, but it cannot substitute for the real function."
+    ],
+    "principle": "consequence, not polish, triggers expert review",
+    "relatedConcept": "Outputs with legal, regulatory, medical, or financial weight need accountable human expert review before use, regardless of how good the draft looks.",
+    "overallExplanation": "Consequence, not polish, triggers expert review: outputs with legal, regulatory, or financial weight need accountable human review before use, regardless of how good the draft looks."
+  },
+  {
+    "id": 209,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "multi",
+    "question": "A hospital operations team uses Claude across many tasks. Which two of the following outputs require expert human review before they are used? (Choose two.)",
+    "options": [
+      "A draft of discharge-instruction language that will be given directly to patients",
+      "A summary of recent regulatory changes affecting the hospital's billing compliance",
+      "A brainstormed list of icebreaker activities for the team's monthly staff meeting",
+      "A reformatted table of next week's internal meeting-room bookings"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Patient-facing clinical guidance carries direct safety consequences: an error in discharge instructions can cause real harm. Content in medical, legal, or financial high-stakes categories requires review by qualified professionals before it reaches the people who will act on it.",
+      "Correct. Regulatory summaries drive compliance decisions, and hallucinated or outdated regulatory details are a known model failure mode. Before the hospital adjusts billing practices, the summary needs verification against the actual regulations by someone accountable for compliance.",
+      "Tempting to treat everything uniformly, but icebreaker ideas are low-stakes and fully judgeable by the person reading them — a weak suggestion is simply not used. Applying expert-review gates to trivial creative output wastes reviewer time and slows adoption without reducing any real risk.",
+      "A reformatting task over internal scheduling data is low-consequence and self-evident to verify at a glance. Requiring formal review for it confuses the presence of AI with the presence of risk; review intensity should scale with the cost of an error."
+    ],
+    "principle": "scale review intensity to the cost of an error",
+    "relatedConcept": "Human expert review is mandatory where outputs affect safety, compliance, or money — and wasteful where errors are cheap and self-evident.",
+    "overallExplanation": "Scale review intensity to the cost of an error: expert review is mandatory where outputs affect safety, compliance, or money, and wasteful where errors are cheap and self-evident."
+  },
+  {
+    "id": 210,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "single",
+    "question": "Carlos, a communications specialist at a software company, receives an accurate but jargon-dense incident summary written by Claude for the engineering team. He now needs a version for affected customers. What is the most effective approach?",
+    "options": [
+      "Send the engineering version to customers, since it is the most accurate and complete account available",
+      "Ask Claude to rewrite the summary for customers, specifying a non-technical reading level, a reassuring tone, and which facts must be preserved",
+      "Trim the technical sections out of the engineering version and send the shortened remainder to customers",
+      "Write the customer version himself from scratch, since audience adaptation is inherently a human-only task"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because accuracy feels like the safest choice, but an audience-mismatched document fails even when every fact is right: customers cannot parse engineering jargon, and the details that matter to them — impact and resolution — are buried. Fitness for audience is part of output quality.",
+      "Correct. Adapting for a new audience is a re-generation task with explicit constraints: state the reader, reading level, tone, and the facts that must survive the translation. This preserves accuracy while transforming register — the core skill of audience adaptation.",
+      "Deleting technical sections leaves a document that was still organized and worded for engineers, now with holes where the substance was. Adaptation means re-expressing the same facts for a new reader, not subtracting text from the old version.",
+      "Manual rewriting produces a fine result but abandons the leverage the tool provides: Claude adapts register and structure quickly and well when given clear audience constraints. Reserving human effort for reviewing the adaptation is the better division of labor."
+    ],
+    "principle": "adaptation is re-expression, not deletion",
+    "relatedConcept": "Tailoring output to an audience means specifying the reader, tone, and must-keep facts and regenerating — accuracy alone doesn't make a document fit its readers.",
+    "overallExplanation": "Adaptation is re-expression, not deletion: tailoring output means specifying the reader, tone, and must-keep facts and regenerating, because accuracy alone doesn't make a document fit its readers."
+  },
+  {
+    "id": 211,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "single",
+    "question": "Mei, a marketing lead at a subscription meal-kit company, had Claude generate two candidate versions of a re-engagement email for lapsed customers. She must pick one to send. What is the best way to compare them?",
+    "options": [
+      "Evaluate both versions against defined criteria for this audience — clarity of the offer, tone for lapsed customers, strength of the call to action",
+      "Choose the longer version, since it contains more persuasive content and covers more of the offer",
+      "Ask Claude which of its two outputs is better and send whichever one it selects",
+      "Merge all distinctive elements of both versions into one email so nothing of value is lost"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Comparing outputs requires explicit criteria derived from the audience and the goal — what must this email accomplish with this reader? Judging both drafts against the same rubric turns a taste-based choice into a defensible decision, and the criteria can also drive a final refinement round.",
+      "Length is not a quality criterion, and for a re-engagement email it often cuts the other way: lapsed customers skim, and a longer message can bury the offer. Choosing by volume substitutes an easy-to-measure proxy for the audience-fit judgment the task requires.",
+      "Claude can articulate trade-offs between the drafts, which is useful input, but delegating the final choice discards the context only Mei has — brand voice, past campaign performance, and what this segment responds to. The human owns the audience judgment.",
+      "Merging everything produces a longer, less coherent email that serves neither version's structure. Comparison exists to select and refine the stronger approach, not to concatenate both; \"keep everything\" is the avoidance of a decision, not a method."
+    ],
+    "principle": "compare drafts against audience-derived criteria",
+    "relatedConcept": "Choosing between outputs is a rubric exercise — define what success looks like for this reader and goal, then judge both versions against it.",
+    "overallExplanation": "Compare drafts against audience-derived criteria: choosing between outputs is a rubric exercise — define what success looks like for this reader and goal, then judge both versions against it."
+  },
+  {
+    "id": 212,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "single",
+    "question": "Hannah, a program officer at an education foundation, is using Claude to build a multi-section grantee onboarding guide. She expects to refine it over several rounds of feedback and then share the finished document with her team. Which output format should she request?",
+    "options": [
+      "An artifact, so the guide exists as a standalone document she can iterate on and share when it's ready",
+      "Inline chat responses, keeping each section as a separate message she can scroll back to later",
+      "A fresh chat per section, so each part of the guide develops in its own clean conversation",
+      "A compact bulleted outline in chat, since shorter output is easier to review at each round"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Artifacts are designed for exactly this shape of work: substantial, self-contained content that gets revised iteratively and ultimately shared or exported. The guide stays a single coherent document across feedback rounds instead of fragmenting into conversation history.",
+      "Tempting because chat is the default, but a multi-section document scattered across inline messages fragments with every revision — each fix produces another partial copy, and assembling the final guide means scavenging through scroll-back for the latest version of each section.",
+      "Separate chats fragment the work further and discard shared context: tone and structure decisions made for one section don't carry to the next, and no single place ever holds the current state of the whole guide.",
+      "An outline is a fine early step, but choosing it as the format because it is easier to review optimizes the reviewer's convenience over the deliverable. The end product is a full guide, and the format should support building and refining that actual artifact."
+    ],
+    "principle": "substantial, iterated, shareable content belongs in an artifact",
+    "relatedConcept": "Format selection follows the content's lifecycle — documents that will be revised and shared need a standalone container, not chat scroll-back.",
+    "overallExplanation": "Substantial, iterated, shareable content belongs in an artifact: format selection follows the content's lifecycle, and documents that will be revised and shared need a standalone container."
+  },
+  {
+    "id": 213,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "multi",
+    "question": "Jordan, an operations coordinator at a retail distributor, uses Claude for several different outputs during the week. Which two format choices correctly match the format to the purpose? (Choose two.)",
+    "options": [
+      "A quick clarification of a shipping policy term — answered inline in the chat",
+      "Inventory figures that will be loaded into a spreadsheet — delivered as a structured table with consistent columns",
+      "A one-line answer confirming a delivery date — delivered as a standalone artifact",
+      "A long employee handbook revised over many sessions — regenerated in full as inline chat text each time"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Inline chat is the right home for quick, conversational, one-off answers that will be read once and acted on. Creating heavier containers for throwaway questions adds friction without adding value — the format matches the content's short lifecycle.",
+      "Correct. Data destined for another tool needs structure that survives the transfer: consistent columns and a predictable layout let the figures move into a spreadsheet cleanly. Choosing structured output for downstream data use is the core format-selection judgment.",
+      "An artifact for a one-line confirmation is format overkill: artifacts exist for substantial, self-contained content that will be revisited, revised, or shared. Wrapping a single fact in a document container adds steps to both producing and reading it.",
+      "A long, evolving document regenerated as chat text each session is the classic format mismatch — versions fragment across conversations and no single authoritative copy exists. This is precisely the lifecycle an artifact is designed to hold."
+    ],
+    "principle": "match the container to the content's lifecycle",
+    "relatedConcept": "Inline for quick answers, structured data for downstream tools, artifacts for substantial evolving documents — format follows use.",
+    "overallExplanation": "Match the container to the content's lifecycle: inline for quick answers, structured data for downstream tools, artifacts for substantial evolving documents."
+  }
+]

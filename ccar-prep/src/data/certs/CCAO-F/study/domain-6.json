@@ -1,0 +1,76 @@
+{
+  "domain": 6,
+  "title": "Governance, Risk, and Responsible Use",
+  "weight": 15,
+  "intro": "This domain tests the judgment that keeps Claude usage defensible: recognizing which use cases fit and which cross lines, protecting sensitive and regulated data before it ever reaches a chat, working inside your organization's AI policies rather than around them, and understanding the ethical weight of AI-assisted work — accountability, honesty, and fairness. Exam questions mirror real workplace moments: a tempting shortcut, a policy gap, a stakeholder request — and ask which response reflects responsible use.",
+  "objectives": [
+    {
+      "objective": "Identify appropriate and inappropriate use cases",
+      "explanation": "Use-case fitness comes down to two questions: what are the stakes of the output, and does a qualified human review and own the result? Appropriate use cases cluster around assistance — drafting, summarizing, brainstorming, organizing, first-pass analysis — where the consequences of an error are contained and a human checks the work before it matters. Internal drafts reviewed before distribution, summaries verified by the accountable team, and ideation about a team's own processes are archetypes.\n\nInappropriate use cases cluster around delegated judgment: letting Claude make consequential decisions about people (hiring, discipline, credit), sending unreviewed output to high-stakes audiences (patients, clients, regulators), or adopting AI interpretations as official positions without expert validation. Two rationalizations recur in exam scenarios and in real life. The first is efficiency pressure — 'the backlog is huge, so let the model auto-reject half.' Workload never converts an inappropriate delegation into an appropriate one. The second is the instruction-as-safeguard fallacy — 'we told it to be objective / careful / unbiased.' A prompt instruction does not make a model a fair or accountable decision-maker.\n\nThe boundary is also organization-specific: your AI policy may draw lines (for example, no AI-driven decisions affecting customer accounts) that define appropriateness for you regardless of what the tool could technically do. And the answer to an inappropriate request is usually reframing, not blanket prohibition: find the assistance version of the use case that keeps humans deciding.",
+      "whyItMatters": "Use-case selection is where responsible AI succeeds or fails first — most incidents trace to a task that should never have been delegated, not to a model malfunction. Associates are often the person in the room when the tempting-but-wrong idea is proposed.",
+      "examples": [
+        {
+          "title": "The résumé-screening shortcut",
+          "body": "Facing 400 applications, a colleague proposes that Claude score them all and auto-reject the bottom half, with a prompt instructing it to 'ignore demographics and be objective.' The talent manager declines the delegation but keeps the assistance: Claude helps draft the job description, structure a consistent evaluation rubric, and organize application materials, while trained humans apply the rubric and make every advancement decision. Throughput improves, and no candidate's outcome rests on an unreviewed, unaccountable AI judgment — the instruction to 'be objective' was never a fairness control."
+        }
+      ],
+      "pitfalls": [
+        "Letting workload or backlog pressure justify delegating consequential decisions about people",
+        "Treating a prompt instruction ('be objective', 'be careful') as a safeguard that makes delegation acceptable",
+        "Sending unreviewed output to high-stakes audiences such as patients, clients, or regulators",
+        "Overcorrecting into blanket bans that prohibit low-risk assistance along with the genuinely inappropriate delegation"
+      ]
+    },
+    {
+      "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+      "explanation": "Data-sensitivity practice happens before the prompt is sent: the governing question is what data is about to leave your controlled systems, and under what terms. Regulated and protected categories — customer financial records, student records, health information, personal identifiers — carry obligations from law and organizational policy that apply regardless of your intent. 'It's only for internal analysis' does not lift a sharing restriction; the classification governs the data, not the motive.\n\nThe workhorse safeguard is anonymization: remove or mask names, ID numbers, account numbers, and other identifiers before uploading, so the analysis proceeds on the structure of the data without exposing whom it describes. Most pattern-finding, trend, and summarization tasks survive anonymization intact — which is why 'redact first' beats both 'upload as-is' and 'abandon the task.' A second, equally important control is environment choice: organizations approve specific workspaces (typically enterprise plans with data-handling agreements) for sensitive work, and using a personal account for company data bypasses every protection those agreements provide.\n\nTwo pseudo-safeguards to reject on sight: instructing Claude to 'keep this confidential' or 'forget this afterward' (the exposure happens at upload; a conversational request is not a data-protection mechanism), and drip-feeding sensitive data in small pieces (splitting the volume changes the pace of exposure, not the fact of it).",
+      "whyItMatters": "Data mishandling is the fastest way for an AI initiative to become a compliance incident — one pasted spreadsheet can violate regulations that carry legal and reputational consequences. Unlike output errors, data exposure cannot be caught by review afterward; the safeguard has to come first.",
+      "examples": [
+        {
+          "title": "Analyzing student support data without exposing students",
+          "body": "A university coordinator wants pattern analysis on a spreadsheet of support requests containing names, ID numbers, and accommodation details — protected records under university policy. She strips the identifying columns and replaces names with row numbers before uploading; the analysis needs request types, dates, and resolution times, not identities. Claude finds the seasonal spike and the under-resourced category she suspected, and no protected record ever left the university's controlled systems. The task lost nothing; the exposure risk went to zero."
+        }
+      ],
+      "pitfalls": [
+        "Rationalizing uploads of protected data because the purpose is internal — the classification governs the data, not the intent",
+        "Treating 'Claude, keep this confidential' or 'forget this' as a data-protection control",
+        "Using a personal account for company data because it is more familiar than the approved workspace",
+        "Splitting sensitive data into small pastes as if volume, rather than exposure, were the issue"
+      ]
+    },
+    {
+      "objective": "Follow organizational AI policies and governance standards",
+      "explanation": "Organizational AI policies translate legal, contractual, and reputational obligations into concrete rules: which tools and workspaces are approved, how data classifications map to what may be shared, which use cases need review before deployment. Following them starts with a sequencing habit — check the policy against your specific use case before building, and route use cases involving sensitive data or customer impact through the governance review process rather than around it. Review is not an obstacle course; it typically surfaces data-handling requirements the builder would not have identified alone.\n\nTwo failure patterns dominate. Shadow AI: building in personal accounts or unapproved tools to move faster or avoid scrutiny — often compounding a data violation with a process violation, and leaving the organization operating workflows it does not know exist. And the output-review substitution: 'my team reads everything Claude produces, so governance approval is redundant.' Output review addresses quality risk; governance also covers input-side risks — data handling, tool approval, regulatory exposure — that no amount of reading the summaries can address.\n\nPolicies also have gaps, because use cases evolve faster than documents. When policy is silent on plainly sensitive material — confidential contracts, employee data — silence is a gap, not a permission. The mature response is to ask the policy owner or legal team, which both gets a real answer and improves the policy; assuming permission and assuming permanent prohibition are both errors.",
+      "whyItMatters": "Policy adherence is what makes individual Claude usage safe at organizational scale. Shadow AI and skipped reviews create risks invisible to the people accountable for them — and one discovered violation can freeze legitimate AI work across the whole company.",
+      "examples": [
+        {
+          "title": "A policy gap handled well",
+          "body": "A procurement specialist wants to upload vendor contracts for renewal-term comparison. The AI policy covers customer data thoroughly but says nothing about vendor material — which carries confidentiality clauses. Instead of reading silence as permission, she emails the policy owner and legal. The answer: contracts under standard NDA terms may be used in the enterprise workspace with counterparty names redacted, and legal adds a vendor-material section to the policy. She gets her use case, compliantly, and the next employee with the same question finds it answered."
+        }
+      ],
+      "pitfalls": [
+        "Building first and checking policy later, when the workflow is already embedded and hard to unwind",
+        "Using personal accounts or unapproved tools to avoid governance friction (shadow AI)",
+        "Treating human review of outputs as a substitute for governance review of data handling and tool approval",
+        "Reading policy silence on sensitive material as default permission instead of asking the policy owner"
+      ]
+    },
+    {
+      "objective": "Understand the ethical implications of AI usage",
+      "explanation": "Beyond policy compliance, responsible use rests on three ethical anchors. Accountability: a human owns every consequential output — reviewed it, stands behind it, and answers for it. 'The AI wrote it' is never an accountability answer; assistance is ethical precisely because responsibility stays human. Honesty: organizations should follow considered disclosure standards about AI-assisted work rather than concealing the practice or — worse — actively misrepresenting provenance ('written entirely by hand'). Reviewed, human-owned AI-assisted drafting is not inherently deceptive, any more than templates or professional writers are; secrecy and false claims are what convert a defensible practice into an ethical failure.\n\nFairness: AI outputs can carry and amplify bias, and the risk sharpens whenever outputs influence decisions about people or communities — whose comments get weight in a public summary, whose applications read as 'strong', which voices survive compression. The safeguard is human examination of outputs for representational bias (do translated, low-volume, or minority voices survive the summarization?), not the model's self-assessment — a model certifying its own analysis as unbiased will confidently do so either way, and that certification means nothing.\n\nA final trap: 'removing the human removes the bias.' Human judgment has biases, but unexamined machine output has its own distortions plus no accountability. The ethical configuration is examined AI output feeding accountable human judgment — not machine output presented as neutral truth.",
+      "whyItMatters": "Ethical failures — concealed AI use, biased summaries steering public decisions, fabricated provenance — damage trust in ways that outlast any single project, and they can occur while every policy checkbox is technically satisfied. Ethics is the layer of judgment policies cannot fully specify.",
+      "examples": [
+        {
+          "title": "Resident feedback that shapes a transit plan",
+          "body": "A city analyst uses Claude to summarize thousands of resident comments that will influence neighborhood service changes. Some comments arrive in other languages; some communities submit fewer, shorter comments. Before the summaries reach the planning committee, the analyst spot-checks whether translated comments and low-volume neighborhoods are represented proportionately in the themes, finds one community's concerns collapsed into a vague bullet, and restores them explicitly. The committee receives the summaries labeled as AI-assisted, with the analyst — not the tool — accountable for the characterization of what residents said."
+        }
+      ],
+      "pitfalls": [
+        "Letting accountability blur — no named human owns an AI-assisted output that influences a real decision",
+        "Concealing AI assistance from stakeholders, or actively misrepresenting how work was produced",
+        "Accepting a model's self-certification of its own objectivity as a bias check",
+        "Excluding hard-to-process voices (other languages, low-volume groups) from analysis, silencing exactly those most at risk of underrepresentation"
+      ]
+    }
+  ]
+}

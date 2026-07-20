@@ -1,0 +1,25 @@
+[
+  {
+    "id": 401,
+    "domain": "Eval, Testing, and Debugging",
+    "objective": "Debugging and Error Handling",
+    "type": "single",
+    "question": "Dana, a developer at an insurtech startup, ships a Claude-powered claims assistant. Users report intermittent failures: sometimes the app shows a generic error page, sometimes it renders a blank summary. Logs show a mix of HTTP 429 responses from the API, occasional 529 overloaded errors, and some responses that returned 200 but whose JSON body failed the app's parser. What should Dana do first to fix this systematically?",
+    "options": [
+      "Classify each failure by origin — transient API errors versus malformed model output — then apply retries with backoff to the former and validation-plus-reprompting to the latter",
+      "Increase max_tokens and switch to a more capable model tier, since both the API errors and the parsing failures suggest the current model is being pushed past its limits",
+      "Wrap every API call in a single catch-all retry loop that re-sends the identical request up to ten times, since retrying resolves most intermittent failures regardless of type",
+      "Add a global exception handler that shows users a friendlier error message, then monitor whether complaint volume drops before investing in deeper changes"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The core debugging skill is isolating the problem's origin: 429/529 are transient integration-layer errors that call for retry with exponential backoff (and rate-limit management), while a 200 response with unparseable JSON is a model-output problem that retrying identically won't reliably fix — it needs response validation, defensive parsing, and a corrective reprompt or stricter output constraints. Different error types demand different recovery strategies.",
+      "Tempting because 'a better model' feels like a universal upgrade, but 429 and 529 are traffic and capacity signals, not capability signals — a stronger tier does nothing for rate limits and may worsen cost. This treats every symptom with one blunt remedy instead of diagnosing distinct causes.",
+      "A catch-all retry loop is reasonable for transient 429/529 errors (ideally with backoff, not ten rapid retries that aggravate rate limiting), but it misdiagnoses the parsing failures: resending the identical prompt tends to reproduce the same malformed output. It conflates two failure modes that need different handling.",
+      "Friendlier error pages improve UX but fix nothing — the failures continue at the same rate, just with nicer wording. This treats the symptom users see rather than the causes the logs already reveal, and delays the actual diagnosis the evidence makes possible today."
+    ],
+    "principle": "isolate whether a failure originates in the integration layer or in model output, then match the recovery strategy to the error type",
+    "relatedConcept": "Trace analysis and error-type identification are what turn intermittent LLM app failures from mysteries into two well-understood buckets with known fixes.",
+    "overallExplanation": "Isolate whether a failure originates in the integration layer or in model output, then match the recovery strategy to the error type — backoff and retries for transient API errors, validation and reprompting for malformed output. Error-type identification is what turns intermittent failures into well-understood buckets with known fixes."
+  }
+]

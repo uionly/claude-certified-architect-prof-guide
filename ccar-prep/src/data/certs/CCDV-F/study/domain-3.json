@@ -1,0 +1,30 @@
+{
+  "domain": 3,
+  "title": "Claude Code",
+  "weight": 3.1,
+  "intro": "This domain covers operating Claude Code as an engineering tool: its core components (Rules, Skills, Commands, Agents, Agent Memory), its execution modes (interactive sessions, headless mode, streaming mode, auto-mode), the CLAUDE.md hierarchy that layers instructions across enterprise, user, and project scopes, repository initialization, and settings.json configuration. It is a small domain by weight, but the exam expects you to know which mechanism fits which job — persistent instructions vs. on-demand commands vs. deterministic settings — rather than treating Claude Code as a single undifferentiated chat tool.",
+  "objectives": [
+    {
+      "objective": "Claude Code Operation",
+      "explanation": "Claude Code is Anthropic's agentic coding tool, and operating it well means knowing its component model. CLAUDE.md files hold persistent natural-language instructions (project conventions, build commands, style rules) and are read automatically at session start. They form a hierarchy: enterprise-level policy files, a user-level CLAUDE.md in the home directory for personal preferences across all projects, a project-root CLAUDE.md committed to the repo for team-shared conventions, and nested CLAUDE.md files in subdirectories for area-specific guidance. More specific scopes layer on top of broader ones, so the right place for an instruction is the narrowest scope where it should always apply. Repository initialization (the /init command) bootstraps a project CLAUDE.md by analyzing the codebase.\n\nThe other components divide responsibilities. Rules are persistent behavioral constraints. Skills are packaged instructions (and optionally scripts/resources) that Claude loads when a matching task arises. Commands — built-in slash commands like /help or /compact, plus custom slash commands you define as markdown files — are reusable prompts invoked on demand. Agents (subagents) are delegated workers with their own context windows and tool sets. Agent Memory persists useful knowledge across sessions. settings.json (at user and project scope, plus settings.local.json for personal, uncommitted overrides) configures the deterministic side: tool permissions and allow/deny lists, hooks, environment variables, and model selection.\n\nExecution modes matter for how Claude Code is consumed. Interactive mode is the default terminal session with session management — you can resume or continue past sessions. Headless mode runs Claude Code non-interactively from a script or CI pipeline (passing a prompt via a flag such as -p) and returns output a program can capture; streaming output formats support piping results into other tooling. Auto-mode style permission settings let Claude proceed without per-action approval, which trades review friction for speed and should be paired with permission boundaries and hooks.",
+      "whyItMatters": "Teams that put everything in chat messages get inconsistent results that vary by developer and by session; teams that use the right component get repeatable behavior — shared conventions in a committed CLAUDE.md, enforcement in settings.json and hooks, automation through headless mode. Exam items test whether you can match the mechanism to the requirement instead of defaulting to the interactive prompt.",
+      "examples": [
+        {
+          "title": "Scoping instructions across the CLAUDE.md hierarchy",
+          "body": "A payments team adopts Claude Code. They commit a project-root CLAUDE.md with the build/test commands, the module layout, and the rule 'never modify files under /generated'. The infra subdirectory gets its own nested CLAUDE.md describing Terraform conventions that only apply there. Each engineer keeps a user-level CLAUDE.md (~/.claude/CLAUDE.md) with personal preferences like preferred commit-message phrasing. Result: every session, for every engineer, starts with the team conventions loaded automatically; personal quirks never leak into the shared repo; and the Terraform guidance appears only when working in that area. Nobody pastes instructions by hand, so nothing depends on memory or discipline."
+        },
+        {
+          "title": "Headless mode for CI automation",
+          "body": "A platform engineer schedules a nightly job: the pipeline checks out the repo and invokes Claude Code in headless mode with a prompt like 'triage new lint failures and draft a summary'. Because headless mode is non-interactive, the job needs pre-granted permissions in settings.json for the tools it uses (and a hook that blocks anything destructive), and the script captures the output for posting to the issue tracker. An interactive session, a slash command someone must remember to run, or a resumed session full of stale context would all fail the core requirement: unattended, repeatable execution."
+        }
+      ],
+      "pitfalls": [
+        "Putting natural-language project instructions in settings.json or, conversely, expecting CLAUDE.md prose to enforce permissions — CLAUDE.md guides the model, settings.json (permissions, hooks) enforces deterministically; they are complementary, not interchangeable.",
+        "Relying on developers to paste conventions into each session instead of committing a project CLAUDE.md — manual repetition is inconsistent and disappears on restart.",
+        "Treating slash commands as an automation/scheduling mechanism — they are on-demand shortcuts inside a session; unattended automation is headless mode driven by an external scheduler or CI.",
+        "Enabling auto-approval modes without permission boundaries or hooks — skipping per-action review is a real productivity gain only when destructive actions are structurally blocked, not merely discouraged in the prompt.",
+        "Letting CLAUDE.md grow into an unbounded dumping ground — every line is loaded into context each session, so bloated memory files waste tokens and dilute the instructions that matter."
+      ]
+    }
+  ]
+}

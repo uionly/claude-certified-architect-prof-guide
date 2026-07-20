@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { questionsById } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
 import { clearActiveQuiz, loadActiveQuiz, saveActiveQuiz, saveAttempt } from '../lib/storage.js'
 import { formatClock, isCorrectSelection } from '../lib/quiz.js'
 import FeedbackPanel from '../components/FeedbackPanel.jsx'
@@ -8,7 +8,7 @@ import Tag from '../components/Tag.jsx'
 
 const LETTERS = ['A', 'B', 'C', 'D']
 
-function buildAttempt(state, { onlyAnswered = false } = {}) {
+function buildAttempt(questionsById, state, { onlyAnswered = false } = {}) {
   const items = state.order
     .map((qid) => {
       const q = questionsById.get(qid)
@@ -35,7 +35,8 @@ function buildAttempt(state, { onlyAnswered = false } = {}) {
 
 export default function Quiz() {
   const navigate = useNavigate()
-  const [state, setState] = useState(() => loadActiveQuiz())
+  const { cert, questionsById } = useCertData()
+  const [state, setState] = useState(() => loadActiveQuiz(cert.code))
   // learn mode: whether the current question has been checked (feedback shown)
   const [checked, setChecked] = useState(false)
   const [now, setNow] = useState(Date.now())
@@ -53,15 +54,15 @@ export default function Quiz() {
     : null
 
   function finish(finalState, opts) {
-    const attempt = buildAttempt(finalState, opts)
+    const attempt = buildAttempt(questionsById, finalState, opts)
     if (attempt.items.length === 0) {
-      clearActiveQuiz()
-      navigate('/practice')
+      clearActiveQuiz(cert.code)
+      navigate(`/${cert.code}/practice`)
       return
     }
-    saveAttempt(attempt)
-    clearActiveQuiz()
-    navigate(`/results/${attempt.id}`, { replace: true })
+    saveAttempt(cert.code, attempt)
+    clearActiveQuiz(cert.code)
+    navigate(`/${cert.code}/results/${attempt.id}`, { replace: true })
   }
 
   // auto-submit exam when the clock runs out
@@ -81,7 +82,7 @@ export default function Quiz() {
     return (
       <p className="text-stone-600">
         No practice session in progress.{' '}
-        <Link to="/practice" className="text-indigo-700 underline">Set one up →</Link>
+        <Link to={`/${cert.code}/practice`} className="text-indigo-700 underline">Set one up →</Link>
       </p>
     )
   }
@@ -92,7 +93,7 @@ export default function Quiz() {
 
   function update(next) {
     setState(next)
-    saveActiveQuiz(next)
+    saveActiveQuiz(cert.code, next)
   }
 
   function toggleOption(i) {
@@ -113,8 +114,8 @@ export default function Quiz() {
 
   function quit() {
     if (window.confirm('Abandon this session? Nothing will be scored.')) {
-      clearActiveQuiz()
-      navigate('/practice')
+      clearActiveQuiz(cert.code)
+      navigate(`/${cert.code}/practice`)
     }
   }
 

@@ -1,0 +1,137 @@
+{
+  "domain": 4,
+  "title": "Prompt Engineering & Structured Output",
+  "weight": 20,
+  "intro": "This domain covers engineering prompts and schemas that produce reliable, machine-consumable output at production scale: explicit criteria that keep precision high, few-shot examples that stabilize format and judgment, tool use with JSON schemas for guaranteed structure, validation-retry loops for extraction quality, the Message Batches API for latency-tolerant workloads, and multi-instance/multi-pass review architectures. Exam questions live mostly inside the Structured Data Extraction and Claude Code for CI scenarios, and reward knowing which mechanism gives a guarantee versus which merely raises a probability.",
+  "objectives": [
+    {
+      "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+      "explanation": "Precision comes from telling the model exactly what counts, not from asking it to be careful. The canonical contrast: 'flag comments only when the claimed behavior contradicts actual code behavior' is an applicable decision rule, while 'check that comments are accurate' is not. General instructions like 'be conservative' or 'only report high-confidence findings' consistently fail to improve precision, because they never define what conservative means or what confidence should attach to — and model self-reported confidence is poorly calibrated anyway.\n\nEffective criteria are categorical: define which issue types to report (bugs, security flaws) and which to skip (minor style preferences, established local patterns). For severity classification, define explicit criteria for each severity level with concrete code examples, so 'critical' versus 'minor' is a matter of matching criteria rather than mood. This converts a vague quality aspiration into rules the model can apply the same way on every run.\n\nFalse positives are not just noise — they are a trust problem. When one category runs a high false-positive rate, developers stop trusting the accurate categories too, and eventually the whole tool. The proportionate response is to temporarily disable the high false-positive category while its criteria are improved, restoring trust in the categories that work, then reintroduce the fixed category. Rationing output volume (finding caps), demanding self-rated confidence, or requiring cross-run consensus all filter by the wrong property; only better criteria filter by validity.",
+      "whyItMatters": "Automated review lives or dies on developer trust, and trust is spent by false positives faster than it is earned by true ones. A reviewer that flags style nits alongside real bugs trains developers to dismiss everything it says — including the security finding that mattered — and once ignored, the tool's accuracy is irrelevant.",
+      "examples": [
+        {
+          "title": "Replacing \"be conservative\" with categorical review criteria",
+          "body": "A fintech CI reviewer drowns pull requests in style preferences, and adding 'be conservative, only report high-confidence findings' changes nothing — the model is confident in its nitpicks. The team rewrites the prompt with categorical rules: report logic bugs, security vulnerabilities, and data-handling errors; skip formatting, naming preferences, and patterns already established in the file. Severity levels each get a definition plus a concrete code example. The false positive rate drops because the model now has a decision rule to apply, not an attitude to adopt."
+        },
+        {
+          "title": "Taking one noisy category offline to save the tool",
+          "body": "A four-category reviewer (security, correctness, performance, maintainability) has accurate security and correctness output, but performance runs 70% false positives and surveys show engineers now dismissing all findings, including security. While the performance criteria are reworked offline, the team disables that category entirely. Trust in the remaining categories recovers within weeks because the signal-to-noise ratio visibly improves, and performance findings return only after the improved criteria are validated against historical PRs."
+        }
+      ],
+      "pitfalls": [
+        "Relying on vague quality instructions — 'be conservative', 'only high-confidence findings' — which fail because they define nothing the model can apply.",
+        "Filtering findings by model self-reported confidence, which is poorly calibrated: the model is often most confident in its false positives.",
+        "Keeping a high false-positive category running while iterating on it, letting its noise destroy trust in every accurate category.",
+        "Defining severity levels without concrete code examples per level, guaranteeing inconsistent classification across runs and reviewers."
+      ]
+    },
+    {
+      "objective": "Apply few-shot prompting to improve output consistency and quality",
+      "explanation": "Few-shot examples are the most effective technique for achieving consistently formatted, actionable output when detailed instructions alone produce inconsistent results. Their power is twofold. First, format: examples demonstrating the specific desired structure — location, issue, severity, suggested fix — anchor every subsequent output to that shape far more reliably than prose format descriptions. Second, judgment: examples showing how ambiguous cases were decided (which tool to select for an ambiguous request, whether a branch-level coverage gap counts) teach reasoning the model can generalize to novel patterns, rather than matching only pre-specified cases.\n\nThe craft is in targeting, not volume: 2-4 examples aimed at the ambiguous scenarios, each showing the reasoning for why one action was chosen over plausible alternatives. For false positive reduction, pair examples — an acceptable code pattern beside a genuine issue, with the rationale for each judgment. For extraction, few-shot examples demonstrating correct handling of varied document structures (inline citations versus bibliographies, methodology sections versus embedded details, narrative prose versus structured schedules) both reduce hallucination and fix the empty/null extraction of fields that are actually present but formatted unexpectedly.\n\nAnti-patterns to recognize: piling on dozens of examples to enumerate every case (few-shot generalizes; enumeration bloats tokens and still misses novel inputs), and 'fixing' extraction misses by mandating that required fields always be populated — which converts silent misses into confident fabrications.",
+      "whyItMatters": "Most production inconsistency — format drift that breaks parsers, erratic judgment on edge cases, empty extractions from unusual document layouts — traces to instructions that describe behavior instead of demonstrating it. Well-chosen examples are the cheapest reliability upgrade available, and knowing when to reach for them versus schemas or retries is core exam judgment.",
+      "examples": [
+        {
+          "title": "Teaching a review bot format and judgment with four examples",
+          "body": "A CI reviewer emits findings in varying shapes and flags an established repository idiom as a bug while missing a real off-by-one. The team adds two format examples showing findings structured as location, issue, severity, and suggested fix, and two judgment examples: the team's accepted caching idiom annotated 'acceptable — established pattern, do not flag', and a superficially similar unsynchronized variant annotated with why it is a genuine race condition. Output format stabilizes immediately, and the reasoning in the judgment pair generalizes to patterns the examples never showed."
+        },
+        {
+          "title": "Fixing empty extractions from narrative contracts",
+          "body": "A legal-tech extractor performs well on contracts with structured schedules but returns empty required fields on narrative-style agreements where parties and dates appear inline in prose. Adding few-shot examples showing correct extraction from both formats — one schedule-style contract and one narrative contract with the same fields located in flowing text — teaches the model where information lives in each structure. Empty-field rates on narrative documents drop without any schema change, and without the fabrication risk that 'always populate required fields' instructions would have introduced."
+        }
+      ],
+      "pitfalls": [
+        "Adding more prose instructions when the failure is format inconsistency — demonstration beats description; show the output shape in examples.",
+        "Enumerating dozens of examples to cover every case instead of 2-4 targeted at ambiguous scenarios — few-shot works by generalizing judgment, not lookup.",
+        "Choosing only obvious examples; the value is in ambiguous cases that show reasoning for why one plausible action beat another.",
+        "Responding to empty extractions by requiring fields to be populated, which trades silent misses for fabricated values."
+      ]
+    },
+    {
+      "objective": "Enforce structured output using tool use and JSON schemas",
+      "explanation": "Tool use with JSON schemas is the most reliable approach for schema-compliant structured output: define an extraction tool whose input parameters are your target schema, and read the structured data from the tool_use response. This eliminates JSON syntax errors — no more truncated braces or stray prose around the payload. It does not eliminate semantic errors: line items that fail to sum to the stated total, or values placed in the wrong fields, are perfectly schema-valid and need validation downstream (objective 4.4).\n\ntool_choice controls how strongly the model is bound to tools. With \"auto\", the model may answer in plain text instead of calling any tool — the source of intermittent parser breakage. With \"any\", the model must call some tool but chooses which — the right setting when multiple extraction schemas exist and the document type is unknown. Forced selection ({\"type\": \"tool\", \"name\": \"extract_metadata\"}) makes the model call one specific tool — the right setting when a particular extraction must run first, before enrichment steps handled in follow-up turns.\n\nSchema design is itself a reliability control. Fields that source documents may not contain must be optional and nullable; required fields force the model to produce something, and fabrication is how it complies. Enums should include \"unclear\" for ambiguous cases and an \"other\" value paired with a detail string for extensible categories, so real-world variety has a truthful landing place. Pair strict output schemas with format normalization rules in the prompt to absorb inconsistent source formatting.",
+      "whyItMatters": "Downstream systems consume structured output programmatically, so a single free-text response or fabricated field can corrupt records or crash a pipeline at volume. Knowing exactly what tool use guarantees (syntax) and what it cannot (semantics), and which tool_choice rung matches the task, is the difference between a robust pipeline and one that fails probabilistically.",
+      "examples": [
+        {
+          "title": "Choosing tool_choice \"any\" for unknown document types",
+          "body": "A pipeline defines extract_invoice, extract_contract, and extract_receipt because incoming documents vary. Under the default behavior, about 8% of runs return conversational text ('This appears to be an invoice...') and break the parser. Setting tool_choice: \"any\" guarantees the model calls one of the tools while leaving it free to pick the schema that fits the document. Forcing extract_invoice would have eliminated text responses too — but at the cost of jamming contracts and receipts into the invoice schema, a worse failure than the one being fixed."
+        },
+        {
+          "title": "Stopping fabricated adjuster names with nullable fields",
+          "body": "An insurance extractor's schema marks every field required, including adjuster_name and incident_time. Audits find the model inventing plausible names and timestamps whenever documents lack them — the schema demands a value, so the model supplies one. Redesigning the schema so fields that may be absent are optional and nullable gives the model a truthful path: return null. Fabrication stops not because the model was told to be honest, but because the structural pressure to invent was removed. An enum gains \"unclear\" and \"other\" with a detail string for the same reason."
+        }
+      ],
+      "pitfalls": [
+        "Assuming strict schemas guarantee correct data — tool use eliminates syntax errors, but semantically wrong values (sums that do not reconcile, swapped fields) remain schema-valid.",
+        "Leaving tool_choice on \"auto\" in pipelines that require structured output, so occasional conversational text breaks the parser.",
+        "Forcing a specific tool when the document type is unknown, corrupting every document that does not match the forced schema.",
+        "Marking fields required when sources may lack them, which pressures the model into fabricating values to satisfy the schema.",
+        "Designing closed enums with no \"unclear\" or \"other\"+detail escape, forcing ambiguous real-world cases into wrong categories."
+      ]
+    },
+    {
+      "objective": "Implement validation, retry, and feedback loops for extraction quality",
+      "explanation": "Because tool use eliminates only syntax errors, production pipelines validate semantics — with Pydantic or JSON schema validation plus business rules — and correct failures through retry-with-error-feedback: a follow-up request containing the original document, the failed extraction, and the specific validation errors. Given that feedback, the model can fix format mismatches, structural errors, and misplaced values. Retrying the identical request, by contrast, is blind — the model does not know what was wrong, so success is luck.\n\nThe critical diagnostic skill is knowing when retries cannot succeed: when the required information is simply absent from the source document — for example, it exists only in a related document the pipeline never provides — no amount of feedback or prompt refinement recovers it. Those failures need an upstream fix (supply the missing source) or an honest schema (make the field nullable). Pushing harder on retries for absent information at best wastes money and at worst teaches the model to fabricate plausible values.\n\nFeedback loops also extend beyond single requests. Adding a detected_pattern field to structured findings records which code construct triggered each finding, enabling systematic analysis of what developers dismiss and which patterns drive false positives. Self-correction can be designed into the schema itself: extracting calculated_total alongside stated_total flags documents where the numbers disagree, and a conflict_detected boolean surfaces inconsistent source data instead of silently picking a side.",
+      "whyItMatters": "Extraction pipelines run unattended over messy documents, and the difference between 90% and 99% usable output is almost entirely loop design: feedback-carrying retries recover most failures cheaply, while blind retries burn budget and non-retryable failures — pushed hard enough — turn into fabricated data flowing downstream undetected.",
+      "examples": [
+        {
+          "title": "Turning failed purchase-order extractions into corrections",
+          "body": "A procurement pipeline's Pydantic layer regularly rejects extractions where line items do not sum to the stated total or quantities land in the unit-price field. The original design resends the identical request, and the retry usually fails identically. Redesigned, the retry sends the document, the failed extraction, and the exact validation messages ('line_items sum to 4,730.00 but total is 4,930.00; unit_price contains integer quantity'). Most failures now correct on the first retry, and the schema gains calculated_total alongside stated_total so discrepancies are flagged rather than silently reconciled."
+        },
+        {
+          "title": "Recognizing the 30% of failures no retry can fix",
+          "body": "A logistics extractor's purchase_order_number field fails validation on 30% of carrier invoices, and feedback-carrying retries never fix it — analysis shows PO numbers live only in separate purchase-order documents the pipeline never supplies. Date-format and field-placement failures, meanwhile, retry successfully. The team stops retrying the PO failures, makes the field nullable, and adds the related purchase-order document to the pipeline input for accounts that provide it. Retry spend drops and fabricated-looking PO numbers stop appearing in audits."
+        }
+      ],
+      "pitfalls": [
+        "Retrying with the identical request instead of appending the specific validation errors — blind retries mostly reproduce the same failure.",
+        "Retrying failures caused by information absent from the source; feedback cannot recover what was never provided, and pressure invites fabrication.",
+        "Treating semantic validation as unnecessary because the schema is strict — strict schemas pass values that are structurally valid but wrong.",
+        "Skipping instrumentation like detected_pattern fields, leaving no way to analyze which constructs drive dismissed or false-positive findings."
+      ]
+    },
+    {
+      "objective": "Design efficient batch processing strategies",
+      "explanation": "The Message Batches API trades latency for cost: 50% savings, a processing window of up to 24 hours, and no guaranteed latency SLA. That profile fits non-blocking, latency-tolerant workloads — overnight reports, weekly audits, nightly test generation — and disqualifies blocking workflows like pre-merge checks, where a developer waiting on a batch could wait a full day. One structural limit matters for agentic designs: the Batches API does not support multi-turn tool calling within a request — it cannot execute tools mid-request and return results — so agentic loops must run synchronously or be restructured into single-turn requests.\n\nOperationally, every batch request carries a custom_id that correlates it with its response. Failure handling builds on this: identify failed items by custom_id and resubmit only those, with appropriate modifications — chunking documents that exceeded context limits, for instance — rather than re-running the whole batch. When SLAs exist, submission frequency is a calculation: with a 24-hour processing window, submitting every 4 hours bounds worst-case completion at 28 hours, safely inside a 30-hour SLA.\n\nThe economic lever most designs miss is first-pass success rate. Before batch-processing a large corpus, refine the prompt against a representative sample; iterating at sample scale is cheap and fast, while iterating by resubmitting a quarter-million documents multiplies every prompt defect by the corpus size and by the 24-hour window per cycle.",
+      "whyItMatters": "Batch economics are compelling — half price at volume — but misapplied batching blocks developer workflows for hours, and unvalidated prompts submitted at corpus scale turn a cheap iteration loop into thousands of dollars per lesson. Matching workload latency tolerance to the API, and proving the prompt first, is where the savings are actually realized.",
+      "examples": [
+        {
+          "title": "Splitting two workloads across the right APIs",
+          "body": "A platform team runs a blocking pre-merge review check and a nightly repository-wide test-coverage analysis. Finance proposes moving both to the Batches API for the 50% saving. The right split: the nightly job is latency-tolerant and moves to batch, cutting its cost in half; the pre-merge check stays synchronous because a no-SLA window of up to 24 hours could block merges for a day. Failed nightly items are identified by custom_id and resubmitted individually — one oversized file is chunked and resubmitted rather than the whole batch re-run."
+        },
+        {
+          "title": "Sampling before a 250,000-document submission",
+          "body": "A records company plans to batch-extract 250,000 scanned property deeds with a prompt tried on only a handful of files. Each full run costs thousands of dollars and takes up to a day, so iterating at corpus scale is ruinous. Instead the team draws a representative sample across deed eras and formats, iterates the prompt synchronously until first-pass success is high, then submits the full corpus once. The batch discount is realized on the production run rather than consumed by repeated corpus-scale prompt debugging."
+        }
+      ],
+      "pitfalls": [
+        "Batching blocking workflows like pre-merge checks — 'usually fast' is not an SLA, and the window extends to 24 hours.",
+        "Assuming batch requests can run agentic loops — multi-turn tool calling is not supported within a batch request.",
+        "Re-running entire batches on partial failure instead of resubmitting only failed items identified by custom_id, with fixes like chunking.",
+        "Submitting large corpora with unvalidated prompts, paying corpus-scale prices and 24-hour cycles for iteration a sample would provide.",
+        "Ignoring SLA arithmetic — submission frequency plus the 24-hour window determines your worst-case delivery time."
+      ]
+    },
+    {
+      "objective": "Design multi-instance and multi-pass review architectures",
+      "explanation": "Self-review has a structural limitation: a model reviewing code in the session that generated it retains the reasoning context from generation, making it unlikely to question its own decisions. Prompt-level fixes — 'review carefully', adversarial framing, even extended thinking — deliberate longer inside the same blind spot. The effective architecture is a second, independent Claude instance that receives the code without the generator's reasoning context and evaluates it on its merits; independent instances consistently catch subtle issues that self-review blesses.\n\nThe second axis is pass structure. Single-pass review of large changesets suffers attention dilution: detailed feedback on early files, cursory notes on later ones, missed defects, and contradictory findings — the same pattern flagged in one file and approved in another. The fix is multi-pass architecture: per-file passes that analyze each file individually for local issues, plus a separate integration pass examining cross-file data flow. Each pass has a focused scope, so depth stays consistent and cross-file issues still get dedicated attention. Note what does not fix attention dilution: larger context windows change what fits, not how evenly it is analyzed, and cross-run consensus filters suppress intermittently caught real bugs.\n\nA third pattern connects review to routing: verification passes where the model self-reports confidence alongside each finding enable calibrated review routing — but those confidence values must be calibrated against labeled outcomes before anyone trusts them (a discipline covered further in Domain 5).",
+      "whyItMatters": "Review architecture determines whether automated review actually catches what humans miss. Teams that let the generator review its own output ship its rationalized defects; teams that run single passes over big changesets get erratic, contradictory feedback that developers learn to ignore. Instance isolation and pass structure are cheap architectural fixes to both.",
+      "examples": [
+        {
+          "title": "Separating generator from reviewer for trading code",
+          "body": "A trading-systems team generates order-validation code and asks the same session to review it before merge. The review consistently approves its own output while human reviewers keep finding edge-case defects the model wrote and then blessed. The team re-architects: generated code goes to a second Claude instance with no access to the generating session, prompted purely as a reviewer with the team's categorical criteria. The independent instance flags boundary-condition defects the self-review never questioned, because it carries none of the reasoning that produced them."
+        },
+        {
+          "title": "Restructuring an 18-file PR review into focused passes",
+          "body": "An e-commerce reviewer analyzes whole PRs in one pass. On an 18-file change it gives deep feedback on early files, cursory notes later, misses a null-dereference, and flags a caching pattern in one file while approving it in another. Restructured, the pipeline runs a per-file pass for local issues — consistent depth, no contradictions — then a separate integration pass tracing data flow between checkout and inventory modules. The integration pass catches a cross-file contract mismatch the per-file passes could not see, and finding quality becomes uniform across the changeset."
+        }
+      ],
+      "pitfalls": [
+        "Letting the generating session review its own code — retained reasoning context makes it rationalize rather than question its decisions.",
+        "Treating extended thinking or adversarial prompts as substitutes for an independent review instance; they deepen reasoning inside the same bias.",
+        "Reviewing large changesets in one pass, producing attention dilution: uneven depth, missed defects, and contradictory findings.",
+        "Reaching for a larger context window to fix erratic large-PR reviews — capacity is not the constraint; attention quality per pass is.",
+        "Filtering findings by cross-run consensus, which suppresses intermittently detected real defects while stable false judgments survive."
+      ]
+    }
+  ]
+}

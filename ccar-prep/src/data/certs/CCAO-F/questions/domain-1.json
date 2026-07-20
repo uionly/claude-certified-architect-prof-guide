@@ -1,0 +1,186 @@
+[
+  {
+    "id": 101,
+    "domain": "Prompting and Task Execution",
+    "objective": "Create effective prompts for business and technical tasks",
+    "type": "single",
+    "question": "Priya, a marketing manager at a national retail chain, asks Claude to \"write something about our summer sale\" and receives a generic paragraph that mentions none of her products or promotions. What change to her prompt would most improve the result?",
+    "options": [
+      "Specify the audience, the channel, the tone, and the key sale details Claude should feature",
+      "Resubmit the same request several times and choose the best of the responses",
+      "Ask Claude to make the copy longer and more creative than the first version",
+      "Switch to a more capable model and send the identical one-line request again"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. An effective prompt supplies the context the model cannot guess: who the message is for, where it will run, the desired tone, and the concrete facts to include. Claude produces generic output when the request is generic, so specificity in the prompt is the primary quality lever.",
+      "Tempting because regeneration sometimes yields a nicer draft, but every retry of a vague prompt samples from the same vague request. Without added context the outputs will vary in wording, not in relevance, so this wastes time without addressing the root cause.",
+      "Length and creativity instructions change style, not substance. The draft failed because Claude had no product, promotion, or audience details to work with, and asking for more words from the same missing inputs just produces a longer generic paragraph.",
+      "Model capability is not the constraint here; even the most capable model cannot know Priya's sale dates, products, or brand voice unless the prompt provides them. Upgrading the model while keeping a one-line request treats a prompt problem as a model problem."
+    ],
+    "principle": "specific context in, specific output out",
+    "relatedConcept": "Effective business prompts state the audience, purpose, format, tone, and key facts rather than leaving Claude to guess them.",
+    "overallExplanation": "Specific context in, specific output out: effective business prompts state the audience, purpose, format, tone, and key facts rather than leaving Claude to guess them."
+  },
+  {
+    "id": 102,
+    "domain": "Prompting and Task Execution",
+    "objective": "Create effective prompts for business and technical tasks",
+    "type": "single",
+    "question": "Marcus, an operations coordinator at a healthcare clinic, needs Claude to draft a patient-facing FAQ about a new appointment booking system. He has the internal rollout document. Which prompt is most likely to produce a usable first draft?",
+    "options": [
+      "\"Write an FAQ about our new booking system\" with no attachment, so Claude stays flexible",
+      "Paste the rollout document alone with no instructions and let Claude infer what he needs",
+      "Attach the rollout document and specify the audience, a plain-language reading level, the question topics to cover, and the desired format",
+      "Ask Claude to first explain what makes a good FAQ in general, then request the draft in a later message"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because short prompts feel efficient, but with no source material Claude will invent plausible-sounding details about a booking system it has never seen, and with no audience guidance it may write for staff instead of patients. Flexibility here just means guessing.",
+      "Providing the source document is half the job, but with no instructions Claude must guess the task, the audience, and the format. It might summarize the rollout plan for managers rather than write patient-friendly questions and answers.",
+      "Correct. This prompt combines grounding material with clear task specification: real source content to draw facts from, a defined audience and reading level, scoped topics, and a stated format. That is the recipe for a first draft that needs refinement rather than rework.",
+      "A general lesson on FAQ writing does not move the actual task forward and adds an unnecessary step. Claude does not need to be taught the genre; it needs Marcus's specific source content and requirements to produce something accurate and on-audience."
+    ],
+    "principle": "pair source material with explicit task instructions",
+    "relatedConcept": "Grounding documents plus a clear statement of audience, scope, and format is the core structure of an effective business prompt.",
+    "overallExplanation": "Pair source material with explicit task instructions: grounding documents plus a clear statement of audience, scope, and format is the core structure of an effective business prompt."
+  },
+  {
+    "id": 103,
+    "domain": "Prompting and Task Execution",
+    "objective": "Apply task decomposition techniques to structure complex requests",
+    "type": "single",
+    "question": "Dana, a project manager at a fintech firm, asks Claude in a single prompt to produce a complete 30-page vendor evaluation report covering requirements, scoring, risk, and recommendations. The output is shallow and uneven across sections. What is the best way to restructure the work?",
+    "options": [
+      "Break the report into stages — outline first, then each section in turn using the agreed outline — and assemble the results",
+      "Repeat the same single prompt but add an instruction demanding more depth and detail in every section",
+      "Switch to the most capable model available and resubmit the original all-in-one request unchanged",
+      "Ask Claude to write the report twice and combine the strongest paragraphs from each version"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Task decomposition breaks a large deliverable into sequenced subtasks, letting each step get focused attention and letting Dana review and steer at each stage. An approved outline then anchors every section, producing depth and consistency a single mega-prompt cannot.",
+      "Demanding more depth does not change the structural problem: one prompt asking for everything forces the model to spread attention thinly across many sections at once. The instruction may add words, but the unevenness comes from task size, not from insufficient enthusiasm.",
+      "A stronger model helps with harder reasoning, but the failure here is workload structure, not capability. Any model asked to produce 30 pages spanning many topics in one pass will trade depth for coverage, so the mega-prompt problem follows the request to the new model.",
+      "Merging two shallow drafts still yields shallow content, because both versions were produced under the same overloaded, single-shot request. This doubles the effort and creates a stitching problem without ever giving any section the focused treatment it needs."
+    ],
+    "principle": "decompose big deliverables into reviewable stages",
+    "relatedConcept": "Breaking complex requests into an outline-then-sections sequence gives each part focused attention and creates checkpoints for course correction.",
+    "overallExplanation": "Decompose big deliverables into reviewable stages: an outline-then-sections sequence gives each part focused attention and creates checkpoints for course correction."
+  },
+  {
+    "id": 104,
+    "domain": "Prompting and Task Execution",
+    "objective": "Apply task decomposition techniques to structure complex requests",
+    "type": "multi",
+    "question": "Elena, a program director at an education nonprofit, must use Claude to plan a curriculum overhaul involving stakeholder input, a phased timeline, and budget estimates. Which two approaches apply task decomposition effectively? (Choose two.)",
+    "options": [
+      "Ask Claude to propose a plan structure first, confirm or adjust it, and only then request the detailed content",
+      "Split the work into sequenced subtasks where each step's output becomes input to the next step",
+      "Write one exhaustive prompt covering every requirement so the entire plan arrives in a single response",
+      "Run the same comprehensive prompt in three separate chats and select whichever full plan reads best"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Getting the structure agreed before generating detail is a core decomposition move: it separates the planning decision from the drafting work, catches misunderstandings early, and gives every later step a shared skeleton to build on.",
+      "Correct. Chaining subtasks so that each output feeds the next — stakeholder analysis into timeline, timeline into budget — is sequential decomposition. Each step gets Claude's full attention on one problem, and errors surface at the step where they occur.",
+      "Tempting because a thorough prompt feels rigorous, but packing every requirement into one request is the opposite of decomposition. The model must juggle all concerns at once, depth suffers, and Elena gets no checkpoint to redirect before the whole plan is written.",
+      "Generating three monolithic plans triples the reading burden without restructuring the task. Each attempt still suffers the single-shot depth problem, and choosing among whole plans gives far less control than shaping the work step by step."
+    ],
+    "principle": "structure first, detail second, one step at a time",
+    "relatedConcept": "Decomposition means sequencing a complex request into confirmable stages, not writing a longer single prompt.",
+    "overallExplanation": "Structure first, detail second, one step at a time: decomposition means sequencing a complex request into confirmable stages, not writing a longer single prompt."
+  },
+  {
+    "id": 105,
+    "domain": "Prompting and Task Execution",
+    "objective": "Iterate prompts to improve output quality",
+    "type": "single",
+    "question": "Tomás, a communications lead at a public utility, receives a first draft from Claude that is too formal and omits two key talking points from the source brief. What is the most effective next step to improve the output?",
+    "options": [
+      "Reply in the same chat with specific feedback: name the tone shift needed and the two missing points to add",
+      "Open a brand-new chat and submit the original prompt again, hoping the next draft lands closer",
+      "Click regenerate on the same message repeatedly until a version appears that fixes both problems",
+      "Accept the draft as a starting point and rewrite the tone and missing content entirely by hand"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Iteration works best as a targeted feedback loop: keep the conversation context, state exactly what is wrong, and say what good looks like. Claude can then revise precisely rather than guess, and each round moves the draft measurably closer to the goal.",
+      "Starting fresh throws away the conversation context and the diagnostic information Tomás now has. The original prompt produced this draft once and will likely produce similar problems again, because nothing about the request has changed.",
+      "Regeneration is a lottery, not a correction: the model receives no information about what was wrong, so fixes to both issues appearing together by chance is unlikely. Specific feedback converges faster than repeated random draws.",
+      "Manual rewriting forfeits the speed advantage of working with Claude and teaches the model nothing for next time. A one-sentence revision request would fix both issues in seconds; hand-editing is the fallback for final polish, not the first response to a fixable draft."
+    ],
+    "principle": "iterate with specific, directive feedback",
+    "relatedConcept": "Telling Claude exactly what to change and why beats regenerating or restarting, because feedback carries information that a retry does not.",
+    "overallExplanation": "Iterate with specific, directive feedback: telling Claude exactly what to change and why beats regenerating or restarting, because feedback carries information that a retry does not."
+  },
+  {
+    "id": 106,
+    "domain": "Prompting and Task Execution",
+    "objective": "Iterate prompts to improve output quality",
+    "type": "single",
+    "question": "Aisha, an analyst at a media company, produces a weekly newsletter summary with Claude. Each week she spends several rounds of corrections getting the tone and structure right, and each week the first draft has the same problems. What should she change?",
+    "options": [
+      "Fold the recurring corrections into the prompt itself, including an example of a past summary that came out right",
+      "Continue the weekly correction rounds, since iteration within each session is how quality is achieved",
+      "Shorten the prompt so Claude has more freedom to find the right tone and structure on its own",
+      "Rotate between different models each week to find one whose default style matches her needs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. When the same corrections recur across sessions, the lesson belongs in the prompt, not in the conversation. Encoding the fixes as instructions and including a known-good example turns hard-won feedback into a reusable template, so future first drafts start where past sessions ended.",
+      "Tempting because iteration is genuinely valuable, but repeating identical corrections every week means the learning is being discarded after each session. Iteration should improve the prompt over time, not just the current draft.",
+      "Removing guidance makes the recurring problems worse: the tone and structure issues exist because the prompt underspecifies them. Freedom helps in brainstorming; in a recurring formatted deliverable, precision and examples are what produce consistency.",
+      "The weekly drift is caused by an underspecified prompt, and that cause travels with her to any model. Model-shopping for a default style is far less reliable than stating the required style explicitly with an example."
+    ],
+    "principle": "bake repeated corrections back into the prompt",
+    "relatedConcept": "Prompt iteration has two loops — refining a draft within a session and refining the reusable prompt across sessions — and recurring fixes belong in the second.",
+    "overallExplanation": "Bake repeated corrections back into the prompt: recurring fixes belong in the reusable prompt across sessions, not re-typed in every conversation."
+  },
+  {
+    "id": 107,
+    "domain": "Prompting and Task Execution",
+    "objective": "Adapt prompting strategies based on task type (analysis, research, drafting, brainstorming)",
+    "type": "single",
+    "question": "Renata, a policy officer at a city government, uses the same tightly constrained prompt style for everything. When she asks Claude to brainstorm community engagement ideas, she gets three safe, narrow suggestions. How should she adapt her prompting for this task type?",
+    "options": [
+      "Ask open-endedly for a large, diverse set of ideas, explicitly inviting unconventional options and deferring evaluation to a later step",
+      "Add even more constraints so Claude understands precisely which kinds of ideas are acceptable",
+      "Ask Claude to produce the single best idea with full supporting detail rather than a scattered list",
+      "Request citations for each idea so the brainstorm output is grounded in verified sources"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Brainstorming rewards breadth first and judgment later: asking for many varied ideas, welcoming unusual ones, and postponing critique widens the option space. Constraints and evaluation belong in a follow-up step where the promising ideas get developed.",
+      "Tempting because constraints improved her analytical work, but brainstorming is the task type where heavy constraints backfire. Narrowing the request further guarantees more of the same safe, narrow output she is trying to escape.",
+      "Asking for one polished idea collapses the exploration phase entirely. The value of brainstorming is generating volume and variety to choose from; converging on a single answer is a later step, after breadth has been generated.",
+      "Citations are a research-task adaptation, not a brainstorming one. Requiring sources for creative suggestions anchors the model to what is already documented and suppresses exactly the novel thinking a brainstorm exists to produce."
+    ],
+    "principle": "diverge before you converge in creative tasks",
+    "relatedConcept": "Brainstorming prompts should maximize quantity and variety with judgment deferred, the opposite of the constraint-heavy style that suits analysis.",
+    "overallExplanation": "Diverge before you converge in creative tasks: brainstorming prompts should maximize quantity and variety with judgment deferred, the opposite of the constraint-heavy style that suits analysis."
+  },
+  {
+    "id": 108,
+    "domain": "Prompting and Task Execution",
+    "objective": "Adapt prompting strategies based on task type (analysis, research, drafting, brainstorming)",
+    "type": "single",
+    "question": "Noah, a grants manager at an education nonprofit, uses one template for every Claude request: \"Answer in three concise bullet points.\" It works well for status summaries but produces thin, unhelpful results when he researches the national funding landscape. What is the best adjustment?",
+    "options": [
+      "Keep the template everywhere, since a consistent format makes all outputs easier to compare",
+      "Adapt the prompt to the task: for research, allow a fuller exploratory response and ask for sources and flagged uncertainties",
+      "Increase the template to five bullet points so research answers have a little more room",
+      "Reframe the research request as a brainstorm so Claude generates a wider range of possibilities"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because consistency has real value for recurring summaries, but a format optimized for brevity actively harms a task whose value lies in depth, evidence, and nuance. Consistency of format should never override fitness for the task type.",
+      "Correct. Different task types need different prompting strategies: research tasks benefit from room to explore, requests for sources, and explicit flagging of uncertain claims, while summaries benefit from tight format constraints. Matching strategy to task is the core skill.",
+      "Two extra bullets is a cosmetic tweak to the wrong strategy. The problem is not bullet count but that a compression-oriented format is being applied to an exploration-oriented task; the research still gets flattened into fragments without evidence.",
+      "Brainstorming prompts optimize for imaginative variety, but research requires grounded, verifiable findings about what actually exists in the funding landscape. Swapping one mismatched strategy for another does not produce the sourced depth Noah needs."
+    ],
+    "principle": "match prompt strategy to task type, not habit",
+    "relatedConcept": "Analysis, research, drafting, and brainstorming each reward different prompt shapes — constraint levels, evidence requirements, and output formats should shift with the task.",
+    "overallExplanation": "Match prompt strategy to task type, not habit: analysis, research, drafting, and brainstorming each reward different constraint levels, evidence requirements, and output formats."
+  }
+]

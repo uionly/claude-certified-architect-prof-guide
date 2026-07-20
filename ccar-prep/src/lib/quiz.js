@@ -1,5 +1,3 @@
-import { cert } from '../data/loader.js'
-
 export function sameSet(a, b) {
   if (a.length !== b.length) return false
   const set = new Set(b)
@@ -10,8 +8,8 @@ export function isCorrectSelection(question, selected) {
   return sameSet(selected, question.correct)
 }
 
-export function examMinutes(questionCount) {
-  return Math.ceil(questionCount * cert.examMinutesPerQuestion)
+export function examMinutes(questionCount, examMinutesPerQuestion) {
+  return Math.ceil(questionCount * examMinutesPerQuestion)
 }
 
 export function shuffle(array) {

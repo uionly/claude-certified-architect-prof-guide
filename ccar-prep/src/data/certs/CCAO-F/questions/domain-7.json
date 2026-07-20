@@ -1,0 +1,140 @@
+[
+  {
+    "id": 701,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "single",
+    "question": "Bianca, a financial analyst at a credit union, asks Claude to 'analyze this quarterly data and tell me what's important,' attaching a spreadsheet. The response is generic — broad observations that could apply to almost any quarter. What is the most likely cause and the best fix?",
+    "options": [
+      "The prompt gave Claude no goal, audience, or criteria for 'important'; she should specify what decisions the analysis supports and what format she needs",
+      "The model has reached its analytical limit on financial data; she should escalate the task to the IT department for a technical solution",
+      "The spreadsheet format confused Claude; she should retype the key figures manually into the chat instead of attaching the file",
+      "Generic first responses are normal; she should regenerate the same prompt several times until a more specific analysis appears"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Generic output usually traces to a generic prompt: 'tell me what's important' gives Claude no definition of important, no audience, and no goal. Diagnosing the missing specification and adding context — the decision at stake, the metrics that matter, the desired format — is the standard fix.",
+      "Tempting because underperformance can suggest capability limits, but nothing here indicates one — the task is routine analysis and the prompt is visibly underspecified. Escalating before diagnosing skips the cheapest, most likely fix and misroutes a prompting problem as a technical one.",
+      "Tempting because input format does occasionally matter, but the response wasn't confused or wrong about the data — it was unfocused, which points to the instruction, not the attachment. Retyping figures adds manual effort without addressing the actual gap.",
+      "Tempting because regeneration sometimes yields variety, but the same underspecified prompt keeps producing the same class of generic answer. Re-rolling without changing anything mistakes randomness for iteration and diagnoses nothing."
+    ],
+    "principle": "diagnose the prompt before blaming the model",
+    "relatedConcept": "Generic output is the signature of an underspecified request — goal, audience, and criteria are the first things to check.",
+    "overallExplanation": "Diagnose the prompt before blaming the model: generic output is the signature of an underspecified request, and stating the goal, the audience, and what counts as important is the fix."
+  },
+  {
+    "id": 702,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "single",
+    "question": "Sam, a grants coordinator at a community foundation, has been working in one Claude conversation all week — drafting three unrelated grant reports, planning an event, and analyzing survey data. Claude's answers have grown confused, mixing details from one grant into another. What should Sam do?",
+    "options": [
+      "Start a fresh conversation for the current task, carrying over only a short summary of the relevant details it needs",
+      "Continue in the same conversation but type the corrections in capital letters so Claude weighs them more heavily",
+      "Ask Claude within the same conversation to permanently erase its memory of the other two grants before continuing",
+      "Report the cross-contamination as a product defect and pause all grant work until the behavior is acknowledged and fixed"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. A long conversation packed with unrelated topics gives the model a context full of competing details, and cross-contamination is the predictable symptom. Restarting with a concise summary of only the relevant material is the standard remedy — clean context, no baggage.",
+      "Tempting because emphasis feels like it should help, but formatting tricks do not remove the conflicting grant details from the conversation's context. Every response is still generated against the same contaminated history; the fix is a fresh start, not louder corrections.",
+      "Tempting because it names the right goal, but asking the model to 'erase' parts of the current conversation does not actually remove them from the context the conversation carries. The reliable way to drop stale context is to leave it behind in a new chat.",
+      "Tempting if the behavior looks like malfunction, but topic-mixing in an overloaded multi-subject conversation is a known, user-manageable characteristic of how context works — not a defect. Pausing all work misdiagnoses a workflow habit as a product failure."
+    ],
+    "principle": "when context gets crowded, restart with a clean summary",
+    "relatedConcept": "Diagnosing poor outputs includes recognizing when the conversation itself — not the prompt — is the problem.",
+    "overallExplanation": "When context gets crowded, restart with a clean summary: unrelated topics accumulated in one long chat produce cross-contamination, and a fresh conversation carrying only the relevant details resolves it."
+  },
+  {
+    "id": 703,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "For six weeks, drafts that Miguel's marketing team produces with their Claude Project have come back from legal review flagged for the same issue: phrasing that overpromises product performance. Each week the team manually fixes the flagged lines and resubmits. What should Miguel do?",
+    "options": [
+      "Update the Project instructions with a rule against performance claims, including examples of the phrasing legal has rejected, so drafts stop repeating the problem",
+      "Keep the manual correction routine, since legal review exists to catch such issues and the current process is technically working",
+      "Ask legal to relax its standard for AI-drafted marketing copy, since the drafts are otherwise strong and the flags are slowing campaigns",
+      "Stop using Claude for any copy that will face legal review and reserve it for internal documents that no reviewer sees"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. A repeated reviewer flag is feedback about the system, not just the draft. Feeding it back into the standing configuration — a rule plus concrete examples of rejected phrasing — converts six weeks of recurring rework into a one-time fix, which is what adjusting based on results means.",
+      "Tempting because the process does catch every error, but catching the same error weekly while never preventing it wastes both teams' time. Treating review as the permanent fix confuses a safety net with a feedback loop — the signal is supposed to change the upstream behavior.",
+      "Tempting because the flags are genuinely slowing campaigns, but the standard exists for regulatory and liability reasons that do not soften because a tool drafted the copy. This adjusts the wrong side of the loop: the drafts should meet the standard, not vice versa.",
+      "Tempting as a way to end the friction, but it abandons a working use case over a correctable instruction gap. The pattern is specific and known — exactly the kind of problem configuration feedback fixes — so retreat is a disproportionate response."
+    ],
+    "principle": "recurring review feedback belongs in the configuration, not in weekly rework",
+    "relatedConcept": "Adjusting based on results means closing the loop — turning reviewer signals into standing instructions.",
+    "overallExplanation": "Recurring review feedback belongs in the configuration: adding a rule with examples of the rejected phrasing to the Project instructions turns a weekly manual correction into a solved problem."
+  },
+  {
+    "id": 704,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "Priyanka, a communications manager at a hospital system, is trying to improve her press-release prompt. Last week she changed the prompt's structure, tone guidance, example, length limit, and audience description all at once. The output improved somewhat, but she cannot tell why. How should she approach the next round of improvement?",
+    "options": [
+      "Change one element at a time and compare results against the same test cases, so she learns which adjustments actually drive the improvement",
+      "Since the combined changes helped, make an even larger batch of simultaneous changes to accelerate the improvement further",
+      "Revert to the original prompt, since improvements she cannot explain are not trustworthy enough to keep using",
+      "Accept the current output level as final, since press-release quality has improved and further analysis is unnecessary"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Adjusting based on results requires knowing which change produced which result. Varying one element at a time against consistent test cases isolates cause and effect, turning prompt improvement from guesswork into learning she can reuse on every future prompt.",
+      "Tempting because the batch did help, but bigger bundles make attribution even worse — she will keep improving accidentally while learning nothing transferable, and a regression would be equally undiagnosable. Speed without attribution compounds the original problem.",
+      "Tempting because unexplained changes feel unscientific, but discarding a real improvement destroys progress without producing understanding. The output got better; the task now is to learn why, not to return to the worse baseline out of principle.",
+      "Tempting because 'better' can feel like done, but stopping at 'somewhat improved' with no understanding of the levers leaves obvious gains unclaimed. Optimization is iterative precisely because each evaluated adjustment teaches what to try next."
+    ],
+    "principle": "change one variable at a time and test against consistent cases",
+    "relatedConcept": "Systematic iteration — isolate the change, hold the test set constant, compare — is how prompt improvements become knowledge.",
+    "overallExplanation": "Change one variable at a time and test against consistent cases: isolating each adjustment is what converts 'the output got better' into knowing which lever moved it — knowledge that transfers to every future prompt."
+  },
+  {
+    "id": 705,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "multi",
+    "question": "Leo runs the reporting desk at a logistics company. Each week his four analysts individually explain the same reporting task to Claude from scratch, then manually restructure the output into the company's standard format. Which two changes would most improve the workflow's efficiency? (Choose two.)",
+    "options": [
+      "Move the standing task explanation and reporting standards into a shared Project so no one re-explains the task each week",
+      "Specify the required output structure in the instructions so reports arrive in the standard format instead of needing manual restructuring",
+      "Ask each analyst to write longer, more detailed prompts every week, since more thorough prompting always yields better results",
+      "Have every analyst independently generate the full report and then merge the four versions to be safe"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Repeated per-person setup is pure waste: a shared Project captures the task explanation and standards once, so every analyst starts from the same grounded configuration. Eliminating repeated setup is the first move in workflow optimization.",
+      "Correct. Manual restructuring after every generation is rework the prompt can eliminate: specifying the exact output structure in the standing instructions makes reports arrive ready to use. Removing a recurring post-processing step is a direct efficiency gain.",
+      "Tempting because detail often helps quality, but writing longer prompts individually each week increases the very repetition that is wasting time — and length is not the same as specification. The efficient version captures the detail once, in shared configuration.",
+      "Tempting because redundancy sounds like quality assurance, but generating four full reports and merging them quadruples the work to produce one deliverable. It adds cost without a quality mechanism — a review step on one draft would achieve more for far less."
+    ],
+    "principle": "capture repeated setup once and specify the output format upfront",
+    "relatedConcept": "Workflow optimization removes recurring waste — re-explained tasks and post-generation rework are the two biggest targets.",
+    "overallExplanation": "Capture repeated setup once and specify the output format upfront: a shared Project ends the weekly re-explaining, and format instructions end the manual restructuring — the two recurring wastes in this workflow."
+  },
+  {
+    "id": 706,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "single",
+    "question": "Fatima, an editor at an online education company, uses Claude to produce course descriptions. Her current process sends one giant prompt asking Claude to research the topic, draft the description, adapt it for three audiences, and generate marketing taglines all at once; results are uneven and hard to correct. How should she optimize this workflow?",
+    "options": [
+      "Break the work into sequential steps — draft, then review, then adapt per audience — so each stage can be checked and corrected before feeding the next",
+      "Keep the single giant prompt but run it five times per course and select the best overall result from the batch",
+      "Add more instructions to the giant prompt covering every way past outputs have gone wrong, until the single pass becomes reliable",
+      "Reduce the scope of the work by cutting the audience adaptations and taglines, since multi-part outputs are inherently unreliable"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Decomposing a multi-part task into sequential steps gives each stage a checkpoint: errors are caught where they occur instead of propagating into the adaptations and taglines. Effectiveness improves and corrections get cheaper — the core of workflow optimization.",
+      "Tempting because sampling several outputs can surface a better draft, but running the flawed all-at-once structure five times quintuples effort while keeping the real problem: no intermediate checkpoints, so a strong tagline can sit atop a wrong description. Volume is not structure.",
+      "Tempting because accumulated rules feel like hard-won learning, but piling corrective instructions onto an overloaded prompt treats symptoms one at a time while the prompt grows brittle. The unevenness comes from doing too much in one pass — the structure, not the wording, is the issue.",
+      "Tempting because it would reduce the failure surface, but cutting deliverables the business needs is retreat, not optimization. Multi-part outputs are reliably achievable with staged decomposition; abandoning scope concedes a problem that structure solves."
+    ],
+    "principle": "decompose overloaded tasks into stages with checkpoints",
+    "relatedConcept": "Optimizing for effectiveness often means restructuring the workflow — staged steps with review beats one overloaded pass.",
+    "overallExplanation": "Decompose overloaded tasks into stages with checkpoints: draft, review, then adapt — so each step is verified before it feeds the next, and errors stop propagating into every downstream deliverable."
+  }
+]

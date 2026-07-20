@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
-import { domains, studyByDomain } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
 import { domainStats, loadAttempts } from '../lib/storage.js'
 import Meter from '../components/Meter.jsx'
 import Tag from '../components/Tag.jsx'
 
 export default function StudyIndex() {
-  const byDomain = domainStats(loadAttempts())
+  const { cert, domains, studyByDomain } = useCertData()
+  const byDomain = domainStats(cert.code, loadAttempts(cert.code))
   return (
     <div>
       <h1 className="font-serif text-3xl font-semibold tracking-tight text-stone-900">Study Guide</h1>
@@ -22,7 +23,7 @@ export default function StudyIndex() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-serif text-xl font-semibold text-stone-900">
                   {ready ? (
-                    <Link to={`/study/${d.id}`} className="hover:underline">
+                    <Link to={`/${cert.code}/study/${d.id}`} className="hover:underline">
                       <span className="text-stone-400">Domain {d.id}:</span> {d.title}
                     </Link>
                   ) : (

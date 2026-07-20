@@ -1,0 +1,84 @@
+{
+  "domain": 1,
+  "title": "Prompting and Task Execution",
+  "weight": 14,
+  "intro": "This domain covers the day-to-day craft of getting good work out of Claude: writing prompts that carry enough context to succeed, breaking large deliverables into manageable stages, improving results through deliberate iteration, and shifting your prompting style to match the kind of task in front of you. Exam questions here are judgment scenarios — a professional gets a weak output and you choose the adjustment that actually addresses the cause — not vocabulary recall.",
+  "objectives": [
+    {
+      "objective": "Create effective prompts for business and technical tasks",
+      "explanation": "Claude produces output that is only as specific as the request it receives. An effective prompt supplies the things the model cannot guess: who the output is for, what it will be used for, what tone and format it should take, and the concrete facts or source material it must draw on. A one-line request like \"write something about our sale\" yields generic copy because the prompt itself is generic — the model has no products, dates, audience, or brand voice to work with.\n\nA reliable structure for business prompts has four parts. First, context: the role or situation (\"You are drafting for a healthcare clinic's patients\"). Second, source material: attach or paste the documents containing the real facts, so Claude grounds its output in your content instead of inventing plausible-sounding details. Third, the task itself, stated plainly with scope (\"Draft an FAQ covering booking, rescheduling, and cancellation\"). Fourth, output requirements: format, length, reading level, and tone.\n\nThe same discipline applies to lightly technical requests a non-developer might make — a formula explanation, a process document, a data cleanup. State what you have, what you need, and what \"done\" looks like. When a prompt underperforms, the first diagnostic question is always: what did I leave the model to guess?",
+      "whyItMatters": "Prompt quality is the single biggest factor a Claude user controls. Professionals who state audience, purpose, format, and facts get usable first drafts; those who send vague requests spend their time correcting generic output or, worse, shipping content built on invented details. The exam repeatedly rewards adding specificity over retrying, lengthening, or switching models.",
+      "examples": [
+        {
+          "title": "Turning a vague request into a working prompt",
+          "body": "A retail marketing manager needs email copy for a summer sale. Instead of \"write something about our summer sale,\" she prompts: \"Draft a promotional email for existing loyalty members of a mid-market home goods chain. The sale runs June 12–19, features 30% off outdoor furniture, and the brand voice is warm and practical. Keep it under 150 words with one clear call to action.\" The draft comes back on-brand and factually correct because every detail Claude needed was in the request, and her review time drops from rewriting to light editing."
+        },
+        {
+          "title": "Grounding a draft in source material",
+          "body": "An operations coordinator at a clinic must write a patient FAQ about a new booking system. He attaches the internal rollout document, then specifies the audience (patients, plain language, no internal jargon), the topics to cover (booking, rescheduling, reminders), and the format (question-and-answer pairs). Because Claude works from the real rollout document rather than guessing how the system works, the answers are accurate, and because the audience is stated, the language is patient-friendly rather than written for staff."
+        }
+      ],
+      "pitfalls": [
+        "Sending a vague prompt and then regenerating repeatedly — every retry samples the same underspecified request, so outputs vary in wording, not relevance.",
+        "Blaming the model and switching tiers when the real gap is missing context; no model can know your sale dates, audience, or brand voice unless the prompt provides them.",
+        "Pasting source material with no instructions, forcing Claude to guess the task, audience, and format.",
+        "Asking for \"longer\" or \"more creative\" output when the draft failed for lack of concrete inputs — style instructions cannot substitute for facts."
+      ]
+    },
+    {
+      "objective": "Apply task decomposition techniques to structure complex requests",
+      "explanation": "Large deliverables fail as single prompts. Asking Claude for a complete 30-page report, a full curriculum plan, or an end-to-end project proposal in one request forces the model to spread attention across many sections at once, and the result is shallow, uneven, and hard to correct because everything arrives at the same time. Task decomposition is the fix: break the work into a sequence of smaller requests, each of which Claude can handle with full focus.\n\nTwo decomposition moves cover most situations. The first is structure-first: ask Claude to propose an outline or plan, review and adjust it yourself, and only then request the detailed content section by section. This separates the planning decision from the drafting work and catches misunderstandings before they multiply across thirty pages. The second is sequential chaining: order the subtasks so that each step's output becomes the next step's input — a stakeholder analysis feeds the timeline, the timeline feeds the budget. Errors then surface at the step where they occur instead of being buried in a finished document.\n\nDecomposition is not the same as writing one longer, more exhaustive prompt, and it is not running the same mega-prompt several times and picking the best result. Both keep the single-shot structure that caused the problem. The distinguishing feature of real decomposition is checkpoints: places where you review, redirect, and approve before the next stage begins.",
+      "whyItMatters": "Complex requests are where most professional value lives — reports, plans, proposals — and where naive prompting fails hardest. Decomposition converts an unreviewable wall of output into a series of checkpoints, which raises quality, keeps you in control of direction, and prevents an early misunderstanding from contaminating an entire deliverable.",
+      "examples": [
+        {
+          "title": "Outline-first for a vendor evaluation report",
+          "body": "A fintech project manager needs a vendor evaluation covering requirements, scoring, risk, and a recommendation. Her one-shot prompt produced shallow sections, so she restarts with stages: first she asks Claude for a proposed report outline and adjusts two sections; then she requests each section individually, pasting the approved outline for consistency; finally she asks Claude to write an executive summary from the finished sections. Each section gets focused treatment, and she redirects a weak risk section after two pages instead of after thirty."
+        }
+      ],
+      "pitfalls": [
+        "Treating a longer, more exhaustive single prompt as decomposition — packing every requirement into one request is the opposite of breaking the task down.",
+        "Generating multiple complete versions of a big deliverable and picking the best, which triples reading effort while keeping the single-shot depth problem.",
+        "Skipping the outline-approval checkpoint and drafting all sections immediately, so a structural misunderstanding spreads through the whole document.",
+        "Decomposing into steps but ignoring the sequence, so later steps (like a budget) are drafted without the earlier outputs (like a timeline) they depend on."
+      ]
+    },
+    {
+      "objective": "Iterate prompts to improve output quality",
+      "explanation": "First drafts from Claude are starting points, and the skill that separates effective users is how they respond to an imperfect one. The productive move is a targeted feedback loop: stay in the same conversation, name exactly what is wrong, and describe what good looks like — \"make the tone conversational rather than formal, and add the two talking points about outage credits and the phone line.\" Because feedback carries information, each round converges on the goal. Regenerating, by contrast, is a lottery: the model learns nothing about what was wrong, so the same problems tend to reappear.\n\nIteration has a second, longer loop that many users miss. If you find yourself making the same corrections every time you run a recurring task — the weekly summary always starts too formal, the report always buries the recommendation — the lesson belongs in the prompt itself, not in the conversation. Fold the recurring fixes into your reusable prompt as explicit instructions, and include an example of a past output that came out right. Future first drafts then start where past sessions ended.\n\nKnowing when to stop also matters. Iteration is for fixable structural and content issues; final wording polish is often faster by hand. And if several rounds of clear feedback are not converging, the problem is usually upstream — missing source material or a task that needs decomposition — not a model that needs more scolding.",
+      "whyItMatters": "The gap between a mediocre and an excellent Claude output is usually two or three rounds of specific feedback, and the gap between a tedious workflow and an efficient one is whether recurring corrections get baked into a reusable prompt. Iteration discipline is what turns Claude from a draft generator into a reliable production tool.",
+      "examples": [
+        {
+          "title": "From weekly correction rounds to a stable template",
+          "body": "A media analyst produces a weekly newsletter summary and spends four correction rounds every week fixing the same issues: too formal, sections in the wrong order, headlines too long. She captures the fixes as prompt instructions — conversational tone, a fixed section order, headline length limit — and pastes last week's approved summary into the prompt as a model of the target. The next week's first draft needs one small edit instead of four rounds, because the corrections now live in the reusable prompt rather than in her memory."
+        }
+      ],
+      "pitfalls": [
+        "Regenerating instead of giving feedback — a retry carries no information about what was wrong, so fixes appear only by chance.",
+        "Starting a fresh chat with the same prompt after a bad draft, discarding both the conversation context and the diagnostic value of the failed attempt.",
+        "Re-typing the same corrections every session for a recurring task instead of folding them into the reusable prompt with a known-good example.",
+        "Iterating endlessly on a draft whose real problem is upstream — missing source material or an oversized task that needs decomposition."
+      ]
+    },
+    {
+      "objective": "Adapt prompting strategies based on task type (analysis, research, drafting, brainstorming)",
+      "explanation": "A prompt style that excels at one kind of task can actively sabotage another, so effective users shift strategy with the task type. Four types cover most business work.\n\nAnalysis tasks — interpreting data, comparing options, evaluating a document — reward tight structure: provide the source material, ask specific questions, request the reasoning behind conclusions, and constrain the output format so findings are easy to scan. Research tasks reward the opposite of compression: give the model room for a fuller exploratory answer, ask for sources, and explicitly request that uncertain or unverifiable claims be flagged, because research output feeds decisions and must be checkable. Drafting tasks live on audience and voice: state who will read it, the tone, the length, and supply any facts it must contain. Brainstorming tasks reward breadth before judgment: ask for a large, diverse set of ideas, explicitly invite unconventional options, and defer evaluation to a follow-up step — heavy constraints and requests for \"the single best idea\" collapse exactly the variety a brainstorm exists to produce.\n\nThe classic failure is template lock-in: a format that works for one recurring task (\"answer in three concise bullets\") gets applied to everything, flattening research into fragments or narrowing a brainstorm to safe suggestions. The diagnostic habit is to ask, before prompting: is this task about rigor, evidence, voice, or variety?",
+      "whyItMatters": "Professionals rarely do just one kind of task, and the exam tests whether you recognize that constraint-heavy prompting suits analysis while it starves brainstorming, and that research needs sources and flagged uncertainty while drafting needs audience and tone. Matching strategy to task type is the difference between Claude helping across your whole role and helping in one narrow groove.",
+      "examples": [
+        {
+          "title": "Unlocking a brainstorm by removing constraints",
+          "body": "A city policy officer, used to tightly constrained analytical prompts, asks Claude for community engagement ideas and gets three safe suggestions. She re-prompts: \"Generate 20 varied ideas for engaging residents on the transit plan, including some unconventional or ambitious ones. Don't evaluate them yet.\" The wider request produces genuinely novel options; in a second step she asks Claude to assess the five most promising against budget and staffing constraints — divergence first, convergence after."
+        },
+        {
+          "title": "Adapting one template across task types",
+          "body": "A grants manager's \"three concise bullets\" template works for status summaries but produces thin research on the national funding landscape. He keeps the template for summaries and writes a research-specific prompt instead: a fuller narrative answer, named sources for every funder mentioned, and a clearly marked list of claims Claude could not verify. The research becomes checkable and decision-ready, while his summaries stay as tight as before — one user, two strategies, each fit to its task."
+        }
+      ],
+      "pitfalls": [
+        "Applying one habitual template to every task type, compressing research into fragments or narrowing brainstorms into safe, conventional lists.",
+        "Adding constraints to a brainstorm to \"guide\" it — divergent tasks need breadth and deferred judgment, not tighter fences.",
+        "Asking for citations in a brainstorm or omitting them in research — evidence requirements belong to research, imaginative freedom to ideation.",
+        "Treating a research task as a brainstorm: swapping one mismatched strategy for another still fails to produce grounded, verifiable findings."
+      ]
+    }
+  ]
+}

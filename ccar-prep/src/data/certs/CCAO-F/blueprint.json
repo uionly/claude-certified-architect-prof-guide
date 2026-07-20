@@ -1,0 +1,103 @@
+{
+  "cert": {
+    "name": "Claude Certified Associate – Foundations",
+    "code": "CCAO-F",
+    "totalQuestions": 60,
+    "examMinutesPerQuestion": 2.0
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Prompting and Task Execution",
+      "weight": 14,
+      "questionCount": 8,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Create effective prompts for business and technical tasks", "questions": 2 },
+        { "objective": "Apply task decomposition techniques to structure complex requests", "questions": 2 },
+        { "objective": "Iterate prompts to improve output quality", "questions": 2 },
+        { "objective": "Adapt prompting strategies based on task type (analysis, research, drafting, brainstorming)", "questions": 2 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Output Evaluation and Validation",
+      "weight": 21,
+      "questionCount": 13,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Evaluate Claude-generated outputs for accuracy and completeness", "questions": 3 },
+        { "objective": "Identify hallucinations, inconsistencies, and biases in responses", "questions": 2 },
+        { "objective": "Apply fact-checking and validation techniques", "questions": 2 },
+        { "objective": "Determine when human review or additional verification is required", "questions": 2 },
+        { "objective": "Edit, adapt, refine, and compare outputs for the intended audience", "questions": 2 },
+        { "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)", "questions": 2 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Product and Model Selection",
+      "weight": 12,
+      "questionCount": 7,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Select appropriate Claude product features (Projects, research mode, chat, artifacts)", "questions": 2 },
+        { "objective": "Differentiate between Claude model types (Haiku, Sonnet, Opus)", "questions": 2 },
+        { "objective": "Align model selection with task requirements (cost, speed, quality)", "questions": 2 },
+        { "objective": "Understand and manage context limitations and memory considerations (when to restart, summarize, or persist)", "questions": 1 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Workflow Integration and Solution Design",
+      "weight": 16,
+      "questionCount": 10,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Apply Claude to analyze requirements and use cases", "questions": 2 },
+        { "objective": "Leverage Claude for research, planning, and process optimization", "questions": 2 },
+        { "objective": "Use Claude to support solution design, development, and iteration", "questions": 2 },
+        { "objective": "Integrate Claude into existing workflows to augment or redesign them", "questions": 2 },
+        { "objective": "Communicate Claude's value and limitations to stakeholders", "questions": 2 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Configuration and Knowledge Management",
+      "weight": 12,
+      "questionCount": 7,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "Configure Claude Projects with instructions and knowledge sources", "questions": 2 },
+        { "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)", "questions": 2 },
+        { "objective": "Create effective system-level instructions", "questions": 2 },
+        { "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions", "questions": 1 }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Governance, Risk, and Responsible Use",
+      "weight": 15,
+      "questionCount": 9,
+      "idStart": 601,
+      "objectives": [
+        { "objective": "Identify appropriate and inappropriate use cases", "questions": 3 },
+        { "objective": "Apply data sensitivity, regulatory, and privacy considerations", "questions": 2 },
+        { "objective": "Follow organizational AI policies and governance standards", "questions": 2 },
+        { "objective": "Understand the ethical implications of AI usage", "questions": 2 }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Troubleshooting and Optimization",
+      "weight": 10,
+      "questionCount": 6,
+      "idStart": 701,
+      "objectives": [
+        { "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs", "questions": 2 },
+        { "objective": "Adjust approach based on feedback and results", "questions": 2 },
+        { "objective": "Optimize workflows for efficiency and effectiveness", "questions": 2 }
+      ]
+    }
+  ]
+}

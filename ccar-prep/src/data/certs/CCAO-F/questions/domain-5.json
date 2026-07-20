@@ -1,0 +1,163 @@
+[
+  {
+    "id": 501,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "single",
+    "question": "Sofia leads a five-person marketing team at a consumer-goods company. Every time someone drafts campaign copy with Claude, they paste the same brand-voice rules and product fact sheet into the chat, and results still vary between teammates. What is the best way to fix this?",
+    "options": [
+      "Create a shared Project with the brand-voice rules as project instructions and the product fact sheets uploaded as knowledge, so every chat starts from the same foundation",
+      "Designate one teammate as the prompt owner who writes all campaign copy, since consistency requires a single person operating Claude",
+      "Have each teammate keep one long-running chat open permanently so Claude gradually remembers the brand rules from earlier messages",
+      "Ask Claude at the start of each chat to recall the brand guidelines it has seen in the team's previous conversations"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is exactly what Projects are for: instructions carry the standing behavioral rules, uploaded knowledge carries the reference documents, and every conversation in the Project starts already grounded in both — consistent across teammates without repeated pasting.",
+      "Tempting because one operator does produce consistent output, but it creates a bottleneck and solves a configuration problem with a staffing change. The variation comes from unshared setup, not from having multiple users; a shared Project removes the variation while keeping everyone productive.",
+      "Tempting because context does persist within a chat, but a single ever-growing conversation degrades over time, mixes unrelated campaigns, and is private to one person. It gives none of the shared, durable grounding a Project provides.",
+      "Tempting because it feels like the tool should remember, but separate chats do not automatically share your documents, and relying on recall invites Claude to reconstruct guidelines from memory imperfectly. Standing material belongs in project instructions and knowledge, not in hoped-for recall."
+    ],
+    "principle": "put standing rules in instructions and reference material in knowledge",
+    "relatedConcept": "Projects turn repeated per-chat setup into a durable, shared configuration for the whole team.",
+    "overallExplanation": "Put standing rules in project instructions and reference material in project knowledge: a shared Project grounds every teammate's chats the same way and eliminates repeated pasting."
+  },
+  {
+    "id": 502,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "single",
+    "question": "Hassan, an independent consultant, is setting up a Claude Project for drafting client proposals. He has a two-page description of his preferred proposal structure and tone, plus a folder of twelve past proposals and service descriptions he wants Claude to draw on. How should he configure the Project?",
+    "options": [
+      "Put the structure-and-tone guidance in the project instructions and upload the past proposals and service descriptions as project knowledge",
+      "Paste everything, including all twelve past proposals, into the project instructions so Claude cannot possibly overlook any of it",
+      "Upload everything as knowledge files, including the tone guidance, and leave the instructions blank to keep the setup simple",
+      "Keep the Project empty and attach the relevant documents manually to each individual conversation as the need arises"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Instructions and knowledge play different roles: instructions are standing directives about how Claude should behave (structure, tone, approach), while knowledge is reference material Claude consults for content. Matching each asset to its role keeps the configuration clear and effective.",
+      "Tempting because stuffing everything into instructions feels like maximum emphasis, but instructions work best as concise behavioral direction. Burying two pages of rules inside twelve proposals' worth of pasted text dilutes the directives and misuses the mechanism built for reference content.",
+      "Tempting because it is one simple bucket, but behavioral guidance left as just another file competes with every other document instead of consistently steering each response. Instructions exist precisely so how-to-behave rules apply reliably to every conversation.",
+      "Tempting because per-chat attachment offers fine control, but it recreates the repeated-setup problem Projects solve and guarantees inconsistency between conversations. Standing reference material belongs in the Project so it is always available."
+    ],
+    "principle": "instructions define behavior; knowledge supplies reference content",
+    "relatedConcept": "Effective Project configuration assigns each asset to the mechanism designed for it.",
+    "overallExplanation": "Instructions define behavior and knowledge supplies reference content: concise standing directives go in project instructions, while documents Claude should draw on are uploaded as project knowledge."
+  },
+  {
+    "id": 503,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "multi",
+    "question": "Meera's program team at an education nonprofit has connected Google Drive to Claude so program officers can ask questions about grant documents. As the team lead responsible for the setup, which two practices should she adopt to manage the connected knowledge well? (Choose two.)",
+    "options": [
+      "Scope the connection to the specific grant folders the team actually needs rather than granting access to the organization's entire Drive",
+      "When an answer looks off, check which source document Claude drew on and confirm the document is the current version",
+      "Connect every drive and shared folder in the organization so no future question could ever fall outside Claude's reach",
+      "Treat connector-sourced answers as pre-verified, since content pulled from official company documents does not require review"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Scoping connector access to what the use case needs is basic knowledge governance: it keeps irrelevant and potentially sensitive material out of scope and makes it far easier to reason about which sources answers come from.",
+      "Correct. Managing connected knowledge includes tracing answers back to their sources: checking what Claude referenced and whether that file is current catches stale-document and wrong-document problems before they mislead the team.",
+      "Tempting because broad access feels future-proof, but it exposes sensitive and irrelevant content, makes answer provenance murky, and violates the principle of granting access proportionate to need. Convenience is not a reason to widen data scope.",
+      "Tempting because official documents feel authoritative, but Claude can misread, over-summarize, or pull from an outdated file even when the source is legitimate. Connector grounding reduces some risks; it does not eliminate the need to review answers that matter."
+    ],
+    "principle": "scope connector access to need and trace answers to sources",
+    "relatedConcept": "Connector management combines proportionate access with the habit of verifying which document an answer came from.",
+    "overallExplanation": "Scope connector access to need and trace answers to their sources: connect only the folders the use case requires, and when an answer matters or looks off, confirm the source document and its currency."
+  },
+  {
+    "id": 504,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "single",
+    "question": "Jonas runs sales operations at a wholesale distributor. Three months ago he uploaded the company price list to the sales team's Claude Project. Prices are revised in a Google Doc every month, and reps have started getting quotes from Claude based on outdated numbers. What is the best way to manage this knowledge source going forward?",
+    "options": [
+      "Add a project instruction telling Claude to warn reps that prices may have changed since the document was uploaded",
+      "Connect the live pricing document through the Google Drive connector so Claude references the current version instead of a static upload",
+      "Ask reps to mentally adjust quoted prices based on their memory of recent revisions before repeating them to customers",
+      "Remove pricing from the Project entirely, since frequently changing information can never be made available to Claude reliably"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a warning is easy to add and honest, but it leaves the underlying problem intact: every quote still starts from wrong numbers, and the disclaimer trains reps to ignore Claude on pricing. Managing knowledge means fixing staleness, not labeling it.",
+      "Correct. Frequently updated material is exactly what connectors are for: pointing Claude at the live Google Doc means answers track the current version rather than a snapshot from upload day. Matching the knowledge mechanism to the document's change rate is the core management skill here.",
+      "Tempting because experienced reps do carry price knowledge, but mental correction of a systematically stale source is error-prone and defeats the purpose of grounding Claude in documents at all. It shifts the burden to human memory instead of fixing the source.",
+      "Tempting as a way to stop bad quotes immediately, but it abandons a high-value use case that a connector handles well. The reasoning error is treating a solvable freshness problem as a permanent disqualification."
+    ],
+    "principle": "match the knowledge mechanism to how often the source changes",
+    "relatedConcept": "Static uploads suit stable documents; connectors keep frequently revised sources current.",
+    "overallExplanation": "Match the knowledge mechanism to how often the source changes: a monthly-revised price list belongs behind a live connector, not in a static upload that goes stale the day after the next revision."
+  },
+  {
+    "id": 505,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Amara manages a customer-support Project at a telecom company. The project instructions currently read: 'Be helpful, professional, and accurate when responding to customer inquiries.' Agents complain that draft replies vary wildly in tone and format. How should Amara revise the instructions?",
+    "options": [
+      "Replace them with specific directives covering the audience, required tone, reply structure, and phrases or commitments to avoid, with a short example of a good reply",
+      "Keep the current wording but repeat it three times in the instructions so Claude weights professionalism and accuracy more heavily",
+      "Delete the instructions and upload the company's 90-page customer-service training manual as the sole guidance",
+      "Leave the instructions unchanged and switch the Project to a more capable model, since stronger models infer the intended tone on their own"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Effective system-level instructions are specific and actionable: who the audience is, what tone and structure to use, what to avoid, ideally anchored by a brief example. Vague virtues like 'be helpful' give Claude nothing concrete to follow, which is why outputs vary.",
+      "Tempting because repetition feels like emphasis, but repeating a vague directive three times just yields the same underspecified guidance louder. The problem is missing specifics, not insufficient weight on the existing words.",
+      "Tempting because the manual contains the real standards, but a 90-page document is reference knowledge, not standing behavioral direction — key rules get diluted among hundreds of pages. Instructions should distill the operative rules; the manual can supplement them as knowledge.",
+      "Tempting because model choice does affect quality, but no model can reliably infer unstated, company-specific formatting and tone standards. Upgrading the model treats a configuration gap as a capability gap and leaves the inconsistency in place."
+    ],
+    "principle": "instructions succeed on specificity, not virtue words",
+    "relatedConcept": "System-level instructions should state audience, tone, structure, and prohibitions concretely enough to be followed.",
+    "overallExplanation": "Instructions succeed on specificity, not virtue words: replace 'be helpful and professional' with concrete directives about audience, tone, structure, and what to avoid, anchored by an example."
+  },
+  {
+    "id": 506,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Felix is writing project instructions for a grant-writing Project at a research university. His draft has grown to forty rules, mostly prohibitions ('never say X', 'don't format Y that way'), plus long excerpts from the style guide, and outputs are becoming erratic. What is the best way to restructure the instructions?",
+    "options": [
+      "Condense them into a short set of clear, positively framed directives about the desired output, and move the full style guide into project knowledge",
+      "Keep all forty rules but rewrite each one in stronger, more emphatic language so none of them can be ignored",
+      "Split the forty rules evenly across the instructions and the first message of each new chat so the guidance is delivered twice",
+      "Number the rules by priority from 1 to 40 so Claude knows exactly which prohibition to sacrifice when rules conflict"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Effective instructions are concise, prioritized, and stated positively — describing the output you want rather than enumerating everything you don't. Bulk reference material such as a style guide belongs in knowledge, where Claude can consult it without it crowding out the core directives.",
+      "Tempting because emphasis feels like enforcement, but the problem is volume and framing, not tone. Forty emphatic prohibitions still bury the important rules, and prohibition-heavy instructions describe what to avoid without ever specifying what a good output looks like.",
+      "Tempting because redundancy sounds safe, but delivering the same overload in two places doubles the noise and creates drift when one copy is updated and the other is not. Duplication is a maintenance hazard, not a reliability technique.",
+      "Tempting because prioritization is genuinely part of good instructions, but ranking forty rules dodges the real fix: most of them should not be instructions at all. A 40-item priority list is still an unusable instruction set with numbers attached."
+    ],
+    "principle": "concise positive directives beat long lists of prohibitions",
+    "relatedConcept": "Instruction quality comes from clarity and prioritization, with bulk reference detail relocated to knowledge.",
+    "overallExplanation": "Concise, positively framed directives beat long lists of prohibitions: state what the output should be, keep the rule set short enough to matter, and move style-guide detail into project knowledge."
+  },
+  {
+    "id": 507,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions",
+    "type": "single",
+    "question": "Rosa manages a Project that answers employee questions about HR policies at a hospitality company. The company just replaced its leave policy, and staff report that Claude is still describing the old rules. The Project was set up a year ago by someone who has since left. What should Rosa do?",
+    "options": [
+      "Replace the outdated policy document in the project knowledge, review the instructions for references to the old rules, and assign an owner with a regular review cadence for future changes",
+      "Post an announcement telling employees to ignore Claude's answers about leave until further notice, and keep the Project as it is",
+      "Rely on employees correcting Claude within their chats, since the corrections will accumulate and update the Project's knowledge over time",
+      "Delete the Project and direct all policy questions back to the HR inbox, since a configuration that has gone stale once cannot be trusted again"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Maintenance means updating the stale knowledge source, checking the instructions for now-wrong references, and — because this failure came from missing ownership — establishing who reviews the configuration when policies change. Fix the content and the process that let it rot.",
+      "Tempting as an immediate risk reduction, but it leaves a known-wrong knowledge source serving answers indefinitely and erodes trust in the whole Project. A warning is a stopgap at best; the update itself is quick and is the actual fix.",
+      "Tempting because Claude does accept corrections in conversation, but in-chat corrections do not modify the Project's knowledge or instructions — each new conversation starts from the same outdated documents. This mistakes conversational context for configuration.",
+      "Tempting because staleness damaged trust, but deleting a working, valued configuration over one out-of-date document is disproportionate. The failure was a missing update process, which an owner and review cadence solves without abandoning the solution."
+    ],
+    "principle": "stale knowledge needs an update and an owner, not a workaround",
+    "relatedConcept": "Configurations decay as the organization changes; maintenance means refreshed sources plus assigned ownership and review cadence.",
+    "overallExplanation": "Stale knowledge needs an update and an owner, not a workaround: replace the outdated document, sweep the instructions for old references, and assign ownership with a review cadence so the next policy change gets caught."
+  }
+]

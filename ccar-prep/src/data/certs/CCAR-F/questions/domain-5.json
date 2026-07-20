@@ -1,0 +1,209 @@
+[
+  {
+    "id": 501,
+    "domain": "Context Management & Reliability",
+    "objective": "Manage conversation context to preserve critical information across long interactions",
+    "type": "single",
+    "question": "A telecom company's support agent handles long, multi-issue conversations and uses progressive summarization to control context growth. QA finds that late in conversations the agent misquotes refund amounts and promised dates — a customer told '$83.40 by March 3' hears 'around $80 soon' forty turns later, because the summaries condensed exact figures into vague language. What design change most directly fixes this?",
+    "options": [
+      "Extract transactional facts like amounts, dates, order numbers, and statuses into a persistent case-facts block included in each prompt outside the summarized history",
+      "Replace progressive summarization with full conversation history in every request so no numerical detail is ever lost to compression",
+      "Instruct the summarizer to write longer, more detailed summaries so that fewer specifics are dropped during each round of compression",
+      "Have the agent re-confirm amounts and dates with the customer whenever it is about to reference a figure from earlier in the conversation"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Progressive summarization predictably condenses numerical values, percentages, dates, and customer-stated expectations into vague language. A persistent case-facts block carries those transactional facts verbatim in every prompt, outside the lossy summarized layer, so precision survives any number of turns.",
+      "Tempting because full history preserves everything, but it abandons context control entirely: long multi-issue conversations plus accumulated tool results will exhaust the window, and the failure mode returns as truncation instead of summarization. Compression is needed; the exact facts just must live outside it.",
+      "Tempting because more detail means less loss per round, but longer summaries only slow the decay — each successive compression still erodes specifics, and the token savings that motivated summarization shrink. It tunes the lossy layer instead of moving critical facts out of it.",
+      "Tempting because confirmation prevents acting on wrong figures, but asking customers to repeat amounts they already provided reads as the agent not listening and degrades the experience. It also treats the symptom per occurrence rather than fixing the retention design."
+    ],
+    "principle": "keep exact transactional facts in a persistent block outside lossy summaries",
+    "relatedConcept": "Progressive summarization is safe for narrative flow but destroys precision; case-facts blocks preserve what must stay exact.",
+    "overallExplanation": "Keep exact transactional facts in a persistent case-facts block outside the lossy summary layer. Summarization is fine for narrative flow but predictably destroys amounts, dates, and stated expectations."
+  },
+  {
+    "id": 502,
+    "domain": "Context Management & Reliability",
+    "objective": "Manage conversation context to preserve critical information across long interactions",
+    "type": "multi",
+    "question": "A research platform's coordinator aggregates outputs from five subagents into one long input for a synthesis step. Two problems recur: findings that sat in the middle of the aggregated input are missing from final reports, and each order-lookup tool result contributes 40+ fields when only a handful are ever relevant, bloating the input. Which two changes address these problems? (Choose two.)",
+    "options": [
+      "Place a summary of key findings at the beginning of the aggregated input and organize the detailed results under explicit section headers",
+      "Trim verbose tool outputs to only the relevant fields before they accumulate in context, instead of appending complete raw responses",
+      "Instruct the synthesis model to weight every part of its input equally so that middle sections receive the same attention as the edges",
+      "Raise the synthesis request's max_tokens so the model has enough output budget to cover every finding in the aggregated input"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Models process the beginning and end of long inputs reliably but may omit middle sections — the lost-in-the-middle effect. Leading with a key-findings summary and using explicit section headers mitigates position effects by putting critical content where attention is strongest and making structure navigable.",
+      "Correct. Tool results consume tokens disproportionately to their relevance; a 40-field lookup with 5 useful fields is mostly context pollution. Trimming outputs to relevant fields before they accumulate keeps the aggregated input dense with signal and shortens it outright.",
+      "Tempting because it names the problem directly, but attention distribution over long inputs is a property of the model, not an instructable behavior — the middle sections still fade regardless of the instruction. Mitigation comes from input ordering and structure, not from asking.",
+      "Tempting because missing findings sound like the output ran out of room, but max_tokens governs how much the model may generate, not how well it attends to a long input. Findings lost in the middle were never attended to; more output budget cannot recover them."
+    ],
+    "principle": "order inputs for position effects and trim tool noise at the source",
+    "relatedConcept": "The lost-in-the-middle effect and disproportionate tool-result token cost are the two classic long-input failure modes.",
+    "overallExplanation": "Order inputs for position effects and trim tool noise at the source. Key findings go first with explicit headers to counter lost-in-the-middle, and tool outputs are cut to relevant fields before they bloat context."
+  },
+  {
+    "id": 503,
+    "domain": "Context Management & Reliability",
+    "objective": "Design effective escalation and ambiguity resolution patterns",
+    "type": "single",
+    "question": "A subscription-billing support agent is tuned for first-contact resolution. Transcript review finds that when customers write 'just let me talk to a person', the agent responds by asking diagnostic questions and attempting fixes first, escalating only after several exchanges. Several of these customers filed complaints. The issues themselves were usually within the agent's capability. How should the escalation behavior change?",
+    "options": [
+      "Escalate immediately when a customer explicitly requests a human, without first attempting investigation, even if the issue looks resolvable",
+      "Continue attempting resolution first since the issues are within the agent's capability, but cap the attempts at two exchanges before escalating",
+      "Add sentiment analysis so rising frustration in the customer's messages triggers escalation before they need to ask a second time",
+      "Have the agent explain its capabilities and success rate when a human is requested, then let the customer decide whether to proceed with the agent"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. An explicit customer request for a human is itself a valid escalation trigger, honored immediately — distinct from the frustration case, where acknowledging and offering resolution is appropriate until the customer reiterates. Overriding a stated preference to chase resolution metrics is what generated the complaints.",
+      "Tempting because it bounds the harm, but two ignored requests are still ignored requests — the failure is overriding an explicit preference at all, not the number of attempts. Capability was never the issue; consent was.",
+      "Tempting because it might catch frustration earlier, but sentiment is an unreliable proxy for escalation decisions, and it is unnecessary here: the customer already stated the trigger in plain language. Adding inference on top of an explicit request is machinery in place of listening.",
+      "Tempting because informed choice sounds respectful, but a customer who has already asked for a human experiences a capabilities pitch as resistance. The guide's pattern reserves offering resolution for cases where the customer expressed frustration, not an explicit request."
+    ],
+    "principle": "an explicit request for a human is an escalation trigger, not a negotiation",
+    "relatedConcept": "Valid triggers — explicit requests, policy gaps, no progress — differ from unreliable proxies like sentiment and self-reported confidence.",
+    "overallExplanation": "An explicit request for a human is an escalation trigger, not a negotiation. Honor it immediately; offering to resolve first is the pattern for frustration, not for a stated preference."
+  },
+  {
+    "id": 504,
+    "domain": "Context Management & Reliability",
+    "objective": "Design effective escalation and ambiguity resolution patterns",
+    "type": "single",
+    "question": "A utility company's support agent calls get_customer with the name a caller provides. For 'Maria Santos' the tool returns three account matches with different addresses and service plans. The current prompt tells the agent to proceed with the best available match, and misdirected account changes have resulted. What behavior should replace this?",
+    "options": [
+      "Ask the customer for an additional identifier such as account number, service address, or registered phone number before proceeding with any account operation",
+      "Select the account with the most recent activity, since the customer contacting support now is most likely the one who used their account most recently",
+      "Escalate to a human agent whenever a name lookup returns more than one match, since ambiguous identity is too risky for autonomous handling",
+      "Present all three accounts' details to the customer, including addresses and plan names, and ask which of them is theirs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Multiple matches require clarification, not heuristic selection: requesting an additional identifier resolves the ambiguity deterministically and keeps the interaction autonomous. This is the guide's pattern for multi-match tool results.",
+      "Tempting because recency correlates with activity, but it is exactly the heuristic selection that produced misdirected account changes — any statistical tiebreak will sometimes pick the wrong Maria Santos, and account operations make those errors costly.",
+      "Tempting because it eliminates the risk, but a multi-match is routine ambiguity that one clarifying question resolves; escalating every occurrence wastes human capacity and fails the customer on an interaction the agent handles safely with the right pattern.",
+      "Tempting because it lets the customer choose, but reading out other customers' addresses and plan details discloses personal data to an unverified caller — resolving ambiguity must not leak the very information that identity checks protect."
+    ],
+    "principle": "resolve multi-match ambiguity by asking for identifiers, never by heuristics",
+    "relatedConcept": "Ambiguity resolution patterns keep agents autonomous on routine cases while avoiding both heuristic guessing and over-escalation.",
+    "overallExplanation": "Resolve multi-match ambiguity by requesting additional identifiers, never by heuristic selection. Clarification keeps the case autonomous and deterministic without leaking other customers' data or over-escalating."
+  },
+  {
+    "id": 505,
+    "domain": "Context Management & Reliability",
+    "objective": "Implement error propagation strategies across multi-agent systems",
+    "type": "single",
+    "question": "In a multi-agent research system, the coordinator receives identical empty-result responses from the search subagent whether the archive API timed out or the query genuinely matched nothing. It therefore retries queries that legitimately found no matches and accepts empty output caused by outages, producing reports with silent coverage holes. How should the subagent's responses change?",
+    "options": [
+      "Return structured context distinguishing access failures — with failure type, attempted query, partial results, and possible alternatives — from valid empty results",
+      "Return a generic 'search unavailable' status for any failure so the coordinator at least knows the difference between an error and a result",
+      "Retry internally with exponential backoff until the archive responds, so the coordinator only ever receives definitive, successful search results",
+      "Treat empty results and failures identically as workflow-stopping conditions so no report is ever produced from incomplete search coverage"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The coordinator can only make intelligent recovery decisions — retry, reformulate, proceed with partial results, annotate gaps — when responses distinguish access failures from valid empty results and carry structured context: failure type, what was attempted, partial results, and alternatives.",
+      "Tempting because it at least separates errors from results, but a generic status hides the context recovery depends on — which query failed, what partial results exist, what alternatives remain. The coordinator knows something broke but not what to do about it.",
+      "Tempting because local retry for transient failures is genuinely good practice, but retrying 'until the archive responds' can block indefinitely during an outage, and the pattern is to propagate unresolvable errors with what was attempted and partial results — not to promise the coordinator only successes.",
+      "Tempting because it prevents silently incomplete reports, but terminating the workflow on any single failure is the opposite anti-pattern to silent suppression — partial results plus annotated coverage gaps are almost always more valuable than no report at all."
+    ],
+    "principle": "distinguish access failures from valid empty results, with structured context",
+    "relatedConcept": "Error propagation design sits between two anti-patterns: silent suppression and whole-workflow termination.",
+    "overallExplanation": "Distinguish access failures from valid empty results and propagate structured context — failure type, attempted query, partial results, alternatives. That is what lets a coordinator recover intelligently instead of guessing."
+  },
+  {
+    "id": 506,
+    "domain": "Context Management & Reliability",
+    "objective": "Manage context effectively in large codebase exploration",
+    "type": "single",
+    "question": "An engineer uses Claude Code for a day-long exploration of a 900k-line insurance claims monolith. By late afternoon the model's answers degrade: asked about the policy-renewal classes it examined that morning, it describes 'typical patterns' in such systems instead of the specific classes it actually read, and its answers have started contradicting earlier ones. Which practice counteracts this degradation?",
+    "options": [
+      "Have the agent maintain a scratchpad file recording key findings as it explores, and reference that file when answering subsequent questions",
+      "Periodically remind the model within the conversation of the most important classes it has seen so the details stay active in recent context",
+      "Restart the session each afternoon so the model begins with a clean context window instead of an afternoon's accumulation of exploration",
+      "Ask the model to re-read the relevant source files each time a question refers to code it examined earlier in the session"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Context degradation in extended sessions shows up exactly this way — generic 'typical patterns' replacing specific discovered classes, and inconsistent answers. A scratchpad file persists key findings outside the conversation window, and referencing it grounds later answers in what was actually discovered.",
+      "Tempting because recent context is processed well, but manual reminders re-inject verbose material into an already-strained window, accelerating the exhaustion that caused the degradation — and they depend on the engineer knowing which details will matter later.",
+      "Tempting because a fresh window removes the degradation, but without persisted findings it also removes the morning's knowledge — the new session starts ignorant, and re-exploration recreates the same accumulation by the next afternoon. Restarts only work when paired with recorded findings.",
+      "Tempting because re-reading restores exact details on demand, but each re-read pours large file contents back into the same overloaded context, compounding the problem it responds to. The efficient artifact is the distilled finding, not the raw source, repeatedly."
+    ],
+    "principle": "persist findings to scratchpad files; do not trust a long session's memory",
+    "relatedConcept": "Scratchpad files, /compact, and subagent delegation are the working set of tools against context degradation in codebase exploration.",
+    "overallExplanation": "Persist findings to scratchpad files rather than trusting a long session's memory. Recorded key findings survive context boundaries and keep late-session answers grounded in what was actually discovered."
+  },
+  {
+    "id": 507,
+    "domain": "Context Management & Reliability",
+    "objective": "Manage context effectively in large codebase exploration",
+    "type": "multi",
+    "question": "A consultancy is mapping a client's legacy ERP codebase with Claude Code in phases: inventory the modules, trace the order-fulfillment flow, then plan a modernization. Phase one's raw exploration output alone nearly fills the context window, and later phases need conclusions from earlier ones. Which two practices keep the multi-phase exploration within context limits while preserving continuity? (Choose two.)",
+    "options": [
+      "Spawn subagents to investigate specific questions, such as tracing the fulfillment flow's dependencies, so verbose output stays out of the main agent's context",
+      "Summarize each phase's key findings before starting the next, injecting the summary into the next phase's initial context instead of carrying raw output forward",
+      "Keep all raw exploration output in the main conversation so later phases can consult the unabridged evidence rather than working from summaries",
+      "Defer all summarization until the final phase so that no detail is lost to compression before the modernization plan is written"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Delegating specific investigations to subagents isolates verbose exploration output in their contexts while the main agent preserves high-level coordination — the core delegation pattern for large codebase exploration.",
+      "Correct. Summarizing key findings at each phase boundary and injecting the summary into the next phase's initial context carries conclusions forward at a fraction of the token cost of raw output, keeping every phase within budget.",
+      "Tempting because unabridged evidence sounds safer than summaries, but phase one's raw output alone nearly fills the window — carrying it forward guarantees exhaustion and the degraded, inconsistent answers that follow. Distillation at boundaries is what makes multi-phase work possible.",
+      "Tempting because early compression does risk losing detail, but deferring all summarization means every phase accumulates on top of the last with no relief, exhausting context long before the final phase. The lossy step must happen at each boundary, deliberately, not never."
+    ],
+    "principle": "delegate verbose exploration to subagents and summarize at phase boundaries",
+    "relatedConcept": "Multi-phase codebase work survives on isolation (subagents) plus distillation (phase summaries injected forward).",
+    "overallExplanation": "Delegate verbose exploration to subagents and summarize key findings at each phase boundary. Isolation plus distillation keeps every phase within context budget while conclusions carry forward."
+  },
+  {
+    "id": 508,
+    "domain": "Context Management & Reliability",
+    "objective": "Design human review workflows and confidence calibration",
+    "type": "single",
+    "question": "A mortgage processor's extraction pipeline reports 97% overall accuracy, and leadership wants human review removed for extractions the model marks high-confidence. The review team notes that the corpus mixes standard loan applications with rarer self-employment income documents, and that nobody has checked whether accuracy holds across types. What should be in place before high-confidence review is reduced?",
+    "options": [
+      "Accuracy analysis segmented by document type and field, plus ongoing stratified random sampling of high-confidence extractions to measure error rates and catch novel patterns",
+      "A higher overall accuracy bar, such as 99%, since 97% still implies thousands of errors at volume and review should not shrink until the aggregate metric improves",
+      "A rule that the model's high-confidence label alone routes documents out of review, since confidence is the model's own estimate of extraction quality",
+      "A second extraction model run in parallel, removing review only for documents where both models produce identical high-confidence outputs"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Aggregate accuracy can mask poor performance on specific document types or fields — 97% overall may hide 80% on self-employment documents. Segmented validation proves performance is consistent before automation, and stratified sampling of high-confidence extractions keeps measuring error rates and surfaces novel failure patterns after.",
+      "Tempting because a stricter bar sounds safer, but it repeats the same mistake at a higher number: any aggregate can conceal a weak segment. The issue is the shape of the metric, not its level — 99% overall could still hide systematic failure on the rare document type.",
+      "Tempting because confidence exists to route review, but uncalibrated self-reported confidence is exactly what cannot be trusted alone — scores must be calibrated against labeled validation sets, and even then sampled high-confidence output needs ongoing measurement, not blanket exemption.",
+      "Tempting because model agreement feels like verification, but two models sharing the same systematic blind spot — an unusual document layout, an ambiguous field — will agree on the same wrong answer. Consensus measures correlation between models, not correctness against ground truth."
+    ],
+    "principle": "segment accuracy by type and field; keep sampling what you automate",
+    "relatedConcept": "Aggregate metrics mask segment failures; calibration and stratified sampling are what make confidence-based routing safe.",
+    "overallExplanation": "Segment accuracy by document type and field, and keep stratified-sampling high-confidence extractions after automating. Aggregate accuracy masks weak segments, and calibration is what makes confidence-based routing trustworthy."
+  },
+  {
+    "id": 509,
+    "domain": "Context Management & Reliability",
+    "objective": "Preserve information provenance and handle uncertainty in multi-source synthesis",
+    "type": "single",
+    "question": "A pharma intelligence platform's research pipeline produces reports where claims can no longer be traced to sources after the synthesis step, and when two credible journals report different efficacy figures — one from a 2021 trial, one from a 2024 trial — the report silently prints whichever figure the synthesis agent encountered first. What output requirements on the subagents and synthesis step fix both problems?",
+    "options": [
+      "Require structured claim-source mappings with publication dates that synthesis must preserve, and annotate conflicting figures with their sources rather than selecting one",
+      "Have the synthesis agent rank sources by citation impact and report only the figure from the more authoritative journal, noting that a less-cited alternative exists",
+      "Instruct the synthesis agent to average conflicting numerical findings and attach the full bibliography of consulted sources to the end of each report",
+      "Route any report containing conflicting statistics to a human reviewer who selects the correct figure before the report is released to clients"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Attribution loss happens when findings are compressed without preserving claim-source mappings, so subagents must emit them — source, excerpt, publication date — and synthesis must preserve and merge them. Conflicting statistics from credible sources are annotated with attribution, and dates reveal when a 'conflict' is actually temporal difference between a 2021 and a 2024 trial.",
+      "Tempting because authority ranking feels rigorous, but arbitrarily selecting one credible value discards information the reader needs — and here the figures likely differ because the trials are three years apart, which citation impact cannot detect. Dates, not prestige, explain the discrepancy.",
+      "Tempting because a bibliography looks like provenance, but a source list at the end maps no claim to any source — traceability is claim-level, not report-level. Averaging figures from different trials fabricates a number no study reported, the worst possible conflict handling.",
+      "Tempting because human judgment on conflicts is valuable, but the reviewer receives a report that has already lost claim-source mappings and dates — the information needed to adjudicate is gone by the time they see it. Provenance must be preserved structurally upstream, not reconstructed downstream."
+    ],
+    "principle": "preserve claim-source mappings and dates; annotate conflicts, never pick silently",
+    "relatedConcept": "Provenance survives synthesis only when attribution and temporal metadata are structural requirements on every agent's output.",
+    "overallExplanation": "Preserve claim-source mappings with publication dates through synthesis, and annotate conflicting figures with attribution instead of selecting one. Temporal metadata often reveals apparent conflicts as different measurement dates."
+  }
+]

@@ -1,12 +1,16 @@
-// Exports the question bank as 3 stratified practice-set CSVs for a
+// Exports each cert's question bank as 3 stratified practice-set CSVs for a
 // dependent bulk-upload system, matching PracticeTestBulkQuestionUploadTemplate_v2.csv.
-// Usage: node scripts/export-practice-sets.mjs
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+// Usage: node scripts/export-practice-sets.mjs [certCode]
+//   no args  -> export every cert under src/data/certs/ (skipping ones with no content yet)
+//   certCode -> export just that cert
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const blueprint = JSON.parse(readFileSync(join(root, 'src/data/blueprint.json'), 'utf8'));
+const certsDir = join(root, 'src/data/certs');
+
+const onlyCert = process.argv[2] || null;
 
 const HEADER = [
   'Question',
@@ -54,23 +58,37 @@ function toRow(q) {
   ].map(csvField).join(',');
 }
 
-// 3 empty buckets to accumulate each domain's stratified slice into.
-const sets = [[], [], []];
+const certCodes = onlyCert
+  ? [onlyCert]
+  : readdirSync(certsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
 
-for (const domain of blueprint.domains) {
-  const qPath = join(root, `src/data/questions/domain-${domain.id}.json`);
-  const questions = JSON.parse(readFileSync(qPath, 'utf8'));
-  questions.forEach((q, i) => {
-    sets[i % 3].push(q);
+for (const certCode of certCodes) {
+  const certDir = join(certsDir, certCode);
+  const blueprint = JSON.parse(readFileSync(join(certDir, 'blueprint.json'), 'utf8'));
+
+  if (blueprint.domains.length === 0) {
+    console.log(`skipping ${certCode}: no content yet`);
+    continue;
+  }
+
+  // 3 empty buckets to accumulate each domain's stratified slice into.
+  const sets = [[], [], []];
+
+  for (const domain of blueprint.domains) {
+    const qPath = join(certDir, `questions/domain-${domain.id}.json`);
+    const questions = JSON.parse(readFileSync(qPath, 'utf8'));
+    questions.forEach((q, i) => {
+      sets[i % 3].push(q);
+    });
+  }
+
+  const exportsDir = join(root, 'exports', certCode);
+  mkdirSync(exportsDir, { recursive: true });
+
+  sets.forEach((questions, i) => {
+    const csv = [HEADER.join(','), ...questions.map(toRow)].join('\n') + '\n';
+    const outPath = join(exportsDir, `PracticeSet${i + 1}.csv`);
+    writeFileSync(outPath, csv, 'utf8');
+    console.log(`Wrote ${outPath} (${questions.length} questions)`);
   });
 }
-
-const exportsDir = join(root, 'exports');
-mkdirSync(exportsDir, { recursive: true });
-
-sets.forEach((questions, i) => {
-  const csv = [HEADER.join(','), ...questions.map(toRow)].join('\n') + '\n';
-  const outPath = join(exportsDir, `PracticeSet${i + 1}.csv`);
-  writeFileSync(outPath, csv, 'utf8');
-  console.log(`Wrote ${outPath} (${questions.length} questions)`);
-});

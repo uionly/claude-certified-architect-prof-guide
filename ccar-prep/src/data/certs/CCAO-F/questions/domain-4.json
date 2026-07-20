@@ -1,0 +1,232 @@
+[
+  {
+    "id": 401,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "single",
+    "question": "Priya, an operations manager at a logistics company, wants to explore whether Claude could help with the team's manual invoice-matching process. Before proposing anything to leadership, she wants a clear picture of what the process actually requires. What is the most effective way to use Claude at this stage?",
+    "options": [
+      "Ask Claude to immediately generate a full automation proposal for invoice matching so leadership can react to something concrete",
+      "Share her written description of the current process and ask Claude to identify the key requirements, edge cases, and open questions she should resolve first",
+      "Skip the analysis step, since Claude adapts to any task and detailed requirements will emerge naturally once the team starts using it",
+      "Ask Claude to estimate the exact cost savings the project will deliver so she can lead the proposal with a financial figure"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a concrete proposal feels like progress, but a solution designed before the requirements are understood usually solves the wrong problem. Jumping to a deliverable skips the analysis step this stage exists for, and leadership reactions to a premature proposal anchor the project on guesses.",
+      "Correct. Using Claude to analyze requirements means feeding it what you know about the process and letting it surface requirements, edge cases, and gaps you have not considered. This structures the discovery work before any solution is designed, which is exactly how an Associate applies Claude to requirements analysis.",
+      "Tempting because Claude is flexible, but flexibility does not remove the need to understand the task. Without knowing the process's exceptions, inputs, and success criteria, the team cannot judge whether outputs are correct — the reasoning error is confusing adaptability of the tool with clarity about the problem.",
+      "Tempting because executives like numbers, but Claude has no access to the company's actual volumes, wages, or error rates, so any precise savings figure would be fabricated. Asking for invented specifics invites hallucinated numbers into a leadership decision."
+    ],
+    "principle": "analyze requirements before designing the solution",
+    "relatedConcept": "Requirements analysis with Claude means using it to surface edge cases, gaps, and clarifying questions — not to skip discovery.",
+    "overallExplanation": "Analyze requirements before designing the solution: Claude is most valuable early on as a thinking partner that surfaces edge cases, gaps, and clarifying questions from what you already know about the process."
+  },
+  {
+    "id": 402,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "multi",
+    "question": "Marcus, an HR lead at a national retail chain, is evaluating a proposed use case: a Claude Project that helps store managers answer new-hire onboarding questions. He has a folder of interview notes from store managers and the current onboarding manual. Which two actions best use Claude to analyze this use case before building anything? (Choose two.)",
+    "options": [
+      "Share the interview notes and ask Claude to summarize the recurring pain points and generate clarifying questions to take back to store managers",
+      "Ask Claude to review the onboarding manual against the interview notes and flag gaps, ambiguities, or conflicts the use case would need to handle",
+      "Ask Claude to confirm that the project will succeed so he can include that assurance in his pitch to the HR director",
+      "Defer all analysis until after launch, since real usage data will reveal the requirements more accurately than any upfront review"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Turning raw stakeholder input into themes and follow-up questions is a core requirements-analysis move: Claude accelerates the synthesis, and the clarifying questions drive a better second round with the actual stakeholders.",
+      "Correct. Comparing the source material against real user needs exposes exactly where the use case will strain — missing policies, contradictory guidance, ambiguous rules. Finding these gaps before building is the point of use-case analysis.",
+      "Tempting because a confident endorsement would strengthen the pitch, but Claude cannot predict organizational outcomes and will simply generate plausible-sounding agreement. Treating that as evidence is using the model as an oracle rather than an analysis tool.",
+      "Tempting because usage data is genuinely valuable, but launching with unexamined requirements means the first version answers questions from a manual known to have gaps. Post-launch learning complements upfront analysis; it does not replace it."
+    ],
+    "principle": "use Claude to synthesize stakeholder input and expose gaps",
+    "relatedConcept": "Use-case analysis pairs Claude's synthesis speed with human stakeholder knowledge before any solution is built.",
+    "overallExplanation": "Use Claude to synthesize stakeholder input and expose gaps before building: summarizing pain points, generating clarifying questions, and flagging conflicts between sources are the analysis moves that make the eventual solution match reality."
+  },
+  {
+    "id": 403,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Dana, a strategy analyst at a media company, needs a current overview of how streaming-content regulations differ across three international markets, including recent changes, to brief her leadership team next week. Which approach best leverages Claude for this research task?",
+    "options": [
+      "Ask a standard chat question and use the answer directly, since Claude's training covers regulatory topics in depth",
+      "Use research mode so Claude searches for current, sourced information, then spot-check the key regulatory claims against the cited sources before briefing leadership",
+      "Ask Claude to write the leadership briefing first, then work backward to find sources that support whatever it produced",
+      "Avoid using Claude entirely, because regulatory topics change too often for any AI tool to contribute usefully"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a plain chat answer is fast, but Claude's training data has a cutoff and recent regulatory changes may be missing or outdated. For a currency-sensitive topic, relying on training knowledge alone risks briefing leadership on stale rules.",
+      "Correct. Research mode is designed for exactly this: gathering current information with sources. Pairing it with verification of the claims that matter most — the regulatory specifics going to leadership — reflects the principle that research outputs are drafts to validate, not finished facts.",
+      "Tempting because it produces the deliverable quickly, but writing conclusions first and searching for support afterward inverts the research process and invites confirmation bias. Sources should shape the briefing, not decorate it.",
+      "Tempting as a cautious stance, but it discards a genuine strength: research mode can gather and organize current sourced material far faster than manual searching. The error is treating a manageable verification burden as a reason to abandon the tool."
+    ],
+    "principle": "match currency-sensitive research to research mode plus verification",
+    "relatedConcept": "Leveraging Claude for research means choosing the feature that reaches current sources and validating what it returns.",
+    "overallExplanation": "Match currency-sensitive research to research mode plus verification: use the feature built to gather current, sourced information, then confirm the claims that will drive decisions before sharing them."
+  },
+  {
+    "id": 404,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Tomas, an operations analyst at a healthcare billing firm, is asked to reduce turnaround time in the claims-correction workflow, which involves six handoffs across three teams. He wants Claude's help optimizing the process. What is the most effective way to start?",
+    "options": [
+      "Describe the current workflow to Claude step by step, ask it to identify likely bottlenecks and propose alternatives, then review the suggestions with the teams who run the process",
+      "Ask Claude for the industry-standard claims workflow and instruct the three teams to adopt it as written",
+      "Have Claude draft a memo announcing that turnaround time will improve, then determine the process changes afterward",
+      "Ask each team to use Claude however they prefer and assume the aggregate effect will shorten the workflow"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Process optimization with Claude works by giving it a faithful picture of the real workflow so it can spot bottlenecks, redundant handoffs, and restructuring options — and then validating those ideas with the people who know the process's unwritten constraints.",
+      "Tempting because industry benchmarks sound authoritative, but a generic workflow ignores this firm's specific systems, staffing, and compliance constraints. Imposing it as written skips both analysis of the actual process and the judgment of the teams running it.",
+      "Tempting because it creates visible momentum, but announcing outcomes before identifying changes is planning theater. Claude is being used for communication about improvement rather than for the analysis that produces improvement.",
+      "Tempting because it feels empowering, but uncoordinated individual usage optimizes isolated steps at best and cannot fix a bottleneck that lives in the handoffs between teams. Workflow-level problems need workflow-level analysis."
+    ],
+    "principle": "describe the real process so Claude can find the real bottlenecks",
+    "relatedConcept": "Process optimization pairs Claude's structured analysis with validation from the people who operate the workflow.",
+    "overallExplanation": "Describe the real process so Claude can find the real bottlenecks, then validate its proposals with the teams who run it — optimization suggestions are hypotheses until people with operational knowledge confirm them."
+  },
+  {
+    "id": 405,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "single",
+    "question": "Lena, a training coordinator at a fintech startup, is designing a one-page interactive checklist that new compliance hires will use during their first week. She plans to build it with Claude using Artifacts. What is the most effective way to develop the checklist?",
+    "options": [
+      "Write one extremely detailed prompt covering every requirement, generate the checklist once, and publish whatever Claude produces",
+      "Generate a first version as an artifact, review it against real onboarding needs, and refine it through follow-up requests until it is ready to share",
+      "Generate ten complete versions in separate chats and publish the one that looks best without further changes",
+      "Draft the checklist entirely by hand first, then ask Claude only to check the spelling before publishing"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because thorough upfront prompting is a good habit, but expecting a publishable deliverable from a single generation ignores how design actually converges. Even a strong first draft needs review against real needs, and one-shot publishing skips the evaluation step entirely.",
+      "Correct. Artifacts are built for iterative development: Claude produces a working draft you can see, and each round of feedback refines it. Treating the first output as a starting point and iterating toward the real requirement is the core solution-design loop.",
+      "Tempting because comparing versions has value, but picking a favorite and freezing it replaces iteration with a lottery. None of the ten was shaped by feedback about actual onboarding needs, so the 'best-looking' draft may still miss the requirement.",
+      "Tempting because hand-drafting keeps full control, but reducing Claude to a spell-checker forfeits its main contribution — rapidly producing and reshaping structured drafts. This under-uses the tool where it is strongest, in generation and revision."
+    ],
+    "principle": "treat the first output as a draft and iterate toward the requirement",
+    "relatedConcept": "Artifacts support solution development by making each version visible and easy to refine through feedback.",
+    "overallExplanation": "Treat the first output as a draft and iterate toward the requirement: the design loop of generate, review against real needs, and refine is how Claude-supported solutions converge on something worth shipping."
+  },
+  {
+    "id": 406,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "single",
+    "question": "Omar, a project manager at a public-sector agency, has designed a Claude-assisted intake process for citizen inquiries. During design he realizes the full vision requires an automated connection between Claude and the agency's internal case-management system, which is beyond what he can configure in claude.ai. What should he do?",
+    "options": [
+      "Deliver the parts he can build with claude.ai features now and escalate the case-management integration to the organization's technical team or Claude Developers",
+      "Attempt the system integration himself by following online tutorials, since escalating would slow the project down",
+      "Cancel the initiative, since a solution that cannot be fully realized with built-in features is not worth pursuing",
+      "Present the full vision to leadership as ready to deploy and resolve the integration question after approval"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Recognizing the boundary of the Associate role — and escalating technical implementation to Developers or Architects while still delivering the value available through built-in features — is exactly the judgment this credential expects. Partial value now plus a proper escalation beats stalling or overreaching.",
+      "Tempting because self-sufficiency feels efficient, but system integration is squarely the domain of technical practitioners. A tutorial-built integration into a government case-management system carries reliability and security risks an Associate is not positioned to manage.",
+      "Tempting as a decisive call, but it throws away the substantial portion of the solution that built-in features can deliver today. The reasoning error is treating one out-of-scope component as invalidating the entire design.",
+      "Tempting because momentum with leadership matters, but presenting an unbuilt integration as ready misrepresents the solution's state. Discovering the gap after approval damages credibility and stalls the project at a worse moment."
+    ],
+    "principle": "deliver what built-in features support and escalate the rest",
+    "relatedConcept": "Associates recognize when a design crosses into technical implementation and route that work to Developers and Architects.",
+    "overallExplanation": "Deliver what built-in features support and escalate the rest: knowing where the Associate scope ends — and handing integrations to technical teams rather than improvising them — is part of sound solution design."
+  },
+  {
+    "id": 407,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "multi",
+    "question": "Aisha, a communications manager at a public-sector agency, wants to integrate Claude into her team's weekly reporting workflow, in which four staff members each compile and summarize program updates for leadership. Which two integration practices give the effort the best chance of succeeding? (Choose two.)",
+    "options": [
+      "Start with one well-defined step — drafting the summaries from raw program updates — while keeping the existing human review before anything reaches leadership",
+      "Set up a shared Claude Project with the report template and standing instructions so all four staff members get consistent output without re-explaining the task weekly",
+      "Replace the entire reporting workflow at once, including the review step, to maximize the visible time savings in the first month",
+      "Have each staff member write their own prompts from scratch each week so the integration stays flexible and unconstrained"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Integrating at a single well-defined step, with existing review intact, lets the team learn where Claude helps and where it fails while the safety net still catches errors. Incremental augmentation is the standard pattern for introducing Claude into a live workflow.",
+      "Correct. A shared Project with the template and standing instructions turns individual prompting into a repeatable team workflow: consistent outputs, no weekly re-explaining, and one place to refine the setup as the team learns.",
+      "Tempting because a dramatic before-and-after impresses leadership, but removing review before the team knows Claude's failure modes sends unvetted content to executives. Big-bang replacement maximizes risk exactly when understanding is lowest.",
+      "Tempting because flexibility sounds healthy, but four people improvising weekly produces inconsistent reports and repeated effort — the exact waste integration should remove. Unstandardized prompting is individual usage, not workflow integration."
+    ],
+    "principle": "integrate incrementally and standardize what repeats",
+    "relatedConcept": "Successful workflow integration starts small with review intact and captures repeated setup in a shared Project.",
+    "overallExplanation": "Integrate incrementally and standardize what repeats: begin with one step while human review still catches errors, and move recurring instructions into a shared Project so the whole team benefits consistently."
+  },
+  {
+    "id": 408,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "single",
+    "question": "Ravi manages a customer-support email team at an online retailer. Agents currently write every reply from scratch, and quality varies widely. He wants to integrate Claude to speed up responses without harming customer trust. Which integration design is most appropriate?",
+    "options": [
+      "Configure Claude to draft each reply from the customer's email and policy guidelines, with the agent reviewing and personalizing every draft before it is sent",
+      "Send Claude's replies to customers automatically and have agents audit a sample of sent messages at the end of each week",
+      "Use Claude only to sort incoming emails by topic, since drafting customer-facing text is too risky for any AI involvement",
+      "Let agents paste customer emails into their personal Claude accounts whenever they feel a draft would help"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Draft-plus-review is the classic augmentation pattern: Claude removes the blank-page work and raises consistency, while the agent's review keeps a human accountable for every customer-facing message. Speed improves without giving up the trust safeguard.",
+      "Tempting because full automation maximizes measured speed, but customer-facing messages are exactly where errors are costly and hard to retract. Sampling after sending means most mistakes reach customers unreviewed — review must come before send, not after.",
+      "Tempting because it avoids all drafting risk, but it leaves the actual bottleneck — writing replies — untouched. The reasoning error is treating a manageable risk (drafts reviewed by humans) as a prohibition, forfeiting most of the integration's value.",
+      "Tempting because it requires no setup, but ad-hoc pasting of customer emails into personal accounts bypasses workflow design, produces inconsistent results, and raises data-handling concerns. It is individual improvisation, not an integration."
+    ],
+    "principle": "augment with draft-plus-review before automating customer-facing steps",
+    "relatedConcept": "Workflow integration places Claude where it removes effort while human review stays ahead of every external send.",
+    "overallExplanation": "Augment with draft-plus-review before automating customer-facing steps: Claude drafts, a human reviews and personalizes, and accountability for what customers receive never leaves the team."
+  },
+  {
+    "id": 409,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "single",
+    "question": "Ingrid, an operations lead at an insurance company, ran a three-month pilot using Claude to draft policy-renewal letters. She is now presenting to the executive team, some of whom are enthusiastic and some skeptical. What is the most effective way to communicate the pilot's results?",
+    "options": [
+      "Present the measured outcomes — drafting time saved and review-stage corrections — alongside a clear statement of where Claude still requires human checking",
+      "Emphasize only the time savings, since mentioning limitations to a skeptical audience will undermine support for expanding the program",
+      "Tell the executives that Claude eliminated errors in renewal letters, since the pilot team caught every mistake before letters went out",
+      "Show a live demonstration of Claude writing an impressive letter and let the demo speak for itself instead of presenting pilot data"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Credible stakeholder communication pairs measured value with honest limitations. Presenting both the savings and the continued need for review sets accurate expectations, builds trust with skeptics, and protects the program when the first visible error inevitably occurs.",
+      "Tempting because it seems to maximize buy-in, but hiding limitations sets expectations the program cannot meet. When an error surfaces later, the omission reads as misrepresentation and skeptics gain ammunition — overselling trades short-term approval for long-term credibility.",
+      "Tempting because zero errors reached customers, but attributing that to Claude misstates the mechanism: human review caught the mistakes. Executives who believe the tool is error-free may later cut the review step the result actually depended on.",
+      "Tempting because demos are persuasive, but a single polished example communicates neither measured value nor known failure modes. Executives deciding on expansion need pilot evidence and an honest risk picture, not a highlight reel."
+    ],
+    "principle": "pair measured value with honest limitations",
+    "relatedConcept": "Stakeholder communication earns durable support by setting expectations the deployed workflow can actually meet.",
+    "overallExplanation": "Pair measured value with honest limitations: presenting pilot data alongside where human review is still required sets expectations that survive the first visible error and keeps skeptics onside."
+  },
+  {
+    "id": 410,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "single",
+    "question": "A senior executive at Noor's manufacturing company reads about AI and asks her to have Claude fully automate the legal review of supplier contracts, removing the legal team from routine agreements. As the employee who introduced Claude to the company, how should Noor respond?",
+    "options": [
+      "Explain that Claude can accelerate contract review by summarizing terms and flagging clauses for the legal team, but that legal judgment and accountability must remain with qualified humans",
+      "Agree to the request, since executives set direction and Claude can be instructed to be extremely careful with legal language",
+      "Reply that Claude should never be used on legal documents in any capacity, so the request cannot be accommodated at all",
+      "Suggest the executive raise the idea with the legal team directly and avoid stating her own view about what Claude can and cannot do"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Communicating limitations means reframing an overreaching request into what the tool genuinely supports: Claude as an accelerant for summarization and flagging, with legal judgment and accountability staying human. This gives the executive real value without endorsing an inappropriate use.",
+      "Tempting because deferring to seniority avoids friction, but 'instructing Claude to be careful' does not make it a substitute for legal counsel — outputs can be confidently wrong, and no one accountable would review them. Agreeing transfers legal risk onto an unvalidated tool.",
+      "Tempting as a safe-sounding boundary, but a blanket prohibition overstates the limitation. Claude can legitimately assist with summarizing and organizing contract content under legal supervision; refusing everything forfeits real value and misinforms the executive.",
+      "Tempting because it routes the question to lawyers, but Noor was asked precisely because she understands the tool. Ducking the capability question leaves the executive's inflated expectations uncorrected and abdicates the communication role Associates are expected to play."
+    ],
+    "principle": "correct overreach by reframing to the appropriate use",
+    "relatedConcept": "Communicating limitations means steering stakeholders from full automation toward human-accountable assistance.",
+    "overallExplanation": "Correct overreach by reframing to the appropriate use: when a stakeholder asks for full automation of expert judgment, explain what Claude genuinely accelerates and where human accountability must remain."
+  }
+]

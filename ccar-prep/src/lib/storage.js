@@ -1,5 +1,9 @@
-const ATTEMPTS_KEY = 'ccarp.attempts.v1'
-const ACTIVE_KEY = 'ccarp.active.v1'
+function keys(certCode) {
+  return {
+    attempts: `cert.${certCode}.attempts.v1`,
+    active: `cert.${certCode}.active.v1`,
+  }
+}
 
 function read(key, fallback) {
   try {
@@ -10,41 +14,57 @@ function read(key, fallback) {
   }
 }
 
-export function loadAttempts() {
-  const attempts = read(ATTEMPTS_KEY, [])
+// One-time, non-destructive migration of the pre-multi-cert storage keys
+// (used only by CCAR-P, the original single-cert version of this app) into
+// the new cert-scoped keys. Legacy keys are left in place as cheap insurance.
+export function migrateLegacyStorage() {
+  const legacyAttempts = localStorage.getItem('ccarp.attempts.v1')
+  const legacyActive = localStorage.getItem('ccarp.active.v1')
+  const { attempts, active } = keys('CCAR-P')
+  if (legacyAttempts && !localStorage.getItem(attempts)) {
+    localStorage.setItem(attempts, legacyAttempts)
+  }
+  if (legacyActive && !localStorage.getItem(active)) {
+    localStorage.setItem(active, legacyActive)
+  }
+}
+
+export function loadAttempts(certCode) {
+  const attempts = read(keys(certCode).attempts, [])
   return Array.isArray(attempts) ? attempts : []
 }
 
-export function getAttempt(id) {
-  return loadAttempts().find((a) => a.id === id) || null
+export function getAttempt(certCode, id) {
+  return loadAttempts(certCode).find((a) => a.id === id) || null
 }
 
-export function saveAttempt(attempt) {
-  const attempts = loadAttempts()
+export function saveAttempt(certCode, attempt) {
+  const attempts = loadAttempts(certCode)
   attempts.push(attempt)
-  localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attempts))
+  localStorage.setItem(keys(certCode).attempts, JSON.stringify(attempts))
 }
 
-export function loadActiveQuiz() {
-  return read(ACTIVE_KEY, null)
+export function loadActiveQuiz(certCode) {
+  return read(keys(certCode).active, null)
 }
 
-export function saveActiveQuiz(state) {
-  localStorage.setItem(ACTIVE_KEY, JSON.stringify(state))
+export function saveActiveQuiz(certCode, state) {
+  localStorage.setItem(keys(certCode).active, JSON.stringify(state))
 }
 
-export function clearActiveQuiz() {
-  localStorage.removeItem(ACTIVE_KEY)
+export function clearActiveQuiz(certCode) {
+  localStorage.removeItem(keys(certCode).active)
 }
 
-export function clearAllProgress() {
-  localStorage.removeItem(ATTEMPTS_KEY)
-  localStorage.removeItem(ACTIVE_KEY)
+export function clearAllProgress(certCode) {
+  const { attempts, active } = keys(certCode)
+  localStorage.removeItem(attempts)
+  localStorage.removeItem(active)
 }
 
 // Aggregates every answered item across all attempts, keyed by objective tag.
 // Returns { [objective]: { attempted, correct } }.
-export function objectiveStats(attempts = loadAttempts()) {
+export function objectiveStats(certCode, attempts = loadAttempts(certCode)) {
   const stats = {}
   for (const attempt of attempts) {
     for (const item of attempt.items) {
@@ -57,7 +77,7 @@ export function objectiveStats(attempts = loadAttempts()) {
 }
 
 // Same aggregation keyed by domain title.
-export function domainStats(attempts = loadAttempts()) {
+export function domainStats(certCode, attempts = loadAttempts(certCode)) {
   const stats = {}
   for (const attempt of attempts) {
     for (const item of attempt.items) {
@@ -69,7 +89,7 @@ export function domainStats(attempts = loadAttempts()) {
   return stats
 }
 
-export function overallStats(attempts = loadAttempts()) {
+export function overallStats(certCode, attempts = loadAttempts(certCode)) {
   let attempted = 0
   let correct = 0
   const seen = new Set()

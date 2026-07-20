@@ -1,0 +1,85 @@
+{
+  "cert": {
+    "name": "Claude Certified Architect – Foundations",
+    "code": "CCAR-F",
+    "totalQuestions": 60,
+    "examMinutesPerQuestion": 2.0
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Agentic Architecture & Orchestration",
+      "weight": 27,
+      "questionCount": 16,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Design and implement agentic loops for autonomous task execution", "questions": 3 },
+        { "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns", "questions": 3 },
+        { "objective": "Configure subagent invocation, context passing, and spawning", "questions": 2 },
+        { "objective": "Implement multi-step workflows with enforcement and handoff patterns", "questions": 2 },
+        { "objective": "Apply Agent SDK hooks for tool call interception and data normalization", "questions": 2 },
+        { "objective": "Design task decomposition strategies for complex workflows", "questions": 2 },
+        { "objective": "Manage session state, resumption, and forking", "questions": 2 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Tool Design & MCP Integration",
+      "weight": 18,
+      "questionCount": 11,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Design effective tool interfaces with clear descriptions and boundaries", "questions": 3 },
+        { "objective": "Implement structured error responses for MCP tools", "questions": 2 },
+        { "objective": "Distribute tools appropriately across agents and configure tool choice", "questions": 2 },
+        { "objective": "Integrate MCP servers into Claude Code and agent workflows", "questions": 2 },
+        { "objective": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively", "questions": 2 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Claude Code Configuration & Workflows",
+      "weight": 20,
+      "questionCount": 12,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization", "questions": 2 },
+        { "objective": "Create and configure custom slash commands and skills", "questions": 2 },
+        { "objective": "Apply path-specific rules for conditional convention loading", "questions": 2 },
+        { "objective": "Determine when to use plan mode vs direct execution", "questions": 2 },
+        { "objective": "Apply iterative refinement techniques for progressive improvement", "questions": 2 },
+        { "objective": "Integrate Claude Code into CI/CD pipelines", "questions": 2 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Prompt Engineering & Structured Output",
+      "weight": 20,
+      "questionCount": 12,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Design prompts with explicit criteria to improve precision and reduce false positives", "questions": 2 },
+        { "objective": "Apply few-shot prompting to improve output consistency and quality", "questions": 2 },
+        { "objective": "Enforce structured output using tool use and JSON schemas", "questions": 2 },
+        { "objective": "Implement validation, retry, and feedback loops for extraction quality", "questions": 2 },
+        { "objective": "Design efficient batch processing strategies", "questions": 2 },
+        { "objective": "Design multi-instance and multi-pass review architectures", "questions": 2 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Context Management & Reliability",
+      "weight": 15,
+      "questionCount": 9,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "Manage conversation context to preserve critical information across long interactions", "questions": 2 },
+        { "objective": "Design effective escalation and ambiguity resolution patterns", "questions": 2 },
+        { "objective": "Implement error propagation strategies across multi-agent systems", "questions": 1 },
+        { "objective": "Manage context effectively in large codebase exploration", "questions": 2 },
+        { "objective": "Design human review workflows and confidence calibration", "questions": 1 },
+        { "objective": "Preserve information provenance and handle uncertainty in multi-source synthesis", "questions": 1 }
+      ]
+    }
+  ]
+}

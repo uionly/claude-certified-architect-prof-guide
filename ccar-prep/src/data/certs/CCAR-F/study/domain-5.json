@@ -1,0 +1,125 @@
+{
+  "domain": 5,
+  "title": "Context Management & Reliability",
+  "weight": 15,
+  "intro": "This domain covers keeping agents accurate as context grows and systems get complicated: preserving critical facts across long conversations, escalating for the right reasons, propagating errors usefully between agents, surviving day-long codebase exploration, calibrating confidence before removing human review, and keeping provenance intact through multi-source synthesis. Exam questions frame these inside the Customer Support Agent, Multi-Agent Research, Code Generation, and Structured Data Extraction scenarios, and reward recognizing which information must never pass through a lossy layer.",
+  "objectives": [
+    {
+      "objective": "Manage conversation context to preserve critical information across long interactions",
+      "explanation": "Long interactions force compression, and compression has predictable casualties. Progressive summarization condenses numerical values, percentages, dates, and customer-stated expectations into vague language — '$83.40 by March 3' becomes 'around $80 soon'. The design response is layering: extract transactional facts (amounts, dates, order numbers, statuses) into a persistent case-facts block included in each prompt outside the summarized history, so exact values survive regardless of how many times the narrative layer is compressed. Multi-issue sessions extend the same idea, persisting structured issue data (order IDs, amounts, statuses) into a separate context layer per issue.\n\nTwo other pressures shape long-context design. Tool results consume tokens disproportionately to their relevance — an order lookup returns 40+ fields when perhaps 5 matter — so verbose outputs should be trimmed to relevant fields before they accumulate in context. And the lost-in-the-middle effect means models reliably process the beginning and end of long inputs while omitting middle sections; mitigate it by placing key-findings summaries at the beginning of aggregated inputs and organizing detail under explicit section headers.\n\nIn multi-agent settings, the same discipline applies to handoffs: subagents should include metadata (dates, source locations, methodological context) in structured outputs so downstream synthesis stays accurate, and upstream agents should return structured data — key facts, citations, relevance scores — instead of verbose content and reasoning chains when downstream agents have limited context budgets. Throughout, conversational coherence still requires passing complete conversation history in subsequent API requests; the art is in what accompanies it.",
+      "whyItMatters": "The facts most likely to be destroyed by summarization — exact amounts, dates, commitments — are precisely the ones with financial and trust consequences when misquoted. An agent that promises a refund figure and later contradicts it, or a synthesis that drops findings buried mid-input, fails in ways users notice immediately and forgive slowly.",
+      "examples": [
+        {
+          "title": "Adding a case-facts block to a billing support agent",
+          "body": "A telecom support agent using progressive summarization starts misquoting refund amounts forty turns into multi-issue conversations. The team adds an extraction step: every transactional fact — amounts, dates, order numbers, statuses, explicit customer expectations — is written into a case-facts block that is included verbatim in each prompt, outside the summarized history. Summaries keep handling narrative flow, but late-conversation answers now quote '$83.40 by March 3' exactly, because the number never passed through the lossy layer."
+        },
+        {
+          "title": "Restructuring a synthesis input that lost its middle",
+          "body": "A coordinator aggregating five subagents' outputs finds middle-section findings missing from final reports, while each raw order lookup contributes 40+ irrelevant fields. Two changes fix it: tool outputs are trimmed to the handful of relevant fields before entering context, shrinking the input, and the aggregated document is restructured to open with a key-findings summary followed by explicitly headed sections. Critical content now sits where attention is strongest, and the shorter, structured input stops burying findings in an unattended middle."
+        }
+      ],
+      "pitfalls": [
+        "Letting exact amounts, dates, and commitments live only inside progressively summarized history, where compression predictably vagues them away.",
+        "Appending complete raw tool results to context instead of trimming to relevant fields, spending the window on 35 fields nobody will use.",
+        "Ignoring position effects in long aggregated inputs — burying key findings mid-input where the model is most likely to omit them.",
+        "Having subagents return verbose prose and reasoning chains to downstream agents with tight context budgets, instead of structured facts, citations, and relevance scores."
+      ]
+    },
+    {
+      "objective": "Design effective escalation and ambiguity resolution patterns",
+      "explanation": "Reliable escalation runs on explicit triggers: the customer explicitly requests a human, policy has a gap or is silent on the situation (not merely that the case is complex), or the agent cannot make meaningful progress. Two popular proxies are explicitly unreliable: sentiment-based escalation, because sentiment does not correlate with case complexity, and self-reported confidence scores, because LLM confidence is poorly calibrated — the agent is often most confident precisely on the hard cases it is getting wrong.\n\nThe explicit-request trigger has an important nuance. When a customer demands a human outright, escalate immediately, without first attempting investigation — overriding a stated preference to chase resolution metrics generates complaints even when the fix succeeds. When a customer is frustrated but has not asked for a human, the pattern is different: acknowledge the frustration while offering resolution if the issue is within the agent's capability, and escalate only if the customer reiterates their preference. Policy gaps behave similarly: a request the policy does not address — competitor price matching when policy only covers own-site adjustments — should be escalated, not improvised.\n\nAmbiguity resolution is the counterpart that keeps agents autonomous. When a lookup returns multiple customer matches, the agent should request additional identifiers (account number, service address, registered phone) rather than selecting by heuristics like most-recent activity. The implementation pattern for all of this is explicit escalation criteria in the system prompt, reinforced with few-shot examples demonstrating when to escalate versus resolve autonomously.",
+      "whyItMatters": "Escalation calibration is where support agents visibly succeed or fail: escalating straightforward cases wastes the human queue and tanks first-contact resolution, while autonomously improvising through policy gaps or ignoring explicit requests for a human creates the complaints and compliance exposure that get agent programs cancelled.",
+      "examples": [
+        {
+          "title": "Honoring \"just let me talk to a person\"",
+          "body": "A billing agent tuned for first-contact resolution responds to explicit human requests with diagnostic questions and fix attempts, escalating only after several exchanges — and customers file complaints even when their issues get solved. The prompt is changed so an explicit request for a human escalates immediately, no investigation first, while a separate few-shot example demonstrates the frustration case: acknowledge, offer to resolve since the issue is in capability, and escalate if the customer reiterates. Complaints stop, and resolution metrics barely move because genuine explicit requests were a small share of volume."
+        },
+        {
+          "title": "Three Maria Santoses and one clarifying question",
+          "body": "A utility agent's get_customer call returns three matches for a caller's name, and the prompt's 'proceed with the best available match' rule has caused misdirected account changes. The replacement pattern asks the customer for an additional identifier — account number, service address, or registered phone — before any account operation. The interaction stays autonomous, no heuristic guessing occurs, and no other customer's details are read out to an unverified caller. One clarifying question is cheaper than any wrong-account incident."
+        }
+      ],
+      "pitfalls": [
+        "Escalating on sentiment or self-reported confidence — both are unreliable proxies for case complexity, and the agent is often confidently wrong on hard cases.",
+        "Attempting resolution first when the customer has explicitly requested a human; that pattern belongs to the frustration case, not the explicit request.",
+        "Improvising through policy gaps instead of escalating when policy is ambiguous or silent on the customer's specific request.",
+        "Resolving multi-match lookups with heuristics like most-recent activity instead of asking for additional identifiers.",
+        "Writing escalation guidance as vague prose instead of explicit criteria with few-shot examples demonstrating escalate-versus-resolve decisions."
+      ]
+    },
+    {
+      "objective": "Implement error propagation strategies across multi-agent systems",
+      "explanation": "When a subagent fails, what the coordinator can do next depends entirely on what the failure report contains. Structured error context — failure type, the attempted query, any partial results, and potential alternative approaches — enables intelligent recovery: retry with a modified query, switch approach, or proceed with partial results and annotate the gap. Generic statuses like 'search unavailable' hide that context; the coordinator knows something broke but not what to do about it.\n\nTwo anti-patterns bracket the design space. Silent suppression — returning empty results marked as success — prevents any recovery and produces reports with invisible coverage holes. Whole-workflow termination on a single failure throws away everything else the system learned. Between them sits the correct division of labor: subagents implement local recovery for transient failures (a timeout retried locally), and propagate to the coordinator only the errors they cannot resolve, together with what was attempted and any partial results.\n\nA subtle but tested distinction: access failures (timeouts, service unavailability — questions needing retry decisions) must be distinguishable from valid empty results (successful queries that genuinely matched nothing). If both arrive as empty output, the coordinator retries legitimate no-match queries and trusts outage-shaped emptiness. Finally, failures should remain visible in the product: synthesis output should carry coverage annotations distinguishing well-supported findings from topic areas with gaps due to unavailable sources, so downstream readers know what the system could not see.",
+      "whyItMatters": "In multi-agent systems the coordinator's recovery intelligence is bounded by its error visibility: opaque failures turn a recoverable timeout into a silently incomplete report delivered as complete. The expensive failures in production research systems are rarely the outages themselves — they are the reports that never disclosed them.",
+      "examples": [
+        {
+          "title": "Making outages and empty archives look different",
+          "body": "A research coordinator receives identical empty results whether the archive API timed out or the query matched nothing, so it retries legitimate no-match queries and accepts outage-shaped emptiness, shipping reports with silent holes. The search subagent is redesigned: transient timeouts get one local retry; unresolved failures propagate as structured errors carrying failure type, the attempted query, partial results, and suggested alternatives, while genuine no-match responses are marked as successful queries with zero matches. The coordinator now reformulates real failures, accepts real emptiness, and annotates coverage gaps in the final report."
+        }
+      ],
+      "pitfalls": [
+        "Returning generic error statuses ('search unavailable') that hide the failure type, attempted query, and partial results the coordinator needs for recovery.",
+        "Silently suppressing errors by returning empty results marked as success, which guarantees reports with invisible coverage holes.",
+        "Terminating the entire workflow on a single subagent failure instead of proceeding with partial results and annotated gaps.",
+        "Conflating access failures with valid empty results, so the coordinator retries no-match queries and trusts outage output.",
+        "Propagating every transient blip to the coordinator instead of attempting local recovery first and escalating only what cannot be resolved."
+      ]
+    },
+    {
+      "objective": "Manage context effectively in large codebase exploration",
+      "explanation": "Extended exploration sessions degrade in a recognizable way: the model starts giving inconsistent answers and describing 'typical patterns' instead of the specific classes it discovered hours earlier. The working countermeasures form a small toolkit. Scratchpad files persist key findings across context boundaries — the agent records discoveries as it explores and references the file for subsequent questions, so late-session answers stay grounded in what was actually found rather than in plausible generalities. The /compact command reduces context usage mid-session when verbose discovery output has filled the window.\n\nSubagent delegation isolates verbosity at the source: spawn subagents to investigate specific questions — 'find all test files', 'trace the refund flow's dependencies' — so the raw exploration output lives in their contexts while the main agent preserves high-level coordination. For multi-phase work, summarize each phase's key findings before spawning the next phase's subagents and inject the summary into their initial context; conclusions carry forward at a fraction of the token cost of raw output.\n\nFor long-running or fragile work, add structured state persistence for crash recovery: each agent exports its state to a known location, and on resume the coordinator loads a manifest of those exports and injects them into agent prompts — so a crash costs the session, not the accumulated understanding. All of these share one principle: durable knowledge lives in artifacts (files, summaries, manifests), never solely in a context window that will eventually be compressed, exhausted, or lost.",
+      "whyItMatters": "Large-codebase engagements run for days, and a session that silently swaps discovered facts for generic patterns produces confident, wrong modernization advice. Teams that externalize findings into scratchpads, summaries, and manifests keep their agents' answers anchored to the actual code; teams that trust the window lose their morning's work every afternoon.",
+      "examples": [
+        {
+          "title": "A scratchpad for a 900k-line claims monolith",
+          "body": "By late afternoon in a day-long exploration, Claude Code describes 'typical patterns' instead of the policy-renewal classes it read that morning, and answers begin contradicting earlier ones — classic context degradation. The engineer restructures the session: the agent maintains a scratchpad file, appending each key finding (class responsibilities, dependency notes, oddities) as it explores, and answers subsequent questions by referencing the file. Late-session answers regain specificity because they are read from recorded findings, not reconstructed from a saturated window."
+        },
+        {
+          "title": "Phased ERP mapping with subagents and boundary summaries",
+          "body": "A consultancy maps a legacy ERP in phases — module inventory, order-fulfillment trace, modernization plan — but phase one's raw output alone nearly fills the window. They restructure: specific investigations are delegated to subagents whose verbose output never enters the main context, and at each phase boundary the key findings are summarized and injected into the next phase's initial context. Each agent also exports structured state to a known location, so when a session crashes mid-trace the coordinator reloads the manifest and resumes without re-exploring."
+        }
+      ],
+      "pitfalls": [
+        "Trusting a long session's memory instead of persisting findings to scratchpad files — degradation replaces discovered specifics with generic patterns.",
+        "Running verbose discovery in the main conversation instead of delegating specific questions to subagents, exhausting the coordinator's window.",
+        "Carrying raw exploration output across phase boundaries rather than summarizing key findings and injecting the summary forward.",
+        "Having no structured state exports or manifest, so a crash or restart costs the entire accumulated understanding rather than a session."
+      ]
+    },
+    {
+      "objective": "Design human review workflows and confidence calibration",
+      "explanation": "The central trap in review design is the aggregate metric: 97% overall accuracy may mask poor performance on specific document types or fields — strong on standard loan applications, weak on rare self-employment income documents — so validation must analyze accuracy by document type and field segment before human review is reduced anywhere. Automation decisions made on the aggregate inherit whatever failure the average conceals.\n\nConfidence-based routing is the right architecture, but only with calibration: have the model output field-level confidence scores, then calibrate review thresholds against labeled validation sets so a score corresponds to a measured error rate rather than to the model's mood. Routing then prioritizes limited reviewer capacity: extractions with low model confidence, or with ambiguous or contradictory source documents, go to human review first.\n\nAutomation is also never fire-and-forget. Stratified random sampling of high-confidence extractions provides ongoing error-rate measurement and detects novel error patterns — new document layouts, upstream format changes — that calibration on historical data cannot anticipate. The stratification matters: sampling across document types and fields ensures rare segments stay measured instead of vanishing into the average. Together the sequence is: segment accuracy first, calibrate confidence against labels, route low-confidence and ambiguous cases to humans, and keep sampling what you automated.",
+      "whyItMatters": "Removing human review is a one-way door if nothing keeps measuring: an unvalidated segment or an uncalibrated confidence score silently routes systematic errors straight to production, and by the time downstream systems surface them, months of extractions need re-processing. Calibration and sampling are what make the cost savings of automation durable.",
+      "examples": [
+        {
+          "title": "Gating a mortgage pipeline's automation on segmented evidence",
+          "body": "Leadership wants human review dropped for high-confidence extractions in a pipeline reporting 97% overall accuracy. Before agreeing, the team segments accuracy by document type and field and finds self-employment income documents running far below the aggregate — the average had been carried by easy standard applications. They calibrate the model's field-level confidence scores against a labeled validation set, set routing thresholds per segment, and keep stratified random sampling of high-confidence extractions running permanently. Months later the sampling catches a novel error pattern from a new document template before it contaminates downstream records."
+        }
+      ],
+      "pitfalls": [
+        "Trusting aggregate accuracy — a strong overall number can mask systematic failure on specific document types or fields.",
+        "Routing on raw self-reported confidence without calibrating thresholds against labeled validation sets.",
+        "Removing review from high-confidence extractions with no ongoing stratified sampling, leaving novel error patterns undetectable.",
+        "Spending limited reviewer capacity uniformly instead of prioritizing low-confidence extractions and ambiguous or contradictory source documents."
+      ]
+    },
+    {
+      "objective": "Preserve information provenance and handle uncertainty in multi-source synthesis",
+      "explanation": "Provenance is lost at summarization steps: when findings are compressed without preserving claim-source mappings, the final report contains claims nobody can trace. The structural fix is to require subagents to output claim-source mappings — source URLs, document names, relevant excerpts — and to require the synthesis agent to preserve and merge those mappings when combining findings. A bibliography appended to a report is not provenance; traceability is claim-level.\n\nConflicting statistics from credible sources are information, not noise. The correct handling is to annotate conflicts with source attribution rather than arbitrarily selecting one value — document analysis completes with both values included and explicitly annotated, and the coordinator decides how to reconcile before synthesis. Temporal metadata is often the resolution: requiring publication or data collection dates in structured outputs prevents temporal differences — a 2021 trial versus a 2024 trial — from being misinterpreted as contradictions. Reports should also be structured with explicit sections distinguishing well-established findings from contested ones, preserving the original sources' characterizations and methodological context.\n\nFinally, synthesis should render content types appropriately — financial data as tables, news as prose, technical findings as structured lists — rather than flattening everything into a uniform format that obscures the nature of the underlying evidence. All of these are requirements on agent output schemas, not stylistic preferences: provenance survives only when attribution, dates, and conflict annotations are mandatory fields that every downstream step must carry forward.",
+      "whyItMatters": "A research product whose claims cannot be traced, or that silently printed one of two credible figures, is unusable for any decision with stakes — and the failure is invisible until a client checks a source. Provenance and uncertainty handling are what let multi-agent research systems be trusted rather than merely fluent.",
+      "examples": [
+        {
+          "title": "Restoring traceability in a pharma intelligence pipeline",
+          "body": "A synthesis step produces reports where claims are untraceable and, when two credible journals report different efficacy figures, silently prints whichever the agent saw first. The fix is schema-level: every subagent must emit claim-source mappings — source name, excerpt, URL, and publication date — and the synthesis agent must preserve and merge them. Conflicting figures now appear together, each attributed, and the dates reveal the 'conflict' as a 2021 trial versus a 2024 trial. The report separates well-established findings from contested ones, and financial results render as tables while regulatory news stays prose."
+        }
+      ],
+      "pitfalls": [
+        "Compressing findings through summarization without preserving claim-source mappings, leaving final reports full of untraceable claims.",
+        "Arbitrarily selecting one of two credible conflicting values instead of including both, annotated with source attribution, for the coordinator to reconcile.",
+        "Omitting publication or data collection dates from structured outputs, so temporal differences masquerade as contradictions.",
+        "Treating a report-level bibliography as provenance when traceability must be claim-level.",
+        "Flattening all content into a uniform format instead of rendering financial data as tables, news as prose, and technical findings as structured lists."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "domain": 7,
+  "title": "Troubleshooting and Optimization",
+  "weight": 10,
+  "intro": "This domain tests what you do when Claude's output disappoints and how you make working setups better over time: diagnosing why a prompt underperforms before reaching for drastic fixes, closing the loop so feedback actually changes your configuration, and restructuring workflows to remove repeated waste. Exam questions describe a symptom — generic output, a confused long chat, recurring reviewer flags — and ask which response reflects sound diagnostic and optimization judgment.",
+  "objectives": [
+    {
+      "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+      "explanation": "Troubleshooting starts with reading the symptom, because different failures have different signatures. Generic, could-apply-to-anything output points to an underspecified prompt: no goal, no audience, no criteria for what matters. The fix is specification — state the decision the output supports, who will read it, what format you need, and what 'important' means. Wrong or fabricated specifics point to a knowledge gap: the prompt asked for facts Claude does not have, and the fix is supplying source material or using a feature (research mode, connected documents) that reaches real sources. Confused output that mixes topics or contradicts earlier turns points to the conversation itself: a long chat crowded with unrelated subjects gives the model a context full of competing details, and the remedy is a fresh conversation carrying only a concise summary of what is relevant.\n\nThe diagnostic discipline is to identify the cause before choosing a fix — and to try the cheap, likely causes first. Most underperformance traces to the prompt or the conversation, not the model or the product. Regenerating the same prompt repeatedly, escalating to technical teams, or declaring the tool defective are all common substitutes for the two-minute diagnosis that would have located the real gap.",
+      "whyItMatters": "The difference between users who get consistent value from Claude and users who conclude 'it doesn't work' is almost entirely diagnostic skill. Misdiagnosis is expensive in both directions: abandoned use cases that a prompt fix would have saved, and escalations that waste technical teams' time on specification gaps.",
+      "examples": [
+        {
+          "title": "Reading two different symptoms correctly",
+          "body": "An analyst gets a vague response to 'analyze this data and tell me what's important' — she recognizes the underspecification signature and rewrites: 'Identify the three trends most relevant to our loan-default risk, for the credit committee, as a bulleted summary with figures.' The output snaps into focus. The same week, a colleague's chat starts blending details from three unrelated grant reports drafted in one marathon conversation — a context problem, not a prompt problem. He starts a new chat with a five-line summary of the one grant that matters, and the confusion disappears. Same tool, two symptoms, two different correct fixes."
+        }
+      ],
+      "pitfalls": [
+        "Regenerating the same underspecified prompt repeatedly and mistaking randomness for iteration",
+        "Blaming the model or escalating to technical teams before checking whether the prompt states goal, audience, and criteria",
+        "Working in one endless multi-topic conversation and treating the resulting confusion as a product defect",
+        "Asking Claude to 'erase' or ignore earlier parts of a crowded chat instead of restarting with a clean summary"
+      ]
+    },
+    {
+      "objective": "Adjust approach based on feedback and results",
+      "explanation": "Feedback only improves a Claude workflow if it changes something upstream. The strongest signal is a recurring pattern: when reviewers flag the same issue week after week — overpromising language, a missing disclaimer, the wrong reading level — that is not a stream of separate draft problems but one configuration problem. Closing the loop means encoding the feedback where it persists: a rule in the Project instructions, ideally with concrete examples of the rejected phrasing, so every future draft inherits the correction. Manually fixing the same flag every week treats the safety net as the fix and leaves the waste in place; asking reviewers to lower their standard adjusts the wrong side of the loop.\n\nThe second half of this objective is how you experiment. When improving a prompt or configuration, change one element at a time and evaluate against the same test cases, so you can attribute results to causes. Changing five things at once can produce improvement you cannot explain — which means you learned nothing transferable and cannot diagnose the next regression. Keep what works even if you have not fully explained it, but structure the next round to isolate the levers. Adjustment is a cycle: result, diagnosis, one targeted change, comparison, repeat.",
+      "whyItMatters": "Teams that never close the feedback loop pay the same correction cost forever — the drafts stay wrong and the reviewers stay busy. Teams that adjust systematically compound: every reviewer flag becomes a standing rule, and every isolated experiment becomes reusable knowledge about what drives quality.",
+      "examples": [
+        {
+          "title": "Turning six weeks of legal flags into one instruction",
+          "body": "Marketing drafts from a Claude Project keep coming back from legal flagged for overpromising product performance; each week the team hand-fixes the lines and resubmits. The manager finally treats the pattern as configuration feedback: he adds a Project instruction — 'Never state or imply performance guarantees; describe capabilities factually' — followed by four verbatim examples of phrasing legal rejected and the compliant rewrites legal accepted. Flags on that issue drop to near zero the following week. Six weeks of recurring rework was one instruction away from solved the entire time."
+        }
+      ],
+      "pitfalls": [
+        "Fixing the same reviewer flag manually every cycle instead of encoding it into the standing instructions",
+        "Changing many prompt elements at once, so improvements and regressions alike are unattributable",
+        "Evaluating each prompt tweak against different examples, making comparisons meaningless",
+        "Responding to recurring flags by pressuring reviewers to relax the standard rather than fixing the drafts"
+      ]
+    },
+    {
+      "objective": "Optimize workflows for efficiency and effectiveness",
+      "explanation": "Once a workflow works, optimization removes its recurring waste. The two most common wastes have direct fixes. Repeated setup — every person re-explaining the same task, pasting the same standards each week — is eliminated by capturing the standing explanation, rules, and reference material once in a shared Project. Post-generation rework — manually restructuring every output into the required format — is eliminated by specifying the exact output structure in the standing instructions so deliverables arrive ready to use. Both fixes share a principle: anything you correct or repeat every cycle should be moved upstream into configuration.\n\nEffectiveness optimization is usually structural. An overloaded single prompt that researches, drafts, adapts, and generates extras in one pass produces uneven results with no place to catch errors; decomposing it into sequential stages — draft, review, then adapt — inserts checkpoints so mistakes are caught where they occur instead of propagating into every downstream deliverable. Decomposition beats both brute force (running the flawed pass many times and picking the best) and instruction bloat (piling corrective rules onto a prompt that is doing too much).\n\nOptimization also has a boundary: it should never silently remove the review steps or scope that the workflow's stakes require. Cutting needed deliverables is retreat, and cutting review to save minutes trades a known cost for an unbounded one.",
+      "whyItMatters": "Optimization is where Claude's value scales from one person's productivity to a team's throughput. Unoptimized workflows leak time invisibly — weekly re-explaining, nightly reformatting — and poorly structured ones cap quality no matter how good the prompts get.",
+      "examples": [
+        {
+          "title": "Two wastes, two upstream fixes",
+          "body": "A reporting desk's four analysts each explain the weekly task to Claude from scratch, then manually restructure the output into the company's format — roughly an hour of pure waste per analyst per week. The lead makes two changes: a shared Project holds the task explanation and reporting standards, and the instructions specify the exact output structure (sections, table layout, summary length). Reports now arrive formatted from a common setup. Nothing about the analysis itself changed; removing the recurring setup and rework recovered the time."
+        },
+        {
+          "title": "Decomposing an overloaded prompt",
+          "body": "An editor's single mega-prompt asks Claude to research a course topic, draft the description, adapt it for three audiences, and produce taglines in one pass; results are uneven and errors in the draft silently poison the adaptations. She restructures into stages: generate the draft, review and correct it, then adapt the approved draft per audience, then produce taglines from the approved copy. Each stage now has a checkpoint, corrections cost one stage instead of a full regeneration, and the deliverable set she was tempted to cut ships reliably."
+        }
+      ],
+      "pitfalls": [
+        "Leaving repeated setup in individual hands instead of capturing it once in a shared Project",
+        "Accepting manual reformatting of every output instead of specifying the format in standing instructions",
+        "Throwing volume (rerun and pick the best) or instruction bloat at a prompt whose real problem is doing too much in one pass",
+        "Optimizing away review steps or needed scope — saving minutes by accepting unbounded quality risk"
+      ]
+    }
+  ]
+}

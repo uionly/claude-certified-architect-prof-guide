@@ -1,0 +1,77 @@
+{
+  "domain": 5,
+  "title": "Configuration and Knowledge Management",
+  "weight": 12,
+  "intro": "This domain tests whether you can turn Claude from a blank chat box into a configured, maintained workspace: setting up Projects with the right split between instructions and knowledge, managing uploads and connectors like Google Drive and Gmail responsibly, writing system-level instructions that actually steer behavior, and keeping the whole configuration current as the organization changes. Exam questions present a configuration decision or a misbehaving setup and ask which fix reflects sound knowledge-management judgment.",
+  "objectives": [
+    {
+      "objective": "Configure Claude Projects with instructions and knowledge sources",
+      "explanation": "A Claude Project is a persistent workspace that combines two configuration mechanisms with different jobs. Project instructions are standing directives about how Claude should behave in every conversation in the Project — the audience, tone, structure, approach, and boundaries. Project knowledge is the reference material Claude draws content from — uploaded documents, fact sheets, templates, past examples. Every chat started inside the Project begins already grounded in both, which is what makes Projects the answer to the most common team problem: everyone pasting the same setup into every chat and still getting inconsistent results.\n\nThe configuration skill the exam tests is assigning each asset to the right mechanism. Behavioral guidance ('write in this tone, follow this structure, never commit to delivery dates') belongs in instructions, stated concisely. Reference content (twelve past proposals, the product catalog, the policy manual) belongs in knowledge. Pasting reference documents into the instructions dilutes the directives; leaving behavioral rules as just another knowledge file means they compete with every other document instead of consistently steering responses.\n\nShared Projects also make configuration a team asset: one place to improve the setup, consistent grounding for every member, and no dependence on any individual's private chat history."
+      ,
+      "whyItMatters": "Projects are the single highest-leverage feature for the Associate audience — they convert individual prompting skill into repeatable team workflows. A well-configured Project is the difference between five people getting five different answers and a team producing consistent, grounded output.",
+      "examples": [
+        {
+          "title": "From repeated pasting to a shared Project",
+          "body": "A marketing team pastes brand-voice rules and product fact sheets into every campaign chat, and output still varies by teammate. The lead creates a shared Project: the two-page voice guide becomes the project instructions, and the fact sheets, past campaign examples, and the messaging framework are uploaded as knowledge. New chats now start grounded identically for everyone. When the voice guide changes a quarter later, one edit to the instructions updates the whole team's setup — instead of five people updating five personal routines."
+        }
+      ],
+      "pitfalls": [
+        "Pasting bulk reference documents into project instructions instead of uploading them as knowledge",
+        "Leaving behavioral rules as a knowledge file rather than putting them in instructions, so they steer responses inconsistently",
+        "Relying on one long-running chat or hoped-for memory of past conversations instead of durable Project configuration",
+        "Building personal Projects for team workflows, so the configuration improves in one person's account only"
+      ]
+    },
+    {
+      "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+      "explanation": "Claude can be grounded in your organization's information two main ways: static uploads (a file added to a Project or chat, frozen at upload time) and connectors (live links to sources like Google Drive and Gmail, which let Claude reference current content). The first management decision is matching the mechanism to the material's change rate: stable documents — a finalized policy, last year's report — suit uploads; frequently revised sources — a monthly price list, an evolving tracker — belong behind a connector, or they will silently go stale and Claude will answer confidently from outdated numbers.\n\nThe second decision is scope. Connectors should be granted access proportionate to the use case: the specific folders the team needs, not the entire organizational drive. Broad access exposes sensitive and irrelevant content, muddies which source an answer came from, and turns a productivity setup into a data-governance problem.\n\nThe third habit is provenance-checking. Even with legitimate sources connected, Claude can pull from the wrong document, an outdated version, or over-summarize what it found. When an answer matters or looks off, check which document Claude referenced and confirm it is the current version. Connector grounding reduces hallucination risk; it does not make answers pre-verified.",
+      "whyItMatters": "Knowledge sources are where Claude's answers get their facts. Stale uploads produce confident wrong answers about prices and policies; over-broad connectors leak sensitive material into everyday chats; unchecked provenance lets a wrong-document answer travel to customers or leadership.",
+      "examples": [
+        {
+          "title": "The price list that went stale",
+          "body": "A sales-operations manager uploads the company price list to the team Project. Prices are revised monthly in a Google Doc, and three months later reps are quoting from the upload-day snapshot. The fix is mechanical: replace the static upload with a Google Drive connector reference to the live pricing document, so Claude reads the current version. He also scopes the connector to the pricing folder only — not the whole sales drive, which contains commission data — and reminds reps that quotes for large deals still get checked against the source before going to a customer."
+        }
+      ],
+      "pitfalls": [
+        "Uploading a static copy of a frequently revised document and letting it silently go stale",
+        "Granting a connector access to far more content than the use case needs 'to be safe'",
+        "Treating connector-grounded answers as pre-verified and skipping review of answers that matter",
+        "Never checking which document an odd answer came from, so wrong-version problems persist undiagnosed"
+      ]
+    },
+    {
+      "objective": "Create effective system-level instructions",
+      "explanation": "System-level instructions — the standing directives in a Project (or personal preferences applied across chats) — are the highest-leverage text an Associate writes, because they shape every response without being retyped. Effective instructions share a few properties. They are specific: 'write for small-business customers at an eighth-grade reading level, lead with the resolution, keep replies under 150 words' gives Claude something to follow, where 'be helpful and professional' does not. They are positively framed: describing the output you want beats enumerating everything you don't, and a short example of a good output anchors the target better than adjectives. They are concise and prioritized: a handful of rules that matter, not forty accumulated prohibitions that bury the essentials.\n\nInstructions also have a boundary: they are for behavioral direction, not bulk content. A 90-page manual or full style guide belongs in project knowledge, with the instructions distilling the operative rules and pointing to the reference when needed.\n\nWhen outputs vary or drift, the first diagnostic question is whether the instructions actually specify the missing property. Teams often blame the model for inconsistency that traces to instructions that never said what consistent looks like.",
+      "whyItMatters": "Instruction quality is usually the difference between a Project that reliably produces on-standard output and one whose results depend on who is typing. Vague or bloated instructions are the most common root cause behind 'Claude is inconsistent' complaints.",
+      "examples": [
+        {
+          "title": "Rewriting 'be professional' into directives",
+          "body": "A telecom support Project instructs Claude to 'be helpful, professional, and accurate,' and agents get wildly varying drafts. The manager rewrites the instructions: audience (retail customers, often frustrated), tone (calm, plain language, no jargon), structure (acknowledge the issue, state the resolution, list next steps), prohibitions (never promise credits or dates the agent hasn't confirmed), plus one example reply. Draft variance collapses immediately — the model was never inconsistent; the target was unspecified."
+        }
+      ],
+      "pitfalls": [
+        "Writing virtue words ('helpful', 'professional', 'high-quality') instead of concrete, followable directives",
+        "Letting instructions grow into dozens of accumulated prohibitions that bury the rules that matter",
+        "Pasting style guides or manuals into instructions instead of distilling rules and moving the source to knowledge",
+        "Blaming the model or switching models for inconsistency that the instructions never addressed"
+      ]
+    },
+    {
+      "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions",
+      "explanation": "Configurations decay. Policies change, prices move, teams reorganize, and a Project set up a year ago starts answering from a world that no longer exists. Maintenance is the discipline that keeps configured Claude trustworthy: when the organization changes, the affected knowledge sources get replaced, and the instructions get swept for references to the old state. Both matter — updating the document while the instructions still describe the old rules leaves the configuration fighting itself.\n\nBecause staleness is usually a process failure rather than a one-time accident, durable maintenance means ownership: a named person responsible for the configuration, a review cadence appropriate to how fast the content changes, and a habit of treating user reports of wrong answers as maintenance signals. The 'inform' part of this objective is keeping users in the loop — telling the team what the Project is grounded in, what changed in an update, and what its known limits are, so people calibrate their trust correctly.\n\nTwo things maintenance is not: it is not correcting Claude inside individual chats (in-chat corrections do not modify Project knowledge or instructions — each new conversation starts from the same stale documents), and it is not deleting a valued configuration because it went stale once. Fix the content, then fix the process that let it rot.",
+      "whyItMatters": "An unmaintained configuration is worse than none, because it delivers wrong answers with the credibility of an official tool. Most staleness incidents trace to missing ownership — nobody's job was to update the Project when the policy changed.",
+      "examples": [
+        {
+          "title": "The HR Project still teaching last year's leave policy",
+          "body": "A hospitality company replaces its leave policy, and the HR-answers Project — configured a year earlier by a departed employee — keeps describing the old rules. The new manager replaces the outdated policy document in project knowledge, sweeps the instructions and finds one line summarizing the old accrual rule, and fixes it. Then she addresses the root cause: she assigns herself as Project owner, adds a step to HR's policy-change checklist ('update the Claude Project'), and posts a note to staff describing what was updated — restoring both the content and the team's trust in it."
+        }
+      ],
+      "pitfalls": [
+        "Assuming in-chat corrections update the Project — new conversations still start from the stale knowledge",
+        "Updating the knowledge document but leaving instructions that still reference the old rules",
+        "Running configurations with no named owner or review cadence, so staleness is discovered by users",
+        "Responding to a staleness incident with warnings or deletion instead of updating the source and fixing the process"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+[
+  {
+    "id": 801,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Amara, a developer at a freight-logistics company, gives Claude two tools: search_shipments and get_shipment_details. Their descriptions read, in full, 'Searches shipments' and 'Gets details'. In traces, the model often calls the wrong one, passes a tracking number where the schema expects an internal ID, and retries with guessed parameters. What should Amara fix first?",
+    "options": [
+      "Rewrite the tool descriptions and parameter schemas to state precisely what each tool does, when to use which, what each parameter means with formats and examples, and what the tool returns",
+      "Add a third dispatcher tool that the model must call first, which inspects the request and tells the model which of the two original tools to invoke next",
+      "Lower the temperature for all tool-calling requests, since parameter guessing and wrong-tool selection are symptoms of sampling variance rather than prompt content",
+      "Merge both tools into a single query_shipments tool with one free-text parameter, letting the backend infer intent so the model no longer has to choose"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Tool descriptions and schemas are the model's only documentation — it selects tools and constructs arguments entirely from them. Precise descriptions ('use this when…', parameter semantics, ID formats with examples, return shape) are the highest-leverage fix for wrong-tool selection and malformed arguments, and the first thing to exhaust before adding architecture.",
+      "Tempting because routing sounds like control, but the dispatcher must be described too — the same underspecification now afflicts three tools instead of two, plus an extra round-trip per call. It adds moving parts to work around documentation that was never written; fix the descriptions first.",
+      "Temperature affects sampling variance, but the model here lacks the information to be right at any temperature: nothing told it which tool fits which case or what format the ID takes. Determinism applied to an underspecified choice just makes the model consistently wrong rather than variably wrong.",
+      "A free-text catch-all trades a schema the model can satisfy for an intent-inference problem the backend must now solve — moving the ambiguity, not removing it. Well-described, precisely-typed tools are how function calling is supposed to carry intent; erasing structure is a step backwards."
+    ],
+    "principle": "tool descriptions and schemas are the model's only documentation — write them like API docs for a developer who can't read your code",
+    "relatedConcept": "In function calling, tool selection and argument construction are driven entirely by names, descriptions, and schemas; most tool-use failures are documentation failures.",
+    "overallExplanation": "Tool descriptions and schemas are the model's only documentation — write them like API docs, with usage criteria, parameter semantics, formats, and examples. Most tool-use failures are documentation failures, so exhaust description quality before adding architecture."
+  },
+  {
+    "id": 802,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "multi",
+    "question": "Luca, an engineer at a B2B billing SaaS, is implementing an invoice-adjustment tool that a Claude agent will call with model-constructed arguments. In early tests the tool sometimes throws unhandled exceptions that kill the agent loop, and once it applied an adjustment to an invoice ID that didn't exist. Which two implementation practices should Luca adopt? (Choose two.)",
+    "options": [
+      "Return failures as structured, descriptive error results in the tool response — such as 'invoice INV-993 not found; verify the ID via search_invoices' — so the model can diagnose and recover",
+      "Validate every model-constructed argument inside the tool — existence, format, ranges, and the caller's authorization — before executing any state-changing operation",
+      "Have the tool return a generic success acknowledgment even on failure, so the agent loop always continues smoothly and errors never distract the model mid-task",
+      "Let exceptions propagate uncaught, since crashing the loop guarantees a human reviews every failure rather than allowing the model to attempt unsupervised recovery"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Agentic recovery depends on the error being visible and actionable in-band: a structured tool result that names the problem and hints at the remedy lets the model correct its arguments or choose another path on the next iteration, keeping the loop alive. Error results are part of the tool's interface, not an afterthought.",
+      "Correct. Model-constructed arguments are untrusted input: plausible-looking but invalid IDs, malformed values, and out-of-scope requests all arrive with confidence. Validating existence, formats, ranges, and authorization server-side before any state change is what stood between this tool and a wrong-invoice adjustment.",
+      "Tempting because it keeps the loop 'smooth', but lying to the model is the worst failure mode: it proceeds on a false premise, builds subsequent steps on an adjustment that never happened, and the discrepancy surfaces later where it is far harder to trace. Honest failure is recoverable; false success compounds.",
+      "Crashing the loop converts every recoverable hiccup — a typo'd ID, a transient timeout — into a full task failure requiring human restart, and an unhandled exception is not a review process. Escalation to humans should be a deliberate approval pattern for consequential actions, not a side effect of missing error handling."
+    ],
+    "principle": "tools must validate model-supplied arguments before acting and report failures as structured, actionable results the model can recover from",
+    "relatedConcept": "In an agentic loop the tool result is the model's only feedback channel — input validation protects your systems, and honest error reporting protects the task.",
+    "overallExplanation": "Tools must validate model-supplied arguments before acting and report failures as structured, actionable results. In an agentic loop the tool result is the model's only feedback channel — validation protects your systems, honest error reporting protects the task."
+  },
+  {
+    "id": 803,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Priyanka, a tech lead at a hospitality platform, designs tools for a booking-operations agent: read-only lookups (availability, reservation details) and consequential actions (cancel reservation, issue refund). Product wants the agent to feel fast, but finance is alarmed about autonomous refunds. Which tool-usage pattern balances these demands?",
+    "options": [
+      "Let read-only lookups execute automatically, but route refunds and cancellations through an approval step where a human confirms the proposed action before the tool runs",
+      "Require human approval for every tool call including lookups, since uniform review of all actions is the only defensible policy once money is involved anywhere in the system",
+      "Let all tools execute automatically but cap refunds at a small amount per transaction, since bounded losses make human review unnecessary at any volume",
+      "Have the agent describe intended refunds in its text replies without executing them, keeping the refund tool permanently disabled and relying on staff to act on the descriptions manually"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Approval patterns should be risk-proportional: reversible, read-only operations run automatically to preserve speed, while consequential, hard-to-reverse actions (moving money, canceling bookings) require human confirmation before execution. This is the standard human-in-the-loop tool pattern — autonomy where it's safe, gating exactly where it isn't.",
+      "Tempting as the maximally cautious position, but forcing a human to approve every availability lookup destroys the product's responsiveness while adding no safety — lookups can't move money. Uniform gating ignores that risk varies by action; review capacity should be spent where consequences live.",
+      "Caps bound the size of each mistake, not the count: an agent misfiring systematically can issue hundreds of 'small' refunds before anyone looks, and per-transaction limits are famously gameable by splitting. A cap can complement approval for large amounts, but it is not a substitute for confirmation on consequential actions.",
+      "This abandons the automation instead of governing it: staff now re-key actions from prose, reintroducing the manual toil and transcription errors the agent was built to remove. An approval flow gives the same human control with none of the double handling — describe-but-never-execute is the over-correction."
+    ],
+    "principle": "gate tool execution proportionally to risk: auto-run reversible reads, require human approval for consequential actions",
+    "relatedConcept": "Approval patterns — which tools run free, which pause for confirmation — are a core tool-set design decision, alongside descriptions and error handling.",
+    "overallExplanation": "Gate tool execution proportionally to risk: reversible read-only operations run automatically while consequential actions pause for human approval. Approval patterns are a core tool-set design decision, spending review capacity exactly where the consequences live."
+  },
+  {
+    "id": 804,
+    "domain": "Tools and MCPs",
+    "objective": "MCP Server Development",
+    "type": "single",
+    "question": "Santiago, a platform engineer at a genomics startup, has built an MCP server exposing the lab's sample-tracking tools. It must serve two audiences: scientists running Claude Desktop locally on managed laptops, and a fleet of remote Claude-based services in the cloud that connect over the network. He asks how MCP transports map to these cases. Which answer is right?",
+    "options": [
+      "Use stdio transport for the local Claude Desktop case, where the client launches the server as a subprocess, and a network transport such as streamable HTTP for the remote services, which also needs authentication added",
+      "Use stdio for both, since stdio streams can be forwarded over the network to remote clients and avoiding HTTP keeps the server free of authentication concerns entirely",
+      "Use a network transport for both, since stdio is a deprecated legacy mode retained only for debugging and local subprocess servers cannot access the filesystem",
+      "MCP servers define their transport per tool rather than per server, so each sample-tracking tool must individually declare whether it is a stdio tool or an HTTP tool"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The transports map to deployment topology: stdio suits local servers launched as a subprocess by the client — ideal for Claude Desktop on each scientist's laptop — while network transports (like streamable HTTP) suit shared remote servers that many clients reach over the network, where authentication and access control become the server's responsibility.",
+      "Tempting because one transport sounds simpler, but stdio's model is a client-spawned local subprocess wired to stdin/stdout — it is not a network protocol, and improvising forwarding recreates a network service with none of HTTP's auth, routing, and infrastructure support. 'No authentication concerns' is exactly backwards for anything remotely reachable.",
+      "stdio is a fully supported, standard MCP transport — the default fit for local integrations — not a deprecated debug mode, and a subprocess server has whatever filesystem access its process permissions grant. Both claims are invented; the real distinction is local subprocess versus networked service.",
+      "Transport is a property of the server-client connection, not of individual tools: all of a server's tools, resources, and prompts travel over whatever transport the server is running. Per-tool transport declarations are not part of the protocol — this confuses the capability layer with the communication layer."
+    ],
+    "principle": "MCP transport follows deployment topology: stdio for client-launched local subprocess servers, network transports (with auth) for shared remote servers",
+    "relatedConcept": "MCP separates what a server offers (tools, resources, prompts) from how clients reach it (stdio, streamable HTTP) — capabilities are transport-independent.",
+    "overallExplanation": "MCP transport follows deployment topology: stdio for client-launched local subprocess servers, network transports with authentication for shared remote servers. The protocol separates what a server offers — tools, resources, prompts — from how clients reach it."
+  },
+  {
+    "id": 805,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "single",
+    "question": "Noor, a staff engineer at an industrial-IoT company, must give Claude access to the company's machine-telemetry platform — live queries, alert acknowledgment, maintenance scheduling. Three internal Claude applications need this now, and two more are planned next quarter; the platform team wants to own and version the integration independently of the app teams. What approach fits best?",
+    "options": [
+      "Build an MCP server exposing the telemetry operations as tools, owned and versioned by the platform team, which each Claude application connects to as a client",
+      "Have each application team implement its own custom tool functions against the telemetry REST API, so every team can tailor error handling and schemas to its needs",
+      "Author a Claude Skill containing the telemetry API documentation and example curl commands, so any Claude instance can learn to call the platform when needed",
+      "Rely on Claude's built-in web-access tooling to reach the telemetry platform's internal endpoints, avoiding any custom integration work across the five applications"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The requirements — one capability shared across many Claude applications, owned and versioned by a single team, maintained independently of any consumer — are precisely MCP's design case: a server exposes the operations as tools once, and every application connects as a client. New apps next quarter get the integration by configuration, not reimplementation.",
+      "Tempting because custom tools are the lightest path for a single application, but five parallel implementations mean five schemas, five error-handling styles, and five things to update when the telemetry API changes — the platform team also loses the independent ownership they explicitly asked for. Right tool type, wrong sharing model.",
+      "Skills package procedural knowledge and instructions, but 'docs plus curl examples' leaves each app to improvise unauthenticated shell calls with no typed schema, no managed credentials, and no owned integration surface. This reaches for the knowledge-distribution mechanism when the need is a maintained, executable interface.",
+      "Built-in tools cover general capabilities; they are not a mechanism for authenticated, structured access to an arbitrary internal platform, and 'avoiding integration work' really means avoiding the schema, auth, and versioning the requirement demands. It mistakes the existence of a generic tool for coverage of a specific contract."
+    ],
+    "principle": "when a capability must be shared across applications and owned independently, expose it as an MCP server rather than per-app custom tools",
+    "relatedConcept": "The built-in / custom tool / Skill / MCP decision turns on scope of reuse, ownership, and whether the need is executable integration or procedural knowledge.",
+    "overallExplanation": "When a capability must be shared across applications and owned independently, expose it as an MCP server that every app connects to, rather than per-app custom tools. The tool-type decision turns on scope of reuse, ownership, and whether the need is executable integration or knowledge."
+  },
+  {
+    "id": 806,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "single",
+    "question": "Elif, a developer-experience engineer at an insurance carrier, wants Claude Code to produce actuarial reports 'the company way': a documented multi-step procedure covering data-validation rules, a mandated report structure, house terminology, and a Python script that renders the final tables. Nothing requires live access to external systems. Which mechanism fits?",
+    "options": [
+      "A Claude Skill packaging the procedure — instructions, the report template, terminology guidance, and the bundled rendering script — loaded when report tasks arise",
+      "An MCP server whose tools return the procedure text and template on request, since MCP is the standard mechanism for distributing organizational capabilities to Claude",
+      "A custom function-calling tool named generate_actuarial_report that takes the raw data and returns the finished report from deterministic code, bypassing model judgment",
+      "A set of custom slash commands, one per report section, which analysts invoke in sequence to assemble each report manually from its parts"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is the Skill design case: packaged procedural knowledge — multi-step instructions, templates, house conventions — plus supporting resources like a rendering script, loaded when the matching task arises. The need is teaching Claude how to perform a workflow, not connecting it to an external system, and Skills are the mechanism for exactly that.",
+      "Tempting because MCP does distribute capabilities, but its purpose is connecting Claude to external systems and data through executable tools — standing up a server so tools can return static procedure text adds transport, deployment, and configuration overhead to deliver what is fundamentally instructions and files. Infrastructure is the wrong container for knowledge.",
+      "A deterministic generate-report function forfeits the reason Claude is involved: applying judgment to messy inputs while following house procedure. If pure code could produce the report, no model is needed at all; if judgment is needed, the single-function tool has nowhere for it to happen. The requirement is guided model work, not bypassed model work.",
+      "Slash commands are user-invoked shortcuts; splitting the procedure across several that analysts must remember to run in order turns a codified workflow back into manual choreography, losing the automatic, task-triggered application that packaging the whole procedure provides."
+    ],
+    "principle": "Skills package procedural knowledge and resources for how to do a task; MCP connects Claude to external systems — match the mechanism to the need",
+    "relatedConcept": "Choosing among Skills, MCPs, and custom tools starts with one question: does Claude need to know something, or reach something?",
+    "overallExplanation": "Skills package procedural knowledge — instructions, templates, and supporting scripts — for how to do a task, while MCP connects Claude to external systems. The choice starts with one question: does Claude need to know something, or reach something?"
+  }
+]

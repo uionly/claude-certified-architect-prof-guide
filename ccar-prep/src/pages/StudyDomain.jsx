@@ -1,28 +1,30 @@
 import { Link, useParams } from 'react-router-dom'
-import { domainById, domains, slugify, studyByDomain } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
+import { slugify } from '../data/loader.js'
 import { loadAttempts, objectiveStats } from '../lib/storage.js'
 import Meter from '../components/Meter.jsx'
 import Tag from '../components/Tag.jsx'
 
-function practiceLink(domainId, objective) {
-  return `/practice?domain=${domainId}&objective=${encodeURIComponent(objective)}`
+function practiceLink(certCode, domainId, objective) {
+  return `/${certCode}/practice?domain=${domainId}&objective=${encodeURIComponent(objective)}`
 }
 
 export default function StudyDomain() {
   const { domainId } = useParams()
+  const { cert, domainById, domains, studyByDomain } = useCertData()
   const id = Number(domainId)
   const domain = domainById[id]
   const study = studyByDomain[id]
-  const perObjective = objectiveStats(loadAttempts())
+  const perObjective = objectiveStats(cert.code, loadAttempts(cert.code))
 
   if (!domain) {
-    return <p className="text-stone-600">Unknown domain. <Link className="text-indigo-700 underline" to="/study">Back to the study guide.</Link></p>
+    return <p className="text-stone-600">Unknown domain. <Link className="text-indigo-700 underline" to={`/${cert.code}/study`}>Back to the study guide.</Link></p>
   }
   if (!study) {
     return (
       <p className="text-stone-600">
         The study guide for Domain {id} hasn't been written yet.{' '}
-        <Link className="text-indigo-700 underline" to="/study">Back to the study guide.</Link>
+        <Link className="text-indigo-700 underline" to={`/${cert.code}/study`}>Back to the study guide.</Link>
       </p>
     )
   }
@@ -35,7 +37,7 @@ export default function StudyDomain() {
     <article className="mx-auto max-w-3xl">
       <header>
         <p className="text-sm text-stone-500">
-          <Link to="/study" className="hover:underline">Study Guide</Link> / Domain {domain.id}
+          <Link to={`/${cert.code}/study`} className="hover:underline">Study Guide</Link> / Domain {domain.id}
         </p>
         <div className="mt-1 flex flex-wrap items-center gap-3">
           <h1 className="font-serif text-3xl font-semibold tracking-tight text-stone-900">{domain.title}</h1>
@@ -107,7 +109,7 @@ export default function StudyDomain() {
 
               <div className="mt-6 flex flex-wrap items-center gap-3 rounded-md bg-stone-200/60 p-3">
                 <Link
-                  to={practiceLink(domain.id, section.objective)}
+                  to={practiceLink(cert.code, domain.id, section.objective)}
                   className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
                 >
                   Practice this objective →
@@ -123,12 +125,12 @@ export default function StudyDomain() {
 
       <nav className="mt-4 flex justify-between border-t border-stone-200 pt-4 text-sm font-medium">
         {prev ? (
-          <Link to={`/study/${prev.id}`} className="text-indigo-700 underline-offset-2 hover:underline">
+          <Link to={`/${cert.code}/study/${prev.id}`} className="text-indigo-700 underline-offset-2 hover:underline">
             ← Domain {prev.id}: {prev.title}
           </Link>
         ) : <span />}
         {next ? (
-          <Link to={`/study/${next.id}`} className="text-right text-indigo-700 underline-offset-2 hover:underline">
+          <Link to={`/${cert.code}/study/${next.id}`} className="text-right text-indigo-700 underline-offset-2 hover:underline">
             Domain {next.id}: {next.title} →
           </Link>
         ) : <span />}

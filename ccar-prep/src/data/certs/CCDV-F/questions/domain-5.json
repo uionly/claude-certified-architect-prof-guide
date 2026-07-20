@@ -1,0 +1,209 @@
+[
+  {
+    "id": 501,
+    "domain": "Model Selection and Optimization",
+    "objective": "LLM Fundamentals",
+    "type": "single",
+    "question": "Tomás, a backend engineer at a travel-booking startup, runs the same prompt through Claude twice while writing an integration test and gets two differently worded — though equally correct — answers. His test asserts an exact string match and fails. He asks why identical inputs produce different outputs. What is the accurate explanation?",
+    "options": [
+      "LLMs generate text by sampling from a probability distribution over next tokens, so outputs are inherently non-deterministic; lowering temperature reduces but does not guarantee eliminating variation",
+      "The API load-balances requests across model versions, and each version phrases answers differently; pinning a model version makes outputs byte-for-byte identical",
+      "The model remembers his earlier request and deliberately rephrases to avoid repeating itself, so clearing conversation history restores identical outputs",
+      "The variation indicates the prompt is ambiguous; a sufficiently precise prompt always produces exactly the same output string on every run"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. LLMs predict a probability distribution over possible next tokens and sample from it; sampling parameters like temperature shape how much the model favors lower-probability tokens. Non-determinism is a fundamental property of this generation process — tests should assert on meaning, structure, or validated fields, not exact strings.",
+      "Tempting because model version pinning is a real and important practice, but it addresses behavior changes across releases, not run-to-run variation. Two calls to the same pinned model can still differ because sampling, not version drift, is the source of the variation here.",
+      "Each stateless API request is independent — the model has no memory of previous requests unless the application includes prior turns in the conversation it sends. This anthropomorphizes the model and invents a cross-request memory mechanism that does not exist.",
+      "Clearer prompts reduce variance in substance, but no prompt makes token sampling deterministic. This misdiagnoses a fundamental property of generation as a prompt-quality problem, and it would send Tomás into endless prompt-tweaking that can never satisfy an exact-match assertion."
+    ],
+    "principle": "next-token sampling makes LLM output non-deterministic; design tests and consumers around meaning, not exact strings",
+    "relatedConcept": "Understanding next-token generation and sampling explains most 'surprising' LLM behaviors, from run-to-run variation to why temperature matters.",
+    "overallExplanation": "Next-token sampling makes LLM output non-deterministic, so tests and downstream consumers should assert on meaning or structure rather than exact strings. Understanding next-token generation and sampling parameters explains most surprising LLM behaviors, including run-to-run variation."
+  },
+  {
+    "id": 502,
+    "domain": "Model Selection and Optimization",
+    "objective": "LLM Fundamentals",
+    "type": "single",
+    "question": "Aisha, an ML engineer at a legal-tech firm, must summarize contracts that vary widely in length. Her pipeline occasionally fails on the longest contracts with an error saying the request exceeds the model's limit, and she notices token counts don't line up with word counts. Which understanding should guide her fix?",
+    "options": [
+      "Tokens are subword units — roughly three-quarters of a word in English on average — and the context window caps the combined input and output tokens, so long contracts need chunking, summarization stages, or a reduced-context strategy",
+      "Tokens map one-to-one to words, so the fix is trimming whitespace and boilerplate; the context window only limits input size and never constrains how much the model can generate",
+      "The context window limit applies per message rather than per request, so splitting the contract across several user messages in the same request lets the model read arbitrarily long documents",
+      "Token limits exist only for billing purposes; requests are never rejected for length, so the errors must instead come from rate limiting on her account tier"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Tokenizers split text into subword units (a word is often more than one token, which is why word counts mislead), and the context window bounds everything the model processes in a request — input plus generated output. Long-document strategies like chunking with map-reduce summarization follow directly from this constraint.",
+      "Tempting because trimming boilerplate genuinely saves tokens, but the two claims are wrong: tokens are subword units, not words, and output tokens count against limits too (max_tokens plus input must fit). Acting on this model of tokens leaves the fundamental over-length failures unexplained and unfixed.",
+      "The context window applies to the entire request the model processes — all messages in the conversation combined — not to each message individually. Splitting content across messages changes nothing about total token count; this misunderstands where the limit is enforced.",
+      "Token accounting does drive billing, but the context window is a hard architectural constraint and over-length requests are rejected with validation errors. Attributing these failures to rate limiting confuses two entirely different error classes and would lead to a useless backoff-based 'fix'."
+    ],
+    "principle": "the context window bounds total tokens (input + output); tokens are subword units, not words",
+    "relatedConcept": "Token mechanics — how text becomes tokens and how the context window constrains them — underlie context engineering, cost modeling, and long-document design.",
+    "overallExplanation": "The context window bounds total tokens across input and output, and tokens are subword units rather than words. These token mechanics underlie long-document strategies like chunking, as well as cost modeling and context engineering."
+  },
+  {
+    "id": 503,
+    "domain": "Model Selection and Optimization",
+    "objective": "LLM Fundamentals",
+    "type": "multi",
+    "question": "Jae, a developer at an e-commerce marketplace, uses Claude to classify seller support tickets into one of eight categories. With a zero-shot prompt at default settings, outputs vary: sometimes the bare label, sometimes a label plus commentary, and occasionally a category outside the allowed set. Which two changes most directly improve consistency? (Choose two.)",
+    "options": [
+      "Add multi-shot examples to the prompt showing several tickets each followed by exactly the bare category label expected",
+      "Lower the sampling temperature so the model favors the highest-probability tokens instead of more varied completions",
+      "Raise max_tokens substantially so the model has room to reason its way to the correct category before answering",
+      "Enable extended thinking so the model deliberates longer, which guarantees the output format will match instructions"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Moving from zero-shot to multi-shot prompting is the standard technique for format consistency: concrete input→output examples demonstrate both the allowed label set and the bare-label format far more reliably than descriptions alone, anchoring the model's completions to the demonstrated pattern.",
+      "Correct. Temperature controls sampling randomness; for deterministic classification tasks, a low temperature concentrates sampling on the highest-probability tokens, reducing run-to-run variation like stray commentary or off-list labels. Classification is exactly the task class where low temperature is appropriate.",
+      "Tempting because more room to 'think' sounds helpful, but max_tokens only caps output length — the problem here is too much unwanted output and off-list labels, not truncation. Raising the cap if anything makes extra commentary easier, addressing a constraint that isn't binding.",
+      "Extended thinking helps on genuinely hard reasoning problems, but routing an eight-way ticket classification through longer deliberation adds latency and cost without addressing format adherence — and nothing about thinking 'guarantees' output format. The absolute claim is the tell that this misunderstands what thinking modes do."
+    ],
+    "principle": "for consistent classification, combine multi-shot examples (format anchoring) with low temperature (reduced sampling variance)",
+    "relatedConcept": "Zero-, single-, and multi-shot prompting and sampling parameters are complementary levers: examples shape what the model produces, temperature shapes how much it varies.",
+    "overallExplanation": "For consistent classification, combine multi-shot examples to anchor the format with low temperature to reduce sampling variance. Prompting technique and sampling parameters are complementary levers — examples shape what the model produces, temperature shapes how much it varies."
+  },
+  {
+    "id": 504,
+    "domain": "Model Selection and Optimization",
+    "objective": "Technical Fundamentals",
+    "type": "single",
+    "question": "Lena, a full-stack developer at a proptech company, is adding Claude to a Python service. A teammate argues they should call the REST endpoint directly with hand-rolled HTTP requests instead of the official SDK, 'to avoid a dependency'. Which statement best captures the real tradeoff?",
+    "options": [
+      "The SDK wraps the same REST API but adds typed request/response handling, authentication headers, retries for transient errors, and streaming helpers — while the underlying HTTP semantics, like rate limits, still apply either way",
+      "The SDK connects over a proprietary binary protocol that is faster than REST, so hand-rolled HTTP calls will always have strictly worse latency than SDK calls",
+      "Direct REST calls bypass the SDK's rate limits, so the hand-rolled approach lets the service send more requests per minute than the SDK would permit",
+      "The SDK is required for production use because the raw REST endpoints are undocumented and only intended for Anthropic's internal tooling, not customer integrations"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Client SDKs are convenience layers over the public REST API: they handle serialization, auth headers, typed errors, sensible retries, and streaming parsing, saving you from rewriting that plumbing. Because both paths hit the same API, server-side realities — rate limits, error codes, token accounting — are identical either way.",
+      "Tempting because SDKs feel like 'more direct' access, but the official SDKs speak plain HTTPS to the same REST endpoints. There is no proprietary faster protocol; this invents a transport difference where the difference is actually developer ergonomics and error-handling maturity.",
+      "Rate limits are enforced server-side per account and workspace, not by the client library. Believing a different client bypasses them confuses client-side convenience code with server-side policy — the hand-rolled version hits exactly the same 429s, just with none of the SDK's backoff handling.",
+      "The REST API is fully documented and supported for direct use; the SDK is a convenience, not a requirement. This gets the relationship backwards — but choosing raw HTTP does mean re-implementing retries, streaming event parsing, and error typing that the SDK already provides."
+    ],
+    "principle": "SDKs are convenience wrappers over the REST API — same endpoints and limits, less plumbing to maintain",
+    "relatedConcept": "Knowing what the SDK layer does (and doesn't do) tells you which problems are client-side ergonomics and which are server-side API behavior.",
+    "overallExplanation": "SDKs are convenience wrappers over the same REST API — identical endpoints and rate limits, with retries, typing, and streaming handled for you. Knowing what the SDK layer does tells you which problems are client-side ergonomics and which are server-side API behavior."
+  },
+  {
+    "id": 505,
+    "domain": "Model Selection and Optimization",
+    "objective": "Technical Fundamentals",
+    "type": "single",
+    "question": "Omar, an engineer at an online-education platform, is building a collaborative tutoring UI. The browser must receive incremental model output as it is generated, and also push frequent user events (cursor moves, interruptions to stop generation) back to the server over the same low-latency connection. His server, in turn, consumes the model's output as server-sent events from the API. Which transport should the browser↔server leg use, and why?",
+    "options": [
+      "A WebSocket connection, because it provides a persistent, bidirectional channel suited to pushing incremental tokens down while simultaneously receiving user events upstream",
+      "Short-interval HTTP polling, because repeatedly issuing GET requests every 200 milliseconds is the most reliable way to approximate realtime delivery in browsers",
+      "A single long-lived HTTP POST that stays open for the whole tutoring session, with user events appended to the still-uploading request body as they occur",
+      "Separate synchronous REST calls per generated token, since REST's statelessness ensures ordered delivery and simplifies retries for each token individually"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. WebSockets provide a persistent full-duplex connection: the server can push tokens as they arrive while the client sends interruptions and events on the same channel with minimal overhead. When you need genuine two-way realtime communication (not just server-to-client streaming, which SSE covers), WebSockets are the standard fit.",
+      "Tempting because polling is simple and universally supported, but a 200ms poll loop adds latency in the worst case, wastes requests when nothing changed, and still doesn't give the client a push channel for its own events. It approximates one direction badly and ignores the bidirectional requirement.",
+      "Appending to an in-flight request body is not a supported interaction pattern in browsers or most HTTP stacks, and intermediaries may buffer or close long uploads. This stretches HTTP request semantics past what they support instead of using a transport designed for two-way traffic.",
+      "A REST call per token multiplies connection and header overhead thousands of times per response and offers no server-push path for interruptions. Statelessness is a virtue for CRUD APIs, but here it is precisely the property that makes the pattern unsuitable for continuous realtime exchange."
+    ],
+    "principle": "match the transport to the traffic: SSE for one-way server streaming, WebSockets for persistent bidirectional realtime channels",
+    "relatedConcept": "AI apps routinely combine transports — REST for requests, SSE for model-output streaming, WebSockets for interactive UIs — and picking the wrong one shows up as latency and complexity.",
+    "overallExplanation": "Match the transport to the traffic: SSE handles one-way server-to-client streaming, while WebSockets provide the persistent bidirectional channel interactive UIs need. AI applications routinely combine REST, SSE, and WebSockets, and picking the wrong one shows up as latency and complexity."
+  },
+  {
+    "id": 506,
+    "domain": "Model Selection and Optimization",
+    "objective": "Technical Fundamentals",
+    "type": "multi",
+    "question": "Fatima, a platform engineer at a fintech aggregator, maintains a Python service that fans out hundreds of concurrent Claude API calls during market hours. Under load she sees sporadic 429 and 529 responses, and occasional requests that hang far longer than any reasonable response should take. Which two practices should she implement? (Choose two.)",
+    "options": [
+      "Retry transient failures with exponential backoff and jitter, capping concurrent in-flight requests so retries don't amplify the overload",
+      "Set explicit client-side timeouts on every request so hung connections fail fast and free resources instead of blocking workers indefinitely",
+      "Remove the SDK and issue raw HTTP requests, since eliminating the wrapper layer is the standard remedy for rate-limit responses under load",
+      "Retry failed requests immediately in a tight loop until they succeed, since transient errors by definition resolve within a few milliseconds"
+    ],
+    "correct": [0, 1],
+    "optionExplanations": [
+      "Correct. Exponential backoff with jitter is the standard treatment for transient 429/5xx-class errors: it spaces retries out, avoids synchronized retry storms, and — combined with a concurrency cap — stops the client from amplifying the very overload that caused the errors.",
+      "Correct. Requests that hang indefinitely consume worker threads or event-loop capacity and can starve the whole service. Explicit timeouts make failures fast and visible so they can be retried or surfaced, which is basic hygiene for any high-volume network client.",
+      "Tempting because 'fewer layers' sounds leaner, but rate limits are enforced server-side and arrive identically no matter which client sends the request. Dropping the SDK removes its built-in retry and timeout handling — making the actual problems worse, not better.",
+      "Immediate tight-loop retries are the classic anti-pattern for rate limiting: they multiply request volume against an endpoint that is telling you to slow down, deepening the 429s. 'Transient' means it resolves eventually, not within milliseconds — hence backoff, not hammering."
+    ],
+    "principle": "high-volume API clients need backoff-with-jitter retries, concurrency caps, and explicit timeouts",
+    "relatedConcept": "Async, high-concurrency integration is where basic engineering practices — timeouts, backoff, bounded parallelism — determine whether an AI service survives its own traffic.",
+    "overallExplanation": "High-volume API clients need exponential backoff with jitter, bounded concurrency, and explicit timeouts. These basic engineering practices determine whether a high-concurrency AI service survives its own traffic."
+  },
+  {
+    "id": 507,
+    "domain": "Model Selection and Optimization",
+    "objective": "Model Selection and Tradeoffs",
+    "type": "single",
+    "question": "Nadia, a tech lead at a media-monitoring company, is assigning models to three workloads: (1) tagging two million short articles per day by topic, (2) an interactive research assistant that drafts nuanced analyst briefings, and (3) a coding agent that plans and executes complex multi-file refactors. Budget matters, but so does quality where it counts. Which assignment best fits the model tiers?",
+    "options": [
+      "Haiku for the high-volume tagging, Sonnet for the interactive assistant, and Opus for the complex refactoring agent",
+      "Opus for all three workloads, since standardizing on the most capable tier removes quality risk and simplifies operations at a justifiable premium",
+      "Haiku for all three workloads with carefully engineered prompts, since prompt quality can always compensate for model capability at a fraction of the cost",
+      "Opus for the tagging (to guarantee accuracy at scale), Haiku for the interactive assistant (for snappy latency), and Sonnet for the refactoring agent"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This matches each tier's design point: Haiku offers the speed and low cost that make two million daily classifications economical; Sonnet balances capability, latency, and cost for interactive knowledge work; Opus's deeper reasoning is reserved for the hardest workload, complex multi-step agentic refactoring, where capability failures are most expensive.",
+      "Tempting because it eliminates per-task analysis, but running two million simple classifications a day through the premium tier multiplies cost enormously for accuracy a smaller model already delivers on easy tasks. It optimizes for organizational convenience over the quality/latency/cost tradeoff the workloads actually present.",
+      "Prompt engineering improves every tier but cannot manufacture reasoning depth the model lacks — complex multi-file refactoring is exactly where a fast, light model's ceiling shows. This overextends a true observation (Haiku handles simple tasks well) into a false universal.",
+      "This inverts the matching logic: simple high-volume tagging doesn't need Opus-grade reasoning (and at that scale the cost is punishing), while an assistant drafting nuanced briefings needs more capability than the fastest tier prioritizes. Latency is one factor, not the only one, in interactive assignments."
+    ],
+    "principle": "match model tier to task difficulty and volume: Haiku for fast high-volume simplicity, Sonnet for balanced interactive work, Opus for the hardest reasoning",
+    "relatedConcept": "Quality, latency, and cost form the tradeoff triangle behind every model-selection decision — the right answer changes per workload, not per organization.",
+    "overallExplanation": "Match model tier to task difficulty and volume: Haiku for fast high-volume simple tasks, Sonnet for balanced interactive work, Opus for the hardest reasoning. Quality, latency, and cost form the tradeoff triangle behind every model-selection decision, and the right answer changes per workload."
+  },
+  {
+    "id": 508,
+    "domain": "Model Selection and Optimization",
+    "objective": "Cost and Token Management",
+    "type": "single",
+    "question": "Ben, a developer at a customer-support SaaS, has an assistant whose every request re-sends the same 30,000-token block — system prompt, policy documents, and tool definitions — followed by a short, unique customer question. Traffic is steady all day and input tokens dominate his bill. What is the most effective cost optimization to apply first?",
+    "options": [
+      "Enable prompt caching with a cache breakpoint after the stable 30,000-token prefix, so subsequent requests read the shared prefix at the discounted cached rate",
+      "Move all traffic to the Batch API, since batch discounts apply to input tokens and customer chat sessions can tolerate the asynchronous processing window",
+      "Ask the model to answer more concisely and cut max_tokens in half, since shorter completions are the primary lever when a bill is dominated by input tokens",
+      "Split the 30,000-token block across the system prompt and several user messages, since tokens in the system role are billed at a higher rate than user-role tokens"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is the textbook prompt-caching shape: a large, stable prefix (system prompt, reference docs, tool definitions) re-sent on every request with only a small dynamic suffix. Caching the prefix means subsequent requests within the cache window pay the much cheaper cached-read rate on the bulk of the input — directly attacking the dominant cost.",
+      "Tempting because batch processing is a real cost lever, but it trades cost for latency measured in an asynchronous processing window — unacceptable for a live support conversation where a customer is waiting. This applies the right instinct (discounted processing) to the wrong workload shape.",
+      "Output trimming is a legitimate optimization, but Ben's bill is dominated by input tokens — 30,000 of input against short answers. Halving output tokens barely moves the total; this optimizes the small term of the cost equation while leaving the large one untouched.",
+      "There is no billing-rate difference between system-role and user-role tokens — input tokens cost the same wherever they sit. This invents a pricing mechanic; worse, scattering the stable block around the conversation can disrupt the very prefix stability that makes caching effective."
+    ],
+    "principle": "cache the large stable prefix; prompt caching wins when requests share a big unchanging prefix with a small dynamic tail",
+    "relatedConcept": "Cost optimization starts with identifying which term dominates the bill — repeated static input, unique input, or output — and applying the lever built for that term.",
+    "overallExplanation": "Prompt caching wins when requests share a large stable prefix with a small dynamic tail, so cache the 30,000-token block and pay the discounted rate on the bulk of the input. Cost optimization starts with identifying which term dominates the bill and applying the lever built for that term."
+  },
+  {
+    "id": 509,
+    "domain": "Model Selection and Optimization",
+    "objective": "Cost and Token Management",
+    "type": "single",
+    "question": "Ingrid, an engineering manager at a healthtech company, gets a surprise five-figure monthly API bill for a document-processing product with four distinct features. Finance asks which feature drives the cost and what next month will look like at projected volumes. The team currently logs nothing about usage. What should Ingrid implement first?",
+    "options": [
+      "Per-request logging of the usage data returned in each API response — input, output, and cache-related token counts — tagged by feature, feeding a cost model of tokens-per-task times projected volume",
+      "A hard monthly spend cap that stops all API calls once the budget is reached, since preventing overruns matters more than understanding their composition",
+      "An immediate migration of all four features to the cheapest model tier, then observing next month's bill to infer which feature had been driving the cost",
+      "A per-feature estimate produced by multiplying each feature's request count by the average document word count, avoiding engineering work on token instrumentation"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. The API returns token usage with every response; logging it per request and tagging by feature turns an opaque bill into an attributable one, and tokens-per-task times projected volume is exactly the cost model finance is asking for. Measurement precedes optimization — you cannot manage what you don't track.",
+      "Tempting because it guarantees no overrun, but a cap that halts all API calls turns a budgeting problem into a product outage for every customer mid-month, and it answers neither of finance's questions — which feature drives cost, or what next month looks like. Guardrails complement attribution; they don't replace it.",
+      "Downgrading all four features changes quality everywhere to learn about cost somewhere, and next month's aggregate bill still won't decompose by feature. This optimizes before measuring — the exact sequencing error that produced the surprise bill in the first place.",
+      "Word counts approximate tokens poorly (tokenization varies by content), and averages hide the skew where one feature's huge documents dominate. Since the API already returns exact token usage per response, estimating from words is choosing worse data to avoid trivial instrumentation."
+    ],
+    "principle": "instrument token usage per request and attribute it by feature before optimizing — measurement precedes cost management",
+    "relatedConcept": "Token usage tracking and cost modeling are the foundation of cost management; every optimization (caching, batching, tier changes) is chosen and verified against that data.",
+    "overallExplanation": "Instrument token usage per request from the API's usage data and attribute it by feature before optimizing — measurement precedes cost management. Every optimization, from caching to tier changes, is chosen and verified against that tracking data."
+  }
+]

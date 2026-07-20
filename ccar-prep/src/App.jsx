@@ -1,4 +1,6 @@
-import { NavLink, Outlet, ScrollRestoration } from 'react-router-dom'
+import { NavLink, Outlet, ScrollRestoration, useParams } from 'react-router-dom'
+import CertSwitcher from './components/CertSwitcher.jsx'
+import { useCertData } from './lib/cert.js'
 
 const navLinkClass = ({ isActive }) =>
   `rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -6,24 +8,32 @@ const navLinkClass = ({ isActive }) =>
   }`
 
 export default function App() {
+  const { certCode } = useParams()
+  const certData = useCertData()
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-stone-200 bg-stone-50/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <NavLink to="/" className="font-serif text-lg font-semibold tracking-tight text-stone-900">
-            CCAR-P Prep
+            Claude Cert Prep
           </NavLink>
-          <nav className="flex flex-wrap items-center gap-1">
-            <NavLink to="/" end className={navLinkClass}>
-              Overview
-            </NavLink>
-            <NavLink to="/study" className={navLinkClass}>
-              Study Guide
-            </NavLink>
-            <NavLink to="/practice" className={navLinkClass}>
-              Practice
-            </NavLink>
-          </nav>
+          {certCode && (
+            <nav className="flex flex-wrap items-center gap-1">
+              <NavLink to={`/${certCode}`} end className={navLinkClass}>
+                Overview
+              </NavLink>
+              <NavLink to={`/${certCode}/study`} className={navLinkClass}>
+                Study Guide
+              </NavLink>
+              <NavLink to={`/${certCode}/practice`} className={navLinkClass}>
+                Practice
+              </NavLink>
+            </nav>
+          )}
+          <div className="ml-auto">
+            <CertSwitcher />
+          </div>
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
@@ -31,8 +41,10 @@ export default function App() {
       </main>
       <footer className="border-t border-stone-200 bg-stone-50">
         <div className="mx-auto max-w-5xl px-4 py-4 text-xs text-stone-500">
-          Claude Certified Architect – Professional (CCAR-P) study companion. Unofficial practice material; progress is
-          stored only in this browser.
+          {certData
+            ? `${certData.cert.name} (${certData.cert.code}) study companion.`
+            : 'Unofficial Claude certification practice material.'}{' '}
+          Progress is stored only in this browser.
         </div>
       </footer>
       <ScrollRestoration />

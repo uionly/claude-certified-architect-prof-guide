@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { allQuestions, domainById, domainIdForQuestion, domains } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
 import { loadActiveQuiz, saveActiveQuiz } from '../lib/storage.js'
 import { examMinutes, shuffle } from '../lib/quiz.js'
 import Tag from '../components/Tag.jsx'
@@ -10,6 +10,7 @@ const COUNT_CHOICES = [10, 20, 30, 'all']
 export default function PracticeSetup() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
+  const { cert, allQuestions, domainById, domainIdForQuestion, domains } = useCertData()
   const paramDomain = params.get('domain') ? Number(params.get('domain')) : null
   const paramObjective = params.get('objective') || ''
 
@@ -20,7 +21,7 @@ export default function PracticeSetup() {
   const [objective, setObjective] = useState(paramObjective)
   const [countChoice, setCountChoice] = useState(10)
 
-  const resumable = useMemo(() => loadActiveQuiz(), [])
+  const resumable = useMemo(() => loadActiveQuiz(cert.code), [cert.code])
 
   const singleDomain = selectedDomains.size === 1 ? domainById[[...selectedDomains][0]] : null
 
@@ -28,7 +29,7 @@ export default function PracticeSetup() {
     let qs = allQuestions.filter((q) => selectedDomains.has(domainIdForQuestion(q)))
     if (objective) qs = qs.filter((q) => q.objective === objective)
     return qs
-  }, [selectedDomains, objective])
+  }, [selectedDomains, objective, allQuestions, domainIdForQuestion])
 
   const count = countChoice === 'all' ? pool.length : Math.min(countChoice, pool.length)
 
@@ -50,10 +51,10 @@ export default function PracticeSetup() {
       answers: {}, // qid -> number[]
       index: 0,
       startedAt: Date.now(),
-      timeLimitSec: mode === 'exam' ? examMinutes(order.length) * 60 : null,
+      timeLimitSec: mode === 'exam' ? examMinutes(order.length, cert.examMinutesPerQuestion) * 60 : null,
     }
-    saveActiveQuiz(state)
-    navigate('/quiz')
+    saveActiveQuiz(cert.code, state)
+    navigate(`/${cert.code}/quiz`)
   }
 
   return (
@@ -64,7 +65,7 @@ export default function PracticeSetup() {
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <span>You have an unfinished {resumable.mode} session ({resumable.order.length} questions).</span>
           <button
-            onClick={() => navigate('/quiz')}
+            onClick={() => navigate(`/${cert.code}/quiz`)}
             className="rounded-md bg-amber-600 px-3 py-1 font-medium text-white hover:bg-amber-700"
           >
             Resume it →
@@ -84,7 +85,7 @@ export default function PracticeSetup() {
             {
               key: 'exam',
               title: 'Exam mode',
-              desc: `Timed at 1.9 min/question (${count ? examMinutes(count) : '—'} min for this set). Feedback is withheld until you submit.`,
+              desc: `Timed at ${cert.examMinutesPerQuestion} min/question (${count ? examMinutes(count, cert.examMinutesPerQuestion) : '—'} min for this set). Feedback is withheld until you submit.`,
             },
           ].map((m) => (
             <button
@@ -193,7 +194,7 @@ export default function PracticeSetup() {
         </button>
         <span className="text-sm text-stone-500 tabular-nums">
           {pool.length} matching question{pool.length === 1 ? '' : 's'}
-          {mode === 'exam' && count > 0 ? ` · ${examMinutes(count)} minute limit` : ''}
+          {mode === 'exam' && count > 0 ? ` · ${examMinutes(count, cert.examMinutesPerQuestion)} minute limit` : ''}
         </span>
       </div>
     </div>

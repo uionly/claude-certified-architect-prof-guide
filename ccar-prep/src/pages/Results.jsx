@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { domainByTitle, questionsById, slugify } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
+import { slugify } from '../data/loader.js'
 import { getAttempt } from '../lib/storage.js'
 import { formatClock, percent } from '../lib/quiz.js'
 import FeedbackPanel from '../components/FeedbackPanel.jsx'
@@ -19,7 +20,7 @@ function groupStats(items, keyFn) {
   return groups
 }
 
-function ReviewItem({ item, index }) {
+function ReviewItem({ item, index, questionsById }) {
   const [open, setOpen] = useState(false)
   const question = questionsById.get(item.qid)
   if (!question) return null
@@ -56,12 +57,13 @@ function ReviewItem({ item, index }) {
 
 export default function Results() {
   const { attemptId } = useParams()
-  const attempt = useMemo(() => getAttempt(attemptId), [attemptId])
+  const { cert, domainByTitle, questionsById } = useCertData()
+  const attempt = useMemo(() => getAttempt(cert.code, attemptId), [cert.code, attemptId])
 
   if (!attempt) {
     return (
       <p className="text-stone-600">
-        Attempt not found. <Link to="/" className="text-indigo-700 underline">Back to overview.</Link>
+        Attempt not found. <Link to={`/${cert.code}`} className="text-indigo-700 underline">Back to overview.</Link>
       </p>
     )
   }
@@ -107,7 +109,7 @@ export default function Results() {
             const domainId = domainByTitle[attempt.items.find((i) => i.objective === objective)?.domain]?.id
             return (
               <li key={objective}>
-                <Tag kind="objective" to={domainId ? `/study/${domainId}#${slugify(objective)}` : undefined}>
+                <Tag kind="objective" to={domainId ? `/${cert.code}/study/${domainId}#${slugify(objective)}` : undefined}>
                   {objective}
                 </Tag>
                 <Meter className="mt-1.5" correct={s.correct} attempted={s.attempted} />
@@ -122,16 +124,16 @@ export default function Results() {
         <p className="mt-1 text-xs text-stone-500">Expand any question for the full reasoning panel.</p>
         <ul className="mt-3 space-y-2">
           {attempt.items.map((item, i) => (
-            <ReviewItem key={item.qid} item={item} index={i} />
+            <ReviewItem key={item.qid} item={item} index={i} questionsById={questionsById} />
           ))}
         </ul>
       </section>
 
       <div className="flex gap-4 border-t border-stone-200 pt-5 text-sm font-medium">
-        <Link to="/practice" className="text-indigo-700 underline-offset-2 hover:underline">
+        <Link to={`/${cert.code}/practice`} className="text-indigo-700 underline-offset-2 hover:underline">
           Practice again →
         </Link>
-        <Link to="/study" className="text-indigo-700 underline-offset-2 hover:underline">
+        <Link to={`/${cert.code}/study`} className="text-indigo-700 underline-offset-2 hover:underline">
           Back to the study guide
         </Link>
       </div>

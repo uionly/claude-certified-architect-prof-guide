@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { allQuestions, cert, domains } from '../data/loader.js'
+import { useCertData } from '../lib/cert.js'
 import { clearAllProgress, domainStats, loadAttempts, overallStats } from '../lib/storage.js'
 import { percent } from '../lib/quiz.js'
 import Meter from '../components/Meter.jsx'
@@ -8,14 +8,15 @@ import StatTile from '../components/StatTile.jsx'
 import Tag from '../components/Tag.jsx'
 
 export default function Home() {
-  const [attempts, setAttempts] = useState(loadAttempts)
-  const overall = useMemo(() => overallStats(attempts), [attempts])
-  const byDomain = useMemo(() => domainStats(attempts), [attempts])
+  const { cert, allQuestions, domains } = useCertData()
+  const [attempts, setAttempts] = useState(() => loadAttempts(cert.code))
+  const overall = useMemo(() => overallStats(cert.code, attempts), [cert.code, attempts])
+  const byDomain = useMemo(() => domainStats(cert.code, attempts), [cert.code, attempts])
   const recent = [...attempts].reverse().slice(0, 5)
 
   function handleReset() {
     if (window.confirm('Delete all attempt history stored in this browser? This cannot be undone.')) {
-      clearAllProgress()
+      clearAllProgress(cert.code)
       setAttempts([])
     }
   }
@@ -33,13 +34,13 @@ export default function Home() {
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
-            to="/study"
+            to={`/${cert.code}/study`}
             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
             Open the study guide
           </Link>
           <Link
-            to="/practice"
+            to={`/${cert.code}/practice`}
             className="rounded-md border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 hover:bg-stone-50"
           >
             Start practicing
@@ -50,7 +51,7 @@ export default function Home() {
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Your progress</h2>
         <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatTile label="Question bank" value={allQuestions.length} detail="scenario questions across 7 domains" />
+          <StatTile label="Question bank" value={allQuestions.length} detail={`scenario questions across ${domains.length} domains`} />
           <StatTile
             label="Coverage"
             value={`${percent(overall.uniqueQuestions, allQuestions.length)}%`}
@@ -83,11 +84,11 @@ export default function Home() {
                 </p>
                 <Meter className="mt-3" correct={s.correct} attempted={s.attempted} />
                 <div className="mt-3 flex gap-4 text-sm font-medium">
-                  <Link to={`/study/${d.id}`} className="text-indigo-700 underline-offset-2 hover:underline">
+                  <Link to={`/${cert.code}/study/${d.id}`} className="text-indigo-700 underline-offset-2 hover:underline">
                     Study →
                   </Link>
                   <Link
-                    to={`/practice?domain=${d.id}`}
+                    to={`/${cert.code}/practice?domain=${d.id}`}
                     className="text-indigo-700 underline-offset-2 hover:underline"
                   >
                     Practice →
@@ -116,7 +117,7 @@ export default function Home() {
               const correct = a.items.filter((i) => i.isCorrect).length
               return (
                 <li key={a.id}>
-                  <Link to={`/results/${a.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-stone-50">
+                  <Link to={`/${cert.code}/results/${a.id}`} className="flex items-center justify-between px-4 py-3 hover:bg-stone-50">
                     <div>
                       <span className="text-sm font-medium capitalize text-stone-900">{a.mode} session</span>
                       <span className="ml-2 text-xs text-stone-500">{new Date(a.ts).toLocaleString()}</span>

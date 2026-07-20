@@ -1,0 +1,30 @@
+{
+  "domain": 4,
+  "title": "Eval, Testing, and Debugging",
+  "weight": 2.6,
+  "intro": "This domain tests whether you can debug a Claude application methodically: identify what kind of error you are looking at, pick the recovery strategy that matches it, read traces to find where a multi-step workflow went wrong, and — most importantly — isolate whether a problem originates in your integration layer or in the model's output. The exam favors candidates who diagnose before they fix.",
+  "objectives": [
+    {
+      "objective": "Debugging and Error Handling",
+      "explanation": "Failures in Claude applications fall into two broad origins, and the first debugging move is deciding which one you are facing. Integration-layer failures come from the plumbing: authentication errors (401), permission errors (403), malformed requests (400), rate limiting (429), server errors (500), and overloaded responses (529). These have deterministic, code-level remedies — fix the request, refresh credentials, and for the transient ones (429, 5xx, 529) retry with exponential backoff and jitter while respecting rate limits. Model-output failures arrive inside a successful HTTP 200: the response is malformed JSON, ignores an instruction, hallucinates a field, stops early because it hit max_tokens (check the stop reason), or refuses. These need different medicine — response validation, defensive parsing, tighter output constraints or few-shot examples, a corrective reprompt that includes the validation error, or structured-output patterns.\n\nMatching recovery strategy to error type is the skill under test. Retrying an identical request is correct for a 529 but mostly useless for malformed output, since the same prompt tends to reproduce the same failure. Conversely, rewriting the prompt does nothing for a rate limit. Blanket remedies — 'retry everything', 'use a bigger model', 'add a try/except and move on' — are the classic wrong answers because they treat symptoms without a diagnosis.\n\nFor multi-step and agentic workflows, trace analysis is how you localize failure. Log each step: the exact prompt sent, the raw response, tool calls with their inputs and results, stop reasons, and token usage. Walking the trace tells you whether the model chose the wrong tool, the tool returned bad data that the model then faithfully used, the context had been polluted by an earlier step, or your parsing code mangled a correct response. Without traces you can only guess; with them, failure modes become reproducible and attributable to a specific step.",
+      "whyItMatters": "Production LLM apps fail in ways traditional apps do not — a request can succeed at the HTTP layer and still be wrong. Teams that cannot separate integration failures from model failures burn time 'fixing prompts' to cure rate limits or adding retries to cure hallucinations, while users keep seeing errors. Systematic error classification is the difference between hours and weeks of debugging.",
+      "examples": [
+        {
+          "title": "Two failures that look identical to users",
+          "body": "An insurtech app intermittently shows blank claim summaries. Logs reveal two distinct populations: some requests died with 429/529 before any content arrived, others returned 200 but the JSON body had a trailing comma or prose wrapped around the object, so the parser threw. The fix is two-track: exponential backoff with jitter and concurrency limits for the transient API errors, and — for the output errors — schema validation on every response, a defensive parser tolerant of code fences, and a single corrective retry that feeds the validator's error message back to the model. Neither fix alone would have cleared the user-visible failure rate, because the symptom had two causes."
+        },
+        {
+          "title": "Trace analysis in an agentic workflow",
+          "body": "A support agent occasionally emails customers wrong order totals. Rather than tweaking the system prompt, the developer replays the trace for a failing session: the model called the order-lookup tool correctly, but the tool returned amounts in cents while the tool description implied dollars, and the model then reported the number verbatim. The failure origin is the tool contract, not the model's reasoning — the fix is correcting the tool's description and normalizing its output, plus a trace-level assertion to catch unit mismatches. The trace turned 'the model is unreliable' into a one-line integration bug."
+        }
+      ],
+      "pitfalls": [
+        "Retrying identical requests to cure malformed model output — retries fit transient integration errors (429/5xx/529); output problems need validation, output constraints, or a corrective reprompt that tells the model what was wrong.",
+        "Assuming a 200 response means the request succeeded end-to-end — the model can return truncated (max_tokens stop reason), malformed, or ungrounded content inside a perfectly healthy HTTP response.",
+        "Debugging multi-step workflows from the final answer alone — without per-step traces (prompts, tool calls, tool results, stop reasons) you cannot tell which step introduced the failure, so fixes are guesses.",
+        "Reaching for a bigger model as a universal remedy — model capability does not fix rate limits, broken tool contracts, or parsing bugs, and it raises cost while leaving the actual cause in place.",
+        "Retrying aggressively in a tight loop on 429s — hammering a rate-limited endpoint without backoff makes throttling worse; use exponential backoff with jitter and cap concurrency."
+      ]
+    }
+  ]
+}

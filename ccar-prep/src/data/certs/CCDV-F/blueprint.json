@@ -1,0 +1,107 @@
+{
+  "cert": {
+    "name": "Claude Certified Developer – Foundations",
+    "code": "CCDV-F",
+    "totalQuestions": 53,
+    "examMinutesPerQuestion": 2.26
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Agents and Workflows",
+      "weight": 14.7,
+      "questionCount": 8,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Agent Architecture", "questions": 2 },
+        { "objective": "Agent Construction with Claude", "questions": 3 },
+        { "objective": "Agent Patterns and Frameworks", "questions": 3 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Applications and Integration",
+      "weight": 33.1,
+      "questionCount": 17,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Understanding Requirements", "questions": 2 },
+        { "objective": "Systems Life Cycle", "questions": 1 },
+        { "objective": "Claude API Mechanics", "questions": 4 },
+        { "objective": "Software Engineering Foundations", "questions": 4 },
+        { "objective": "Claude Application Design", "questions": 4 },
+        { "objective": "Configuration Management", "questions": 2 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Claude Code",
+      "weight": 3.1,
+      "questionCount": 2,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Claude Code Operation", "questions": 2 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Eval, Testing, and Debugging",
+      "weight": 2.6,
+      "questionCount": 1,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Debugging and Error Handling", "questions": 1 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Model Selection and Optimization",
+      "weight": 16.8,
+      "questionCount": 9,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "LLM Fundamentals", "questions": 3 },
+        { "objective": "Technical Fundamentals", "questions": 3 },
+        { "objective": "Model Selection and Tradeoffs", "questions": 1 },
+        { "objective": "Cost and Token Management", "questions": 2 }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Prompt and Context Engineering",
+      "weight": 11.0,
+      "questionCount": 6,
+      "idStart": 601,
+      "objectives": [
+        { "objective": "Context Engineering", "questions": 2 },
+        { "objective": "Prompt Engineering", "questions": 3 },
+        { "objective": "Output Handling", "questions": 1 }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Security and Safety",
+      "weight": 8.1,
+      "questionCount": 4,
+      "idStart": 701,
+      "objectives": [
+        { "objective": "AI Application Security", "questions": 1 },
+        { "objective": "Guardrails and Safe Deployment", "questions": 1 },
+        { "objective": "Claude Hooks", "questions": 1 },
+        { "objective": "Identity, Secrets, and Key Management", "questions": 1 }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Tools and MCPs",
+      "weight": 10.6,
+      "questionCount": 6,
+      "idStart": 801,
+      "objectives": [
+        { "objective": "Tool Implementation", "questions": 3 },
+        { "objective": "MCP Server Development", "questions": 1 },
+        { "objective": "Agentic Customization", "questions": 2 }
+      ]
+    }
+  ]
+}

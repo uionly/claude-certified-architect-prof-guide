@@ -1,0 +1,84 @@
+{
+  "domain": 3,
+  "title": "Product and Model Selection",
+  "weight": 12,
+  "intro": "This domain tests whether you can pick the right tool from Claude's toolbox: choosing among product features (Projects, research mode, plain chat, artifacts) by the shape of the task, understanding what actually distinguishes the Haiku, Sonnet, and Opus model tiers, aligning model choice with a task's cost, speed, and quality requirements, and managing the practical limits of long conversations — knowing when to restart, what to summarize, and where to persist durable context. Every question is a matching exercise: task profile on one side, feature or tier on the other.",
+  "objectives": [
+    {
+      "objective": "Select appropriate Claude product features (Projects, research mode, chat, artifacts)",
+      "explanation": "Each Claude product feature is built for a different shape of work, and selection means recognizing the shape before choosing the tool.\n\nPlain chat is the default for quick, one-off tasks: a question, a short draft, a fast explanation. It needs no setup and carries no overhead — which is exactly why it is wrong for work that recurs. Projects solve the recurring-context problem: knowledge files (style guides, background documents, reference material) and custom instructions are configured once and automatically apply to every chat inside the Project. If you find yourself re-uploading the same documents or re-typing the same instructions in every conversation, that is the signal a Project should exist. Research mode is for depth of investigation: extended, multi-source research that gathers and synthesizes information well beyond a single-pass chat answer — an unfamiliar market, a complex policy landscape. It investigates new information; it does not store your private context. Artifacts are containers for substantial outputs: documents, plans, and reports that will be revised across sessions and eventually shared or exported, kept as one coherent, editable piece instead of fragments in chat history.\n\nThe classic mis-selections are using the wrong tool's strength: one endless chat as a substitute for a Project (context degrades and clutters), a Project spun up for a single quick question (setup overhead with no recurrence to pay it back), research mode expected to recall private engagement documents, or an evolving deliverable rebuilt inline every session instead of living in an artifact.",
+      "whyItMatters": "Feature selection is the difference between Claude as an occasional answer box and Claude as workflow infrastructure. Professionals who match feature to task shape stop paying a re-setup tax on every conversation, get genuinely deep research when depth is needed, and keep their deliverables whole — and the exam's scenarios all hinge on spotting the shape correctly.",
+      "examples": [
+        {
+          "title": "From re-upload ritual to a Project",
+          "body": "A consultant on a months-long hospital engagement starts every chat by uploading the client's style guide and background documents and re-typing tone and terminology instructions. She creates a Project instead: the documents become Project knowledge, the standing instructions become Project instructions, and every new chat inside the Project starts already briefed. Her conversations stay short and scoped to each day's task, while the durable context lives where it persists — the recurring-setup signal was the tell that a Project was overdue."
+        },
+        {
+          "title": "One week, four features",
+          "body": "A beverage-company strategy analyst plans his week: an unfamiliar market segment to investigate (research mode — deep multi-source synthesis), a launch plan to draft, revise, and share (artifact — one evolving document), a quick date-format question (plain chat — zero setup), and team writing standards he uses constantly (Project instructions — set once, applied to every chat). Each task's shape — investigative depth, evolving deliverable, one-off question, recurring context — picks its feature, and none of the tools is forced to do another's job."
+        }
+      ],
+      "pitfalls": [
+        "Using one endless chat as a substitute for a Project — context degrades and unrelated threads accumulate, while Projects persist setup cleanly across fresh chats.",
+        "Creating a Project for a one-off question, paying setup overhead that only recurring work repays.",
+        "Expecting research mode to store or recall private documents and instructions — it investigates new information; Projects persist known context.",
+        "Rebuilding an evolving deliverable inline every session instead of keeping it whole in an artifact."
+      ]
+    },
+    {
+      "objective": "Differentiate between Claude model types (Haiku, Sonnet, Opus)",
+      "explanation": "Claude's model family is a ladder with a consistent trade-off shape, and an accurate mental model of it underlies every selection decision. Haiku is the fastest and most economical tier, built for simple, well-defined, high-volume work: tagging, sorting, short formulaic drafts, quick extraction. Sonnet is the balanced tier — strong capability at interactive speed — and the sensible default for everyday professional tasks: drafting, summarizing, analysis of moderate complexity. Opus is the most capable tier, offering the deepest reasoning for genuinely complex work — multi-document synthesis, subtle analysis, high-stakes deliverables — at higher cost and slower responses.\n\nTwo misconceptions cause most selection errors. The first is that the tiers differ only in speed: they differ in reasoning capability too, so a light model on a genuinely hard task produces shallower work, not just slower-arriving work. The second is that \"most capable\" means \"always best\": most business tasks don't need maximum reasoning depth, and defaulting everything to Opus buys unused capability at real cost in money and waiting time.\n\nRecognizing which task profiles genuinely need the top tier is the differentiating skill: complexity of reasoning (conflicting sources, multi-step synthesis), consequence of error, low volume, and tolerance for slower responses all point up the ladder; simplicity, volume, and speed pressure point down. Tier and recency are also separate dimensions — a newer light model still targets speed and economy, so selecting by release date instead of task fit misroutes work.",
+      "whyItMatters": "Teams standardize their workflows around whichever mental model of the tiers their lead gives them, so a wrong briefing — 'they only differ in speed,' 'Sonnet is the most capable' — misroutes work at scale. Knowing what each tier is actually for is prerequisite knowledge for the alignment decisions the rest of this domain tests.",
+      "examples": [
+        {
+          "title": "A conflicting-regulations synthesis earns Opus",
+          "body": "A transportation-authority policy analyst must reconcile three lengthy, partially conflicting regulatory documents into one carefully reasoned position — a one-off, high-stakes deliverable with no deadline pressure. The profile checks every box for the top tier: genuine multi-document reasoning difficulty, high cost of a subtle error, single deliverable rather than volume, and latency slack. He uses Opus. Choosing Haiku to save money on a task like this optimizes the cheapest dimension of the work while risking the expensive one."
+        }
+      ],
+      "pitfalls": [
+        "Believing the tiers differ only in speed — they differ in reasoning depth, so hard tasks on light models come back shallower, not just slower.",
+        "Treating Opus as the universal default because 'quality matters' — most tasks never use the extra depth, and the cost and latency are paid on every request.",
+        "Inverting the ladder (assuming Sonnet is the top tier, or that Opus is a long-document specialty model) and misrouting the hardest work.",
+        "Selecting by release date — recency and tier are separate dimensions, and a newer light model still targets speed and economy."
+      ]
+    },
+    {
+      "objective": "Align model selection with task requirements (cost, speed, quality)",
+      "explanation": "Knowing the tiers is step one; alignment is the applied skill of locating a task on the cost-speed-quality triangle and choosing accordingly. The governing rule: choose the cheapest, fastest tier whose quality meets the task's bar — and establish where that bar is with evidence, not intuition.\n\nEvidence matters because stakes rhetoric misleads in both directions. \"This affects revenue\" sounds like a mandate for the top model, but if spot checks show a light and a heavy model performing identically on a simple high-volume task, the premium buys nothing measurable. Conversely, if a lighter model demonstrably misses the reasoning a task requires, the cost of its errors usually dwarfs the price difference. Quick spot checks — run the same representative tasks through candidate tiers and compare — are within any professional's reach and turn model choice from a matter of taste into a defensible decision.\n\nThe three canonical profiles to recognize: simple, formulaic, high-volume work where speed and cost dominate belongs on the economical tier (the sample-question pattern: high-volume customer reply drafts). Moderate complexity with a real quality bar, interactive turnaround, and meaningful volume — most daily professional drafting and analysis — is the balanced tier's home ground. Complex reasoning with high error cost and low volume justifies the top tier. Non-strategies to avoid: alternating tiers to \"average out\" cost, hedging upward against hypothetical hard cases when the evidence covers the real distribution, and inventing arbitrary routing rules unrelated to task requirements.",
+      "whyItMatters": "Model choice is repeated across every task, every day, so misalignment compounds: always-Opus habits waste budget and time on work a lighter tier handles identically, while always-cheapest habits quietly ship shallow output on tasks with a real quality bar. The exam's selection questions consistently reward evidence-based matching over stakes-based intuition.",
+      "examples": [
+        {
+          "title": "Product tagging at volume",
+          "body": "An e-commerce merchandising lead generates short, formulaic category tags for thousands of product descriptions daily. Spot checks show light and heavy models tagging with equal accuracy. She picks the fast, economical tier: the task is simple, volume is high, speed and cost dominate, and the measured quality bar is met. The tempting counterargument — 'product data affects revenue, so use the best model' — fails against the evidence in hand: across thousands of daily items, the premium would purchase zero measured improvement."
+        },
+        {
+          "title": "Daily client letters in the balanced middle",
+          "body": "A wealth-management communications manager drafts moderately complex, personalized client letters all day: quality genuinely matters, replies should come back at interactive speed, and volume is meaningful. This is the middle of the triangle, and the balanced tier fits — the economical model is too shallow for personalized financial writing, while the top tier's cost and latency across daily volume buy depth these letters don't use. If an occasional letter involves genuinely complex judgment, he routes that one letter upward rather than upgrading the whole stream."
+        }
+      ],
+      "pitfalls": [
+        "Letting stakes rhetoric ('this affects revenue,' 'clients are important') override spot-check evidence showing tier-equivalent quality.",
+        "Defaulting to the cheapest tier when the task's quality bar is real — cost is one requirement among three, not the deciding one by default.",
+        "Alternating tiers or inventing arbitrary routing rules (time of day, day of week) instead of aligning tier with task requirements.",
+        "Upgrading an entire high-volume stream to hedge against a few hypothetical hard cases, when routing those few cases upward is the targeted fix."
+      ]
+    },
+    {
+      "objective": "Understand and manage context limitations and memory considerations (when to restart, summarize, or persist)",
+      "explanation": "A Claude conversation works within a finite context window — the amount of material the model can actively attend to at once. Long-running chats accumulate everything: early decisions, dead ends, tangents, pasted documents. As a conversation grows very long, practical symptoms appear: responses drift from decisions made early on, previously acknowledged choices get forgotten or contradicted, and you find yourself re-explaining things the chat already covered.\n\nThe management pattern has three verbs. Summarize: when a working session has produced real decisions, distill them — settled choices, key constraints, current state of the work — into a compact summary, and ask Claude to help write it. Restart: begin a fresh chat seeded with that summary, so the model works from a clean, focused context containing only what matters now. Persist: move durable, long-lived material — reference documents, standing instructions, the project's canonical decisions — into Project knowledge, where it survives every restart and applies to every future chat automatically.\n\nRecognize the non-solutions. Re-stating early decisions inside every new message fights the limitation rather than managing it, and leaves the accumulated clutter in place. Switching the same overloaded conversation to a more capable model doesn't help — context limitations apply across tiers, and the new model inherits the same drift. Writing shorter messages only slows further growth; it recovers nothing. The restart is not a failure or a loss of work: with a good summary and persisted knowledge, it is how long-horizon work stays sharp.",
+      "whyItMatters": "Every professional doing sustained work in Claude eventually hits context degradation, and those who don't recognize it blame the model, escalate tiers pointlessly, or grind through drifting responses. The summarize-restart-persist pattern is the difference between multi-week projects that stay coherent and chats that slowly decay into re-explanation loops.",
+      "examples": [
+        {
+          "title": "Rescuing a two-week course-design chat",
+          "body": "A curriculum designer has spent two weeks in one chat designing a course; responses now drift from early decisions and she re-explains settled choices daily. She asks Claude to draft a summary of the design: the agreed module structure, audience level, assessment approach, and open questions. She reviews and corrects it, saves the course outline and style decisions into her course-design Project's knowledge, and opens a fresh chat seeded with the summary. The new conversation is immediately sharper — it carries only what matters, and the durable decisions now persist across every future session."
+        }
+      ],
+      "pitfalls": [
+        "Pushing on in a degraded chat, re-injecting early decisions into every message instead of summarizing and restarting.",
+        "Treating context drift as a capability problem and switching the same overloaded conversation to a bigger model, which inherits the same clutter.",
+        "Restarting without a summary, losing the decisions the long chat had actually settled and re-litigating them from scratch.",
+        "Keeping durable reference material only inside a chat's history instead of persisting it to Project knowledge where it survives restarts."
+      ]
+    }
+  ]
+}
