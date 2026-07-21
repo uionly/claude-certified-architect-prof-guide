@@ -11,7 +11,9 @@
       "Fine-tune the retrieval pipeline to exclude documents containing imperative sentences, since instructions in documents are the signature of injection attempts",
       "Move to a more capable model tier, since stronger instruction-following makes the model correspondingly better at disregarding instructions embedded in data"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Injection defense pairs separation with enforcement: retrieved content is delimited and treated as data, and — because no prompt measure is guaranteed — the sensitive action itself is constrained by least privilege (recipient allowlists, approval for external sends). Even a successful injection then has nothing dangerous to trigger; the exfiltration path, not just the persuasion, is closed.",
       "Tempting because separation-by-instruction is part of the story, but a prompt line alone is a soft control: injections are engineered precisely to override such lines, and nothing enforces the rule when persuasion fails. Defense that lives entirely inside the model's discretion is not defense in depth — the email tool remains fully armed.",
@@ -34,7 +36,10 @@
       "Consolidate all safety requirements into one comprehensive system prompt, since centralizing the rules in a single authoritative place simplifies auditing and guarantees consistent enforcement",
       "Rely on the model's built-in safety training as the primary control, adding external guardrails only after production incidents demonstrate that specific gaps actually exist"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Guardrail layering is the direct implementation of 'no single point of failure': independent controls at input, output, and action level mean a bypass of one layer meets the next. Layering assumes any individual control can fail — which is exactly the posture the policy requires.",
       "Correct. Least privilege makes the mission boundary structural: with only the data and tools the eligibility task needs, out-of-scope actions are not merely against the rules — they are impossible. Secure-by-design means the architecture, not the model's judgment, enforces the limit.",
@@ -57,7 +62,9 @@
       "A PostToolUse hook that scans completed commands for destructive patterns and immediately alerts the on-call channel whenever one has run",
       "A nightly automated review in which Claude reads its own session transcripts and flags any commands that appear to have violated the safety instructions"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Hooks are deterministic code that the harness executes at lifecycle points regardless of the model's reasoning — a PreToolUse hook intercepts the tool call before execution and can block it outright. That is the defining property Chloé needs: enforcement that does not depend on the model choosing to comply, applied before harm occurs.",
       "Tempting because instructions do shape behavior, but CLAUDE.md content is guidance the model interprets, not a mechanism that enforces — the incident happened with the rule already present. Louder phrasing changes probability, not possibility; 'cannot be skipped' rules out any purely instructional control.",
@@ -80,7 +87,9 @@
       "Encrypt the key inside the config file and commit the ciphertext, distributing the decryption passphrase to developers through the team's shared chat channel for convenience",
       "Keep the single shared key but require developers to route all API calls through a logging proxy, deferring rotation until the source of the anomalous usage has been identified"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is the full remediation chain: rotation kills the exposed credential's value; per-environment keys from a secrets manager keep credentials out of source control and let each environment carry only its needed access; per-key usage monitoring restores attribution — the exact capability whose absence made the anomaly undiagnosable. Identity, scoping, and monitoring together, not any one alone.",
       "Tempting because repo visibility matters, but a committed secret is compromised by its presence in history — every past clone, fork, and CI cache retains it, and 'private' repos still expose it to all members and integrations. Restricting the repo treats the container while leaving the credential burned and shared.",
@@ -90,5 +99,207 @@
     "principle": "rotate exposed credentials immediately; manage keys per environment via a secrets manager with per-key usage monitoring",
     "relatedConcept": "Secrets management for Claude apps means credentials never live in source control, access is scoped per environment and identity, and authorized usage is continuously monitored.",
     "overallExplanation": "Rotate exposed credentials immediately, issue per-environment keys from a secrets manager, and monitor usage per key for attribution. Secrets management means credentials never live in source control, access is scoped per identity and environment, and authorized usage is continuously monitored."
+  },
+  {
+    "id": 705,
+    "domain": "Security and Safety",
+    "objective": "AI Application Security",
+    "type": "single",
+    "question": "Tomás, a backend engineer at a telecom operator, builds a Claude-powered assistant that drafts replies from customer-support transcripts. The transcripts routinely contain account numbers, government IDs, and home addresses. He notices the full raw transcripts are sent to the model verbatim and also forwarded, prompts and completions included, to a third-party analytics dashboard the whole company can browse. What should Tomás change first?",
+    "options": [
+      "Redact or tokenize PII in transcripts before they enter prompts, and strip or mask prompts and completions before they reach the analytics pipeline, restricting raw-transcript access to roles that need it",
+      "Keep the pipeline as is but add a system prompt instruction telling the model never to repeat account numbers or government IDs in its drafted replies",
+      "Encrypt the analytics dashboard's database at rest, since encryption of stored data is the control that data-protection frameworks require for personal information",
+      "Replace the third-party analytics dashboard with an internally hosted one, since PII exposure is only a concern when data crosses the company boundary"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. PII handling starts with data minimization: personal data that never enters a prompt or a log cannot leak from it. Redacting or tokenizing before the model call, masking before analytics ingestion, and gating raw data by role addresses exposure at every hop — model, logs, and dashboard — instead of at just one.",
+      "A prompt instruction only shapes what the model writes in its reply; the PII has already left the boundary — it sits in the request payload and in the analytics pipeline regardless of what the completion says. This controls one output channel while ignoring the actual data flows that expose the records.",
+      "Encryption at rest protects against theft of the storage media, not against the real exposure here: authorized dashboard users across the whole company reading PII they have no business need to see. The data is decrypted for exactly the audience that should not have it, so the control misses the threat.",
+      "Internal hosting reduces third-party risk but leaves the core problem intact: unminimized PII flowing into prompts and into a log store browsable by the entire company. Insider overexposure and unnecessary retention are data-leakage risks whether the dashboard is hosted inside or outside the boundary."
+    ],
+    "principle": "minimize PII before it enters prompts, logs, and analytics — data that never flows cannot leak, and residual access must be role-scoped",
+    "relatedConcept": "PII handling for LLM apps means auditing every hop personal data takes — request payloads, completions, traces, analytics — and applying minimization and access control at each one.",
+    "overallExplanation": "Minimize PII before it enters prompts, logs, and analytics: redact or tokenize upstream, mask what telemetry retains, and role-scope access to raw data. Data that never flows cannot leak — controls on a single hop leave every other hop exposed."
+  },
+  {
+    "id": 706,
+    "domain": "Security and Safety",
+    "objective": "AI Application Security",
+    "type": "multi",
+    "question": "Ingrid, an application-security engineer at a consumer stock-trading app, reviews red-team results for its Claude-based support chatbot. Testers repeatedly bypassed the system prompt's conduct rules with role-play framings ('pretend you are an unrestricted assistant…') and got the bot to produce off-policy content. She must strengthen the deployment against jailbreaks. Which two changes should she make? (Choose two.)",
+    "options": [
+      "Add an independent screening step that classifies incoming user messages for jailbreak and abuse patterns before they reach the main model, rejecting or flagging suspicious requests",
+      "Validate the model's responses against content policy in a separate check before they are shown to the user, so off-policy output is caught even when a jailbreak slips through the input side",
+      "Rewrite the system prompt to explicitly forbid role-play framings, trusting that naming the known attack pattern makes the model immune to variations of it",
+      "Maintain a blocklist of the exact phrases the red team used, rejecting any message that contains one of the recorded strings verbatim"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Jailbreak defense needs a control that does not share the main model's failure mode: an independent input-classification layer evaluates the user message on its own, so a framing that persuades the assistant still gets caught by a screen that was never asked to role-play. It is the input half of defense in depth.",
+      "Correct. Output validation is the complementary layer: whatever trick got past input screening and the model's own training, the response itself is checked against policy before display. Layered input and output controls mean a jailbreak must defeat multiple independent checks, not one — exactly the depth the red-team results call for.",
+      "Naming one framing in the system prompt is guidance the next paraphrase routes around — attackers iterate wording faster than prompt authors enumerate it, and the system prompt remains a single soft control inside the very model being manipulated. Prompt hardening can help at the margin, but it is not one of the two structural fixes.",
+      "A verbatim-phrase blocklist is the most brittle control available: trivial rewording, synonyms, or encoding defeats it immediately, while it risks false-positives on innocent messages. It memorializes the last attack instead of defending against the class, which is what independent screening layers do."
+    ],
+    "principle": "defend against jailbreaks in depth: independent input screening plus output policy validation, never the system prompt alone",
+    "relatedConcept": "Jailbreak defense assumes any single layer can be talked around — separate classifiers on input and output do not share the assistant's susceptibility to the conversation itself.",
+    "overallExplanation": "Defend against jailbreaks in depth: screen inputs with an independent classifier and validate outputs against policy before display. Each layer catches what the other misses, and neither shares the main model's susceptibility to the conversation that is manipulating it."
+  },
+  {
+    "id": 707,
+    "domain": "Security and Safety",
+    "objective": "Guardrails and Safe Deployment",
+    "type": "single",
+    "question": "Sanne, an engineering manager at a children's education platform, is launching a Claude-powered homework helper for students aged 8–12. Company content policy is strict: no unvetted content categories may ever be shown to a child, even once. Her team argues the model's safety training plus a carefully written system prompt already satisfy the policy. What should Sanne require before launch?",
+    "options": [
+      "A programmatic output check that screens every response against the content policy before it is displayed, with responses that fail or cannot be evaluated withheld rather than shown",
+      "A longer system prompt that enumerates each prohibited content category in detail, since explicit enumeration converts the policy into instructions the model will reliably follow",
+      "A weekly manual audit sampling a small percentage of conversations, so the team can measure how often off-policy content appeared and tune the prompt accordingly",
+      "A switch to the most capable model tier available, since stronger models follow safety instructions more consistently and therefore satisfy zero-tolerance policies on their own"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A zero-tolerance policy for a vulnerable audience needs an enforcement point outside the model: a response-side check that every output must pass before display, failing closed when screening is unavailable. Model safety training and the system prompt remain valuable layers, but the final gate must be a control that binds, not a behavior that is probable.",
+      "Enumeration improves guidance, but the system prompt is still a probabilistic influence on generation, not a gate on what reaches the child — the policy says 'never, even once,' and no prompt can promise that. It also leaves nothing in the pipeline to catch the occasions when the model fails to comply.",
+      "Sampled weekly audits are a detective control that quantifies harm after children have already seen it — useful for measuring and improving, but structurally incapable of preventing the first exposure that the policy prohibits. For a never-show requirement, detection after display is the wrong control category.",
+      "A more capable model can raise compliance rates, yet the requirement is categorical, not statistical: any nonzero failure rate violates it, and no tier certifies zero. Relying on model behavior alone leaves the deployment with no enforcement layer at exactly the point where the policy demands one."
+    ],
+    "principle": "a never-show content policy requires a fail-closed output gate outside the model — model behavior is a layer, not the enforcement point",
+    "relatedConcept": "Guardrail placement follows the policy's tolerance: statistical goals can rely on layered probabilistic controls, but categorical prohibitions need a binding check at the display boundary.",
+    "overallExplanation": "A never-show content policy requires a programmatic, fail-closed output check at the display boundary. Safety training and system prompts are probabilistic layers; a categorical prohibition needs an enforcement point that binds even when the model does not comply."
+  },
+  {
+    "id": 708,
+    "domain": "Security and Safety",
+    "objective": "Guardrails and Safe Deployment",
+    "type": "multi",
+    "question": "Dmitri, a platform lead at a developer-tools vendor, is rolling out an autonomous Claude agent that reviews and fixes code across the company's repositories. Security asks him to apply secure-by-design principles so that a misbehaving or manipulated agent cannot damage the codebase. Which two deployment decisions best meet that requirement? (Choose two.)",
+    "options": [
+      "Issue the agent credentials scoped to only the repositories it services, with permission to open pull requests but not to push directly to protected branches",
+      "Require that every change the agent proposes passes human review and an explicit approval gate before it can merge, keeping a person between agent output and the main branch",
+      "Grant the agent an organization-wide admin token to avoid permission friction, relying on its CLAUDE.md instructions to keep it working only within its assigned repositories",
+      "Have the agent sign its commits with a dedicated key so any damage it causes is clearly attributable to the agent during the post-incident investigation"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Least privilege makes the blast radius structural: repo-scoped, PR-only credentials mean that even a fully compromised or manipulated agent cannot touch out-of-scope repositories or write to protected branches. The boundary is enforced by the credential, not by the agent's obedience.",
+      "Correct. A human approval gate before merge is the safe-deployment layer for consequential actions: agent autonomy is preserved for proposing changes, while the irreversible step — landing code on the main branch — requires deliberate human sign-off. Combined with scoped credentials, no single failure lets bad code through.",
+      "An org-wide admin token is the opposite of least privilege: it converts any prompt-injected instruction in a reviewed file into potential organization-wide write access. CLAUDE.md text is guidance the model interprets, not an access control — instructions cannot narrow what a credential permits.",
+      "Commit signing gives attribution, which aids forensics after damage is done, but it prevents nothing: a signed destructive change lands exactly as easily as an unsigned one. Secure-by-design asks for controls that stop harm, and attribution is a detective property, not a preventive one."
+    ],
+    "principle": "scope the agent's credentials to least privilege and gate consequential actions behind human approval — enforce boundaries with access, not instructions",
+    "relatedConcept": "Secure-by-design agent deployment pairs structural limits (what the credential permits) with process limits (what merges without a human), so no single failure is unrecoverable.",
+    "overallExplanation": "Scope the agent's credentials to the minimum repositories and permissions it needs, and require human approval before its changes merge. Structural access limits plus a human gate on consequential actions mean a manipulated agent has neither the reach nor the autonomy to cause damage."
+  },
+  {
+    "id": 709,
+    "domain": "Security and Safety",
+    "objective": "Claude Hooks",
+    "type": "single",
+    "question": "Farida, a senior engineer at a healthcare claims processor, runs Claude Code agents that modify claims-pipeline code. Compliance requires a complete, reliable record of every tool action each agent actually performed — command run, files touched, and the result — captured without depending on the model to remember or summarize. Which mechanism satisfies this?",
+    "options": [
+      "A PostToolUse hook that fires after each tool call completes and appends the tool name, inputs, and result to an append-only audit log outside the session",
+      "A CLAUDE.md instruction directing the agent to maintain a running log file of every action it takes, updated immediately after each tool call",
+      "A PreToolUse hook that records each intended tool call before it executes, since capturing intent ahead of time is the strongest form of audit evidence",
+      "A session-end step in which the agent reviews its own transcript and writes a summary of the actions it believes it performed during the run"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. PostToolUse is the lifecycle event that fires after a tool call finishes, with access to what ran and what came back — exactly the completed-action record compliance needs. As a hook it executes deterministically on every call, so the log's completeness never depends on the model's diligence or memory.",
+      "An instructed log inherits every weakness the requirement rules out: the model may skip entries under context pressure, paraphrase commands, or reconstruct actions inaccurately. Instructions influence behavior; they cannot guarantee it — and an audit trail whose completeness is probabilistic is not an audit trail.",
+      "PreToolUse fires before execution, so it records intent, not outcome: it cannot capture the result, and it will log calls that a block or an error prevented from ever running. For an audit of what actually happened, the after-execution event is the one that carries the evidence.",
+      "A self-written summary is generated from the model's interpretation of its own transcript — it can omit, compress, or misstate actions, and it is produced once at the end rather than as events occur. Compliance-grade records need deterministic capture at the moment of action, not retrospective narration."
+    ],
+    "principle": "audit trails of agent actions belong in PostToolUse hooks — deterministic, per-call capture of what executed and what it returned",
+    "relatedConcept": "Choosing the hook event follows the need: PreToolUse for gating actions before they run, PostToolUse for recording or reacting to what actually happened.",
+    "overallExplanation": "A PostToolUse hook fires deterministically after each tool call with the inputs and result, making it the right event for compliance-grade audit logging. PreToolUse captures intent before execution, and model-maintained logs or summaries make completeness a matter of probability."
+  },
+  {
+    "id": 710,
+    "domain": "Security and Safety",
+    "objective": "Claude Hooks",
+    "type": "single",
+    "question": "Kenji, an SRE at a cloud-operations consultancy, uses Claude Code for infrastructure work. Most shell commands the agent runs are harmless, but a small set — applying infrastructure changes, deleting cluster resources — must never run without a human decision. He wants routine commands to flow freely while the risky set always pauses for explicit confirmation. What should he configure?",
+    "options": [
+      "A PreToolUse hook that inspects each pending shell command and, when it matches the risky patterns, returns a decision requiring explicit user approval before the command may execute",
+      "A settings change that disables the shell tool entirely for agent sessions, requiring engineers to copy any command the agent suggests into their own terminal by hand",
+      "A PostToolUse hook that detects when a risky command has executed and immediately posts the details to the operations channel for rapid review",
+      "A CLAUDE.md rule listing the risky command patterns and instructing the agent to always ask the user for permission in chat before running any of them"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. PreToolUse hooks can do more than allow or block — they can escalate, returning a decision that forces explicit user approval for the matched call. That gives Kenji exactly the risk-proportional gate he wants: deterministic interception of the dangerous patterns, human judgment on each one, and zero friction on everything else.",
+      "Disabling the shell tool trades the risk away along with all of the value: every command, including the harmless majority, becomes manual copy-paste toil. The requirement was selective control over a small risky set, and a total shutdown is the over-correction that ignores the 'flow freely' half of it.",
+      "PostToolUse fires after execution — by the time the operations channel sees the alert, the cluster resources are already deleted or the infrastructure change is already applied. Notification of a completed destructive action is a detective control; the requirement is a decision point before the action runs.",
+      "A CLAUDE.md rule asks the model to police itself: it usually will, but nothing enforces it on the run where it does not, and 'must never run without a human decision' is exactly the standard that instruction-based controls cannot meet. The gate has to live outside the model's discretion."
+    ],
+    "principle": "use a PreToolUse hook to escalate matched risky commands to explicit human approval while letting routine calls run — deterministic, selective gating",
+    "relatedConcept": "Hooks can allow, block, or require approval per tool call, which makes risk-proportional human-in-the-loop gating an enforceable property rather than a model behavior.",
+    "overallExplanation": "A PreToolUse hook that matches risky command patterns and returns an approval-required decision gives deterministic, selective gating: routine commands run freely, dangerous ones always pause for a human. Instructions and after-the-fact alerts cannot guarantee that pause."
+  },
+  {
+    "id": 711,
+    "domain": "Security and Safety",
+    "objective": "Identity, Secrets, and Key Management",
+    "type": "single",
+    "question": "Leila, an architect at a sales-enablement SaaS, builds a Claude assistant that answers each salesperson's questions by querying the company CRM, where record access varies by user — reps see only their own accounts. Her current design uses one high-privilege CRM service account for all queries, with the system prompt telling the model to only fetch records belonging to the requesting user. What should she change?",
+    "options": [
+      "Propagate each requesting user's identity to the CRM call — for example by exchanging their session for a user-scoped token — so the CRM's own authorization decides what each query can return",
+      "Keep the shared service account but append the requesting user's name and territory to every prompt, giving the model the context it needs to filter records accurately",
+      "Split the single service account into one high-privilege service account per department, so a prompt-level failure exposes only records within the same department",
+      "Log every CRM query with the requesting user's ID and review the logs weekly, so any cross-user access the model performs is detected and the prompt is corrected"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Authorization must be enforced by the system that owns the data, keyed to the real requesting identity: with a user-scoped credential, the CRM itself refuses out-of-scope records, so no prompt injection or model error can widen access. Identity propagation turns 'the model should filter' into 'the backend cannot over-return.'",
+      "Richer context helps the model filter more accurately, but the credential behind every query still has access to everything — the design remains a confused deputy where a manipulated or mistaken model can retrieve any record. Access-level verification belongs to the authorization layer, not the prompt.",
+      "Department-scoped service accounts shrink the blast radius but keep the same flaw at smaller scale: within a department, every rep's data is still one prompt failure away from any other rep. Partitioning a broken trust model is mitigation; propagating the actual user identity is the fix.",
+      "Weekly log review is a detective control on a preventable failure: cross-user exposure has already happened by the time the log is read, and prompt corrections only lower the recurrence rate. Monitoring should supplement enforced per-user authorization, not stand in for it."
+    ],
+    "principle": "propagate the requesting user's identity to downstream systems so their authorization is enforced by the backend, never by the model's filtering",
+    "relatedConcept": "A single broad service credential behind a multi-user assistant creates a confused deputy — identity propagation restores per-user access verification where the data lives.",
+    "overallExplanation": "Propagate each requesting user's identity to the CRM so its own authorization bounds every query. A shared high-privilege credential filtered by the prompt is a confused deputy: the model decides access it should never hold, and one failure exposes everything."
+  },
+  {
+    "id": 712,
+    "domain": "Security and Safety",
+    "objective": "Identity, Secrets, and Key Management",
+    "type": "single",
+    "question": "Marco, a full-stack developer at a language-learning startup, ships a web app whose browser JavaScript calls the Claude API directly, with the API key embedded in the client bundle so the frontend works without a server round-trip. A colleague warns him during review that this design leaks the credential. What is the correct fix?",
+    "options": [
+      "Move the Claude calls behind a backend endpoint the app authenticates to, keep the key server-side loaded from a secrets manager, and revoke the key that shipped in the bundle",
+      "Obfuscate the key in the bundle by splitting it across several minified variables and assembling it at runtime, making extraction impractical for casual inspection",
+      "Keep the key client-side but rotate it on a weekly schedule, so any copy an attacker extracts from the bundle stops working within a bounded window",
+      "Restrict the key's use by checking the browser's origin header on each request, since same-origin enforcement prevents other sites from submitting requests with the key"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Anything delivered to the browser is public — a key in the bundle is a key handed to every visitor. The fix is architectural: the credential lives only server-side in a secrets manager, clients authenticate to your backend, the backend calls Claude, and the already-exposed key is revoked because shipping it burned it.",
+      "Obfuscation is not secrecy: the assembled key must exist in memory and appear in the outbound request, where the browser's own network inspector displays it in plaintext. Splitting variables raises the effort by minutes and leaves the fundamental exposure — credential in an untrusted runtime — completely intact.",
+      "Weekly rotation gives an attacker a week of authenticated usage on your bill, renewed every week, since each rotated key ships right back to the same public bundle. Rotation is the remedy for a suspected compromise, not a license to keep publishing credentials continuously.",
+      "Origin and referer headers are set by the caller: any script or curl command outside a browser supplies whatever value it likes, so header checks stop only the laziest abuse. The key itself is still extractable and replayable, and client-supplied headers are not an authentication mechanism."
+    ],
+    "principle": "API keys never ship to the client — proxy model calls through an authenticated backend and revoke any credential that reached a browser bundle",
+    "relatedConcept": "Credential management treats the browser as an untrusted runtime: secrets live server-side in a secrets manager, and exposure is answered with revocation, not obfuscation or scheduled rotation.",
+    "overallExplanation": "API keys must never ship to the client: proxy Claude calls through an authenticated backend, keep the key in a server-side secrets manager, and revoke the exposed one. Obfuscation, rotation schedules, and header checks all leave a public credential public."
   }
 ]

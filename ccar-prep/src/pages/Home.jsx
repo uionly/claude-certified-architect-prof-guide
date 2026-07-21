@@ -80,7 +80,7 @@ export default function Home() {
                   <Tag kind="domain">{d.weight}%</Tag>
                 </div>
                 <p className="mt-1 text-xs text-stone-500">
-                  {d.objectives.length} objectives · {d.questionCount} questions
+                  {d.objectives.length} objectives · {d.questionCount * (cert.practiceSets ?? 1)} questions
                 </p>
                 <Meter className="mt-3" correct={s.correct} attempted={s.attempted} />
                 <div className="mt-3 flex gap-4 text-sm font-medium">

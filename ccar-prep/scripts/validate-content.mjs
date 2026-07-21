@@ -30,6 +30,10 @@ for (const certCode of certCodes) {
     continue;
   }
   const blueprint = JSON.parse(readFileSync(blueprintPath, 'utf8'));
+  // practiceSets: how many distinct full-exam-sized sets the bank holds.
+  // The blueprint's questionCount / objective counts describe ONE exam; the
+  // bank must contain that distribution × practiceSets.
+  const sets = blueprint.cert?.practiceSets ?? 1;
   const errors = [];
 
   for (const domain of blueprint.domains) {
@@ -44,8 +48,8 @@ for (const certCode of certCodes) {
     } catch (e) { errors.push(`D${domain.id}: invalid JSON in questions file: ${e.message}`); continue; }
 
     if (!Array.isArray(questions)) { errors.push(`D${domain.id}: questions file is not an array`); continue; }
-    if (questions.length !== domain.questionCount)
-      errors.push(`D${domain.id}: expected ${domain.questionCount} questions, found ${questions.length}`);
+    if (questions.length !== domain.questionCount * sets)
+      errors.push(`D${domain.id}: expected ${domain.questionCount * sets} questions (${domain.questionCount} per set × ${sets}), found ${questions.length}`);
 
     const validObjectives = new Set(domain.objectives.map((o) => o.objective));
     const perObjective = {};
@@ -86,7 +90,8 @@ for (const certCode of certCodes) {
 
     for (const o of domain.objectives) {
       const n = perObjective[o.objective] || 0;
-      if (n !== o.questions) errors.push(`D${domain.id}: objective "${o.objective}" expected ${o.questions} questions, found ${n}`);
+      if (n !== o.questions * sets)
+        errors.push(`D${domain.id}: objective "${o.objective}" expected ${o.questions * sets} questions (${o.questions} per set × ${sets}), found ${n}`);
     }
 
     // ---- study guide ----

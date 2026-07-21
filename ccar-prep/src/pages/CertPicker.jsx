@@ -26,7 +26,7 @@ export default function CertPicker() {
                 </span>
               </div>
               <p className="mt-1 text-xs text-stone-500">
-                {c.code} · {c.totalQuestions} questions
+                {c.code} · {c.totalQuestions * (c.practiceSets ?? 1)} questions
               </p>
             </Link>
           )

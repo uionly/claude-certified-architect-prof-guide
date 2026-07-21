@@ -11,7 +11,9 @@
       "Ask Claude whether it missed anything important and rely on its answer as the completeness check",
       "Compare the summary's length to the contract's length to confirm an appropriate level of detail"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Evaluating an output means checking it against the source and against the task requirements: are the decision-critical clauses present, and are they represented accurately? Fluency is a property of the writing, not evidence about the underlying contract, so verification must go back to the original document.",
       "Tempting because polished prose feels trustworthy, but fluency and confidence are exactly how a flawed summary presents itself too. Language models write smoothly whether or not they captured the source correctly, so readability is not an accuracy signal.",
@@ -34,7 +36,9 @@
       "Ask Claude to confirm its own total in the same conversation and proceed if it stands by the number",
       "Forward the analysis with a general note that some figures may need double-checking later"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because access to the source feels like a guarantee, but models can misread, miscount, or mis-aggregate data they were given. Having the spreadsheet in context lowers error rates; it does not eliminate them, so a suspected discrepancy still demands source verification.",
       "Correct. One demonstrated numeric error changes the evidence status of the whole output: verification against the source resolves the specific discrepancy, and a confirmed error means the remaining figures need spot-checking before anyone acts on them. This is evaluation driven by the source, not by trust.",
@@ -57,7 +61,10 @@
       "Ask Claude to rate its own confidence in the brief and present it if the self-rating is high",
       "Rerun the same prompt and treat matching output across two runs as confirmation of accuracy"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Accuracy evaluation traces checkable claims — market share figures, funding rounds, product capabilities — back to authoritative sources. Fabricated or outdated specifics are precisely the kind of error that survives a fluency read-through and embarrasses a presenter in front of executives.",
       "Correct. Completeness is measured against the task's requirements, not against the output's internal coherence. A brief can be accurate in everything it says while silently omitting two of the five questions leadership asked, so the evaluation must compare coverage to the original request.",
@@ -80,7 +87,9 @@
       "The specificity of the title and publication number indicates the reference is genuine, so no further checking is needed",
       "Ask Claude for a direct link to the report and treat a provided URL as confirmation that it exists"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because indexing gaps do exist, but assuming a document is real when it cannot be found anywhere inverts the burden of proof. Citing an unlocatable source in official communications is exactly the failure mode that hallucinated citations cause.",
       "Correct. Language models can fabricate specific-looking details — titles, publication numbers, section references — with full fluency. An unfindable citation should be presumed hallucinated until the actual document is located; specificity is a property of the text, not evidence of existence.",
@@ -103,7 +112,9 @@
       "Ask Claude directly whether its summaries are biased and accept its assessment of its own output",
       "Standardize the problem away by instructing Claude to describe every candidate in identical positive language"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Systematic tone differences not grounded in the source material are a signature of bias in generated text. The right response is evidence-based: audit outputs against the notes to confirm the skew, and insert human review before the outputs affect hiring decisions, where biased language causes real harm.",
       "Tempting because interviews do differ, but Grace's observation was that the tone gaps are not supported by the notes. Assuming generated differences reflect reality — when the source material says otherwise — is exactly how bias passes unnoticed into decisions.",
@@ -126,7 +137,9 @@
       "Check the numbers against another AI chatbot and treat agreement between the two as verification",
       "Add a footnote stating the figures are AI-generated so the board can apply its own judgment"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The core fact-checking technique is tracing claims to authoritative primary sources — the organizations that actually publish the data. This both catches fabricated or outdated figures and produces the citation the board presentation needs to be credible.",
       "Tempting because the model will comply and often adjust something, but a self-check runs on the same knowledge that produced the originals. It cannot reliably distinguish its own accurate figures from its plausible fabrications, so it is not independent verification.",
@@ -149,7 +162,9 @@
       "Assume the readout is grounded, since Claude generated it directly from the uploaded source notes",
       "Read the readout carefully on its own, flagging anything that sounds internally inconsistent or surprising"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because web verification is a standard fact-checking technique, but it is the wrong tool here: internal meeting content does not exist on the public web. Validation technique must match where the ground truth lives, and for internal notes that is the notes themselves.",
       "Correct. The right technique compares output to its actual source, and with limited time, verification effort goes first to the highest-consequence claims — numbers, dates, and commitments leadership will act on. This is targeted source-checking rather than trust or surface reading.",
@@ -172,7 +187,9 @@
       "Have a colleague proofread it for typos and formatting, then send it to the customer list",
       "Ask Claude to review the draft from a lawyer's perspective and incorporate its suggested edits"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because grounding in the memo handles factual accuracy, but accuracy to an internal document is not the bar for this output. Coverage-change notifications carry legal obligations about wording, required disclosures, and timing that the memo's author and Claude may both have missed.",
       "Correct. The trigger for expert human review is consequence, not quality: external communications with regulatory, contractual, or legal weight require review by the humans accountable for those risks, no matter how polished the draft. Claude accelerates the drafting; it does not absorb the accountability.",
@@ -195,7 +212,10 @@
       "A brainstormed list of icebreaker activities for the team's monthly staff meeting",
       "A reformatted table of next week's internal meeting-room bookings"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Patient-facing clinical guidance carries direct safety consequences: an error in discharge instructions can cause real harm. Content in medical, legal, or financial high-stakes categories requires review by qualified professionals before it reaches the people who will act on it.",
       "Correct. Regulatory summaries drive compliance decisions, and hallucinated or outdated regulatory details are a known model failure mode. Before the hospital adjusts billing practices, the summary needs verification against the actual regulations by someone accountable for compliance.",
@@ -218,7 +238,9 @@
       "Trim the technical sections out of the engineering version and send the shortened remainder to customers",
       "Write the customer version himself from scratch, since audience adaptation is inherently a human-only task"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because accuracy feels like the safest choice, but an audience-mismatched document fails even when every fact is right: customers cannot parse engineering jargon, and the details that matter to them — impact and resolution — are buried. Fitness for audience is part of output quality.",
       "Correct. Adapting for a new audience is a re-generation task with explicit constraints: state the reader, reading level, tone, and the facts that must survive the translation. This preserves accuracy while transforming register — the core skill of audience adaptation.",
@@ -241,7 +263,9 @@
       "Ask Claude which of its two outputs is better and send whichever one it selects",
       "Merge all distinctive elements of both versions into one email so nothing of value is lost"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Comparing outputs requires explicit criteria derived from the audience and the goal — what must this email accomplish with this reader? Judging both drafts against the same rubric turns a taste-based choice into a defensible decision, and the criteria can also drive a final refinement round.",
       "Length is not a quality criterion, and for a re-engagement email it often cuts the other way: lapsed customers skim, and a longer message can bury the offer. Choosing by volume substitutes an easy-to-measure proxy for the audience-fit judgment the task requires.",
@@ -264,7 +288,9 @@
       "A fresh chat per section, so each part of the guide develops in its own clean conversation",
       "A compact bulleted outline in chat, since shorter output is easier to review at each round"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Artifacts are designed for exactly this shape of work: substantial, self-contained content that gets revised iteratively and ultimately shared or exported. The guide stays a single coherent document across feedback rounds instead of fragmenting into conversation history.",
       "Tempting because chat is the default, but a multi-section document scattered across inline messages fragments with every revision — each fix produces another partial copy, and assembling the final guide means scavenging through scroll-back for the latest version of each section.",
@@ -287,7 +313,10 @@
       "A one-line answer confirming a delivery date — delivered as a standalone artifact",
       "A long employee handbook revised over many sessions — regenerated in full as inline chat text each time"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Inline chat is the right home for quick, conversational, one-off answers that will be read once and acted on. Creating heavier containers for throwaway questions adds friction without adding value — the format matches the content's short lifecycle.",
       "Correct. Data destined for another tool needs structure that survives the transfer: consistent columns and a predictable layout let the figures move into a spreadsheet cleanly. Choosing structured output for downstream data use is the core format-selection judgment.",
@@ -297,5 +326,660 @@
     "principle": "match the container to the content's lifecycle",
     "relatedConcept": "Inline for quick answers, structured data for downstream tools, artifacts for substantial evolving documents — format follows use.",
     "overallExplanation": "Match the container to the content's lifecycle: inline for quick answers, structured data for downstream tools, artifacts for substantial evolving documents."
+  },
+  {
+    "id": 214,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Femi, a program coordinator at a job-training nonprofit, uploads sixty participant survey responses and asks Claude for a thematic summary. Claude returns a tidy five-theme write-up. What should Femi do to evaluate the summary's completeness before reporting it to funders?",
+    "options": [
+      "Accept the summary, since the five themes match his general impression of what participants say",
+      "Check coverage: ask which responses support each theme and spot-check that the full set of sixty is actually reflected, since models can quietly base a summary on only part of a large input",
+      "Rerun the identical prompt and treat the reappearance of the same five themes as confirmation",
+      "Ask Claude whether it read all sixty responses and accept its confirmation as the completeness check"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Matching his impressions is weak evidence — his impressions and the model's summary can share the same blind spots. A funder-facing report needs the summary checked against the actual responses, not against what he already expected to hear.",
+      "Correct. Completeness evaluation for a bulk input means confirming the whole input was actually represented. Mapping themes back to specific responses and spot-checking exposes silent partial coverage — a known failure mode where a fluent summary quietly rests on a fraction of the material.",
+      "A second run of the same prompt can under-read the input in the same way the first did. Stability across runs measures consistency of the process, not coverage of the sixty responses; a repeated omission still looks like agreement.",
+      "A model that under-weighted the later responses typically has no reliable awareness of having done so, and will affirm diligence either way. Self-report is not evidence; coverage has to be demonstrated against the actual response set."
+    ],
+    "principle": "confirm the whole input made it into the output",
+    "relatedConcept": "For summaries of bulk material, completeness means demonstrated coverage — themes traceable to specific inputs — not fluency or model self-report.",
+    "overallExplanation": "Confirm the whole input made it into the output: for bulk summaries, completeness means demonstrated coverage traceable to specific inputs, not fluency or self-report."
+  },
+  {
+    "id": 215,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Lorenzo, a tour-operations manager at a travel company, asks Claude to list the entry requirements for a destination his groups visit, and receives a confident, detailed answer drawn from the model's general knowledge. What accuracy consideration should drive his evaluation before he briefs travelers?",
+    "options": [
+      "The answer can be trusted because the details match what he remembers from last season's briefings",
+      "The answer is reliable as long as it is internally consistent and does not contradict itself anywhere",
+      "The answer may be outdated: entry rules change and model knowledge has a cutoff, so time-sensitive facts must be verified against the current official source before travelers rely on them",
+      "The answer should be shared with travelers as-is, accompanied by a note that rules can change"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Agreement with last season's memory is exactly the wrong comfort: if the rules changed this year, both his memory and the model's training data would be stale in the same direction. Matching an old baseline cannot validate a time-sensitive fact.",
+      "Internal consistency measures whether the answer hangs together, not whether it describes today's rules. A perfectly coherent description of last year's visa regime is still wrong for travelers departing next month.",
+      "Correct. Evaluating accuracy includes evaluating currency: model knowledge is frozen at a training cutoff, and entry requirements are a fast-changing, high-consequence fact category. The check that matters is the destination's current official guidance, dated today, not the fluency of the answer.",
+      "A \"rules can change\" note shifts the burden onto travelers, who will reasonably act on the specifics they were given. Distributing possibly stale requirements with a disclaimer is not a substitute for the operator verifying them first."
+    ],
+    "principle": "check the clock, not just the facts",
+    "relatedConcept": "Accuracy evaluation includes currency — time-sensitive claims must be verified against present-day authoritative sources because model knowledge has a cutoff.",
+    "overallExplanation": "Check the clock, not just the facts: time-sensitive claims must be verified against present-day authoritative sources, because model knowledge is frozen at a training cutoff."
+  },
+  {
+    "id": 216,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Greta, the owner of a catering company, gives Claude her cost and revenue figures and receives a margin analysis with computed percentages recommending she discontinue one menu line. The reasoning reads persuasively. What should she do before acting on the recommendation?",
+    "options": [
+      "Recompute the key figures herself from the source numbers, because a persuasive recommendation built on an arithmetic slip is still a wrong recommendation",
+      "Act on the recommendation, since the narrative logic connecting the numbers to the conclusion is sound",
+      "Rerun the analysis in a new conversation and act if the recommendation comes out the same",
+      "Act on it cautiously by discontinuing the menu line in only one location as a limited pilot first"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Evaluating an analytical output means checking the calculations, not just the conclusions: models can make arithmetic and aggregation slips while narrating them fluently. Reworking the key margins from her own source figures is quick and settles whether the recommendation rests on correct math.",
+      "Narrative logic can be flawless while the numbers feeding it are wrong — the argument \"drop the line because its margin is 4 percent\" is only as good as that 4 percent. Persuasiveness is a property of the prose, not evidence about the arithmetic.",
+      "A rerun can repeat the same computational slip, and agreement between two runs of the same model on the same data is not independent verification. The source figures are sitting in her own records; checking them directly is both faster and conclusive.",
+      "A pilot tests market reaction, not arithmetic — she would be spending weeks acting on numbers she could verify in an afternoon. If the margin figure is simply miscalculated, even the limited pilot is a decision built on a wrong premise."
+    ],
+    "principle": "verify the math beneath the recommendation",
+    "relatedConcept": "Analytical outputs are only as good as their computations — recompute the decision-critical figures from source data before acting.",
+    "overallExplanation": "Verify the math beneath the recommendation: analytical outputs are only as good as their computations, so recompute the decision-critical figures from source data before acting."
+  },
+  {
+    "id": 217,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Zainab, a policy associate at an industry trade association, has Claude summarize a member survey report. The source repeatedly qualifies its findings — \"preliminary,\" \"self-reported,\" \"small-employer segment excluded\" — but Claude's summary states the findings as firm, unqualified facts. What should she do?",
+    "options": [
+      "Circulate the summary as-is, since simplifying away hedges is what a good summary is supposed to do",
+      "Ask Claude to add a general disclaimer at the top noting that survey data always has limitations",
+      "Shorten the summary further so it contains fewer claims that could be overstated",
+      "Restore the source's specific qualifiers to the relevant claims, because dropping them makes the findings sound stronger than the evidence supports"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Summaries should compress wording, not certainty. \"Preliminary\" and \"self-reported\" are substantive properties of the evidence, and members reading unqualified claims will weight the findings far more heavily than the survey's own authors intended.",
+      "A blanket disclaimer is noise that readers skim past, and it fails to tell them which claims carry which limitation. The exclusion of small employers matters for specific findings, and only a qualifier attached to those findings communicates that.",
+      "Fewer overstated claims is still overstatement. Cutting content changes how much is said, not how accurately the remaining claims reflect their evidentiary strength — the summary's certainty level would still exceed the source's.",
+      "Correct. A subtle but consequential summarization failure is certainty inflation: hedges and scope limits get compressed away, leaving claims stronger than the source makes them. Evaluation should compare the confidence level of output and source, and restore the qualifiers that changed the meaning."
+    ],
+    "principle": "summaries must preserve the source's level of certainty",
+    "relatedConcept": "Dropped hedges and scope qualifiers make claims stronger than the evidence — evaluation compares confidence levels between output and source, not just facts.",
+    "overallExplanation": "Summaries must preserve the source's level of certainty: dropped hedges and scope qualifiers make claims stronger than the evidence, so compare confidence levels, not just facts."
+  },
+  {
+    "id": 218,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "single",
+    "question": "Mateus, an e-commerce manager at a furniture maker, used Claude to generate 240 product descriptions from spec sheets ahead of a site relaunch next week. Reading every description line-by-line is not feasible before the deadline. How should he structure his review?",
+    "options": [
+      "Publish all 240 descriptions now and rely on customers to report any errors they encounter",
+      "Review a systematic sample from every product category, and fully check the high-risk fields — dimensions, weight limits, and safety claims — on every single item",
+      "Delay the relaunch until every description has been read line-by-line, however long that takes",
+      "Review only the ten longest descriptions, since more text means more chances for errors"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Outsourcing quality control to customers means the first person to discover a wrong weight limit may be someone whose shelf collapsed. Error discovery after publication costs returns, reviews, and potentially safety incidents — far more than structured pre-launch review.",
+      "Correct. When volume makes full review impossible, evaluation becomes a risk-allocation exercise: a systematic sample across categories estimates the overall error rate, while the fields where errors cause real harm — dimensions, load limits, safety claims — get checked on every item regardless.",
+      "Tempting because total review sounds like total diligence, but it ignores the real deadline and treats a marketing paragraph's phrasing as equal in risk to a weight-limit figure. Review effort is a finite resource; spending it evenly is spending it badly.",
+      "Length is a poor proxy for risk: a short description with a wrong load capacity is far more dangerous than a long one with a clumsy sentence. Sampling should be systematic across the catalog, with intensity driven by consequence, not word count."
+    ],
+    "principle": "sample the volume, fully check the high-risk fields",
+    "relatedConcept": "Bulk-output evaluation allocates finite review effort by risk — systematic sampling for overall quality, complete checking wherever errors cause harm.",
+    "overallExplanation": "Sample the volume, fully check the high-risk fields: bulk-output evaluation allocates finite review effort by risk, with complete checking wherever errors cause harm."
+  },
+  {
+    "id": 219,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+    "type": "multi",
+    "question": "Signe, a communications coordinator at a renewable-energy developer, reads a community briefing Claude drafted about a wind project from the project documents she supplied. Which two features of the draft should she treat as warning signs requiring closer scrutiny? (Choose two.)",
+    "options": [
+      "Precise-sounding statistics that do not appear anywhere in the documents she provided",
+      "Hedged phrasing such as \"approximately\" where the source documents give rounded figures",
+      "Specific project details that go beyond anything contained in the source material",
+      "A briefing that is substantially shorter than the underlying project documents"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. A statistic that cannot be traced to the supplied material had to come from somewhere else — general model knowledge or outright fabrication. Precision makes such numbers more dangerous, not more credible, because they read as authoritative in a public-facing briefing.",
+      "Hedged language mirroring rounded source figures is honest representation, not a defect. Flagging appropriate uncertainty as suspicious inverts the evaluation: overconfident precision is the red flag, and calibrated approximation is what a faithful draft should contain.",
+      "Correct. Content exceeding the source is the signature of the model filling gaps — plausible details about roads, timelines, or noise levels that no document supports. In a community briefing, unsupported specifics become public commitments, so anything beyond the source needs verification or removal.",
+      "Briefings are supposed to be dramatically shorter than the project files they distill; compression is the job. Length reduction alone signals nothing — what matters is whether the retained claims are supported, which the other two flags actually test."
+    ],
+    "principle": "flag content the source cannot account for",
+    "relatedConcept": "The key red flags in grounded drafting are unsourceable statistics and details beyond the supplied material — not honest hedging or expected compression.",
+    "overallExplanation": "Flag content the source cannot account for: the red flags in grounded drafting are unsourceable statistics and details beyond the supplied material, not honest hedging or compression."
+  },
+  {
+    "id": 220,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "single",
+    "question": "Bao, a franchise operations manager at a smoothie chain, receives a Claude-drafted expansion report that states \"42 locations\" in the introduction but shows 47 locations in a later table. How should he interpret and handle this discrepancy?",
+    "options": [
+      "Use the figure from the table, since structured data is generally more reliable than narrative prose",
+      "Ask Claude which of the two figures is correct and adopt whichever one it confirms",
+      "Treat the contradiction as a reliability warning: verify the true count in the source data, and scrutinize the report's related figures before using any of them",
+      "Assume the two figures describe different time periods and present the report without changes"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "There is no rule that tables are generated more accurately than prose — both came from the same generation process, and either could hold the error. Picking a winner by format is a guess dressed up as a heuristic.",
+      "Asking the model to adjudicate its own contradiction just produces a confident selection with no new evidence behind it. The model already produced both numbers; its preference between them is not verification.",
+      "Correct. An internal inconsistency is more than a typo to patch — it is evidence that the generation process mishandled this data at least once. The correct figure must come from the source records, and the demonstrated slip means neighboring figures deserve scrutiny before the report circulates.",
+      "Inventing an innocent explanation for an unexplained contradiction is how errors get rationalized into reports. If two periods were genuinely intended, the report should say so and the source data should confirm it — assumption is not a validation method."
+    ],
+    "principle": "an internal contradiction is a reliability alarm",
+    "relatedConcept": "When an output disagrees with itself, neither figure is trustworthy by default — resolve it at the source and widen scrutiny of nearby claims.",
+    "overallExplanation": "An internal contradiction is a reliability alarm: when an output disagrees with itself, resolve the figure at the source and widen scrutiny of nearby claims."
+  },
+  {
+    "id": 221,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "single",
+    "question": "Colm, a facilities manager at a self-storage company, asks Claude — with no documents attached — for the exact signage-permit fees and setback distances in the small municipality where a new site is planned. Claude answers with confident, specific figures. How should Colm assess this response?",
+    "options": [
+      "Proceed with the figures, since they are detailed, internally consistent, and formatted like real regulations",
+      "Recognize the answer as high hallucination risk — hyper-specific facts about an obscure locality, requested with no source material — and confirm the actual figures with the municipality before acting",
+      "Ask the identical question again in a new chat and treat matching figures across both chats as confirmation",
+      "Trust the figures because permit rules are public records, which models learn thoroughly during training"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Detail, internal consistency, and regulatory formatting are properties of fluent text, and fabricated specifics come with all three. Hallucinated fee schedules look exactly like real ones — that resemblance is the hazard, not a reassurance.",
+      "Correct. Hallucination risk is highest exactly here: a request for precise figures about an obscure topic, with nothing provided to ground the answer. Recognizing those risk conditions — specificity, obscurity, no source — is the identification skill, and the municipality's own records are the only real check.",
+      "Two chats draw on the same underlying model, which can produce the same plausible invention twice. Consistency across conversations demonstrates stability of the fabrication, not correspondence with the municipality's actual fee schedule.",
+      "Being nominally public does not mean a small town's current fee table was in training data, was current at the cutoff, or was memorized precisely — and fees change by council vote. \"It's public information\" is a rationalization, not verification."
+    ],
+    "principle": "obscure plus specific plus ungrounded equals verify first",
+    "relatedConcept": "Hallucination risk peaks when a prompt requests precise details on obscure topics without source material — recognize the conditions, not just the symptoms.",
+    "overallExplanation": "Obscure plus specific plus ungrounded equals verify first: hallucination risk peaks when a prompt requests precise details on obscure topics without source material."
+  },
+  {
+    "id": 222,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "single",
+    "question": "Dilnoza, an operations director at a language-school chain, writes to Claude: \"I think we should close the downtown branch — analyze whether I'm right.\" The analysis that comes back strongly supports closing. What should she recognize about this response?",
+    "options": [
+      "Framing the question around her own stated position can bias the analysis toward agreement, so she should re-ask neutrally and request the strongest case for both keeping and closing the branch",
+      "The agreement is meaningful because Claude reached the same conclusion through independent analysis",
+      "She should ask Claude to confirm that it was not simply agreeing with her framing before she proceeds",
+      "She should supply more of her own reasoning for closure so Claude can validate her argument in greater depth"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Models tend to accommodate the user's stated position — a leading frame like \"analyze whether I'm right\" invites an analysis organized around confirming it. Recognizing this agreement bias and re-prompting neutrally, with both sides argued at full strength, is how to get analysis instead of an echo.",
+      "The analysis was not independent: her conclusion was embedded in the prompt as the position to evaluate. Agreement obtained after announcing the answer you favor is the weakest possible evidence that the answer is correct.",
+      "The same accommodating tendency that shaped the analysis also shapes the meta-answer — a model is not a reliable witness to its own bias. The remedy is structural, in how the question is framed, not another question layered on the biased exchange.",
+      "Feeding in more of her pro-closure reasoning deepens the framing problem: the conversation becomes progressively more anchored to one side. She would be building a more elaborate echo, not a more rigorous analysis."
+    ],
+    "principle": "a leading question buys agreement, not analysis",
+    "relatedConcept": "Stating your preferred conclusion in the prompt biases the model toward it — neutral framing with both sides argued at full strength is the countermeasure.",
+    "overallExplanation": "A leading question buys agreement, not analysis: stating your preferred conclusion biases the model toward it, so re-ask neutrally with both sides argued at full strength."
+  },
+  {
+    "id": 223,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+    "type": "multi",
+    "question": "Jonas, an executive assistant at a maritime shipping firm, reviews board-meeting minutes that Claude drafted from an uploaded transcript. Which two elements of the draft are most likely to be fabrications he should catch? (Choose two.)",
+    "options": [
+      "A condensed paraphrase that compresses a long fuel-contract discussion into three sentences",
+      "A verbatim quote attributed to the CFO that does not appear anywhere in the transcript",
+      "A note that one agenda item was deferred to next quarter, matching what the transcript records",
+      "A precise budget figure that appears nowhere in the transcript or any attached material"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "Condensing a long discussion into a faithful short paraphrase is exactly what minute-drafting is for. Compression is expected behavior, not fabrication — the test is whether the paraphrase misrepresents the discussion, not whether it shortens it.",
+      "Correct. Quotation marks assert that exact words were spoken, and a \"verbatim\" line absent from the transcript is a classic hallucination: the model composed plausible speech and attributed it. In board minutes, an invented CFO quote is a serious misrepresentation with governance consequences.",
+      "An entry that accurately matches the transcript is the draft working as intended. Flagging correct, source-supported content as suspicious would make review meaningless — identification skill lies in separating supported claims from unsupported ones.",
+      "Correct. Numbers are asserted facts, and a precise figure with no origin in any provided material had to be generated rather than extracted. Fabricated specifics like this read as authoritative in official minutes, which is precisely why untraceable figures must be caught before approval."
+    ],
+    "principle": "quotes and figures must trace to the transcript",
+    "relatedConcept": "In source-grounded drafting, verbatim quotes and precise numbers absent from the source are the highest-risk fabrications — faithful compression is not.",
+    "overallExplanation": "Quotes and figures must trace to the transcript: in source-grounded drafting, verbatim quotes and precise numbers absent from the source are the highest-risk fabrications."
+  },
+  {
+    "id": 224,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Tessa, a content strategist at an oral-care products brand, is preparing a blog post with Claude that cites consumer-habit statistics. She wants the fact-checking to be as efficient and reliable as possible. Which technique best achieves that?",
+    "options": [
+      "Treat any claim as verified once Claude lists a citation for it, since cited claims have been sourced",
+      "Use only rounded, approximate numbers in the post so that precision errors become impossible",
+      "Judge each statistic against her own industry intuition and check only the ones that feel wrong",
+      "Ask Claude to provide the source for each statistic, then open every source to confirm it exists and actually reports the figure — citations ease verification but must themselves be verified"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "A listed citation is a claim about a source, not proof of one — models can attach fabricated references or real references that say something different. Treating citation as verification skips the entire step where checking actually happens.",
+      "Rounding changes the size of a potential error, not whether the underlying claim is true; a rounded version of a fabricated statistic is still fabricated. This manages the appearance of precision instead of validating anything.",
+      "Intuition-filtered checking misses the most dangerous category: plausible fabrications, which by definition feel right. A statistic that fits her expectations sails through unchecked, and those are exactly the claims a fluent model produces.",
+      "Correct. Requesting sources at generation time structures the output for verification — every claim arrives with a checkable origin. The essential second step is opening each source to confirm it exists and actually supports the figure, because the citation itself is generated text too."
+    ],
+    "principle": "generate with sources, then verify the sources",
+    "relatedConcept": "Asking for citations makes outputs verifiable by design, but each citation must still be opened and confirmed — a reference is generated text, not evidence.",
+    "overallExplanation": "Generate with sources, then verify the sources: asking for citations makes outputs verifiable by design, but each citation must still be opened and confirmed."
+  },
+  {
+    "id": 225,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Karim, a market analyst at a specialty coffee importer, gets a Claude-generated claim about next season's harvest outlook in a producing country. No single authoritative primary source covers it. How should he validate the claim before it shapes purchasing decisions?",
+    "options": [
+      "Corroborate it across several genuinely independent, reputable sources — government agriculture data, trade bodies, and established industry press — before relying on it",
+      "Find one industry blog that repeats the same outlook and consider the claim confirmed",
+      "Ask Claude to state its confidence level in the claim and proceed if the stated confidence is high",
+      "Ask the same question in a second Claude conversation and treat a consistent answer as verification"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When no single primary source settles a claim, triangulation is the technique: agreement among genuinely independent, reputable sources — official statistics, trade organizations, established press — provides converging evidence. Independence is the operative word; the sources must not all trace back to one origin.",
+      "One blog repeating the outlook may simply be echoing the same rumor mill the claim came from — or content generated the same way. A single low-authority echo is correlation with the claim, not independent support for it.",
+      "Self-reported confidence is generated text like everything else the model produces, and models express high confidence in fabrications. A confidence statement is not evidence about the coffee harvest; it is a sentence about the answer.",
+      "Two conversations with the same model are about as independent as asking one person twice. Consistency demonstrates that the model reliably produces this answer, which is compatible with the answer being reliably wrong."
+    ],
+    "principle": "triangulate across genuinely independent sources",
+    "relatedConcept": "When no single primary source exists, validation means convergence among independent authorities — not echoes, self-confidence, or repeated model runs.",
+    "overallExplanation": "Triangulate across genuinely independent sources: when no single primary source exists, validation means convergence among independent authorities, not echoes or repeated model runs."
+  },
+  {
+    "id": 226,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Elif, a grant writer at a wildlife conservancy, uses Claude with web search for a funding proposal, and Claude cites a real, existing journal article as the source for a species-decline statistic. What does proper validation of this statistic require?",
+    "options": [
+      "Nothing further — the article exists and the citation is real, so the statistic is verified",
+      "Confirming the journal is peer-reviewed, since peer-reviewed sources can be relied on without reading",
+      "Opening the cited article and confirming it actually supports the specific figure, since a real source can be attached to a claim it never makes",
+      "Asking Claude to quote the article's relevant passage as proof that the statistic appears in it"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Existence of the source and accuracy of the claim are two different checks, and only the first has been done. A genuine article can be cited for a number it never reports, a different species, or a finding the authors actually contradicted.",
+      "Peer review speaks to the article's quality, not to whether this statistic appears in it or means what the proposal says it means. Trusting the label without reading the content leaves the actual claim-to-source match untested.",
+      "Correct. The subtle failure mode with real citations is claim-source mismatch: the reference is genuine but does not say what it is cited for — the figure differs, the scope differs, or the finding is more qualified. Validation means reading the source and confirming it supports the exact claim being made.",
+      "The quoted passage would be generated text from the same system whose citation is being checked — it can be paraphrased, reconstructed, or invented. Proof lives in the article itself, which Elif must open, not in the model's account of the article."
+    ],
+    "principle": "a real citation can still misrepresent its source",
+    "relatedConcept": "Validation has two layers — the source must exist, and it must actually support the specific claim — and only reading the source settles the second.",
+    "overallExplanation": "A real citation can still misrepresent its source: validation requires both that the source exists and that it actually supports the specific claim, which only reading it settles."
+  },
+  {
+    "id": 227,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Apply fact-checking and validation techniques",
+    "type": "single",
+    "question": "Hugo, a speechwriter at a chamber of commerce, has a Claude-drafted speech mixing employment figures, dates, and named local businesses with rhetorical passages about community spirit. With limited time before the event, how should he apply fact-checking?",
+    "options": [
+      "Check every sentence with equal rigor, including the rhetorical passages about community spirit",
+      "Separate the verifiable factual claims — figures, dates, names — and check those against authoritative sources; the rhetorical passages are judgment and style, not checkable facts",
+      "Skip fact-checking altogether, since a ceremonial speech is persuasive rather than informational",
+      "Check only the claims that sound surprising, since unremarkable statements are unlikely to be wrong"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Rhetorical passages contain no propositions a source could confirm or refute — \"our community's spirit is strong\" cannot be fact-checked, only judged for tone. Spending scarce time \"verifying\" style steals rigor from the employment figures that can actually be wrong.",
+      "Correct. The first move in fact-checking is sorting content by checkability: figures, dates, and named entities are verifiable claims with authoritative sources; rhetoric is aesthetic judgment. Concentrating limited verification time on the checkable claims is how the technique is applied efficiently.",
+      "Ceremonial speeches still assert facts — a wrong employment figure or a misnamed business is an error the audience will notice and the chamber will own. The genre changes the tone, not the obligation to get checkable claims right.",
+      "Plausibility-filtering is the trap: fluent models produce fabrications that sound perfectly unremarkable, and those pass a surprise-based screen untouched. Whether a claim gets checked should depend on whether it is checkable and consequential, not on whether it raises eyebrows."
+    ],
+    "principle": "sort claims by checkability before checking",
+    "relatedConcept": "Fact-checking starts by separating verifiable claims — figures, dates, names — from rhetoric and judgment, then spending verification effort on the former.",
+    "overallExplanation": "Sort claims by checkability before checking: separate verifiable figures, dates, and names from rhetoric, then spend limited verification effort on the checkable claims."
+  },
+  {
+    "id": 228,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "single",
+    "question": "Sana, an office manager at a metal-fabrication company, used Claude to draft a one-page equipment lockout safety refresher from the official machine manual she uploaded. She cannot herself judge whether the technical steps are correct. What should happen before the page is distributed to the floor?",
+    "options": [
+      "Distribute it, since the draft was generated directly from the official manual she provided",
+      "Simplify the language further, so any technical inaccuracies matter less to readers",
+      "Have the site safety officer review it, because review only functions when the reviewer can actually recognize errors in the content",
+      "Ask a colleague in the accounting department to proofread the page before it is posted"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Grounding in the manual reduces error risk but cannot eliminate it — a dropped step, a reordered sequence, or a condensed warning changes safety-critical meaning. For content where an error can injure someone, source-grounding is not a substitute for qualified review.",
+      "Simplification changes readability, not correctness, and in safety procedures oversimplification is itself a hazard — removing a caveat or merging two steps can make instructions dangerous. Making an error easier to read does not make it matter less.",
+      "Correct. Human review has a competence requirement: the reviewer must be able to recognize an error when they see one. Sana has correctly identified that she cannot evaluate this content, so the review must go to someone who can — the safety officer with authority over these procedures.",
+      "A proofreader from accounting can catch typos but has the same blind spot Sana does: no ability to spot a wrong sequence or missing isolation step. Review by someone unqualified in the subject creates the appearance of diligence without its substance."
+    ],
+    "principle": "review requires a reviewer who can catch the error",
+    "relatedConcept": "Escalating to human review means matching the reviewer's expertise to the content — review by someone who cannot recognize the errors is not review.",
+    "overallExplanation": "Review requires a reviewer who can catch the error: escalation means matching reviewer expertise to the content, because unqualified review is only the appearance of diligence."
+  },
+  {
+    "id": 229,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "single",
+    "question": "Wiremu, a billing coordinator at a veterinary clinic network, is setting up a new monthly workflow in which Claude drafts client payment-reminder emails from billing exports. How should he decide the level of human review the workflow needs?",
+    "options": [
+      "Review every draft in the first several batches, and relax to spot-checking only after the workflow has demonstrated consistent accuracy",
+      "Skip review entirely, since payment reminders are routine template-like messages",
+      "Review drafts only when a client calls to complain about an incorrect reminder",
+      "Review the output of the very first run carefully, then treat the workflow as validated from then on"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A new AI workflow has an unknown error profile, so review intensity should start high and step down only as evidence accumulates: full review of early batches reveals the failure patterns, and demonstrated reliability is what earns the transition to sampling. Verification requirements are provisional, not fixed.",
+      "Routine in format is not routine in consequence: these messages assert specific amounts owed by specific clients, and a mis-mapped export means dunning the wrong person for the wrong sum. Template-like appearance says nothing about the reliability of a brand-new data-driven pipeline.",
+      "Complaint-driven review means the error-detection system is the clinic's angriest clients, and every silent error — someone quietly paying an inflated figure — never surfaces at all. Verification must precede sending, not follow the damage.",
+      "One clean run is a sample size of one, and each month brings a fresh export with new edge cases — refunds, partial payments, plan changes. Confidence should be earned across varied batches, not granted permanently after a single success."
+    ],
+    "principle": "new workflows earn reduced review through evidence",
+    "relatedConcept": "Review intensity for a new AI workflow starts at full coverage and steps down to sampling only after consistent accuracy is demonstrated across varied runs.",
+    "overallExplanation": "New workflows earn reduced review through evidence: start at full coverage and step down to sampling only after consistent accuracy across varied runs."
+  },
+  {
+    "id": 230,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "single",
+    "question": "Agnes, a regional manager at a commercial cleaning-services company, asked Claude to analyze performance data and rank three subcontractors as candidates for contract termination. The analysis is well organized and the ranking looks reasonable. What should she do with it?",
+    "options": [
+      "Act on the ranking directly, since Claude analyzed the same performance data she would have used",
+      "Ask Claude to double-check its own ranking and proceed once it reconfirms the order",
+      "Terminate only the lowest-ranked subcontractor as a compromise between speed and caution",
+      "Treat the ranking as one input: examine the underlying performance evidence herself and make the termination decision as her own, since it affects people's livelihoods"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Same data does not mean same accountability. The analysis may have weighted factors she would weight differently, missed context the data cannot show — a subcontractor's difficult route assignments, say — and no one can answer for the decision if she cannot explain it beyond \"the ranking said so.\"",
+      "A model reconfirming its own ranking adds confidence theater, not verification — it re-derives the same conclusion from the same process. The missing ingredient is human examination of the evidence, which no amount of self-checking supplies.",
+      "Splitting the difference still delegates the core judgment to the ranking: the lowest-ranked subcontractor is terminated on the model's ordering without anyone validating the evidence behind it. A smaller unexamined decision is still an unexamined decision.",
+      "Correct. Decisions with serious consequences for specific people are a category where human review is not optional: the AI analysis is legitimate input, but Agnes must verify the evidence, apply the context only she has, and own the outcome. Accountability for consequential judgments cannot be delegated to a tool."
+    ],
+    "principle": "consequential decisions about people stay human-owned",
+    "relatedConcept": "AI analysis can inform but never absorb accountability — decisions with serious consequences for individuals require human examination of the evidence and human ownership.",
+    "overallExplanation": "Consequential decisions about people stay human-owned: AI analysis can inform but never absorb accountability, so the human verifies the evidence and owns the outcome."
+  },
+  {
+    "id": 231,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Determine when human review or additional verification is required",
+    "type": "multi",
+    "question": "Rocco, a public-relations manager at a kombucha brewery, produced several outputs with Claude this week. Which two require additional verification before they are used? (Choose two.)",
+    "options": [
+      "A market-growth statistic that will be quoted in a press release sent to journalists",
+      "A friendlier rewording of a paragraph Rocco wrote himself for the internal newsletter",
+      "A comparative claim about a rival brand's ingredients destined for advertising copy",
+      "A draft agenda for the team's Monday planning meeting"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. A statistic in a press release will be repeated by journalists under the brewery's name, and a fabricated or outdated figure becomes a public, quotable error. External publication plus a checkable factual claim is a textbook trigger for verification before use.",
+      "The underlying content is Rocco's own text, and the change is stylistic — he is fully competent to judge whether the friendlier version still says what he meant. Low stakes plus self-evident evaluation means a read-through is sufficient.",
+      "Correct. Factual claims about a competitor's product carry legal exposure: if the ingredient claim is wrong, advertising it invites false-advertising complaints and a public correction. Comparative marketing claims need verification against reliable evidence, and often legal review, before publication.",
+      "An internal meeting agenda is low-consequence and instantly correctable — a missing item gets added in the meeting's first minute. Demanding formal verification for it confuses the presence of AI with the presence of risk."
+    ],
+    "principle": "external claims with legal or public weight get verified",
+    "relatedConcept": "Verification triggers combine audience and consequence — publishable statistics and competitor claims demand it; self-judgeable internal drafts do not.",
+    "overallExplanation": "External claims with legal or public weight get verified: verification triggers combine audience and consequence, so publishable statistics and competitor claims demand it while self-judgeable internal drafts do not."
+  },
+  {
+    "id": 232,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "single",
+    "question": "Stefan, a training lead at an HVAC equipment manufacturer, uses Claude to adapt installer-manual content into a plain-language maintenance guide for homeowners. The adaptation reads beautifully. What quality step does this adaptation still require?",
+    "options": [
+      "None — adaptation only changes style and reading level, so the facts are guaranteed to carry over intact",
+      "Checking the adapted version against the original manual, since rewording for lay readers can subtly change technical facts like clearances, intervals, and safety warnings",
+      "Verifying the original manual once more, since the source is what ultimately matters for accuracy",
+      "Asking Claude to confirm that it kept all technical facts identical during the adaptation"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Adaptation is regeneration, not reformatting — every sentence is rewritten, and rewriting can turn \"at least 30 inches of clearance\" into \"about two feet\" or soften a warning into a suggestion. Style transformation and factual preservation are separate outcomes, and only one was requested.",
+      "Correct. Simplification is a known vector for accuracy drift: units get rounded, conditions get dropped, and safety caveats get smoothed away in the name of readability. Comparing the adapted guide against the original manual — especially numbers, intervals, and warnings — is the review this step specifically demands.",
+      "The manual's accuracy was never in question; it is the fixed reference point. The new risk was introduced by the transformation between the manual and the homeowner guide, and re-reading the source without comparing the adaptation checks the wrong document.",
+      "The model's assurance about its own faithfulness is generated text, not a comparison — a model that unknowingly altered a clearance figure will sincerely report fidelity. The check requires putting the two documents side by side, which only a human reviewer actually does."
+    ],
+    "principle": "re-verify facts after every audience transformation",
+    "relatedConcept": "Adapting content for a new audience regenerates it, so technical facts — numbers, intervals, warnings — must be re-checked against the original after adaptation.",
+    "overallExplanation": "Re-verify facts after every audience transformation: adaptation regenerates the text, so numbers, intervals, and warnings must be re-checked against the original."
+  },
+  {
+    "id": 233,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "single",
+    "question": "Alba, a sustainability lead at a footwear manufacturer, must turn the annual impact results into three deliverables: a board memo, an all-staff note, and a public blog post. How should she direct Claude to produce the three versions?",
+    "options": [
+      "Specify for each audience what they need to know, the appropriate depth, and what must be left out — such as confidential cost data in the public post",
+      "Produce one thorough master version and send the same document to the board, staff, and public",
+      "Write the public blog post first, then create the board and staff versions by adding detail to it",
+      "Ask Claude for long, medium, and short renditions of the same text, matched to the three audiences"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Multi-audience adaptation is a per-audience specification exercise: each version needs its readers' concerns (governance and risk for the board, meaning and pride for staff, credibility for the public), its own depth, and — critically — its own exclusions, since confidential figures that belong in a board memo must never reach the blog.",
+      "One document cannot serve three readerships: it either buries the board's decision-relevant detail in public-friendly prose or exposes internal figures to the public. The single-version approach guarantees at least one audience is served badly — or a confidentiality breach.",
+      "Building upward from the most sanitized version anchors all three documents to public messaging, when the board memo needs analysis and internal specifics that were deliberately stripped out. Deriving the richest document from the poorest one runs the adaptation backward.",
+      "Length is the least important difference between these audiences. A short board memo and a short blog post contain different information, not the same information at different lengths — sizing does not address who may see what, or what each reader needs."
+    ],
+    "principle": "one source, per-audience specs, deliberate exclusions",
+    "relatedConcept": "Multi-audience adaptation defines each version's needs, depth, and exclusions separately — confidentiality boundaries are part of the audience spec, not an afterthought.",
+    "overallExplanation": "One source, per-audience specs, deliberate exclusions: multi-audience adaptation defines each version's needs, depth, and confidentiality boundaries separately."
+  },
+  {
+    "id": 234,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "single",
+    "question": "Kenji, a strategy analyst at a ferry operator, must condense a 40-page operations review into a one-page brief for the executive committee. How should he direct Claude to perform the adaptation?",
+    "options": [
+      "Compress each of the review's ten sections into two sentences so every part gets balanced coverage",
+      "Keep the methodology discussion prominent in the brief, since it establishes the review's credibility",
+      "Lead with what executives must act on — the decisions required, the key risks, and the recommendations — selecting content by decision-relevance rather than shrinking every section proportionally",
+      "Deliver the full 40-page review with the most important passages highlighted for busy readers"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Proportional compression treats the source's structure as the audience's priorities, which it is not: two sentences on the fleet-maintenance crisis and two on survey methodology gives a trivial topic the same space as an urgent one. Balance across sections is the wrong fairness for a decision document.",
+      "Executives take the methodology on trust and can request it if questioned; giving it prominent space in a one-page brief spends the scarcest real estate on what the audience needs least. Credibility apparatus belongs in the full review, available on demand.",
+      "Correct. Executive adaptation is a selection problem, not a shrinking problem: the brief exists so the committee can decide and act, so content is chosen by decision-relevance — required decisions, material risks, recommendations — and everything else is left in the underlying report it can point to.",
+      "Forwarding 40 highlighted pages declines the task rather than adapting the document. The committee asked for one page precisely because they will not excavate the full review; highlighting redistributes the reading burden the brief was supposed to remove."
+    ],
+    "principle": "condense by decision-relevance, not proportionally",
+    "relatedConcept": "An executive brief selects what the audience must decide and act on — it is a re-prioritization of the source, not a uniform miniature of it.",
+    "overallExplanation": "Condense by decision-relevance, not proportionally: an executive brief selects what the audience must decide and act on, rather than shrinking every section uniformly."
+  },
+  {
+    "id": 235,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+    "type": "multi",
+    "question": "Odile, an HR lead at a regional bakery chain, is adapting the leave-policy document with Claude for frontline staff, who typically read workplace messages on their phones during short breaks. Which two practices will make the adaptation effective? (Choose two.)",
+    "options": [
+      "Make the adapted version as brief as possible, assuming frontline staff will not read policy text anyway",
+      "Tell Claude the audience's reading context and background — read on phones during breaks, no HR terminology — so the rewrite fits how it will actually be used",
+      "Soften the policy's requirements in the rewrite so the overall tone feels friendlier to staff",
+      "Pilot the adapted version with a few frontline employees and refine it based on what they misunderstand"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "Brevity driven by the assumption that the audience will not read is condescension posing as adaptation — and cutting too much removes the notice periods and steps staff genuinely need. The goal is fitting the content to the reader, not minimizing it out of pessimism.",
+      "Correct. Audience adaptation starts with specifying the audience concretely: the reading device, the time available, and the vocabulary the readers do and do not share. \"Phones, short breaks, no HR terminology\" gives Claude the constraints that determine structure, sentence length, and word choice.",
+      "Tone can and should be warm, but softening the requirements changes the policy itself — staff who follow a friendlier paraphrase of the notice rules may be out of compliance with the actual policy. Adaptation must preserve substance exactly while transforming register.",
+      "Correct. The target audience is the only authoritative judge of whether the adaptation works: piloting with real frontline employees surfaces the misreadings neither Odile nor Claude can predict, and their confusions become the concrete revision list for the next iteration."
+    ],
+    "principle": "specify the reader's context, then test with real readers",
+    "relatedConcept": "Effective adaptation states the audience's reading conditions and vocabulary up front, and validates the result with members of the actual audience.",
+    "overallExplanation": "Specify the reader's context, then test with real readers: effective adaptation states the audience's reading conditions up front and validates the result with the actual audience."
+  },
+  {
+    "id": 236,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "single",
+    "question": "Ibrahim, an office administrator at a law firm, has Claude review three competing copier service contracts so the partners can choose one at Friday's meeting. Which output format should he request?",
+    "options": [
+      "A flowing narrative that discusses each contract in turn with full paragraphs of analysis",
+      "Three separate summaries produced in three separate conversations, one per contract",
+      "A single-paragraph verdict recommending one contract so the partners get a fast answer",
+      "A comparison table with the contracts as columns and consistent criteria — cost, response time, exit terms — as rows, since a side-by-side structure matches how the choice will be made"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Narrative buries the comparison: to weigh exit terms, the partners must hunt through three separate paragraphs and hold the figures in memory. Prose is the right format for argument and nuance, not for lining up three options against the same criteria.",
+      "Splitting the work across conversations guarantees inconsistency — each summary emphasizes different aspects, so the three outputs cannot be laid side by side. The comparison the partners need is exactly what three disconnected summaries fail to produce.",
+      "A verdict without visible trade-offs asks the partners to ratify a conclusion they cannot inspect, on a contract decision they own. The meeting needs the comparison itself; a recommendation can accompany it, but cannot replace it.",
+      "Correct. Format should mirror the decision structure: choosing among options against shared criteria is inherently tabular, and a table with consistent rows makes gaps, outliers, and trade-offs visible at a glance. Selecting structured output when the task is comparison is the core format-selection judgment."
+    ],
+    "principle": "comparisons across options belong in a table",
+    "relatedConcept": "Choose the output format that mirrors the task's structure — evaluating options against shared criteria calls for consistent side-by-side structure, not prose.",
+    "overallExplanation": "Comparisons across options belong in a table: choose the output format that mirrors the task's structure, and evaluating options against shared criteria is inherently side-by-side."
+  },
+  {
+    "id": 237,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "single",
+    "question": "Lucia, a product-marketing associate at a pet-food brand, ran Claude's research mode on the raw-food segment and received a long, heavily sourced report. Leadership asked one question: should the brand enter this segment? What should Lucia do with the research output?",
+    "options": [
+      "Curate before sharing: distill the findings that bear on the entry decision, keep the source links attached to the claims that survive, and cut the rest",
+      "Forward the complete report to leadership so that no potentially relevant finding is lost",
+      "Send leadership only the single-sentence bottom line so their time is fully respected",
+      "Convert the entire report, section by section, into a slide deck for the leadership meeting"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Curation is the step between research output and audience: selecting what bears on the actual decision, preserving the source links so surviving claims stay verifiable, and discarding the rest. The value Lucia adds is judgment about relevance — the raw report is input to her work, not the deliverable.",
+      "Forwarding everything transfers the curation work to the people with the least time to do it, and most of the report does not touch the entry decision. Completeness of the handoff is not a virtue when the question was specific; it is the absence of the analyst's job.",
+      "A bare yes-or-no strips out the reasoning and evidence leadership needs to weigh the call and probe its assumptions. Respecting their time means giving a decision-shaped brief with support, not withholding everything except the conclusion.",
+      "Reformatting is not curating: a slide per section faithfully reproduces the report's bulk in a different container, and the deck inherits every irrelevant passage as a slide. The problem to solve is selection, and changing the medium does not perform it."
+    ],
+    "principle": "curate research to the decision, keep the sources",
+    "relatedConcept": "Research output is raw material — the human's job is selecting what bears on the decision and preserving verifiability, not forwarding or reformatting the whole dump.",
+    "overallExplanation": "Curate research to the decision, keep the sources: research output is raw material, and the human's job is selecting what bears on the decision while preserving verifiability."
+  },
+  {
+    "id": 238,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "single",
+    "question": "Ansel, a volunteer coordinator at a food bank, has finished developing a shift-onboarding checklist with Claude. The shift leads who will use it every weekend were not part of the conversation and need their own clean copy. What is the best way to deliver it?",
+    "options": [
+      "Send the shift leads screenshots of the chat messages in which the checklist was worked out",
+      "Have Claude produce the checklist as an artifact — a standalone document he can copy, export, and share as a clean final version, separate from the conversation that produced it",
+      "Tell each shift lead to ask Claude to regenerate the checklist themselves whenever they need it",
+      "Paste the full conversation transcript into an email so the leads also see the reasoning behind each item"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Screenshots freeze the drafting process, not the deliverable: revisions scattered across messages mean the leads must reconstruct which version is final, and images of chat cannot be searched, printed cleanly, or updated. The working session is not the document.",
+      "Correct. The checklist's users live outside the conversation, so the content needs a container that travels: an artifact separates the finished deliverable from the chat that produced it, giving Ansel one authoritative version to copy, export, print, and distribute to the shift leads.",
+      "Each regeneration produces a fresh variant, so every shift lead would work from a slightly different checklist — and none from the version Ansel refined and approved. A vetted operational document must be distributed, not re-created on demand.",
+      "The transcript buries the checklist inside corrections, dead ends, and superseded drafts, leaving each reader to excavate the final version themselves. The leads need the outcome of the reasoning; shipping the whole process instead of the product serves no one."
+    ],
+    "principle": "deliverables for people outside the chat need their own container",
+    "relatedConcept": "When an output's users are not in the conversation, it belongs in an artifact — one authoritative, exportable version separated from the drafting process.",
+    "overallExplanation": "Deliverables for people outside the chat need their own container: an artifact provides one authoritative, exportable version separated from the drafting process."
+  },
+  {
+    "id": 239,
+    "domain": "Output Evaluation and Validation",
+    "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+    "type": "multi",
+    "question": "Dario, a knowledge coordinator at an elevator-maintenance company, is consolidating findings from many Claude research sessions into a single reference page his field teams will consult. Which two practices will make the consolidated page most useful? (Choose two.)",
+    "options": [
+      "Group the material by topic and by relevance to the teams' recurring tasks, rather than by the order in which the research happened",
+      "Include every finding gathered across all the sessions, so that no detail is ever lost",
+      "Keep source attributions attached to the claims so teammates can re-verify any item later",
+      "Merge everything into one continuous narrative so the page reads smoothly from start to finish"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Organization should serve the reader's retrieval pattern, not the researcher's history: field teams arrive with a task and need the relevant findings grouped where they will look. Chronological order preserves how the research unfolded, which is the one thing no user of the page cares about.",
+      "Including everything is hoarding, not curating — the marginal findings dilute the important ones, and a bloated page trains field teams to stop consulting it. Curation means the discipline of leaving things out; completeness of the archive belongs elsewhere.",
+      "Correct. A reference page outlives the sessions that fed it, and claims will eventually be questioned or need updating. Source attributions kept with each claim make every item independently re-verifiable later — traceability is what separates curated knowledge from unsourced folklore.",
+      "A continuous narrative optimizes for reading start-to-finish, which is exactly how a reference page is never used. Field teams scan and jump; headings, groups, and structure serve that access pattern, while smooth prose actively hides the item someone came to find."
+    ],
+    "principle": "organize for retrieval, attribute for re-verification",
+    "relatedConcept": "Curated reference material is grouped by how readers will look things up and keeps sources attached to claims — not everything, and not a narrative.",
+    "overallExplanation": "Organize for retrieval, attribute for re-verification: curated reference material is grouped by how readers look things up, with sources kept attached to claims."
   }
 ]

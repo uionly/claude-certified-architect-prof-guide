@@ -11,7 +11,9 @@
       "The spreadsheet format confused Claude; she should retype the key figures manually into the chat instead of attaching the file",
       "Generic first responses are normal; she should regenerate the same prompt several times until a more specific analysis appears"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Generic output usually traces to a generic prompt: 'tell me what's important' gives Claude no definition of important, no audience, and no goal. Diagnosing the missing specification and adding context — the decision at stake, the metrics that matter, the desired format — is the standard fix.",
       "Tempting because underperformance can suggest capability limits, but nothing here indicates one — the task is routine analysis and the prompt is visibly underspecified. Escalating before diagnosing skips the cheapest, most likely fix and misroutes a prompting problem as a technical one.",
@@ -34,7 +36,9 @@
       "Ask Claude within the same conversation to permanently erase its memory of the other two grants before continuing",
       "Report the cross-contamination as a product defect and pause all grant work until the behavior is acknowledged and fixed"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. A long conversation packed with unrelated topics gives the model a context full of competing details, and cross-contamination is the predictable symptom. Restarting with a concise summary of only the relevant material is the standard remedy — clean context, no baggage.",
       "Tempting because emphasis feels like it should help, but formatting tricks do not remove the conflicting grant details from the conversation's context. Every response is still generated against the same contaminated history; the fix is a fresh start, not louder corrections.",
@@ -57,7 +61,9 @@
       "Ask legal to relax its standard for AI-drafted marketing copy, since the drafts are otherwise strong and the flags are slowing campaigns",
       "Stop using Claude for any copy that will face legal review and reserve it for internal documents that no reviewer sees"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. A repeated reviewer flag is feedback about the system, not just the draft. Feeding it back into the standing configuration — a rule plus concrete examples of rejected phrasing — converts six weeks of recurring rework into a one-time fix, which is what adjusting based on results means.",
       "Tempting because the process does catch every error, but catching the same error weekly while never preventing it wastes both teams' time. Treating review as the permanent fix confuses a safety net with a feedback loop — the signal is supposed to change the upstream behavior.",
@@ -80,7 +86,9 @@
       "Revert to the original prompt, since improvements she cannot explain are not trustworthy enough to keep using",
       "Accept the current output level as final, since press-release quality has improved and further analysis is unnecessary"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Adjusting based on results requires knowing which change produced which result. Varying one element at a time against consistent test cases isolates cause and effect, turning prompt improvement from guesswork into learning she can reuse on every future prompt.",
       "Tempting because the batch did help, but bigger bundles make attribution even worse — she will keep improving accidentally while learning nothing transferable, and a regression would be equally undiagnosable. Speed without attribution compounds the original problem.",
@@ -103,7 +111,10 @@
       "Ask each analyst to write longer, more detailed prompts every week, since more thorough prompting always yields better results",
       "Have every analyst independently generate the full report and then merge the four versions to be safe"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Repeated per-person setup is pure waste: a shared Project captures the task explanation and standards once, so every analyst starts from the same grounded configuration. Eliminating repeated setup is the first move in workflow optimization.",
       "Correct. Manual restructuring after every generation is rework the prompt can eliminate: specifying the exact output structure in the standing instructions makes reports arrive ready to use. Removing a recurring post-processing step is a direct efficiency gain.",
@@ -126,7 +137,9 @@
       "Add more instructions to the giant prompt covering every way past outputs have gone wrong, until the single pass becomes reliable",
       "Reduce the scope of the work by cutting the audience adaptations and taglines, since multi-part outputs are inherently unreliable"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Decomposing a multi-part task into sequential steps gives each stage a checkpoint: errors are caught where they occur instead of propagating into the adaptations and taglines. Effectiveness improves and corrections get cheaper — the core of workflow optimization.",
       "Tempting because sampling several outputs can surface a better draft, but running the flawed all-at-once structure five times quintuples effort while keeping the real problem: no intermediate checkpoints, so a strong tagline can sit atop a wrong description. Volume is not structure.",
@@ -136,5 +149,307 @@
     "principle": "decompose overloaded tasks into stages with checkpoints",
     "relatedConcept": "Optimizing for effectiveness often means restructuring the workflow — staged steps with review beats one overloaded pass.",
     "overallExplanation": "Decompose overloaded tasks into stages with checkpoints: draft, review, then adapt — so each step is verified before it feeds the next, and errors stop propagating into every downstream deliverable."
+  },
+  {
+    "id": 707,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "single",
+    "question": "Dalia, operations specialist at a car-rental company, requests weekly fleet-status updates from Claude using one dense paragraph that packs in seven formatting and content requirements. Every week the drafts satisfy about five of the seven, with different requirements dropped each time. What is the most likely diagnosis and fix?",
+    "options": [
+      "Seven requirements exceed what the model can handle, so she should escalate to a more capable model tier",
+      "Requirements buried in a dense paragraph get overlooked; she should restructure them as an explicit numbered list and check drafts against it",
+      "Two of the requirements are evidently unachievable, so she should cut them from the specification",
+      "The prompt lacks emphasis, so she should paste the same paragraph twice in the message so nothing is missed"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because dropped requirements can look like a capability ceiling, but seven formatting rules are routine — and the varying pattern of misses points at presentation, not capacity. Escalating models before restructuring the prompt skips the cheap, likely fix.",
+      "Correct. Requirements woven through a dense paragraph compete for attention and get inconsistently honored; making each one an explicit, separated list item makes the full set legible and easy to follow — and gives Dalia a checklist to verify each draft against.",
+      "Tempting because consistently failing requirements might suggest impossibility, but these fail inconsistently — different ones drop each week, which means all seven are achievable and the problem is how they are communicated. Cutting scope surrenders needs the business actually has.",
+      "Tempting because repetition feels like emphasis, but duplicating the same dense paragraph doubles the wall of text without making any individual requirement more distinct. The issue is structure and legibility, not volume."
+    ],
+    "principle": "requirements buried in prose get dropped — make them an explicit list",
+    "relatedConcept": "Inconsistent partial compliance is the signature of poorly structured requirements, not model incapacity.",
+    "overallExplanation": "Requirements buried in prose get dropped: restructuring the seven rules as a clearly separated numbered list makes each one legible and gives Dalia a checklist for verifying that every draft covers the full set."
+  },
+  {
+    "id": 708,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "single",
+    "question": "Halima, sustainability officer at a packaging manufacturer, uploaded a supplier audit report and asks Claude questions about it. She notices that when she asks about topics the report does not cover, Claude still replies with specific-sounding percentages that appear nowhere in the document. How should she resolve this?",
+    "options": [
+      "Instruct Claude to answer only from the uploaded report and to say when the information is not there, then verify any figure that matters",
+      "Accept the figures, since Claude supplements uploaded documents with its general knowledge of the industry",
+      "Re-upload the report in a different file format, since the extra numbers suggest the original was misread",
+      "Ask Claude to double-check its own numbers and keep whichever answer it produces twice in a row"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The diagnosis is answering beyond the source: asked about topics the document does not cover, the model fills the gap with plausible specifics. Constraining answers to the report, requiring it to flag gaps, and verifying figures that matter closes the failure at both ends.",
+      "Tempting because general industry knowledge sounds like a bonus, but numbers that appear nowhere in the source and arrive without provenance are classic fabrications — specific-sounding percentages are exactly the form hallucinated detail takes. Unverified 'supplemental' figures are a liability in audit work.",
+      "Tempting because file parsing problems do occur, but a misread file produces wrong answers about content that exists — not confident answers about topics the report never addresses. The symptom points to gap-filling, so reformatting the upload treats the wrong cause.",
+      "Tempting because consistency feels like confirmation, but a model can repeat the same fabricated figure as fluently as a real one — stability across regenerations measures nothing about truth. Verification means checking against the source, not polling the tool."
+    ],
+    "principle": "constrain answers to the source and require gaps to be flagged",
+    "relatedConcept": "Confident specifics about topics the document never covers are gap-filling hallucinations, resolved by grounding instructions plus verification.",
+    "overallExplanation": "Constrain answers to the source: instructing Claude to answer only from the report and flag missing information stops gap-filling fabrication, and verification of material figures catches whatever slips through."
+  },
+  {
+    "id": 709,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "single",
+    "question": "Cormac, membership manager at a botanical garden, cannot get newsletter blurbs into the shape he wants. Across many attempts he has refined his description — 'shorter, warmer, punchier ending, less brochure-like' — yet drafts keep missing the mark in the same ways. What should he try next?",
+    "options": [
+      "Add more precise adjectives to the description until the words finally pin down the style he means",
+      "Conclude the task is a poor fit for Claude and return to writing the blurbs entirely by hand",
+      "Include one or two past blurbs he considers ideal in the prompt as concrete models to match",
+      "Regenerate the same prompt repeatedly until a draft happens to land in the right shape"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because refinement has been his whole strategy, but that is the diagnosis: style adjectives like 'warm' and 'punchy' are interpreted differently than he means them, and stacking more of them compounds the ambiguity rather than resolving it.",
+      "Tempting after many misses, but the failures trace to an underspecified target, not a capability gap — matching the style of provided examples is something the tool does well. Quitting now abandons the fix he has not yet tried.",
+      "Correct. When descriptions keep failing, show instead of tell: an example of the ideal output communicates length, rhythm, warmth, and ending style far more precisely than adjectives can. Anchoring the prompt with exemplary past blurbs is the standard resolution for style-matching misses.",
+      "Tempting because output varies between runs, but the misses are systematic — the same gaps every time — so the problem is the specification, not the dice. Re-rolling an unchanged prompt is repetition, not troubleshooting."
+    ],
+    "principle": "when style descriptions keep failing, provide an example to match",
+    "relatedConcept": "Examples communicate tone and shape more precisely than adjectives — showing beats telling for style-sensitive outputs.",
+    "overallExplanation": "When descriptions keep failing, show instead of tell: including one or two ideal past blurbs gives Claude a concrete model of length, tone, and ending style that no stack of adjectives can convey."
+  },
+  {
+    "id": 710,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+    "type": "multi",
+    "question": "Renata, scheduling coordinator at a film-production company, relies on a team Project whose call-sheet summaries were accurate for months but turned unreliable this week — wrong locations, mixed-up dates. Several teammates use and edit the Project. Which two diagnostic steps should she take first? (Choose two.)",
+    "options": [
+      "Check what changed recently — new knowledge files, edited instructions, or a different input format from the schedulers",
+      "Switch the team to a different model immediately, since sudden inaccuracy means the current one has degraded",
+      "Re-run a task that previously produced a correct summary as a controlled test to see whether the failure reproduces",
+      "Retire the workflow, since a system that fails after months of reliability has proven itself untrustworthy"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. A sudden quality break in a long-stable, multi-editor configuration points strongly at a recent change: a conflicting document added to knowledge, an instruction edit, or altered inputs. Auditing what changed is the highest-yield first move in diagnosing regressions.",
+      "Tempting because a model swap is a fast lever, but changing the biggest variable before diagnosing destroys the information needed to find the real cause — and if a bad knowledge file is the culprit, the new model will fail identically. Diagnosis precedes remedies.",
+      "Correct. Re-running a previously successful task is a controlled experiment: if the old task now fails, something in the shared configuration broke; if it still works, the problem lies in this week's new inputs. Either result cuts the search space in half.",
+      "Tempting because trust has taken a hit, but abandoning a workflow that ran well for months over an undiagnosed one-week regression is disproportionate — sudden breaks after stability usually trace to a specific, fixable change, not to inherent unreliability."
+    ],
+    "principle": "diagnose regressions by auditing recent changes and re-running a known-good test",
+    "relatedConcept": "Sudden failure in a stable workflow points to something that changed — controlled tests separate configuration breaks from input problems.",
+    "overallExplanation": "Audit what changed and re-run a known-good task: a stable workflow that suddenly fails almost always broke because something changed, and the controlled test reveals whether the fault is in the configuration or this week's inputs."
+  },
+  {
+    "id": 711,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "Linnea, coordinator at a regional tourism board, sends hotel and tour operators a weekly visitor-statistics summary drafted with Claude. Several operators have now told her the summaries are too technical and too long for them to use. The numbers themselves are accurate. How should she respond to this feedback?",
+    "options": [
+      "Keep the current format, since the data is accurate and the recipients can learn to read past the technical framing",
+      "Simplify each summary by hand every week before sending, leaving the prompt itself unchanged",
+      "Attach a glossary of the technical terms so recipients can decode the summaries themselves",
+      "Revise the prompt to name the audience, require plain language, and cap the length — then ask operators whether the next few issues land better"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because accuracy feels like the job done, but a summary its readers cannot use has failed regardless of correctness — the recipients are the measure of fit. Dismissing consistent audience feedback is the opposite of adjusting based on results.",
+      "Tempting because it fixes each issue, but it institutionalizes weekly manual rework for a problem the prompt can solve once. Feedback should change the process that produces the output, not add a permanent human patch after it.",
+      "Tempting because a glossary addresses the vocabulary, but it shifts the burden onto busy operators and leaves the length complaint untouched. The feedback asked for a different summary, not for homework that makes the current one survivable.",
+      "Correct. Adjusting based on feedback means encoding it into the prompt — audience, plain language, length cap — and then closing the loop by checking with the recipients whether the change worked. Feedback in, prompt revised, result verified."
+    ],
+    "principle": "encode audience feedback into the prompt and verify the fix with the audience",
+    "relatedConcept": "Recipient complaints are calibration data — the prompt absorbs them once, and the next cycle confirms the adjustment landed.",
+    "overallExplanation": "Encode the feedback into the prompt: naming the audience, requiring plain language, and capping length fixes the process rather than each output, and checking back with operators confirms the adjustment actually worked."
+  },
+  {
+    "id": 712,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "Otto, quality lead at a localization agency, has two competing prompt versions for generating style-check summaries of translated documents. Half the team swears the newer version is better; the other half prefers the original. The debate has run for two weeks on gut feel. How should Otto settle it?",
+    "options": [
+      "Adopt the newer version, since iteration means later versions embody the lessons of earlier ones",
+      "Define explicit success criteria and evaluate both versions against them on the same sample of documents",
+      "Put it to a team vote after everyone takes a quick look at one example output from each version",
+      "Merge the two prompts into one longer prompt so the strengths of both are preserved"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because later usually should be better, but 'newer' is a timestamp, not evidence — revisions regress as often as they improve when nothing measures them. Half the team's experience already contradicts the assumption.",
+      "Correct. Gut-feel debates persist because 'better' was never defined. Setting explicit criteria — completeness of issues caught, clarity, usable format — and scoring both versions on the same document sample converts opinion into evidence and settles the question in an afternoon.",
+      "Tempting because it is democratic and fast, but one example per version is anecdote, and votes aggregate the same unanchored impressions that fueled two weeks of debate. A poll of gut feelings is still gut feeling, just tallied.",
+      "Tempting because it promises the best of both, but concatenating competing prompts typically produces contradictions and bloat, not combined strengths — and afterward nobody knows what the merged version's performance owes to which half. It adds a third contender instead of resolving two."
+    ],
+    "principle": "define what good means before judging which version is better",
+    "relatedConcept": "Comparative prompt evaluation needs stated criteria and a common test set — otherwise iteration is a matter of taste.",
+    "overallExplanation": "Define what good means first: explicit success criteria applied to both prompt versions on the same document sample turn a two-week taste debate into an evidence-based decision."
+  },
+  {
+    "id": 713,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "Sadia, community manager at a video-game studio, summarizes weekly moderation reports with Claude. Every week she spends the first twenty minutes coaching Claude through the same corrections — group incidents by severity, use the studio's category names, skip the preamble. She assumed Claude would eventually learn her preferences, but each new chat starts from scratch. What should she do?",
+    "options": [
+      "Fold the corrections that worked into her saved prompt or the Project's instructions, since chats do not carry refinements forward on their own",
+      "Keep coaching each chat patiently, since enough repetition across conversations gradually trains the model on her preferences",
+      "Run the whole month inside one continuous chat so the corrections stay in context and never need repeating",
+      "Report the failure to retain her corrections between chats as a product defect that support should investigate"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The refinements she rediscovers every week are a finished specification: written into the standing prompt or Project instructions once, they apply from the first response of every future chat. Capturing what worked is how in-chat lessons become durable process improvements.",
+      "Tempting because repetition trains humans, but her conversations do not train the model — each chat starts from the same baseline no matter how many times she has corrected the previous ones. The twenty minutes will recur forever until the corrections move into standing configuration.",
+      "Tempting because corrections genuinely do persist within a single conversation, but a month-long chat accumulates weeks of unrelated report detail, degrading quality and mixing incidents across weeks. It trades a twenty-minute problem for a context-bloat problem.",
+      "Tempting if she expected cross-chat learning, but starting fresh is how conversations are designed to work, not a malfunction — persistence across chats is exactly what saved prompts and Project instructions provide. Support cannot fix a feature request the product already answers."
+    ],
+    "principle": "capture successful in-chat corrections in standing configuration",
+    "relatedConcept": "Conversations do not train the model — refinements persist only when written into saved prompts or Project instructions.",
+    "overallExplanation": "Capture successful corrections in standing configuration: the fixes Sadia re-teaches weekly belong in her saved prompt or Project instructions, because new chats start fresh and repetition never becomes learning."
+  },
+  {
+    "id": 714,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Adjust approach based on feedback and results",
+    "type": "single",
+    "question": "Bogdan, fleet coordinator at a bicycle-courier service, rewrote his reliable daily dispatch-summary prompt hoping to squeeze out more detail. The new version is clearly worse — rambling summaries that bury the route exceptions dispatchers need. He kept a copy of the old prompt. What is the best way forward?",
+    "options": [
+      "Keep the new version and patch its problems one by one with additional corrective instructions until quality returns",
+      "Conclude that output quality is essentially random and alternate between the two versions day by day",
+      "Revert to the known-good version, note what the failed rewrite taught him, and try a smaller, single change next",
+      "Abandon prompt-based summaries, since a process that a rewrite can break this badly is too fragile to rely on"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because patching feels like progress, but stacking corrections onto a worse baseline grows a brittle prompt while the proven version sits unused. Sunk effort in the rewrite is not a reason to renovate it when reverting costs nothing.",
+      "Tempting because run-to-run variation is real, but these results are not random — the old prompt reliably worked and the new one reliably buries the exceptions. Alternating versions guarantees dispatchers get bad summaries half the time, by schedule.",
+      "Correct. A regression against a kept known-good version has a clean playbook: roll back, so dispatchers get reliable summaries today; record what the failed change revealed; and iterate again with one small adjustment so the next result is attributable. The failure is information, not a sunk cost.",
+      "Tempting because the fragility spooked him, but the process did not break — a large, untested rewrite did, and the old version still works exactly as before. Abandoning a proven workflow over a reversible experiment inverts the lesson: iterate in smaller, tested steps."
+    ],
+    "principle": "revert to known-good, treat the regression as information, iterate smaller",
+    "relatedConcept": "Keeping prior prompt versions makes failed experiments cheap — roll back first, then adjust one thing at a time.",
+    "overallExplanation": "Revert to the known-good version first: dispatchers get working summaries immediately, the failed rewrite becomes a lesson rather than a liability, and the next improvement attempt should be a single, testable change."
+  },
+  {
+    "id": 715,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "single",
+    "question": "Imani, merchandising coordinator at a garden-supply retailer, writes about forty product blurbs each season. Her current method: open a fresh chat per product, re-explain the format and tone rules, paste the product details, and repeat — roughly two days of work each season. How should she optimize this?",
+    "options": [
+      "Keep the per-product chats but reuse yesterday's conversation by scrolling up and editing her earlier messages",
+      "Set up the standing format and tone rules once — in a Project or saved prompt — and process the products in structured batches of several per request",
+      "Generate all forty blurbs from just the product names and correct the details by hand afterward",
+      "Split the products with a colleague who uses the same one-chat-per-product method, halving her share of the work"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because it recycles some setup, but scroll-and-edit archaeology in old chats is slower and more error-prone than the problem it solves, and yesterday's conversation drags along yesterday's products as context. It optimizes the wrong part of the routine.",
+      "Correct. The waste is re-explaining rules forty times and paying per-item overhead forty times. Capturing the standing rules once and batching several products per structured request eliminates both — the same two-day job becomes hours without any loss of per-product specification.",
+      "Tempting because it minimizes input effort, but blurbs generated from names alone will invent sizes, materials, and uses, turning drafting time into forty rounds of fact-correction. Feeding accurate details in remains cheaper than repairing fabrications afterward.",
+      "Tempting because halving her share sounds like relief, but it duplicates an inefficient method across two people — total effort stays the same and inconsistency between two writers' setups creeps in. Optimization means fixing the method, not staffing the waste."
+    ],
+    "principle": "capture the rules once and batch repetitive items",
+    "relatedConcept": "High-volume repetitive tasks optimize through standing configuration plus structured batching, not per-item chats.",
+    "overallExplanation": "Capture the rules once and batch the work: a Project or saved prompt holds the format and tone standing, and processing products several per structured request removes the per-item setup that consumed two days."
+  },
+  {
+    "id": 716,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "single",
+    "question": "Tobias, publications coordinator at a scientific society, wants to speed up the conference-abstract workflow. Claude drafts each batch of session summaries in about ten minutes, but every batch then waits roughly three days in a review queue handled by a single approver. Tobias plans to spend next week further refining his drafting prompts. What should he do instead?",
+    "options": [
+      "Map where the end-to-end time actually goes and target the review bottleneck — for example, adding reviewers or triaging what needs full review",
+      "Proceed with the prompt refinement as planned, since the AI step is the part of the workflow that optimization applies to",
+      "Remove the review step entirely, since a three-day delay proves the check costs more than it is worth",
+      "Have Claude regenerate each queued batch daily so the approver always reviews the freshest possible drafts"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Optimization starts with measuring where the time goes: drafting is ten minutes, the queue is three days, so the bottleneck owns essentially all the cycle time. Adding review capacity or triaging low-risk summaries attacks the constraint; everything else is rounding error.",
+      "Tempting because prompt work feels like the natural lever in an AI workflow, but shaving minutes off a ten-minute step cannot touch a three-day queue. Optimizing the step you enjoy instead of the step that dominates is the classic bottleneck mistake.",
+      "Tempting because deleting the delay deletes the wait, but the review exists to catch errors before publication — removing the only quality gate trades a scheduling problem for an accuracy risk. The fix is capacity and triage, not abolition.",
+      "Tempting because fresher drafts sound like a service to the reviewer, but daily regeneration changes documents mid-queue, forcing re-reads and making the reviewer slower — it adds churn to the exact step that is already the constraint."
+    ],
+    "principle": "optimize the bottleneck the measurements point to, not the step you like",
+    "relatedConcept": "Workflow efficiency is governed by the constraint — end-to-end timing reveals whether the AI step even matters.",
+    "overallExplanation": "Optimize the bottleneck: end-to-end timing shows the three-day review queue, not the ten-minute drafting step, owns the cycle time, so capacity and triage at review deliver what further prompt polish cannot."
+  },
+  {
+    "id": 717,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "single",
+    "question": "Maren, knowledge-base editor at an engineering-services firm, must condense six hundred legacy articles into short summaries whose technical facts must be right. She has two staff members and Claude, and needs to decide how to divide the work between them for the best combination of speed and reliability. What is the best allocation?",
+    "options": [
+      "Have her staff write all six hundred summaries manually, since only human work can guarantee technical accuracy",
+      "Have Claude produce and approve all the summaries itself, reserving staff for unrelated project work",
+      "Alternate articles between Claude and the staff so the humans and the tool carry equal shares of the load",
+      "Have Claude draft every summary and flag its uncertain points, with staff verifying technical facts and approving each one"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because manual work feels safest, but two people hand-writing six hundred summaries is months of grind on exactly the mechanical condensing Claude does well — and fatigue erodes the accuracy the manual approach was meant to protect. It buys little reliability at enormous cost.",
+      "Tempting because full automation maximizes throughput, but self-approved summaries mean technical errors ship unchecked into a knowledge base engineers will rely on. The requirement that facts be right is precisely the part that cannot be delegated to the tool.",
+      "Tempting because equal shares sound fair, but alternation assigns work by arithmetic instead of by strength: three hundred summaries get slow human drafting they did not need, and the other three hundred get no human verification at all — the worst half of each approach.",
+      "Correct. This allocation matches each contributor to what they are best at: Claude does the high-volume condensing and flags its own uncertainty, and human judgment concentrates where the requirement lives — verifying technical facts and approving. Speed from the tool, reliability from the people."
+    ],
+    "principle": "allocate drafting to the tool and judgment to the humans",
+    "relatedConcept": "Effective human-AI workflow design assigns volume work to Claude and concentrates human effort at the verification step.",
+    "overallExplanation": "Allocate by strength: Claude drafts all six hundred summaries and flags uncertainties, while staff verify technical facts and approve — the combination that delivers the tool's speed with human-guaranteed accuracy."
+  },
+  {
+    "id": 718,
+    "domain": "Troubleshooting and Optimization",
+    "objective": "Optimize workflows for efficiency and effectiveness",
+    "type": "multi",
+    "question": "Katya, compliance assistant at a shipping company, produces a monthly regulatory-update digest with Claude's help. The process is slow for two reasons: she rebuilds her long prompt from memory every month, and she gives every section the same exhaustive triple-check, whether it covers minor port notices or sanctions changes. Which two changes would most improve the workflow? (Choose two.)",
+    "options": [
+      "Save a reusable prompt template for the digest so the monthly setup no longer starts from scratch",
+      "Add second and third full review passes to every section, ensuring maximum safety across the digest",
+      "Keep a standard check on all sections but concentrate the deepest review on the highest-stakes ones, such as sanctions changes",
+      "Skip review altogether in months when few regulatory changes occur, reclaiming that time entirely"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Rebuilding the prompt from memory every month is pure recurring waste that also breeds inconsistency between issues. A saved template captures the specification once, so each month starts at the real work instead of at reconstruction.",
+      "Tempting because more passes sound safer, but the digest already suffers from undifferentiated triple-checking — adding more of it to every section deepens the exact inefficiency Katya needs to remove, spending scarce review time where the stakes do not justify it.",
+      "Correct. Review effort is a finite resource best spent where errors cost most: every section keeps a standard check, while sanctions changes and other high-stakes items get the deep scrutiny. Proportionate, risk-based review raises effectiveness and speed at the same time.",
+      "Tempting because quiet months feel low-risk, but a light month's digest can still contain the one change that matters, and 'few changes' is only known reliably after review. Skipping the quality gate entirely is not optimization — it is deleting the control."
+    ],
+    "principle": "templatize the recurring setup and scale review depth to the stakes",
+    "relatedConcept": "Recurring workflows optimize through saved templates and risk-proportionate review, never through abandoning the check.",
+    "overallExplanation": "Templatize the setup and right-size the review: a saved prompt ends the monthly rebuild, and concentrating deep scrutiny on high-stakes sections — while everything keeps a standard check — spends review effort where errors actually cost."
   }
 ]

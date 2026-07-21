@@ -3,7 +3,8 @@
     "name": "Claude Certified Architect – Foundations",
     "code": "CCAR-F",
     "totalQuestions": 60,
-    "examMinutesPerQuestion": 2.0
+    "examMinutesPerQuestion": 2.0,
+    "practiceSets": 3
   },
   "domains": [
     {

@@ -11,7 +11,9 @@
       "Terminate whenever the assistant message contains any text content, since text output indicates Claude has finished acting",
       "Instruct Claude to emit a special completion token in its final message and exit the loop when that token appears in the text"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The stop_reason field is the model's explicit, structured signal about loop state: \"tool_use\" means Claude has requested a tool and expects results back for another iteration, while \"end_turn\" means it has finished. Driving control flow from stop_reason makes termination deterministic instead of dependent on phrasing.",
       "Tempting because it guarantees termination, but an arbitrary iteration cap as the primary stopping mechanism is a named anti-pattern: it cuts off legitimate multi-tool tasks that need more turns and lets trivial tasks run pointless extra checks. A cap can exist as a safety backstop, but never as the main exit condition.",
@@ -34,7 +36,9 @@
       "tool_choice is left at \"auto\", which permits the model to re-request tools; setting it to \"any\" would prevent duplicate calls",
       "The loop is missing a PostToolUse hook to normalize the order data into a format the model can recognize on later turns"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. In a working agentic loop, each tool result is appended to the conversation history and sent back with the next request so the model can reason about the new information. Rebuilding the request from scratch each iteration erases everything the tools returned, so the model is genuinely acting on a context in which the lookup never happened.",
       "Tempting because weak descriptions do cause tool-selection problems, but description quality affects which tool gets chosen, not whether prior results are visible. Even a perfectly described tool will be re-called if its results were dropped from the context the model receives.",
@@ -57,7 +61,10 @@
       "Relying on a hard cap of ten iterations as the primary stopping mechanism, terminating regardless of what stop_reason indicates",
       "Appending each executed tool's result to the conversation history before sending the next request in the loop"
     ],
-    "correct": [0, 2],
+    "correct": [
+      0,
+      2
+    ],
     "optionExplanations": [
       "Correct — this is an anti-pattern. Natural-language completion signals are probabilistic: the model may phrase completion differently, mention the signal word mid-task, or emit text alongside a tool request. The structured stop_reason field exists precisely so control flow never depends on parsing prose.",
       "This is correct loop behavior, not an anti-pattern. stop_reason \"tool_use\" is the model's explicit request for tool execution, and returning results for the next iteration is exactly how the agentic loop lifecycle is supposed to work.",
@@ -80,7 +87,9 @@
       "Subagents that communicate directly automatically inherit each other's full conversation histories, contaminating each other's context",
       "Peer-to-peer handoffs remove the coordinator's ability to enforce the iteration cap that serves as the primary loop-termination mechanism"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. In the hub-and-spoke pattern the coordinator is the single point where delegation, error handling, and information routing happen. When subagents talk peer-to-peer, failures surface in places no one is watching, error handling fragments across agents, and the coordinator loses the ability to decide what each subagent should see.",
       "Tempting because summarization at the hub is a real benefit, but the claim is too strong: nothing about a direct handoff inherently exceeds a context window, and the coordinator is not the only place content can be condensed. The core issue is loss of control and observability, not context size.",
@@ -103,7 +112,9 @@
       "Cache complete pipeline outputs by query text so repeated questions skip the pipeline entirely on subsequent requests",
       "Switch every subagent to a smaller, faster model so that running the full pipeline on simple queries becomes cheap enough to tolerate"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The coordinator's role includes deciding which subagents a given query actually needs based on its complexity. Model-driven dynamic selection lets a simple factual query invoke only the search subagent while a broad research request still gets the full pipeline — matching cost and latency to the work required.",
       "Tempting because it is deterministic, but a keyword classifier is a pre-configured decision tree: it replaces the model's contextual reasoning with brittle pattern rules that misroute anything the keywords did not anticipate. The strength of an LLM coordinator is precisely that it can reason about query requirements.",
@@ -126,7 +137,9 @@
       "Add a paragraph to the synthesis subagent's system prompt telling it to list any coverage gaps it notices at the end of its output",
       "Run two synthesis subagents in parallel on the same findings and have the report generator merge their outputs to cover more ground"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is the iterative refinement loop: the coordinator treats synthesis output as a draft to evaluate, identifies missing subtopics, sends targeted follow-up queries back to search and analysis, and re-invokes synthesis. Coverage becomes a checked property of the pipeline rather than a hope about the first pass.",
       "Tempting because finer decomposition sounds more thorough, but overly narrow task decomposition is a named risk: fragmenting a broad topic into slivers up front tends to produce incomplete coverage of the connective themes between them, and no up-front plan can anticipate what the research itself will reveal is missing.",
@@ -149,7 +162,9 @@
       "The coordinator must call fork_session before delegating so the synthesis subagent starts from a branch of the coordinator's session that contains the findings",
       "The subagent's AgentDefinition lacks a memory flag, which is what enables subagents to share state with the coordinator between invocations"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Subagents do not automatically inherit parent context or share memory between invocations, so \"the findings gathered so far\" refers to nothing from the subagent's point of view. The fix is to pass the complete search results and analysis outputs — ideally as structured data separating content from source metadata — directly in the delegation prompt.",
       "Tempting because allowedTools misconfiguration is a real failure mode, but \"Task\" in allowedTools is what lets a coordinator spawn subagents; it is not a channel for a subagent to pull data from its parent. No tool grant changes the fact that context must be pushed into the subagent's prompt explicitly.",
@@ -172,7 +187,9 @@
       "Give each search subagent a strict output-token budget so each sequential invocation completes in roughly a third of the time",
       "Move the searches into PostToolUse hooks on the coordinator so they execute deterministically outside the model's turn structure"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Parallel subagent spawning is achieved by emitting multiple Task tool calls in one coordinator response rather than spreading them across turns. Since the subtopics are independent and already partitioned to avoid duplication, the three searches can run concurrently and total time drops to roughly the longest single search.",
       "Tempting as a simplification, but it undoes the deliberate partitioning that minimizes duplication and gives each agent a focused scope. One agent working a triple-width query sequentially does the same total work in the same serial time, with worse focus per subtopic.",
@@ -195,7 +212,9 @@
       "Add few-shot examples to the system prompt demonstrating the agent calling get_customer first even when the customer volunteers order details",
       "Route every proposed refund through a second Claude instance that reviews the transcript and approves the call only if verification occurred"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When deterministic compliance is required — identity verification before financial operations is the canonical case — prompt instructions alone have a non-zero failure rate. A programmatic prerequisite gate makes the required ordering impossible to skip: the downstream tool physically cannot execute until the prerequisite step has completed.",
       "Tempting because prompt placement does influence adherence, but repositioning and repetition only reduce the failure rate; they cannot eliminate it. A 5% violation rate on financial operations is a deterministic-compliance requirement, and probabilistic mitigations are categorically the wrong tool for it.",
@@ -218,7 +237,10 @@
       "Resolve only the damaged-item issue and ask the customer to open separate tickets for the other two concerns to keep the session focused",
       "Escalate the raw conversation as-is, since a specialist reconstructs details faster from the full history than from a second-hand summary"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Multi-concern requests should be decomposed into distinct items, each investigated in parallel with shared context, then synthesized into one unified resolution. The customer asked three things in one message and deserves one coherent answer, not a serial drip of partial replies.",
       "Correct. Structured handoff protocols exist precisely for mid-process escalation to humans who lack transcript access: the summary must carry customer details, root cause analysis, amounts, and recommended actions so the specialist can act immediately without re-investigating from scratch.",
@@ -241,7 +263,9 @@
       "Ask each backend team to change its API to return ISO 8601 dates and human-readable statuses so the tools are consistent at the source",
       "Add few-shot examples to the prompt demonstrating correct date comparisons across Unix timestamps and ISO 8601 strings"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. PostToolUse hooks intercept tool results for transformation before the model ever sees them — the canonical use case being normalization of heterogeneous formats from different MCP tools. The model then reasons over uniform data every time, making the date comparisons deterministic rather than dependent on in-context conversion.",
       "Tempting because it documents the real problem, but it relies on the model performing format conversion correctly on every single turn — probabilistic compliance for what should be a mechanical transformation. Intermittent failures are exactly what prompt-based normalization produces.",
@@ -264,7 +288,9 @@
       "A PostToolUse hook that inspects each completed process_refund result and files a compliance alert whenever the amount exceeded $500",
       "Removing the process_refund tool from the agent entirely so that every refund, regardless of amount, is routed to a human for processing"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Tool call interception hooks enforce compliance rules deterministically: the outgoing call is inspected before execution, blocked when it violates the threshold, and redirected to the alternative escalation workflow. The violating refund becomes impossible rather than merely discouraged, which is what a compliance requirement demands.",
       "Tempting because reinforcement and examples do reduce violations, but prompt-based enforcement is probabilistic by nature and the audit has already demonstrated its non-zero failure rate. When business rules require guaranteed compliance, hooks are the correct mechanism, not stronger wording.",
@@ -287,7 +313,9 @@
       "Replace the fixed review with an agent that dynamically decides which files look risky and reviews only those, skipping files it judges low-risk",
       "Split the pull request alphabetically into two halves and run the same full review prompt independently on each half to shorten the input"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. A multi-file code review has predictable, known-in-advance aspects, which makes it a prompt-chaining problem: per-file local analysis passes keep each file's issues in sharp focus and avoid attention dilution, while a dedicated cross-file integration pass examines data flow with all files' findings in view — eliminating the contradictions.",
       "Tempting because it names both symptoms, but instructions cannot repair attention dilution — the input is simply too large for uniform depth, and telling the model to try harder does not restructure the work. The fix is decomposition of the task, not exhortation within it.",
@@ -310,7 +338,9 @@
       "Begin generating tests immediately for the first source file and proceed file by file in directory order so progress is visible from the first hour",
       "Ask the engineer to supply a complete module-by-module test specification first, since decomposition should be settled before an agent starts work"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is an open-ended investigation task where the right subtasks cannot be known until the code is explored, so it calls for dynamic adaptive decomposition: map structure first, identify high-impact areas, create a prioritized plan, and revise it as each step reveals dependencies the plan could not have anticipated.",
       "Tempting because fixed pipelines are predictable and testable, but prompt chaining fits workflows whose steps are knowable at design time. In an unmapped legacy codebase the module list, priorities, and hidden dependencies are exactly what is unknown, so any fixed up-front sequence is built on guesses.",
@@ -333,7 +363,9 @@
       "Start a completely fresh session and re-explore the service from scratch, because any code change invalidates the prior session's analysis",
       "Use fork_session to branch yesterday's session into two parallel copies and investigate one refactored module in each branch"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When prior context is mostly valid, named session resumption via --resume preserves the accumulated investigation, and informing the agent about the specific changed files triggers targeted re-analysis of exactly the stale parts. This avoids both full re-exploration and silently reasoning from outdated tool results.",
       "Tempting because resumption does restore the conversation, but that is precisely the danger: the restored context contains yesterday's tool results for the two refactored modules, which are now wrong. Without being told about the changes, the agent will confidently reason from stale file contents.",
@@ -356,7 +388,10 @@
       "Evaluate both refactoring strategies inside one resumed session, alternating between them turn by turn to keep a single source of truth",
       "Resume the original session for the feature work as well, since accumulated conversation history always outweighs the staleness of old tool results"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. fork_session exists for exactly this: creating independent branches from a shared analysis baseline so divergent approaches can be explored in parallel. Each branch inherits the expensive shared analysis once, and neither strategy's exploration leaks conclusions into the other.",
       "Correct. When prior tool results are stale, resuming injects outdated file contents into the agent's reasoning; starting a new session with a structured summary of the still-valid key findings is the more reliable pattern — fresh ground truth from the current code, curated knowledge carried forward.",
@@ -366,5 +401,812 @@
     "principle": "fork for divergent branches; restart with summaries when stale",
     "relatedConcept": "Session management offers two distinct moves — fork_session for parallel exploration from a shared baseline, and fresh sessions with structured summaries when prior tool results have gone stale.",
     "overallExplanation": "Use fork_session for independent parallel branches from a shared analysis baseline, and start fresh with a structured summary when prior tool results are stale. Choosing between resumption, forking, and restarting is driven by how much of the saved context is still valid."
+  },
+  {
+    "id": 117,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "single",
+    "question": "Your customer support resolution agent handles high-ambiguity requests — returns, billing disputes, account issues — with MCP tools get_customer, lookup_order, process_refund, and escalate_to_human. An engineer proposes replacing the model's tool selection with a hardcoded state machine that always runs get_customer, then lookup_order, then process_refund for any return-related request, arguing this makes behavior fully predictable. What is the strongest architectural argument against this proposal?",
+    "options": [
+      "A hardcoded state machine will exceed the context window because every state transition table must be embedded in the system prompt on each turn",
+      "High-ambiguity requests require model-driven decision-making, where Claude reasons about which tool to call next based on context; a pre-configured sequence fails on every request shape the tree's designer did not anticipate",
+      "Pre-configured tool sequences prevent the API from ever returning stop_reason \"end_turn\", so conversations built on them can never terminate cleanly",
+      "Fixed tool ordering is only problematic when financial operations are involved, and since returns are logistics operations the state machine would actually work reliably here"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "This invents a constraint that does not exist: a state machine lives in application code, not in the prompt, so it consumes no meaningful context. The real cost of the proposal is architectural rigidity, not token usage.",
+      "Correct. The core distinction in agentic loop design is between model-driven decision-making — Claude choosing the next tool based on what the conversation and prior tool results reveal — and pre-configured decision trees. Returns and billing disputes arrive in shapes no fixed sequence anticipates (missing order numbers, multiple orders, disputes that turn out to be fraud), and a state machine handles exactly the cases its designer foresaw and nothing else.",
+      "This is a fabricated mechanism: stop_reason is set by the model based on whether it is requesting tools or finishing its turn, and nothing about application-side sequencing prevents \"end_turn\" from occurring. The objection to decision trees is lost flexibility, not broken termination.",
+      "This gets the tradeoff backwards twice: return flows do involve process_refund, a financial operation, and even where finances are not involved, fixed ordering still fails on unanticipated request variation. Deterministic enforcement belongs at specific critical prerequisites, not as a whole-conversation script."
+    ],
+    "principle": "model-driven tool selection, not pre-configured decision trees",
+    "relatedConcept": "Agentic loops derive their power from Claude reasoning about the next action in context — decision trees handle only the cases their designers anticipated.",
+    "overallExplanation": "High-ambiguity workloads need model-driven decision-making, where Claude reasons about which tool to call next based on context. Pre-configured decision trees and fixed tool sequences are the named alternative that fails on unanticipated request variation; reserve determinism for specific critical prerequisites."
+  },
+  {
+    "id": 118,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "single",
+    "question": "An engineer new to the Claude Agent SDK sends a request, receives stop_reason \"tool_use\" with a lookup_order tool call in the response, and then re-sends the identical conversation unchanged, expecting Claude to execute the tool on the second pass. The loop spins, receiving the same tool request every time. What misunderstanding of the agentic loop lifecycle does this reveal?",
+    "options": [
+      "tool_choice was left at \"auto\"; setting it to \"any\" would make the model execute the requested tool instead of merely asking for it",
+      "The loop lacks a PostToolUse hook, which is the Agent SDK component responsible for actually running requested tools",
+      "In the agentic loop, the application is responsible for executing requested tools and returning their results in the next request — Claude only emits the tool call; it never runs the tool itself",
+      "The request is missing a server-side execution flag that tells the API to run the tool and inline its output before responding"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "tool_choice controls whether and which tool the model must request — \"auto\" permits text, \"any\" forces some tool call. No tool_choice value causes execution: the model always stops at emitting the tool_use block, and the caller must run it.",
+      "PostToolUse hooks intercept tool results after execution to transform them before the model processes them. They presuppose that something already executed the tool; they are not an execution engine and cannot substitute for the application's role in the loop.",
+      "Correct. The agentic loop lifecycle is: send the request, inspect stop_reason, execute the requested tools in your application, and return the results for the next iteration. Claude's \"tool_use\" response is a request for the caller to act — re-sending the unchanged conversation gives the model no new information, so it can only repeat the same request forever.",
+      "This invents an API capability that does not exist for this loop: there is no flag that makes the Messages API execute your MCP or custom tools server-side and splice in results. The execute-and-return step belongs to the application layer by design."
+    ],
+    "principle": "the application executes tools; Claude only requests them",
+    "relatedConcept": "The loop lifecycle — send request, inspect stop_reason, execute requested tools, return results — assigns tool execution unambiguously to the application.",
+    "overallExplanation": "In the agentic loop lifecycle the application executes requested tools and returns results for the next iteration; Claude only emits tool_use requests. Re-sending an unchanged conversation gives the model nothing new, so it repeats the same tool request indefinitely."
+  },
+  {
+    "id": 119,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "single",
+    "question": "A post-incident review found that your document-analysis agent looped for more than forty iterations one night: a misconfigured MCP tool kept returning errors, and the model kept retrying variations. The team must now decide how termination should be designed across all of your Agent SDK loops. Which design correctly balances autonomy against runaway protection?",
+    "options": [
+      "Keep stop_reason as the primary control — continue on \"tool_use\", terminate on \"end_turn\" — and add a generous iteration ceiling purely as a runaway safety backstop that alerts the team when it trips",
+      "Make a low fixed cap of five iterations the primary stopping mechanism for every loop, so runaway behavior becomes structurally impossible regardless of what stop_reason reports",
+      "Have the model append a numeric progress score to each response and terminate the loop whenever the score fails to increase for two consecutive turns",
+      "Compare consecutive assistant messages for textual similarity and exit the loop when responses begin to look repetitive, since repetition is the signature of a stuck agent"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. stop_reason remains the legitimate exit condition — \"end_turn\" is the model's structured completion signal — while a generous ceiling exists only to contain genuine runaways like this incident. Because the backstop alerts when hit, every trip becomes a diagnosable defect (here, the broken tool) rather than a silent truncation of legitimate work.",
+      "Tempting after an incident, but an arbitrary iteration cap as the primary stopping mechanism is a named anti-pattern: five iterations truncates every legitimate multi-tool task, converting a one-night incident into a permanent capability ceiling. Caps belong at the safety margin, not at the center of control flow.",
+      "Self-reported progress scores are natural-language signals wearing a numeric costume: the model may score inconsistently, optimistically, or forget the convention entirely. Loop control built on parsing model output for termination cues is precisely what structured stop_reason exists to replace.",
+      "Textual-similarity heuristics are another form of parsing prose for control flow: legitimate work can look repetitive (checking many similar files), and a stuck agent can phrase each retry differently. The incident's root cause was a broken tool, which structured error handling and an alerting backstop surface directly."
+    ],
+    "principle": "stop_reason is the exit; caps are alarmed backstops only",
+    "relatedConcept": "Termination design keeps \"end_turn\" as the real completion signal while a generous, alerting iteration ceiling contains runaways without capping legitimate work.",
+    "overallExplanation": "Drive termination from stop_reason and treat iteration ceilings as generous, alerting safety backstops — never as the primary stopping mechanism. Low caps truncate legitimate multi-tool tasks, and prose-derived signals like progress scores or similarity checks reintroduce the text-parsing anti-pattern."
+  },
+  {
+    "id": 120,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "multi",
+    "question": "Your structured data extraction agent frequently produces responses that contain explanatory text such as \"I'll check the invoice header next\" alongside a tool_use block, with stop_reason \"tool_use\". A code review of the loop is examining how these mixed responses should be handled. Which two behaviors are correct? (Choose two.)",
+    "options": [
+      "Treat the text content as the final user-facing answer and terminate the loop, since the model has produced a natural-language message",
+      "Execute the requested tool and return its result in the next request, exactly as for a response containing only the tool_use block",
+      "Send the text back to the model and ask whether it considers the task complete before executing any of the requested tools",
+      "Treat the text as commentary accompanying the tool request, never as a completion indicator — stop_reason alone governs whether the loop continues"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "This is the named anti-pattern of checking for assistant text content as a completion indicator. Claude routinely narrates its intentions alongside tool requests, so terminating on text presence exits mid-task — exactly the class of bug that strands extractions half-finished.",
+      "Correct. stop_reason \"tool_use\" means the model has requested a tool and expects its result back for the next iteration, regardless of any accompanying narration. The loop's obligation — execute the tool, append the result, continue — is identical whether or not text came along.",
+      "This inserts a wasted model round-trip that itself relies on parsing a natural-language answer about completion, compounding the anti-pattern with latency and cost. The structured signal already present in the response makes the question unnecessary.",
+      "Correct. Explanatory text alongside a tool_use block is commentary, not a state signal. The distinction between structured control flow (stop_reason) and incidental prose is the foundation of reliable loop design — text may be logged or shown to users, but it must never drive termination."
+    ],
+    "principle": "text alongside tool_use is commentary, not a signal",
+    "relatedConcept": "Mixed text-plus-tool_use responses are normal; only stop_reason carries loop-control meaning, and the tool must still be executed and its result returned.",
+    "overallExplanation": "When stop_reason is \"tool_use\", execute the requested tool and return its result — any accompanying text is narration, never a completion indicator. Treating assistant prose as a state signal is a named anti-pattern that terminates loops mid-task."
+  },
+  {
+    "id": 121,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "single",
+    "question": "Your developer productivity agent often requests several tools in a single assistant turn — for example three Grep searches over different directories as parallel tool_use blocks. The loop implementation executes only the first requested tool and returns just that one result; the model then re-requests the remaining searches on subsequent turns, roughly tripling turn count and latency. What is the correct loop behavior?",
+    "options": [
+      "Configure forced tool selection so the model can only ever emit one tool call per turn, eliminating the multi-tool case the loop cannot handle",
+      "Return the first tool's result along with a text note telling the model that the other requested searches are queued and still pending",
+      "Split each multi-tool turn into separate conversations, one per requested tool, and merge the assistant's conclusions afterwards",
+      "Execute every tool requested in the turn and return a result for each tool call in the next request, so the model reasons over all outcomes in a single iteration"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Forced tool selection ({\"type\": \"tool\", \"name\": ...}) exists to guarantee a specific tool is called, not to work around an incomplete loop. Constraining the model to one call per turn preserves the serialization problem — three searches still take three round-trips — and removes legitimate parallelism the model was using well.",
+      "A prose note about pending work is unstructured state the model must track across turns, and the missing tool calls still lack results in the conversation history. The model will re-request them anyway, or worse, reason as though the pending searches already ran.",
+      "Splitting into per-tool conversations destroys the shared context that motivated the parallel requests: each fork loses the original task framing and the other searches' results, and the merge step has no principled way to reconcile three independently reasoned conclusions.",
+      "Correct. When a turn contains multiple tool_use blocks, the loop should execute all requested tools and return a result for every one of them in the next request. That is what lets the model requested parallel work for: it incorporates all outcomes at once and decides the next action with complete information, collapsing three round-trips into one."
+    ],
+    "principle": "return a result for every tool call requested in the turn",
+    "relatedConcept": "Executing requested tools means all of them — partial results leave dangling tool calls that force the model to re-request work and serialize what it parallelized.",
+    "overallExplanation": "When a single turn requests multiple tools, execute them all and return a result for each in the next request. Partial execution leaves dangling requests the model must re-issue, serializing intentionally parallel work and tripling latency."
+  },
+  {
+    "id": 122,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design and implement agentic loops for autonomous task execution",
+    "type": "single",
+    "question": "To keep requests small, an engineer's agentic loop starts a brand-new conversation on every iteration: it sends only the system prompt, the latest tool result pasted in as user text (\"The tool returned: ...\"), and the instruction \"continue the task\". The agent repeatedly loses track of the original request, contradicts earlier findings, and asks for information tools already returned. What is the correct implementation?",
+    "options": [
+      "Add a task-recap paragraph that the loop regenerates and prepends each iteration, so the model can reconstruct where it is in the work",
+      "Maintain one growing conversation history and append each tool result to it, so every iteration carries the original request, all prior tool calls, and all prior results",
+      "Store each tool result in a vector database and give the agent a recall tool it can query whenever it needs an earlier finding",
+      "Increase max_tokens substantially so the model can restate everything it currently knows inside each response before acting"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "A regenerated recap is a lossy, hand-maintained reconstruction of what the conversation history already represents natively. Whatever the recap-writer omits is gone, and the recap logic itself becomes a second state machine that must perfectly mirror the model's reasoning to work.",
+      "Correct. The agentic loop works because tool results are appended to the conversation history between iterations, letting the model incorporate each new piece of information into its ongoing reasoning. One growing conversation gives every turn the original request, what has been tried, and what came back — restarting the conversation each iteration amputates exactly that.",
+      "A vector store bolts probabilistic retrieval onto a problem the conversation history solves deterministically: within a single task run, the model should not have to guess which earlier findings to recall. Retrieval infrastructure has its place across sessions, not as a substitute for in-loop context.",
+      "max_tokens caps response length; it does nothing about what the model receives as input. The failure here is missing input context — no output budget lets the model restate findings it was never shown."
+    ],
+    "principle": "one growing history; append results, never restart the conversation",
+    "relatedConcept": "Tool results appended to a continuous conversation are what let the model reason about progress — per-iteration fresh conversations amputate the task's memory.",
+    "overallExplanation": "Maintain a single growing conversation and append each tool result to it so every iteration sees the original request and all prior findings. Restarting the conversation per iteration destroys the accumulated context the agentic loop depends on."
+  },
+  {
+    "id": 123,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "single",
+    "question": "Your multi-agent research system spawns three parallel web-search subagents for each broad topic, and each subagent receives the identical prompt \"research <topic> thoroughly\". Cost analysis shows roughly seventy percent of retrieved sources are duplicated across the three agents, so the parallelism triples spend without tripling coverage. What should the coordinator do differently?",
+    "options": [
+      "Collapse the three search subagents into a single agent, since parallel search has been shown to waste money on this workload",
+      "Keep the identical prompts but add a deduplication step in the synthesis stage that discards repeated sources after they arrive",
+      "Partition the research scope before delegating — assign each subagent a distinct subtopic or source type — so the parallel searches cover complementary ground with minimal duplication",
+      "Reduce each subagent's maximum result count by two-thirds so that the duplicated retrieval at least costs no more than one agent would"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "This treats a delegation defect as a parallelism defect. Parallel search is exactly right for broad topics — it cuts latency and widens coverage — but only when each agent works a distinct slice. Collapsing to one agent serializes the work and caps coverage at what a single context can hold.",
+      "Post-hoc deduplication runs after the tokens are spent: three agents still crawl the same sources and the bill is already tripled by the time synthesis discards the copies. It also does nothing to add the coverage the duplicated effort displaced.",
+      "Correct. Partitioning research scope across subagents to minimize duplication is a core coordinator skill: give one agent academic sources, another news and industry reports, or split the topic into distinct subtopics. Identical prompts guarantee convergent searching; complementary assignments make parallelism buy coverage instead of copies.",
+      "Shrinking result budgets reduces the cost of duplication without reducing duplication: the three agents still converge on the same top-ranked sources, so you now pay for one agent's coverage delivered redundantly, with the long tail of unique sources cut off entirely."
+    ],
+    "principle": "partition scope across subagents; identical prompts buy duplication",
+    "relatedConcept": "Coordinators minimize duplication by assigning each search subagent a distinct subtopic or source type before spawning them in parallel.",
+    "overallExplanation": "Partition research scope across parallel subagents — distinct subtopics or source types per agent — so parallelism purchases coverage rather than duplication. Identical broad prompts make agents converge on the same sources at triple cost."
+  },
+  {
+    "id": 124,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "single",
+    "question": "Aiming for thoroughness, your research coordinator decomposes every broad topic into fifteen or more hyper-narrow subtasks before delegating — one subagent per tiny sliver. Reports come back covering each sliver in isolation yet reviewers consistently find whole thematic areas and cross-cutting connections missing from the final output. What is the underlying design problem?",
+    "options": [
+      "Overly narrow task decomposition by the coordinator is a documented risk that produces incomplete coverage of broad topics — partition into fewer, meaningfully scoped subtopics and let iterative refinement fill gaps discovered after synthesis",
+      "Fifteen subagents is simply too few for genuine thoroughness; the coordinator should decompose further until every conceivable aspect of the topic has a dedicated agent",
+      "The slivers would integrate correctly if the subagents shared memory; enabling context inheritance between subagent invocations would restore the missing connections",
+      "Decomposition should move out of the coordinator entirely — let each search subagent choose its own scope, since agents closest to the sources judge coverage best"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Overly narrow decomposition is a named coordinator risk: slicing a broad topic into slivers loses the connective themes that live between the slices, and no up-front plan can enumerate everything a broad topic contains. Meaningful subtopic scope plus a refinement loop — evaluate synthesis for gaps, re-delegate targeted queries — turns coverage into a checked property.",
+      "This doubles down on the failure mode: more slivers mean more isolated fragments and even less chance any agent sees the relationships spanning them. The missing material is not un-assigned slivers; it is the connective tissue that fragmentation itself destroys.",
+      "Subagents do not share memory or inherit context between invocations, and no configuration changes that — isolation is fundamental to how subagents work. More importantly, shared memory would not fix a decomposition that never asked anyone to investigate the cross-cutting themes.",
+      "Pushing scope selection into the subagents abandons the coordinator's core responsibility of task decomposition and delegation. Agents choosing their own scope produce uncontrolled overlap and uncovered gaps, with no single vantage point responsible for whole-topic coverage."
+    ],
+    "principle": "meaningful subtopic scope beats hyper-narrow slivers",
+    "relatedConcept": "Overly narrow coordinator decomposition is a named risk: fragmented slivers lose cross-cutting themes, and refinement loops — not finer slicing — close the coverage gaps.",
+    "overallExplanation": "Overly narrow task decomposition by the coordinator produces incomplete coverage of broad topics — connective themes fall between the slivers. Decompose into meaningfully scoped subtopics and close remaining gaps through iterative refinement rather than ever-finer slicing."
+  },
+  {
+    "id": 125,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "multi",
+    "question": "An architecture review board is evaluating the design document for your coordinator-led research system before it goes to production. The reviewers want the team to call out genuine, documented failure modes of coordinator-subagent orchestration rather than hypothetical ones. Which two items belong on that list? (Choose two.)",
+    "options": [
+      "The coordinator decomposing broad topics too narrowly, so the fragments fail to cover connective themes and the final report has coverage gaps",
+      "Subagents automatically inheriting the coordinator's conversation history and leaking accumulated context to one another across invocations",
+      "The coordinator routing every query through the full subagent pipeline regardless of complexity, inflating latency and cost on simple requests",
+      "Dynamic subagent selection making runs nondeterministic, a property that must be engineered out before any multi-agent system reaches production"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct — this is a documented risk. Hyper-narrow decomposition produces slivers investigated in isolation, and the connective themes of a broad topic fall between them. It is the reason coordinators pair meaningful subtopic scope with iterative refinement loops rather than slicing ever finer.",
+      "This inverts how subagents work: they operate with isolated context and inherit nothing automatically — not the parent's history and not each other's. Context reaches a subagent only when explicitly included in its prompt, so inheritance-based leakage is not a real failure mode.",
+      "Correct — this is a documented inefficiency. A coordinator's responsibilities include deciding which subagents each query actually needs based on its complexity; always running the full pipeline makes a simple factual question pay a broad-research price in both latency and spend.",
+      "This condemns the recommended pattern: coordinators should dynamically select subagents by analyzing query requirements. Run-to-run variation in routing is inherent to model-driven orchestration and is managed through observability, not eliminated by regressing to fixed pipelines."
+    ],
+    "principle": "know the real coordinator risks: narrow slicing and blanket pipelines",
+    "relatedConcept": "The documented coordinator failure modes are overly narrow decomposition and indiscriminate full-pipeline routing — not context inheritance or dynamic selection, which are misconceptions.",
+    "overallExplanation": "The genuine documented failure modes are overly narrow task decomposition (incomplete coverage of broad topics) and routing every query through the full pipeline (wasted latency and cost). Subagent context inheritance does not exist, and dynamic selection is the recommended design, not a defect."
+  },
+  {
+    "id": 126,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "single",
+    "question": "In your research system, the coordinator collects outputs from the search and document-analysis subagents and forwards them to the report-generation subagent as one raw concatenated block — verbose reasoning chains, retrieval logs, and two findings that directly contradict each other included. Final reports now assert both sides of the contradiction in different sections. Where should this be fixed?",
+    "options": [
+      "Instruct the report generator to detect and flag contradictions in its input, resolving them in favor of whichever finding appears better sourced",
+      "Have the coordinator perform genuine result aggregation — reconcile or annotate the contradiction, drop the reasoning-chain noise, and pass a consolidated, coherent set of findings to report generation",
+      "Run report generation twice on the same concatenated input and publish whichever draft contains fewer internal contradictions",
+      "Grant the report generator access to the Task tool so it can query the search and analysis subagents directly whenever its inputs disagree"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "The report generator is the wrong vantage point: it lacks the original research goals, cannot re-delegate for verification, and choosing a winner by apparent sourcing quality arbitrarily discards a possibly valid finding. Contradiction handling requires the agent that holds the whole picture.",
+      "Correct. Result aggregation is a core coordinator responsibility, not a pass-through. The coordinator sits at the hub precisely so it can reconcile conflicting findings — re-delegating a targeted verification query if needed, or annotating the conflict explicitly — and forward a consolidated set of findings rather than raw concatenated subagent output.",
+      "Sampling twice from the same contradictory input changes phrasing, not substance: both drafts are generated from findings that assert opposite things, so the contradiction survives in whichever draft is picked. This adds cost while leaving the defect upstream and untouched.",
+      "Giving the report generator spawning power breaks hub-and-spoke: subagent communication now bypasses the coordinator, fragmenting error handling and observability, and the generator still lacks the research goals needed to judge which follow-up queries would resolve the conflict."
+    ],
+    "principle": "aggregation is coordinator work, not a pass-through",
+    "relatedConcept": "The coordinator's result-aggregation role means reconciling and consolidating subagent outputs before downstream delegation — raw concatenation exports its unfinished work.",
+    "overallExplanation": "Result aggregation is a core coordinator responsibility: reconcile or explicitly annotate conflicting findings and pass consolidated results onward. Forwarding raw concatenated subagent output pushes unresolved contradictions into the final report."
+  },
+  {
+    "id": 127,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "single",
+    "question": "Your synthesis subagent was given a web-search tool \"for convenience\". Production traces now show that when it notices coverage gaps mid-synthesis, it quietly runs its own searches — duplicating work the search subagents already did, issuing queries nobody can observe at the hub, and occasionally citing sources the analysis stage never vetted. What is the correct orchestration pattern?",
+    "options": [
+      "Keep the search tool but add a system prompt instruction telling the synthesis agent to search only when strictly necessary and to log its reasons",
+      "Give the document-analysis subagent a search tool as well, so gaps get covered redundantly from two independent vantage points",
+      "Add logging middleware around the synthesis agent's searches so that at least the hub gains visibility into the queries being issued",
+      "Remove search from the synthesis agent and have it report gaps to the coordinator, which re-delegates targeted queries to the search subagents and re-invokes synthesis"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Prompt instructions make the misuse rarer, not absent, and every remaining self-serve search still bypasses the hub: unvetted sources flow into reports and the coordinator's picture of what was searched stays incomplete. The structural problem is tool placement, not search frequency.",
+      "Duplicating the misplaced capability doubles the failure mode: now two agents outside the search specialization issue unobserved queries, duplication rises further, and the coordinator's view of overall research coverage degrades even more.",
+      "Logging restores visibility but not control: the searches still bypass the analysis stage, so unvetted sources continue reaching reports, and the coordinator still cannot partition scope or prevent duplicated retrieval. Observability of a broken flow is not a fix for the flow.",
+      "Correct. This restores hub-and-spoke: all inter-subagent needs route through the coordinator, which is exactly the iterative refinement loop — synthesis surfaces gaps, the coordinator re-delegates targeted queries to the search specialists, analysis vets the results, and synthesis re-runs. Every search is observed, partitioned, and quality-controlled at the hub."
+    ],
+    "principle": "gaps route through the coordinator, not through side-channel tools",
+    "relatedConcept": "Hub-and-spoke plus iterative refinement: synthesis reports gaps, the coordinator re-delegates to search specialists, and re-invokes synthesis — no subagent self-serves outside its role.",
+    "overallExplanation": "Route gap-filling through the coordinator: synthesis reports what is missing, the coordinator re-delegates targeted queries to the search subagents, and synthesis is re-invoked. Side-channel searching bypasses the hub's observability, scope partitioning, and quality control."
+  },
+  {
+    "id": 128,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+    "type": "single",
+    "question": "After you added an iterative refinement loop, some research runs never settle: the coordinator keeps finding something to improve, re-delegating searches and re-invoking synthesis for hours, with costs an order of magnitude above normal. You need a principled way for the refinement loop to decide it is done. What should govern loop exit?",
+    "options": [
+      "The coordinator evaluates each synthesis pass against the original research goals and quality criteria, re-delegating only for specific identified gaps and stopping once coverage is sufficient",
+      "Every topic gets exactly three refinement passes — enough for quality, few enough for cost — with the loop hard-stopping at three regardless of the output's state",
+      "The loop exits when the synthesis subagent's own output states that coverage is now complete and no further research is required",
+      "The loop exits when two consecutive synthesis outputs score above a similarity threshold, indicating the refinement has converged on a stable report"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The refinement pattern is goal-referenced by design: the coordinator evaluates synthesis output for gaps against the research goals and quality criteria it holds, re-delegates targeted queries for the specific deficiencies found, and re-invokes synthesis until coverage is sufficient. \"Sufficient against stated criteria\" is a decidable check; \"nothing more to improve\" never is.",
+      "A fixed pass count is the iteration-cap anti-pattern transplanted into orchestration: simple topics waste two passes, hard topics ship with known gaps at pass three. A generous ceiling can back-stop the loop, but the primary exit must reference the work's actual state.",
+      "The synthesis agent is structurally the wrong judge: it cannot know what it never saw, so its coverage claims are optimistic by construction, and exiting on its say-so parses model prose for control flow. Gap evaluation belongs to the coordinator, which holds the original goals.",
+      "Output similarity measures stability, not adequacy: a report can converge while missing whole subtopics, and phrasing can vary across passes whose substance is identical. Convergence heuristics also give the coordinator no signal about which gaps remain actionable."
+    ],
+    "principle": "refinement exits on goal-referenced sufficiency, not counts or convergence",
+    "relatedConcept": "Iterative refinement loops terminate when the coordinator judges coverage sufficient against the original research goals and quality criteria — the decidable form of done.",
+    "overallExplanation": "The coordinator should evaluate synthesis output against the original research goals and quality criteria, re-delegate for specific gaps, and stop when coverage is sufficient. Fixed pass counts, synthesis self-assessment, and similarity convergence all decouple loop exit from whether the work is actually done."
+  },
+  {
+    "id": 129,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Configure subagent invocation, context passing, and spawning",
+    "type": "single",
+    "question": "You have defined AgentDefinitions for a web-search subagent and a document-analysis subagent, each with clear descriptions and scoped tools. The coordinator's configuration sets allowedTools to [\"WebSearch\", \"Read\", \"Grep\"]. In every run the coordinator attempts all the research itself and no delegation ever occurs, even when explicitly prompted to use its subagents. What is the cause?",
+    "options": [
+      "The subagent AgentDefinitions are missing an activation field that registers them with the coordinator's runtime for discovery",
+      "Subagent names must be listed verbatim in the coordinator's system prompt before the runtime exposes them as invocable targets",
+      "The coordinator's allowedTools must include \"Task\" — the Task tool is the mechanism for spawning subagents, and without it delegation is impossible no matter how the subagents are defined",
+      "fork_session must be enabled on the coordinator's session, since subagent spawning is implemented as a fork of the parent session"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "AgentDefinition carries descriptions, system prompts, and tool restrictions; there is no separate activation or registration field to forget. The subagents here are correctly defined — the missing piece is on the coordinator's side of the configuration.",
+      "Prompt text can encourage delegation but does not create the capability: invocation happens through a tool call, and a tool the coordinator is not allowed to use cannot be granted by mentioning names in prose. The prompt already asks for delegation and it still cannot occur.",
+      "Correct. Subagents are spawned through the Task tool, and a coordinator can only call tools present in its allowedTools. With [\"WebSearch\", \"Read\", \"Grep\"], the coordinator literally has no mechanism to delegate, so it falls back to doing everything itself — the exact symptom observed. Adding \"Task\" to allowedTools restores delegation.",
+      "fork_session creates independent branches of a session for exploring divergent approaches from a shared baseline; it is unrelated to subagent spawning, which flows through the Task tool. Enabling it would add nothing to the coordinator's delegation ability."
+    ],
+    "principle": "no \"Task\" in allowedTools means no subagents, period",
+    "relatedConcept": "The Task tool is the spawning mechanism for subagents, and it must appear in the coordinator's allowedTools for any delegation to be possible.",
+    "overallExplanation": "Subagents are spawned via the Task tool, so the coordinator's allowedTools must include \"Task\". Perfectly defined subagents are unreachable if the coordinator lacks the one tool that invokes them — it will silently attempt all work itself."
+  },
+  {
+    "id": 130,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Configure subagent invocation, context passing, and spawning",
+    "type": "single",
+    "question": "Your search subagents return findings as flowing prose in which claims and their source mentions are interleaved (\"...as one industry analysis noted, adoption doubled, though a separate survey from last spring suggests...\"). Two handoffs later, the synthesis subagent's report attaches citations to the wrong claims and drops several sources entirely. What change to the context-passing design fixes this?",
+    "options": [
+      "Instruct the synthesis subagent to double-check every citation against the original sources before finalizing the report",
+      "Require subagents to emit findings in a structured format that separates content from metadata — each claim paired with its source URL, document name, and page number — so attribution survives every handoff intact",
+      "Include the full raw text of every retrieved web page in the synthesis subagent's prompt so it can re-derive correct citations itself",
+      "Add a PostToolUse hook on the coordinator that appends an alphabetized bibliography of all retrieved sources to each subagent handoff"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "The synthesis agent cannot verify against sources it does not have: it received prose in which claim-source pairings were already ambiguous, and no instruction can recover bindings that were never explicitly represented. Verification requires the structure this pipeline lacks.",
+      "Correct. Structured data formats that separate content from metadata — source URLs, document names, page numbers attached to each individual finding — are the prescribed way to pass context between agents while preserving attribution. Prose interleaving makes claim-source bindings implicit, and every summarization step degrades implicit bindings further.",
+      "Raw page dumps explode the synthesis agent's context with material the search and analysis stages already processed, and re-deriving citations from scratch duplicates their work while inviting new mismatches. The pipeline needs bindings preserved, not evidence re-litigated.",
+      "A detached bibliography lists sources without binding them to claims — the report still cannot say which claim came from which source. The failure is per-claim attribution, and an appended list at the handoff level does not represent that relationship at all."
+    ],
+    "principle": "structure separates claims from source metadata at every handoff",
+    "relatedConcept": "Passing context between agents in structured formats — content distinct from source URLs, document names, page numbers — is what preserves attribution across multi-agent pipelines.",
+    "overallExplanation": "Use structured data formats that separate content from metadata, pairing each finding with its source URL, document name, and page number. Prose interleaving leaves claim-source bindings implicit, and they corrupt a little more at every handoff."
+  },
+  {
+    "id": 131,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Configure subagent invocation, context passing, and spawning",
+    "type": "single",
+    "question": "Your coordinator's delegation prompts read like scripts: \"Open the document. Read section 2. Extract the table on page 4. Then summarize paragraphs 6 through 9.\" Subagents perform flawlessly on the document layouts the scripts anticipate and fail badly on anything else — skipping content when a section is renumbered or a table moves. How should the delegation prompts be redesigned?",
+    "options": [
+      "Specify the research goal and the quality criteria the output must meet, letting each subagent adapt its own approach to whatever document structure it actually encounters",
+      "Extend each script with conditional branches covering every document variant the team has encountered so far, updating the scripts as new layouts appear",
+      "Have the coordinator read each document itself first and generate a bespoke step-by-step script tailored to that document's exact layout before delegating",
+      "Lower the subagents' sampling temperature so they follow the procedural instructions more literally and deviate less from the prescribed steps"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Coordinator prompts should specify research goals and quality criteria rather than step-by-step procedural instructions, precisely to enable subagent adaptability. A goal like \"extract the reported quarterly figures with their reporting periods; every figure must cite its page\" survives any layout, because the subagent — an LLM with the document in front of it — decides how to achieve it.",
+      "Variant-by-variant branching is an arms race against document diversity that the team never wins: each new layout fails first, then gets a patch. It also makes prompts enormous while keeping the core defect — the subagent is forbidden from using its own judgment.",
+      "This makes the coordinator do every subagent's reading work up front, destroying the delegation benefit and doubling document processing. The coordinator's context fills with layouts it should never need, and the bespoke scripts still break when a document surprises the script-writer.",
+      "Temperature adjusts sampling variability, not comprehension of instructions, and stricter literalism is the opposite of the fix: the failures happen because the scripts are followed literally against documents they do not describe. More obedience to a wrong script produces more wrong extractions."
+    ],
+    "principle": "delegate goals and quality criteria, not procedures",
+    "relatedConcept": "Coordinator prompts that state research goals and quality criteria — instead of step-by-step scripts — let subagents adapt to whatever they actually encounter.",
+    "overallExplanation": "Delegation prompts should specify research goals and quality criteria rather than step-by-step procedures, enabling subagents to adapt to real-world variation. Scripts fail on every layout their author did not anticipate; goals survive them all."
+  },
+  {
+    "id": 132,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Configure subagent invocation, context passing, and spawning",
+    "type": "multi",
+    "question": "You are adding a new document-analysis subagent type to your Agent SDK research system and writing its AgentDefinition. A teammate unfamiliar with the SDK asks what this configuration actually provides. Which two elements are genuinely part of what an AgentDefinition configures for a subagent type? (Choose two.)",
+    "options": [
+      "A description of the subagent's purpose, which the coordinator uses to decide when this subagent type is the right one to invoke",
+      "A memory-sharing flag that, when enabled, lets the subagent read the coordinator's conversation history directly during execution",
+      "An inheritance setting that automatically passes the parent agent's accumulated context into the subagent at spawn time",
+      "A system prompt establishing the subagent's role, plus tool restrictions that scope it to the tools its specialization requires"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "optionExplanations": [
+      "Correct. AgentDefinition includes a description of each subagent type, and that description is what informs delegation decisions — the coordinator matches the task at hand against subagent descriptions when choosing which specialist to spawn via the Task tool.",
+      "No such flag exists. Subagents operate with isolated context and do not share memory with the coordinator or between invocations; anything the subagent needs must be explicitly included in the prompt it is spawned with. Isolation is fundamental, not a toggle.",
+      "This is the same misconception in different clothing: subagents do not automatically inherit parent context, and no AgentDefinition setting changes that. Context passing is an explicit act — the coordinator writes findings into the delegation prompt itself.",
+      "Correct. AgentDefinition configures each subagent type's system prompt — establishing role and behavior — and its tool restrictions, so a document-analysis agent gets document tools and nothing that invites cross-specialization misuse. Description, system prompt, and tool restrictions are the definition's substance."
+    ],
+    "principle": "AgentDefinition = description, system prompt, tool restrictions",
+    "relatedConcept": "AgentDefinition configures descriptions, system prompts, and tool restrictions per subagent type — context isolation is fundamental and no setting disables it.",
+    "overallExplanation": "AgentDefinition provides each subagent type's description (guiding the coordinator's invocation decisions), system prompt, and tool restrictions. Memory-sharing flags and automatic context inheritance do not exist — subagent context is always passed explicitly in the delegation prompt."
+  },
+  {
+    "id": 133,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Implement multi-step workflows with enforcement and handoff patterns",
+    "type": "single",
+    "question": "After a prerequisite gate on refunds eliminated a compliance problem, your team is energized and proposes gating every workflow ordering programmatically: greeting before lookup, empathy statement before any fix, summary before session close. Three sprints later the agent is brittle — legitimate conversation variations get blocked, and the gate code is a maintenance burden. What principle should govern where enforcement is applied?",
+    "options": [
+      "Gate every ordering rule programmatically, since deterministic enforcement is categorically superior to prompt guidance and the brittleness just needs more engineering",
+      "Reserve programmatic enforcement for rules that require deterministic compliance — such as identity verification before financial operations — and use prompt-based guidance for soft ordering preferences where a small failure rate is acceptable",
+      "Remove all gates including the refund prerequisite and consolidate every rule into a carefully engineered system prompt for consistency of mechanism",
+      "Replace the gates with a second Claude instance that reviews each proposed tool call against the full rulebook before permitting it to execute"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Universal gating mistakes the lesson of the refund win: that gate succeeded because the rule was a hard invariant with financial consequences. Conversational orderings have legitimate exceptions by nature, so encoding them as absolutes guarantees the observed brittleness — no amount of engineering makes a soft preference hard.",
+      "Correct. The enforcement spectrum matches mechanism to consequence: programmatic prerequisites where prompt instructions' non-zero failure rate is unacceptable (identity checks before financial operations), and prompt guidance for stylistic or soft-ordering preferences where occasional deviation is harmless. This keeps gates few, meaningful, and maintainable while the agent stays flexible.",
+      "This overcorrects into the original compliance failure: prompt instructions have a non-zero failure rate, and the refund prerequisite exists precisely because that rate was unacceptable for financial operations. Uniformity of mechanism is not a virtue worth reintroducing unauthorized refunds for.",
+      "A reviewing model is still probabilistic — it can approve a violating call — while adding a full inference round-trip of latency and cost to every tool call in the system. For hard rules it under-delivers versus a simple gate; for soft preferences it is wildly disproportionate."
+    ],
+    "principle": "gates for hard invariants, prompts for soft preferences",
+    "relatedConcept": "Programmatic enforcement and prompt-based guidance are complementary: deterministic compliance requirements get gates; stylistic ordering preferences tolerate probabilistic adherence.",
+    "overallExplanation": "Reserve programmatic enforcement for rules needing deterministic compliance — like verification before financial operations — and use prompt guidance for soft preferences where small failure rates are acceptable. Gating everything makes agents brittle; gating nothing reopens compliance holes."
+  },
+  {
+    "id": 134,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Implement multi-step workflows with enforcement and handoff patterns",
+    "type": "single",
+    "question": "When your support agent escalates a billing dispute mid-investigation, the human billing specialists — who work in a separate ticketing system with no access to the agent's conversation — currently receive only a ticket ID and a sentiment label like \"customer frustrated\". Specialists re-contact customers to ask for basics, and escalated-case resolution time has doubled. What should the escalation carry instead?",
+    "options": [
+      "The complete raw conversation transcript exported verbatim into the ticket, so specialists can reconstruct the investigation from primary material",
+      "A deep link back into the agent's session plus a one-paragraph abstract, so specialists can pull details on demand as questions arise",
+      "The sentiment trajectory across the conversation and the agent's confidence score, so specialists can triage which escalations deserve attention first",
+      "A structured handoff summary containing customer details, the root cause analysis so far, the disputed amount, and the agent's recommended action, so the specialist can act immediately without re-investigating"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "A raw multi-turn transcript buries the actionable facts in greetings, tool chatter, and dead-end turns — the specialist must re-perform the agent's analysis to find the root cause. It transfers data while failing to transfer the investigation's conclusions, which is what saves resolution time.",
+      "The premise of this scenario is that specialists work in a separate system without access to the agent's conversation, so the link resolves to nothing they can open. Even with access, on-demand pulling recreates the re-investigation burden the handoff should eliminate.",
+      "Sentiment and confidence describe the conversation's mood, not the case: a specialist triaging by frustration level still opens the ticket knowing nothing about who the customer is, what went wrong, or what amount is disputed. The doubled resolution time comes from missing substance, not missing prioritization.",
+      "Correct. Structured handoff protocols for mid-process escalation carry exactly this payload: customer details, root cause analysis, the amounts involved, and recommended actions. The specialist inherits the investigation's conclusions rather than its raw material, and can act on the case immediately — the specific fix for humans who lack transcript access."
+    ],
+    "principle": "hand off conclusions and recommendations, not mood or raw logs",
+    "relatedConcept": "Structured handoff summaries — customer details, root cause, amounts, recommended action — are the escalation payload for humans without conversation access.",
+    "overallExplanation": "Escalations to transcript-less humans need a structured handoff summary: customer details, root cause analysis, disputed amounts, and recommended actions. Sentiment labels and raw transcripts both force the specialist to re-investigate, which is what doubles resolution time."
+  },
+  {
+    "id": 135,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Implement multi-step workflows with enforcement and handoff patterns",
+    "type": "single",
+    "question": "You implemented a programmatic prerequisite gate that blocks process_refund until get_customer has returned a verified customer ID. It works — no unverified refunds occur — but the gate silently swallows blocked calls, so the agent perceives process_refund as broken, apologizes to the customer, and gives up on cases it could have completed after verifying. How should the gate behave when it blocks a call?",
+    "options": [
+      "Return a structured response explaining that customer verification is required first, so the agent can call get_customer, complete verification, and legitimately retry the refund",
+      "Continue failing silently by design, since revealing the gate's existence teaches the model to anticipate and possibly reason its way around the enforcement",
+      "Terminate the automated workflow and escalate every blocked refund attempt to a human agent, since a blocked call indicates the model cannot be trusted on this case",
+      "Detect the block, execute get_customer automatically inside the gate using the details the customer already stated, and then allow the original refund call to proceed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A gate's job is to enforce ordering, not to strand the workflow: returning a structured explanation converts the block into a recoverable step, steering the agent to perform verification and then retry legitimately. Enforcement stays deterministic while the agent keeps its ability to complete the case — the compliance win without the abandonment cost.",
+      "Silence cannot strengthen a programmatic gate — the gate blocks regardless of what the model knows — so opacity buys nothing. What it costs is visible in production: the agent misdiagnoses a policy block as a system fault, misleads the customer about an outage, and abandons resolvable cases.",
+      "Escalating every blocked call confuses a sequencing correction with an unresolvable case: the agent is fully capable of verifying and then refunding. Routing these to humans forfeits first-contact resolution on routine refunds and floods specialists with cases that needed one more tool call.",
+      "Auto-executing verification with customer-stated details defeats the check's purpose: verification exists because stated identity cannot be trusted, and it may require interaction — asking for additional identifiers — that only the agent can conduct. The gate would be laundering unverified data into a verified-looking flow."
+    ],
+    "principle": "a blocking gate should redirect the agent to the prerequisite",
+    "relatedConcept": "Prerequisite gates enforce ordering best when a block returns structured guidance, letting the agent complete the missing step and retry rather than abandoning the case.",
+    "overallExplanation": "When a prerequisite gate blocks a call, it should return a structured response naming the missing prerequisite so the agent can verify and retry. Silent blocking preserves compliance but destroys resolution — the agent misreads policy enforcement as system failure."
+  },
+  {
+    "id": 136,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Implement multi-step workflows with enforcement and handoff patterns",
+    "type": "multi",
+    "question": "Your team is triaging a requirements backlog for the customer support agent, deciding which behaviors get programmatic enforcement and which are handled through prompt guidance. Budget allows building enforcement for only two items this quarter. Which two requirements genuinely need programmatic enforcement rather than prompt instructions? (Choose two.)",
+    "options": [
+      "The agent should acknowledge the customer's frustration before proposing a resolution on emotionally charged tickets",
+      "No refund may ever be processed until get_customer has returned a verified customer identity for the session",
+      "Refunds above the compliance policy threshold must never execute autonomously and must always route to a human approver",
+      "Responses should stay concise, avoid internal jargon, and close by asking whether anything else is needed"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "optionExplanations": [
+      "This is a tone preference with no compliance consequence when occasionally missed — a customer receiving a solution slightly before the empathy statement suffers no harm. Prompt guidance with examples handles it well, and a gate here would block legitimate conversational variation.",
+      "Correct. Identity verification before financial operations is the canonical deterministic-compliance requirement: prompt instructions carry a non-zero failure rate, and a single unverified refund is a real financial and compliance loss. A programmatic prerequisite that blocks process_refund until verification completes is the only guarantee.",
+      "Correct. A hard monetary threshold with a mandatory human-approval path is a business rule requiring guaranteed compliance — an interception mechanism that blocks over-threshold refund calls and redirects to escalation makes violations impossible, which auditors require and prompts cannot promise.",
+      "Style and closing-question conventions are probabilistic-compliance territory: occasional lapses cost nothing measurable, and enforcement machinery for phrasing would be brittle and unmaintainable. This is exactly what system prompt guidance is for."
+    ],
+    "principle": "spend enforcement budget where violations have hard consequences",
+    "relatedConcept": "Deterministic enforcement belongs to rules whose single violation is unacceptable — verification prerequisites and monetary thresholds — while tone and style ride on prompt guidance.",
+    "overallExplanation": "Programmatic enforcement belongs to the two hard invariants: verification before any refund, and the monetary threshold above which refunds must route to humans. Tone acknowledgment and response style tolerate the small failure rate of prompt guidance."
+  },
+  {
+    "id": 137,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Apply Agent SDK hooks for tool call interception and data normalization",
+    "type": "single",
+    "question": "Your Agent SDK deployment has two new requirements: (a) results returned by a records-lookup MCP tool sometimes contain unmasked personal data that must never reach the model, and (b) any write_config call whose environment argument is \"production\" must be prevented from executing. An engineer asks which hook pattern applies to each requirement. What is the correct pairing?",
+    "options": [
+      "Use PostToolUse hooks for both requirements, since the post-execution hook observes the most complete information about each tool interaction",
+      "Intercept outgoing tool calls for both requirements, since acting before execution is strictly safer than acting after it",
+      "Intercept outgoing tool calls to block production write_config before it executes, and use a PostToolUse hook to redact personal data from results before the model processes them",
+      "Handle both requirements with system prompt instructions, since hook code adds latency to every tool interaction in the deployment"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "PostToolUse fires after the tool has run, which is fatal for requirement (b): by the time the hook observes the call, production configuration has already been written. Post-execution observation can transform or audit results, but it cannot prevent an action that already happened.",
+      "Pre-execution interception cannot satisfy requirement (a): the personal data lives in the tool's result, which does not exist until after execution. A hook inspecting the outgoing call sees arguments, not the response — there is nothing to redact yet.",
+      "Correct. The two hook patterns map to the two halves of a tool interaction: interception of outgoing calls enforces rules about whether an action may execute (block production write_config, arguments in hand, before anything happens), while PostToolUse transforms results before the model processes them (redact personal data on the way in). Matching hook point to purpose is the core skill.",
+      "Both requirements demand deterministic guarantees — personal data must never reach the model, production writes must never execute — and prompt instructions provide probabilistic compliance at best. A prompt also cannot redact data at all: the result reaches the model's context in order to be read."
+    ],
+    "principle": "gate actions before execution; transform results after it",
+    "relatedConcept": "Hook selection follows the interaction lifecycle — outgoing-call interception for blocking and compliance, PostToolUse for transforming results before the model sees them.",
+    "overallExplanation": "Block-or-allow decisions belong in hooks that intercept outgoing tool calls, before execution; data transformation and redaction belong in PostToolUse hooks, before the model processes results. Each requirement fails if assigned to the other hook point."
+  },
+  {
+    "id": 138,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Apply Agent SDK hooks for tool call interception and data normalization",
+    "type": "single",
+    "question": "Your interception hook correctly blocks process_refund calls above the $500 compliance threshold, but it returns a bare \"Error: operation failed\" to the agent. Production traces show the agent retrying the identical refund three times, then telling customers \"our refund system is currently down\" — misinformation that generates follow-up tickets. What should change?",
+    "options": [
+      "Add a retry limiter so the agent stops re-attempting after the first blocked refund and moves on to summarizing the conversation",
+      "Have the hook return an explicit policy response — refunds above $500 require human approval, use escalate_to_human — so a blocked call becomes a redirect into the correct alternative workflow",
+      "Add a system prompt warning that refund attempts above $500 will fail, so the agent learns not to attempt them in the first place",
+      "Have the hook return a successful-looking empty result so the agent stops retrying and simply proceeds with the rest of the conversation"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "A retry limiter suppresses the symptom while preserving the misdiagnosis: the agent still believes the tool malfunctioned, still tells the customer something false, and still fails to route the case anywhere. The customer's over-threshold refund remains unhandled at the end.",
+      "Correct. Interception hooks should not just block — they should redirect to the alternative workflow. A response stating the policy and the correct next step turns the model's reasoning in the right direction: it stops retrying, tells the customer the truthful reason, and escalates for human approval. The block becomes a routed outcome instead of a dead end.",
+      "Prompt warnings reduce attempts probabilistically but leave the hook's response broken for every attempt that still occurs — and attempts will occur, since customers state amounts mid-conversation. The deterministic layer must itself communicate usefully; the prompt is a supplement, not the fix.",
+      "Returning fake success is silent error suppression: the agent now believes a refund was issued, may confirm that to the customer, and the case closes with a compliance-relevant action falsely recorded as done. This converts a communication defect into a data-integrity incident."
+    ],
+    "principle": "blocked calls should redirect, not dead-end",
+    "relatedConcept": "Tool call interception pairs blocking with redirection — the hook's response tells the agent why and routes it into the alternative workflow such as human escalation.",
+    "overallExplanation": "A blocking hook should return an explicit policy response that redirects the agent to the alternative workflow — here, escalation for human approval. Generic errors cause retries and misinformation; fake successes silently corrupt case state."
+  },
+  {
+    "id": 139,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Apply Agent SDK hooks for tool call interception and data normalization",
+    "type": "single",
+    "question": "Your developer productivity agent has a delete_records tool that engineers rely on for cleaning test fixtures in the staging environment. A security review demands a hard guarantee that the tool never runs against the production database. The system prompt already forbids production deletes, but the auditors explicitly reject prompt instructions as an acceptable control. What satisfies the requirement while preserving the staging workflow?",
+    "options": [
+      "Implement a tool call interception hook that inspects each delete_records call's target-environment argument and blocks execution against production, redirecting the agent to the manual change-management runbook",
+      "Strengthen the system prompt with few-shot examples demonstrating the agent refusing production delete requests in several realistic phrasings",
+      "Remove delete_records from the agent entirely and make all fixture cleanup a manual process, since only tool absence fully eliminates the possibility of misuse",
+      "Add a PostToolUse hook that pages the security team with full call details whenever a delete completes against the production environment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Interception hooks enforce compliance rules on outgoing calls deterministically, and inspecting arguments lets the rule be precise: deletes with a production target are blocked before execution and redirected to the sanctioned manual process, while staging cleanup proceeds untouched. This is the guarantee auditors asked for, scoped so it costs no legitimate functionality.",
+      "Few-shot examples lower the probability of a production delete without eliminating it, and the auditors have already ruled that probabilistic controls fail the requirement. Examples are a fine supplement for agent behavior, but they cannot be the control of record for a hard guarantee.",
+      "Total removal provides the guarantee but at maximum cost: staging cleanup — the tool's entire legitimate value — reverts to manual work for every engineer. When the dangerous subset of calls is identifiable from arguments, an argument-inspecting block achieves the same guarantee while keeping the tool.",
+      "PostToolUse fires after execution: the page arrives when production records are already gone. Alerting after the fact builds an audit trail, which is worthwhile, but the requirement is prevention — the delete must never run, not be promptly regretted."
+    ],
+    "principle": "argument-inspecting interception scopes hard guarantees precisely",
+    "relatedConcept": "Interception hooks can enforce rules conditioned on a call's arguments — blocking the dangerous subset before execution while leaving legitimate use untouched.",
+    "overallExplanation": "An interception hook that inspects the target-environment argument blocks production deletes deterministically while preserving staging cleanup. Prompts are probabilistic, tool removal over-pays, and PostToolUse alerts arrive after the damage."
+  },
+  {
+    "id": 140,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Apply Agent SDK hooks for tool call interception and data normalization",
+    "type": "multi",
+    "question": "During a design workshop for your support agent, four engineers each propose a hook implementation. You want to approve only the proposals that use hooks for what hooks are actually good at, and push the rest toward more appropriate mechanisms. Which two proposals are appropriate uses of Agent SDK hooks? (Choose two.)",
+    "options": [
+      "A PostToolUse hook that converts Unix timestamps, ISO 8601 strings, and numeric status codes arriving from different MCP tools into one consistent format before the model processes them",
+      "A hook that parses each assistant message's text and forcibly terminates the agentic loop whenever the phrasing suggests the task sounds finished",
+      "An interception hook that blocks process_refund calls exceeding the compliance threshold and redirects those cases into the human escalation workflow",
+      "A hook that examines each user message for keywords and dictates which subagent the coordinator must delegate to next based on the matches"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Normalizing heterogeneous data formats from different MCP tools is the canonical PostToolUse use case: a mechanical, deterministic transformation applied to every result before the model reasons over it, eliminating the intermittent errors that in-context conversion produces.",
+      "This launders a named anti-pattern through hook machinery: loop termination decided by parsing natural-language phrasing is unreliable no matter where the parsing code lives. Termination belongs to the structured stop_reason signal — a hook wrapping prose-sniffing is still prose-sniffing.",
+      "Correct. Intercepting outgoing tool calls to enforce compliance rules — blocking refunds above a threshold and redirecting to an alternative workflow like human escalation — is precisely the deterministic-guarantee role hooks exist to fill where prompt instructions cannot promise compliance.",
+      "Keyword-dictated delegation replaces the coordinator's model-driven judgment with a brittle pre-configured decision tree: routing which subagent handles a query is contextual reasoning the model should perform. Hooks are for deterministic transformations and gates, not for making the agent's decisions."
+    ],
+    "principle": "hooks transform and gate; they do not think for the agent",
+    "relatedConcept": "Appropriate hook roles are result normalization (PostToolUse) and compliance interception of outgoing calls — not loop control by prose parsing or keyword-driven delegation.",
+    "overallExplanation": "Hooks earn their keep on deterministic mechanics: PostToolUse normalization of heterogeneous tool data, and interception that blocks policy-violating calls with redirection to escalation. Text-parsed loop termination and keyword-based delegation move model-driven decisions into brittle code."
+  },
+  {
+    "id": 141,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design task decomposition strategies for complex workflows",
+    "type": "single",
+    "question": "Your legal team uses Claude to review 60-page vendor contracts. A single whole-document pass produces sharp findings for early sections and superficial ones later. An engineer then tried per-clause decomposition — over 300 subtasks per contract — which missed obligations that span clauses and multiplied cost. How should the review be decomposed?",
+    "options": [
+      "Keep the per-clause decomposition but batch ten clauses into each request, cutting the subtask count and per-request overhead by an order of magnitude",
+      "Decompose per section for focused local analysis, then run a separate cross-section integration pass over the combined findings to catch obligations that span the document",
+      "Return to the single whole-document pass with an added instruction to allocate equal analytical depth to every section from the first page to the last",
+      "Let the model choose its own decomposition granularity at run time for each contract, since document structure varies and no fixed scheme fits all"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Batching reduces overhead but keeps the structural defect: arbitrary ten-clause windows still sever obligations that reference clauses outside the window, and no pass ever examines the contract's cross-cutting commitments as a whole. The granularity is less extreme but still wrong for the task.",
+      "Correct. This applies the local-pass-plus-integration-pass pattern at the right granularity: sections are large enough to give each pass meaningful context, small enough to avoid the attention dilution that degraded the whole-document review, and the dedicated integration pass is where spanning obligations — payment terms referencing termination clauses — get caught by design rather than by luck.",
+      "Attention dilution is a property of oversized inputs, not of insufficient willpower: instructing the model to be equally thorough does not restructure the work, and the later-section superficiality will persist. Decomposition, not exhortation, is the fix the first failure already demonstrated.",
+      "Contract review is a predictable multi-aspect task — the aspects are known before any contract arrives — which is prompt-chaining territory, not open-ended investigation. Run-time improvised granularity also makes review coverage unauditable, a poor property for a legal workflow."
+    ],
+    "principle": "granularity: big enough for context, small enough for focus, plus integration",
+    "relatedConcept": "Decomposition granularity is a tradeoff — oversized passes dilute attention, hyper-fine slicing severs cross-cutting concerns — resolved by meaningful chunks plus a dedicated integration pass.",
+    "overallExplanation": "Decompose at section granularity for focused local passes, then run a cross-section integration pass for spanning obligations. Whole-document passes dilute attention; per-clause slicing severs cross-cutting concerns — both extremes lose findings."
+  },
+  {
+    "id": 142,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design task decomposition strategies for complex workflows",
+    "type": "single",
+    "question": "Your on-call team hands your Agent SDK productivity agent an open-ended assignment: \"production latency doubled over the past week — find out why.\" The cause is genuinely unknown; it could be a code change, an infrastructure shift, data growth, or a dependency update. Which task decomposition approach fits this assignment?",
+    "options": [
+      "A fixed diagnostic pipeline that checks code diffs first, then configuration changes, then dashboards, executed in the same preset order for every incident",
+      "A breadth-first sweep that reviews every service in the system in alphabetical order until the anomalous component is eventually encountered",
+      "Requiring the on-call engineer to enumerate the complete investigation subtask list up front, so the agent executes a fully specified plan",
+      "An adaptive investigation plan: form initial hypotheses, investigate the most likely first, and generate new subtasks based on what each step actually uncovers"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Fixed sequential pipelines fit workflows whose steps are knowable at design time. An unknown-cause incident is the opposite case: a preset order spends its early budget on whichever category the pipeline author guessed first, and the pipeline has no mechanism to pursue the anomaly the first step actually reveals.",
+      "Alphabetical order is an arbitrary priority function with no relationship to likelihood of fault: the investigation's early effort lands on whatever sorts first rather than on services implicated by the evidence, and cross-service causes — a shared dependency — may never surface from any single service's review.",
+      "This relocates the impossible demand: the cause is unknown to everyone, so the engineer cannot enumerate the right subtasks either. Adaptive decomposition exists precisely so investigation plans can be built incrementally from findings instead of requiring omniscience up front.",
+      "Correct. Open-ended investigation is the home ground of dynamic adaptive decomposition: the value of each next step depends on what the last step discovered. Hypothesize, test the most likely, and let findings generate the next subtasks — if the code diff is clean but a dependency bumped mid-week, the plan reshapes around that discovery immediately."
+    ],
+    "principle": "unknown causes demand plans that adapt to findings",
+    "relatedConcept": "Adaptive investigation plans generate subtasks from what each step discovers — the decomposition pattern for open-ended diagnosis where fixed pipelines investigate the author's guesses.",
+    "overallExplanation": "An unknown-cause incident calls for dynamic adaptive decomposition: initial hypotheses, likelihood-ordered investigation, and new subtasks generated from each discovery. Fixed pipelines and arbitrary sweeps spend effort on guesses instead of evidence."
+  },
+  {
+    "id": 143,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design task decomposition strategies for complex workflows",
+    "type": "single",
+    "question": "Your team must migrate a large codebase from a legacy logging library to a structured logger. Usage is tangled: some modules call the library directly, others go through home-grown wrapper utilities, and a few construct log calls dynamically. Engineers are debating whether this is a prompt-chaining task or a dynamic-decomposition task. What is the right decomposition design?",
+    "options": [
+      "Combine the patterns: run an exploratory mapping phase to discover usage patterns and high-impact areas, then execute a per-module sequential migration pipeline built from that map, revising the plan when hidden dependencies surface",
+      "Treat it as pure prompt chaining: enumerate the module list from a search of import statements and migrate each module in a fixed predetermined order until the list is exhausted",
+      "Treat it as pure open-ended investigation: let the agent wander the codebase migrating whatever legacy logging usage it encounters next until no more instances remain",
+      "Skip sequencing altogether: spawn parallel subagents immediately, one per top-level directory, and have each migrate its directory's logging calls independently and concurrently"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The task has an unknowable front half and a predictable back half, so the decomposition should change shape at the boundary: adaptive exploration first — map direct calls, wrappers, and dynamic constructions, identify high-impact areas — then a per-module pipeline whose order and contents come from the map rather than from guesses, kept open to revision as migration surfaces dependencies the map missed.",
+      "An import-statement search is exactly what this codebase defeats: wrapper utilities and dynamically constructed calls do not import the legacy library at their call sites, so the enumerated list is incomplete before migration begins. Chaining is right for the execution phase, but only after real discovery builds the list.",
+      "Pure wandering forfeits prioritization and coverage guarantees: high-impact shared wrappers might be migrated last, the agent cannot say what remains at any point, and completion is asserted rather than known. Once mapping is done, this task's execution is predictable — squandering that predictability is a design error.",
+      "Immediate parallelization before mapping collides at the shared seams: multiple subagents will each encounter the same cross-directory wrapper utilities and migrate them independently, producing conflicting edits. Parallel execution may be viable later, but only after the map reveals where the shared surfaces are."
+    ],
+    "principle": "explore to build the map; chain to execute it",
+    "relatedConcept": "Hybrid decomposition — an adaptive mapping phase feeding a structured execution pipeline — fits tasks whose discovery is open-ended but whose execution becomes predictable once mapped.",
+    "overallExplanation": "Map first, then chain: exploratory discovery of usage patterns and high-impact areas builds the module plan, and a sequential per-module pipeline executes it, adapting when hidden dependencies surface. Static searches miss wrappers and dynamic calls; wandering forfeits coverage guarantees."
+  },
+  {
+    "id": 144,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Design task decomposition strategies for complex workflows",
+    "type": "multi",
+    "question": "You are writing your platform team's decomposition playbook for agent workloads, matching each recurring workflow to the decomposition pattern it should use. Reviewers will reject any pairing that misapplies a pattern. Which two pairings are correct? (Choose two.)",
+    "options": [
+      "Prompt chaining for the recurring pull-request review, whose aspects — per-file local analysis followed by cross-file integration checking — are known before any PR arrives",
+      "Dynamic adaptive decomposition for the nightly report job, which always runs the same three steps of gathering metrics, formatting tables, and publishing the summary",
+      "Prompt chaining for diagnosing an intermittent crash that no one can reproduce, so the investigation follows a dependable predetermined sequence",
+      "Dynamic adaptive decomposition for exploring an undocumented legacy system, where each finding determines which component deserves examination next"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "optionExplanations": [
+      "Correct. PR review is a predictable multi-aspect task: every review needs per-file local passes and a cross-file integration pass, and this structure is known at design time. Prompt chaining encodes it as a fixed sequence of focused steps, giving repeatable coverage without attention dilution.",
+      "A three-step job that never varies is the strongest possible case for a fixed pipeline — adaptive decomposition here adds nondeterminism, cost, and failure modes to a workflow with nothing to adapt to. Reserving dynamic patterns for tasks with genuine unknowns is the playbook's whole point.",
+      "An unreproducible intermittent crash is the canonical unknown: the next useful step depends entirely on what the last probe revealed, so no predetermined sequence can be dependable. Assigning prompt chaining here investigates the sequence author's guesses instead of the evidence.",
+      "Correct. Undocumented legacy exploration is open-ended investigation: structure, risk areas, and dependencies are discovered rather than known, so the plan must generate subtasks from findings. Dynamic adaptive decomposition — map, prioritize, adapt as dependencies emerge — is the matching pattern."
+    ],
+    "principle": "pattern follows predictability: chain the knowable, adapt to the unknown",
+    "relatedConcept": "Prompt chaining suits workflows whose aspects are enumerable at design time; dynamic decomposition suits investigations whose subtasks emerge from findings.",
+    "overallExplanation": "Match the pattern to task predictability: prompt chaining for enumerable multi-aspect work like per-file-plus-integration PR review, and dynamic adaptive decomposition for open-ended exploration like undocumented legacy systems. Fixed jobs need no adaptivity; unreproducible mysteries defeat fixed sequences."
+  },
+  {
+    "id": 145,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Manage session state, resumption, and forking",
+    "type": "single",
+    "question": "An engineer on your team runs several long-running Claude Code investigations concurrently — an authentication bug hunt and a performance audit — each spanning multiple days. Every morning she launches a fresh claude session and spends the first half hour re-explaining the codebase areas involved and re-establishing what each investigation has already ruled out. What practice eliminates this daily overhead?",
+    "options": [
+      "Consolidate both investigations into one perpetual session that is never closed, so all accumulated context stays available in a single place",
+      "Record each investigation's findings in the project CLAUDE.md file so every new session automatically loads the current state of both efforts",
+      "Give each investigation a named session and continue the right one each morning with --resume <session-name>, restoring that conversation's accumulated context intact",
+      "End each day by copying the final assistant message into a notes file, then paste it into the next morning's fresh session as the opening message"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "A single perpetual session interleaves two unrelated investigations, so each morning's work wades through the other effort's tool results and reasoning — and the combined context fills far faster. Merged history is barely an improvement on no history when the concerns are distinct.",
+      "CLAUDE.md is configuration — standards and conventions loaded into every session — not a journal of in-flight investigation state. Stuffing daily findings into it pollutes shared team context, burdens every unrelated session with both investigations' notes, and still loses the conversational reasoning chain.",
+      "Correct. Named session resumption exists for exactly this: --resume <session-name> continues a specific prior conversation, so \"auth-bug\" and \"perf-audit\" each persist as separate threads with their accumulated exploration, ruled-out hypotheses, and tool results intact. The half hour of morning reconstruction simply disappears.",
+      "One final assistant message is a keyhole view of a multi-day investigation: everything not restated in that last message — earlier findings, dead ends, file-level details — is lost, and the morning still begins with re-exploration. Manual transcript shuttling is the workaround named sessions obsolete."
+    ],
+    "principle": "one named session per investigation; --resume continues it",
+    "relatedConcept": "Named session resumption with --resume <session-name> continues a specific prior conversation across work sessions, keeping concurrent investigations separate and intact.",
+    "overallExplanation": "Name each investigation's session and continue it with --resume <session-name> — each thread's accumulated context returns intact, with concurrent efforts kept separate. Perpetual merged sessions, CLAUDE.md journaling, and pasted final messages all lose or pollute context."
+  },
+  {
+    "id": 146,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Manage session state, resumption, and forking",
+    "type": "single",
+    "question": "After an expensive session in which Claude Code built a deep analysis of your service's architecture, the team wants to evaluate two candidate testing strategies — property-based testing versus snapshot testing — with each evaluation grounded in that analysis but conducted independently, so neither exploration's conclusions influence the other. What is the right session-management approach?",
+    "options": [
+      "Evaluate both strategies sequentially inside the resumed session, instructing the model to disregard the first evaluation entirely before beginning the second",
+      "Use fork_session to create two independent branches from the shared analysis baseline, exploring one testing strategy in each branch",
+      "Start two brand-new sessions and have each rebuild the architecture analysis from scratch before evaluating its assigned strategy",
+      "Resume the same named session in two terminals at once and run one strategy evaluation in each, letting the shared name keep them synchronized"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Instructing a model to disregard prior context does not remove it: the first strategy's reasoning, tradeoffs, and partial conclusions remain in the conversation and bias the second evaluation. Sequential evaluation in one thread is precisely the cross-contamination the team said it must avoid.",
+      "Correct. fork_session exists for exploring divergent approaches from a shared analysis baseline: both branches inherit the expensive architecture analysis once, then diverge completely, so each strategy is evaluated on identical footing with no leakage between explorations. Comparing testing strategies from a shared baseline is the pattern's textbook application.",
+      "Independence is achieved, but the expensive analysis is paid for twice — and worse, the two rebuilt analyses may differ in coverage or emphasis, so the strategy comparison is no longer conducted against the same baseline. Forking delivers the same independence while preserving both cost and comparability.",
+      "This treats a session name as a synchronization mechanism, which it is not — the name identifies one conversation thread, and pushing two divergent evaluations into it produces interleaved, mutually contaminating context rather than parallel isolation. Branching is fork_session's job."
+    ],
+    "principle": "fork the shared baseline; explore alternatives in isolation",
+    "relatedConcept": "fork_session creates independent branches from a shared analysis baseline — the mechanism for comparing testing or refactoring strategies without cross-contamination or re-analysis cost.",
+    "overallExplanation": "fork_session branches the expensive shared analysis into independent explorations — one per testing strategy — with identical baselines and zero cross-contamination. Sequential evaluation contaminates; rebuilding pays twice and breaks comparability."
+  },
+  {
+    "id": 147,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Manage session state, resumption, and forking",
+    "type": "single",
+    "question": "Two sprints ago you built a rich Claude Code session analyzing your order-management service. Since then, roughly forty files in the analyzed area were changed across several merged feature branches. Resuming the old session today, the agent confidently describes module boundaries and call paths that no longer exist. How should the investigation be continued?",
+    "options": [
+      "Start a new session seeded with a structured summary of the still-valid key findings, letting fresh tool calls establish current ground truth against the modern codebase",
+      "Resume the old session and enumerate all forty changed files so the agent performs targeted re-analysis of each before continuing the investigation",
+      "Resume the old session unchanged and rely on its accumulated history, since a rich conversation record always outweighs some staleness in tool results",
+      "Use fork_session to branch the old session into a fresh copy, since forking discards the parent's stale tool results while preserving its conclusions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When prior tool results are broadly stale, starting fresh with an injected structured summary is the more reliable pattern: curated, still-valid conclusions carry forward as explicit context, while everything about current code structure comes from new tool calls against the real codebase. The confident-but-wrong answers disappear because their stale source material is gone.",
+      "Targeted re-analysis is the right move when a couple of known files changed; at forty files across multiple branches it approximates full re-exploration while the resumed history still holds stale results for anything the enumeration misses — and those remain in context, ready to resurface as confident errors.",
+      "The observed behavior already falsifies this: stale tool results are worse than absent ones because the agent treats them as current ground truth. When most of the analyzed area has changed, accumulated history is a liability describing a codebase that no longer exists.",
+      "This misstates what forking does: fork_session branches a session to explore divergent approaches from a shared baseline, and the branch inherits that baseline — including every stale tool result. Forking is for parallel exploration, not a cleansing mechanism for outdated context."
+    ],
+    "principle": "broadly stale context means restart with a summary, not resume",
+    "relatedConcept": "The resumption decision tracks context validity: mostly-valid context resumes with change notifications; broadly stale context restarts fresh with a structured summary of key findings.",
+    "overallExplanation": "With forty files changed, prior tool results are broadly stale — start a new session seeded with a structured summary of still-valid findings and let fresh tool calls establish ground truth. Resumption suits small, known deltas; forking merely copies the stale baseline."
+  },
+  {
+    "id": 148,
+    "domain": "Agentic Architecture & Orchestration",
+    "objective": "Manage session state, resumption, and forking",
+    "type": "multi",
+    "question": "A newly drafted onboarding document for your platform team makes four claims about Claude Code session management, and you have been asked to strike the inaccurate ones before it circulates. Which two claims are accurate and should stay in the document? (Choose two.)",
+    "options": [
+      "Resumed sessions automatically detect files changed since the last turn and silently refresh any stale tool results in the conversation history",
+      "When resuming a session after code modifications, you should tell the agent which previously analyzed files changed so it can re-analyze them targetedly",
+      "Choose resumption when prior context is mostly valid; when old tool results are broadly stale, start a fresh session seeded with a structured summary instead",
+      "When forked branches complete, fork_session automatically merges each branch's findings back into the parent session for consolidated review"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "optionExplanations": [
+      "No such auto-detection exists: a resumed session's history contains the tool results exactly as they were captured, and the agent will reason from them as if current. This misbelief is dangerous precisely because it removes the practice — informing the agent of changes — that actually mitigates staleness.",
+      "Correct. Informing a resumed session about specific file changes is the documented practice: it directs targeted re-analysis at exactly the stale parts, preserving the rest of the accumulated investigation instead of forcing full re-exploration or silently trusting outdated results.",
+      "Correct. This is the core resumption decision rule: resumption pays off when the saved context is mostly still true, while broadly stale tool results make a fresh session with an injected structured summary the more reliable continuation — curated knowledge forward, ground truth rebuilt.",
+      "fork_session creates independent branches from a shared baseline for divergent exploration; nothing merges branches back automatically. Consolidating findings across branches is deliberate human or coordinator work — believing in auto-merge would lead teams to fork and lose results."
+    ],
+    "principle": "sessions neither self-refresh nor self-merge; you manage validity",
+    "relatedConcept": "Accurate session-management doctrine: notify resumed sessions of file changes, and choose between resuming, forking, and restarting based on how much saved context remains valid.",
+    "overallExplanation": "The accurate claims are the two practices: notify resumed sessions of changed files for targeted re-analysis, and resume only when context is mostly valid — restarting with a structured summary when it is broadly stale. Auto-detection of changes and auto-merging of forks are inventions."
   }
 ]

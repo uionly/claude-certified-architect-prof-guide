@@ -11,7 +11,9 @@
       "Store both team conventions and personal preferences in each developer's settings.json, since settings files override CLAUDE.md content when they conflict",
       "Create a custom slash command containing the conventions that developers must remember to run before starting any task in the repository"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Claude Code reads CLAUDE.md files hierarchically: a committed project-root CLAUDE.md gives every teammate the same shared instructions automatically, while a user-level CLAUDE.md in the home directory carries personal preferences across all of that developer's projects. This is exactly the separation of scopes the hierarchy is designed for.",
       "Tempting because pasted instructions do land in context, but this relies on every developer remembering to do it every session, and the instructions are lost on session restart. It rebuilds by hand and unreliably what the CLAUDE.md hierarchy provides automatically and consistently.",
@@ -34,7 +36,9 @@
       "Agent Memory, so Claude Code remembers the nightly task and re-runs it automatically on its own schedule without any pipeline integration",
       "Session resumption, restoring the previous night's interactive session in the pipeline so the accumulated context makes triage more accurate"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Headless mode (invoking the CLI non-interactively with a prompt, e.g. via the -p flag) is designed for scripts, CI pipelines, and automation where no human drives the session, and its output can be captured and parsed by the surrounding job. This matches the requirement exactly.",
       "Slash commands package reusable prompts, but they run inside a session — they are an ergonomic shortcut for a user or agent, not a scheduling or CI mechanism by themselves. This confuses a workflow shortcut with a non-interactive execution mode.",
@@ -44,5 +48,106 @@
     "principle": "headless mode is the mechanism for non-interactive, scripted, and CI-driven Claude Code runs",
     "relatedConcept": "Claude Code's operating modes — interactive sessions, headless mode, and streaming — are chosen based on whether a human, a script, or a UI consumes the output.",
     "overallExplanation": "Headless mode is the mechanism for non-interactive, scripted, and CI-driven Claude Code runs. Choose the operating mode — interactive, headless, or streaming — based on whether a human, a script, or a UI is consuming the output."
+  },
+  {
+    "id": 303,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "single",
+    "question": "Tomas's team at a music-streaming company performs the same ritual before every release: ask Claude Code to scan merged PRs since the last tag, summarize user-facing changes, and draft release notes in the team's format. Everyone types slightly different prompts and gets inconsistent results. The team wants a shared, on-demand, one-keystroke way to run this exact procedure. What should Tomas create?",
+    "options": [
+      "A section in the project CLAUDE.md describing the release-notes procedure so it is always present in context",
+      "A custom slash command checked into the project's .claude/commands directory so every teammate invokes the identical procedure on demand",
+      "A headless-mode wrapper script that each developer maintains in their personal dotfiles with their preferred prompt",
+      "A user-level CLAUDE.md entry on each developer's machine containing the team's release-notes prompt"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "CLAUDE.md holds always-applicable instructions that load into every session; a release procedure used on demand would add permanent context bloat to unrelated sessions while still requiring someone to phrase the request correctly.",
+      "Correct. Custom slash commands package a reusable prompt as a file under .claude/commands; committing it gives the whole team the same invocable procedure, which is exactly the fit for a repeatable, on-demand workflow.",
+      "Personal wrapper scripts recreate the inconsistency problem — each developer's dotfiles drift independently — and headless mode targets non-interactive automation, not an ergonomic shortcut inside interactive sessions.",
+      "User-level CLAUDE.md applies across all of a developer's projects and loads into every session; it is personal scope for the wrong content, and each machine's copy would drift just like the ad-hoc prompts do today."
+    ],
+    "principle": "repeatable on-demand procedures belong in committed custom slash commands",
+    "relatedConcept": "Claude Code separates always-on instructions (CLAUDE.md) from on-demand procedures (custom slash commands), and committing command files shares them with the team.",
+    "overallExplanation": "Repeatable on-demand procedures belong in committed custom slash commands. A prompt file in the project's .claude/commands directory gives every teammate the identical invocable workflow, without bloating always-loaded CLAUDE.md context."
+  },
+  {
+    "id": 304,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "multi",
+    "question": "Farah, platform lead at a cybersecurity vendor, is standardizing her team's Claude Code configuration: shared tool permissions and hooks for everyone in the repository, plus room for individual developers to override settings locally. Reviewing how the settings files work, she asks the team which claims are accurate. Which two statements are accurate? (Choose two.)",
+    "options": [
+      "Permission rules in settings.json are advisory — Claude may bypass a denied tool when it judges the action to be safe",
+      "A .claude/settings.json committed to the repository shares configuration such as permissions and hooks with everyone who works in that project",
+      "settings.local.json holds a developer's personal per-project overrides and is designed to stay out of version control",
+      "Natural-language coding conventions belong in settings.json, which has replaced CLAUDE.md for project instructions"
+    ],
+    "correct": [
+      1,
+      2
+    ],
+    "optionExplanations": [
+      "Permissions are enforced by the tooling, not weighed by the model — a denied tool is unavailable regardless of the model's confidence. Treating enforcement as advice would defeat the purpose of a permission system.",
+      "Correct. The project-scoped .claude/settings.json is meant to be committed, so permissions, hooks, and related configuration travel with the repository and apply consistently to every teammate who opens it.",
+      "Correct. settings.local.json is the personal layer: per-project overrides for an individual developer, intentionally excluded from version control so local preferences never leak into the team's shared configuration.",
+      "settings.json carries operational configuration — permissions, hooks, environment settings — while natural-language project instructions remain CLAUDE.md's job. The two files answer different questions and neither replaced the other."
+    ],
+    "principle": "commit .claude/settings.json for shared config; keep settings.local.json personal and uncommitted",
+    "relatedConcept": "Claude Code's settings layers separate team-shared operational configuration from personal overrides, and both are distinct from CLAUDE.md's instruction role.",
+    "overallExplanation": "Commit .claude/settings.json so permissions and hooks apply to the whole team, and keep settings.local.json as the uncommitted personal layer. Permissions are enforced by the tooling, and natural-language instructions still belong in CLAUDE.md."
+  },
+  {
+    "id": 305,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "single",
+    "question": "Wen runs developer experience at a manufacturing conglomerate with dozens of engineering teams. She has built a set of Claude Code assets — several slash commands, a code-review subagent, and an MCP server configuration — and needs to distribute them to many repositories with versioned updates, so teams can install them and stay current without copy-pasting files around. What is the right mechanism?",
+    "options": [
+      "Package the assets as a Claude Code plugin and distribute it through a plugin marketplace that teams can install from",
+      "Commit the assets to one flagship repository and instruct other teams to copy its .claude directory whenever it changes",
+      "Paste the slash-command contents into an organization-wide CLAUDE.md so the procedures load in every session",
+      "Convert each asset into a headless-mode shell script and circulate the scripts through the company chat tool"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Plugins exist to bundle Claude Code customizations — commands, agents, MCP configuration and more — into a single installable, versionable unit, which is precisely the many-teams distribution problem Wen is facing.",
+      "Manual copying has no version linkage: repositories drift the moment the source changes, updates depend on humans noticing announcements, and nothing tracks which team is running which revision.",
+      "CLAUDE.md distributes instructions, not functionality — it cannot carry a subagent definition or MCP server wiring, and stuffing command bodies into always-loaded context bloats every session with rarely used material.",
+      "Shell scripts shared over chat lose the assets' native integration — the commands stop being slash commands and the subagent stops being an agent — and chat distribution has even weaker versioning than manual copying."
+    ],
+    "principle": "plugins are the unit of packaging and versioned distribution for Claude Code customizations",
+    "relatedConcept": "A Claude Code plugin bundles commands, agents, and MCP configuration so many teams can install and update the same customizations from a marketplace.",
+    "overallExplanation": "Plugins are the unit of packaging and versioned distribution for Claude Code customizations. Bundling the commands, subagent, and MCP configuration into a plugin lets dozens of teams install from a marketplace and receive updates without manual copying."
+  },
+  {
+    "id": 306,
+    "domain": "Claude Code",
+    "objective": "Claude Code Operation",
+    "type": "single",
+    "question": "Bianca, a developer at a maritime-logistics software firm, was three hours into a Claude Code refactoring session — the conversation held hard-won context about the codebase's quirks and the decisions already made — when her laptop forced a restart for security updates. Back at her terminal afterward, she wants to continue exactly where the work stopped. What should she do?",
+    "options": [
+      "Start a new session and re-explain the refactor from scratch, since terminated sessions cannot be recovered",
+      "Rely on the project CLAUDE.md, since Claude Code automatically writes each session's full conversation into it",
+      "Resume the previous session from her session history, restoring the conversation and its accumulated context",
+      "Re-run her shell history through headless mode so the prior conversation is reconstructed programmatically"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Sessions persist beyond the process that ran them — treating a closed terminal as lost work forfeits three hours of accumulated context that session management exists specifically to preserve.",
+      "CLAUDE.md is curated instruction memory, not a transcript log; Claude Code does not dump full conversations into it, so nothing about the interrupted session would be waiting there after the restart.",
+      "Correct. Claude Code's session management keeps prior conversations resumable — picking the interrupted session back up restores its transcript and accumulated context, letting the refactor continue where it stopped.",
+      "Shell history records the commands Bianca typed, not the conversation state, and headless mode runs fresh non-interactive prompts — replaying commands would start brand-new sessions, not reconstruct the old one."
+    ],
+    "principle": "interrupted work is recovered through session resumption, not by rebuilding context manually",
+    "relatedConcept": "Session management is a core Claude Code feature: past conversations persist and can be resumed with their full context after a crash, reboot, or closed terminal.",
+    "overallExplanation": "Interrupted work is recovered through session resumption, not manual context rebuilding. Claude Code persists past conversations, so resuming the prior session restores its transcript and hard-won context after a reboot or closed terminal."
   }
 ]

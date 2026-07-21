@@ -11,7 +11,9 @@
       "Have each teammate keep one long-running chat open permanently so Claude gradually remembers the brand rules from earlier messages",
       "Ask Claude at the start of each chat to recall the brand guidelines it has seen in the team's previous conversations"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is exactly what Projects are for: instructions carry the standing behavioral rules, uploaded knowledge carries the reference documents, and every conversation in the Project starts already grounded in both — consistent across teammates without repeated pasting.",
       "Tempting because one operator does produce consistent output, but it creates a bottleneck and solves a configuration problem with a staffing change. The variation comes from unshared setup, not from having multiple users; a shared Project removes the variation while keeping everyone productive.",
@@ -34,7 +36,9 @@
       "Upload everything as knowledge files, including the tone guidance, and leave the instructions blank to keep the setup simple",
       "Keep the Project empty and attach the relevant documents manually to each individual conversation as the need arises"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Instructions and knowledge play different roles: instructions are standing directives about how Claude should behave (structure, tone, approach), while knowledge is reference material Claude consults for content. Matching each asset to its role keeps the configuration clear and effective.",
       "Tempting because stuffing everything into instructions feels like maximum emphasis, but instructions work best as concise behavioral direction. Burying two pages of rules inside twelve proposals' worth of pasted text dilutes the directives and misuses the mechanism built for reference content.",
@@ -57,7 +61,10 @@
       "Connect every drive and shared folder in the organization so no future question could ever fall outside Claude's reach",
       "Treat connector-sourced answers as pre-verified, since content pulled from official company documents does not require review"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Scoping connector access to what the use case needs is basic knowledge governance: it keeps irrelevant and potentially sensitive material out of scope and makes it far easier to reason about which sources answers come from.",
       "Correct. Managing connected knowledge includes tracing answers back to their sources: checking what Claude referenced and whether that file is current catches stale-document and wrong-document problems before they mislead the team.",
@@ -80,7 +87,9 @@
       "Ask reps to mentally adjust quoted prices based on their memory of recent revisions before repeating them to customers",
       "Remove pricing from the Project entirely, since frequently changing information can never be made available to Claude reliably"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because a warning is easy to add and honest, but it leaves the underlying problem intact: every quote still starts from wrong numbers, and the disclaimer trains reps to ignore Claude on pricing. Managing knowledge means fixing staleness, not labeling it.",
       "Correct. Frequently updated material is exactly what connectors are for: pointing Claude at the live Google Doc means answers track the current version rather than a snapshot from upload day. Matching the knowledge mechanism to the document's change rate is the core management skill here.",
@@ -103,7 +112,9 @@
       "Delete the instructions and upload the company's 90-page customer-service training manual as the sole guidance",
       "Leave the instructions unchanged and switch the Project to a more capable model, since stronger models infer the intended tone on their own"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Effective system-level instructions are specific and actionable: who the audience is, what tone and structure to use, what to avoid, ideally anchored by a brief example. Vague virtues like 'be helpful' give Claude nothing concrete to follow, which is why outputs vary.",
       "Tempting because repetition feels like emphasis, but repeating a vague directive three times just yields the same underspecified guidance louder. The problem is missing specifics, not insufficient weight on the existing words.",
@@ -126,7 +137,9 @@
       "Split the forty rules evenly across the instructions and the first message of each new chat so the guidance is delivered twice",
       "Number the rules by priority from 1 to 40 so Claude knows exactly which prohibition to sacrifice when rules conflict"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Effective instructions are concise, prioritized, and stated positively — describing the output you want rather than enumerating everything you don't. Bulk reference material such as a style guide belongs in knowledge, where Claude can consult it without it crowding out the core directives.",
       "Tempting because emphasis feels like enforcement, but the problem is volume and framing, not tone. Forty emphatic prohibitions still bury the important rules, and prohibition-heavy instructions describe what to avoid without ever specifying what a good output looks like.",
@@ -149,7 +162,9 @@
       "Rely on employees correcting Claude within their chats, since the corrections will accumulate and update the Project's knowledge over time",
       "Delete the Project and direct all policy questions back to the HR inbox, since a configuration that has gone stale once cannot be trusted again"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Maintenance means updating the stale knowledge source, checking the instructions for now-wrong references, and — because this failure came from missing ownership — establishing who reviews the configuration when policies change. Fix the content and the process that let it rot.",
       "Tempting as an immediate risk reduction, but it leaves a known-wrong knowledge source serving answers indefinitely and erodes trust in the whole Project. A warning is a stopgap at best; the update itself is quick and is the actual fix.",
@@ -159,5 +174,358 @@
     "principle": "stale knowledge needs an update and an owner, not a workaround",
     "relatedConcept": "Configurations decay as the organization changes; maintenance means refreshed sources plus assigned ownership and review cadence.",
     "overallExplanation": "Stale knowledge needs an update and an owner, not a workaround: replace the outdated document, sweep the instructions for old references, and assign ownership with a review cadence so the next policy change gets caught."
+  },
+  {
+    "id": 508,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "single",
+    "question": "Ingrid, office manager at an architecture firm, built one Claude Project that the team uses for three unrelated workflows: RFP responses, meeting minutes, and social-media posts. The instructions have grown into a tangle of rules for all three, and outputs increasingly apply the wrong conventions to the wrong task. What should she do?",
+    "options": [
+      "Expand the single Project's instructions with more detail about which rules apply to which type of task",
+      "Ask teammates to declare at the top of each chat which of the three workflows they are working on",
+      "Create a separate Project for each workflow, each with focused instructions and only the knowledge that workflow needs",
+      "Remove the instructions entirely and rely on the uploaded knowledge, since documents conflict less than rules do"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because more routing detail feels like more control, but it grows the tangle: every chat still carries three workflows' worth of competing rules, and each addition raises the odds of another cross-application. The structure, not the wording, is the problem.",
+      "Tempting because a declared context can help within a chat, but it depends on every teammate remembering a manual step and still leaves all three rule sets active in every conversation. It patches the symptom while the mixed configuration keeps generating conflicts.",
+      "Correct. A Project works best when it is scoped to one purpose: RFPs, minutes, and social posts each get their own instructions and knowledge, so no chat carries rules meant for a different task. Splitting by workflow removes the conflicts at the source.",
+      "Tempting because deleting the conflicting rules ends the contradictions, but it also discards the behavioral guidance each workflow genuinely needs — documents cannot tell Claude what tone, structure, or conventions to apply. This trades one failure mode for another."
+    ],
+    "principle": "scope each Project to one workflow",
+    "relatedConcept": "Projects are purpose-scoped containers — unrelated workflows belong in separate Projects, not one shared rule pile.",
+    "overallExplanation": "Scope each Project to one workflow: separate Projects give RFPs, minutes, and social posts their own focused instructions and knowledge, eliminating the cross-applied conventions a shared configuration keeps producing."
+  },
+  {
+    "id": 509,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "single",
+    "question": "Tomás, proposal coordinator at a renewable-energy developer, is adding knowledge to a new Project for drafting project proposals. The team drive holds about 300 files, including early drafts, superseded technical specs, and duplicates alongside the current templates and reference documents. How should he stock the Project's knowledge?",
+    "options": [
+      "Upload all 300 files so nothing that might ever be relevant is missing from the Project",
+      "Upload a curated set: the current, final versions of the documents proposal drafting actually relies on",
+      "Upload nothing, and paste whatever text seems relevant into each individual chat as the need arises",
+      "Upload everything but add an instruction telling Claude to ignore any documents that look outdated"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because completeness feels safe, but dumping drafts, superseded specs, and duplicates into knowledge means answers can be grounded in any of them — including the wrong versions. More material is not better grounding when much of it is obsolete.",
+      "Correct. Knowledge works best curated: the current, final documents the workflow actually depends on give Claude a clean, authoritative base and make it easy to know what any answer was drawn from. Selection is a configuration decision, not an afterthought.",
+      "Tempting because per-chat pasting gives fine control, but it recreates the repeated-setup burden Projects exist to remove and guarantees teammates ground their chats differently. Standing reference material belongs in the Project, chosen deliberately.",
+      "Tempting because the instruction sounds like a filter, but Claude has no reliable way to know which of 300 files the team considers outdated — 'looks outdated' is not a real criterion. Curation is a human judgment that must happen before upload, not a rule applied after."
+    ],
+    "principle": "curate knowledge to current, authoritative documents",
+    "relatedConcept": "A Project's knowledge should be a selected library, not a mirror of the team drive.",
+    "overallExplanation": "Curate knowledge to current, authoritative documents: uploading only the final versions the workflow relies on gives Claude a clean base, while bulk-dumping drafts and duplicates invites answers grounded in the wrong file."
+  },
+  {
+    "id": 510,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "single",
+    "question": "Beatriz, coordinator at a conference-management company, set up a Project with her event playbook and vendor documents. Believing Claude will forget them otherwise, she runs every task — budgets, speaker emails, signage copy — in one ever-growing chat inside the Project, which has become slow and confused. What should she understand about how Projects work?",
+    "options": [
+      "She should periodically repaste the project instructions into the long chat so they stay active as it grows",
+      "She should export the long chat and upload the transcript as a knowledge file so nothing is ever lost",
+      "She should ask Claude to promise to remember the playbook before closing any conversation in the Project",
+      "She can start a fresh chat per task, because the Project's instructions and knowledge apply to every chat inside it"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because repasting feels like reinforcement, but the instructions never stop applying — the degradation comes from months of unrelated tasks crowding one conversation, which repasting makes longer still. It treats the wrong problem and worsens the real one.",
+      "Tempting because a transcript preserves history, but a sprawl of budgets, emails, and signage drafts is noise, not reference material — uploading it pollutes the Project's clean knowledge base with exactly the clutter causing the confusion.",
+      "Tempting because it feels like securing a commitment, but a conversational promise has no effect on how configuration works: the playbook persists because it is project knowledge, not because Claude agreed to remember it. The mechanism is the Project, not the pledge.",
+      "Correct. Project instructions and knowledge ground every conversation started inside the Project, so nothing is forgotten between chats. The right pattern is a fresh chat per task on top of the standing configuration — clean context each time, playbook always present."
+    ],
+    "principle": "project configuration persists across every chat in the Project",
+    "relatedConcept": "The Project carries the standing context, so individual chats can stay short and task-focused.",
+    "overallExplanation": "Project configuration persists across every chat: instructions and knowledge ground each new conversation in the Project, so the right habit is a fresh, focused chat per task — not one overloaded thread hoarding context."
+  },
+  {
+    "id": 511,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Configure Claude Projects with instructions and knowledge sources",
+    "type": "multi",
+    "question": "Owen, training coordinator at a national veterinary-clinic chain, is building his first shared Project to help clinic managers draft onboarding plans and training checklists. Which two setup practices will most improve the Project's quality before he opens it to managers? (Choose two.)",
+    "options": [
+      "Write project instructions that define Claude's role, the audience, and the output standards managers expect",
+      "Upload the company's entire shared drive as knowledge so no conceivable question falls outside the Project",
+      "Try the Project on a handful of representative real tasks and refine the setup before rolling it out",
+      "Leave the instructions empty, since well-chosen knowledge documents make behavioral guidance redundant"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Instructions are where the Project's behavior is defined: who the outputs are for, what role Claude plays, and what a good deliverable looks like. Without them, every manager gets generic responses shaped only by whatever they happen to type.",
+      "Tempting because total coverage sounds thorough, but an entire shared drive buries the relevant training documents under payroll files, old policies, and clutter — degrading answer quality and making provenance impossible to reason about. Knowledge should be selected, not mirrored.",
+      "Correct. Piloting on representative tasks is how configuration problems surface while they are still cheap to fix: gaps in the instructions, missing documents, and formatting misses all show up before dozens of managers depend on the Project.",
+      "Tempting because good documents do carry a lot, but knowledge tells Claude what the facts are, not how to behave — tone, structure, and audience still need stating. Skipping instructions leaves the most controllable quality lever unused."
+    ],
+    "principle": "define behavior in instructions and pilot before rollout",
+    "relatedConcept": "A well-configured Project pairs explicit behavioral direction with a test run on real tasks.",
+    "overallExplanation": "Define behavior in instructions and pilot before rollout: role, audience, and output standards make responses consistent, and a trial on representative tasks catches setup gaps before the whole team depends on the Project."
+  },
+  {
+    "id": 512,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "single",
+    "question": "Lucia, quality manager at a food-processing plant, discovers her team's Project contains both the 2024 and 2026 versions of the sanitation manual, uploaded by different people. Staff report that Claude's answers about hold times and cleaning agents contradict each other from one chat to the next. What is the best fix?",
+    "options": [
+      "Add an instruction telling Claude to prefer the newer document whenever the two manuals disagree",
+      "Remove the superseded 2024 manual so the current version is the single source of truth in the Project",
+      "Keep both versions uploaded, since more context generally improves the quality of Claude's answers",
+      "Tell staff to ask Claude which manual it used each time and discard answers drawn from the old one"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because a preference rule sounds like a tidy patch, but it leaves a known-obsolete safety document in the knowledge base and bets compliance-relevant answers on the rule being applied perfectly every time. The obsolete source should not be in scope at all.",
+      "Correct. Managing uploaded knowledge means removing superseded material, not layering rules on top of it. With only the current manual present, every chat grounds on the same authoritative version and the contradictions disappear at the source.",
+      "Tempting because extra context often helps, but two versions of the same manual are not complementary context — they are direct contradictions on hold times and chemicals. Conflicting duplicates degrade answers; they never enrich them.",
+      "Tempting because provenance-checking is a good habit, but making every staff member interrogate and filter answers shifts a configuration failure onto users indefinitely. A knowledge base that requires manual answer-discarding is simply misconfigured."
+    ],
+    "principle": "remove superseded documents instead of ruling around them",
+    "relatedConcept": "Knowledge hygiene keeps one authoritative version of each document in scope.",
+    "overallExplanation": "Remove superseded documents instead of ruling around them: deleting the 2024 manual leaves one authoritative source, which ends the contradictory answers without depending on preference rules or user vigilance."
+  },
+  {
+    "id": 513,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "single",
+    "question": "Nora, executive assistant at a metropolitan museum, compiles a weekly briefing for the director summarizing key email threads about donor logistics and exhibition vendors. She currently copies dozens of emails into a Claude chat by hand every Friday, which takes over an hour. What is the best way to streamline this?",
+    "options": [
+      "Connect her Gmail account through the connector so Claude can search and reference her mail when she requests the briefing",
+      "Export her entire mailbox once a month and upload the archive to the Project as a knowledge file",
+      "Keep pasting the threads manually, since connectors work with files and documents rather than email",
+      "Ask IT to create a separate email account for Claude that is copied on all museum correspondence"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is the use case email connectors exist for: with Gmail connected, Claude can search and reference the messages Nora already has access to when she asks for her briefing, replacing an hour of copying with a single request against live mail.",
+      "Tempting because an archive gets the mail into the Project, but a monthly export is stale for most of its life and dumps thousands of irrelevant messages into knowledge. It replaces a live, searchable source with an oversized outdated snapshot.",
+      "Tempting if she assumes connectors are file-only, but that premise is wrong — Gmail is a standard connector precisely so email context does not have to be pasted by hand. Continuing the manual routine forfeits the fix the platform provides.",
+      "Tempting as a workaround, but a shadow account copied on all museum correspondence over-collects far beyond her briefing needs and creates a data-governance problem IT would rightly refuse. The connector already scopes access to what her own account can see."
+    ],
+    "principle": "connect the mailbox instead of hand-copying threads",
+    "relatedConcept": "The Gmail connector lets Claude search and reference mail the user already has access to, on request.",
+    "overallExplanation": "Connect the mailbox instead of hand-copying threads: the Gmail connector lets Claude search Nora's own mail when she asks for the briefing, replacing manual pasting with live, permission-scoped access."
+  },
+  {
+    "id": 514,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "multi",
+    "question": "Gustavo, operations coordinator at a regional airline, has inherited several team Projects whose knowledge — dozens of uploads and a handful of connectors — accumulated over a year with no oversight. Which two practices should he adopt to bring the knowledge under proper management? (Choose two.)",
+    "options": [
+      "Keep a simple inventory of what each Project's knowledge contains and where each source came from",
+      "Leave every existing connector in place indefinitely, since revoking access might disrupt someone's workflow",
+      "Add each new company document to every Project by default so knowledge never falls behind",
+      "Periodically review the uploads and connector access, removing sources the Projects no longer need"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "optionExplanations": [
+      "Correct. An inventory is the foundation of knowledge management: knowing what is uploaded where, and from what source, is what makes updates findable, staleness detectable, and answers traceable. Inherited configurations are unmanageable without it.",
+      "Tempting because caution about breaking workflows is reasonable, but indefinite access-by-inertia is the opposite of management — unneeded connectors keep exposing data with no owner or purpose. The fix for uncertainty is checking with users, not never reviewing.",
+      "Tempting because it sounds like staying current, but blanket-adding every document to every Project floods each one with irrelevant material and buries the sources that matter. Knowledge stays useful through relevance to the Project's purpose, not volume.",
+      "Correct. Periodic review with removal is the maintenance half of knowledge management: uploads that are obsolete and connectors no one uses should exit the configuration, keeping scope proportionate to actual need and answers grounded in what matters."
+    ],
+    "principle": "inventory what you have and prune what you no longer need",
+    "relatedConcept": "Managing accumulated knowledge means knowing its contents and origins, then reviewing and removing on a cadence.",
+    "overallExplanation": "Inventory what you have and prune what you no longer need: a record of each Project's sources makes the knowledge manageable, and periodic review with removal keeps access and content proportionate to real use."
+  },
+  {
+    "id": 515,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+    "type": "single",
+    "question": "Adele, communications officer at a symphony orchestra, stocked her media-inquiries Project with the finalized season program and the published press kit — documents that will not change until next season. A new colleague insists that static uploads are always bad practice and everything must become a live Google Drive connection. How should Adele respond?",
+    "options": [
+      "Agree and convert every document to a connector, since uploaded files inevitably go stale within weeks",
+      "Remove the documents from the Project and paste excerpts into individual chats to avoid the debate",
+      "Keep the static uploads for these finalized documents, reserving connectors for sources that actually change",
+      "Set up both a connector and a static upload for each document so the Project is covered either way"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because connectors do solve staleness, but staleness is a property of changing documents — a finalized season program is stable until next season by definition. Converting stable files adds a live dependency with no freshness benefit in return.",
+      "Tempting as a way to sidestep the disagreement, but it abandons the Project's core value: standing reference material available to every chat. Per-chat pasting reintroduces the repeated setup and inconsistency the Project was built to eliminate.",
+      "Correct. The mechanism should match the document's change rate: finalized, published materials are exactly what static uploads suit, while connectors earn their keep on sources that are revised often. A blanket 'always connect' rule ignores the actual decision criterion.",
+      "Tempting because redundancy sounds robust, but duplicating every document creates two copies that can diverge and doubles the maintenance surface for zero benefit. Redundant knowledge sources are a hygiene problem, not a safeguard."
+    ],
+    "principle": "match the mechanism to the document's change rate, in both directions",
+    "relatedConcept": "Connectors suit changing sources; stable, finalized documents are well served by static uploads.",
+    "overallExplanation": "Match the mechanism to the document's change rate in both directions: a finalized season program belongs as a static upload, and reflexively converting stable files to connectors adds dependency without freshness."
+  },
+  {
+    "id": 516,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Henrik, research assistant at a policy think tank, added the line 'Never make factual errors — be 100% accurate at all times' to his Project's instructions. He now proposes dropping the team's citation-verification step, reasoning that accuracy is guaranteed by the instruction. What should the team understand about system-level instructions?",
+    "options": [
+      "The instruction will work if it is also repeated at both the top and the bottom of the instruction block",
+      "Instructions steer tone, format, and approach, but cannot make outputs factually reliable — verification must stay",
+      "The instruction should be strengthened with consequences, such as stating that inaccurate answers will be rejected",
+      "The team should keep the rule and simply ask Claude after each response whether it complied with it"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because placement does affect how instructions land, but repetition of an unenforceable demand just delivers the same impossibility twice. No position in the instruction block converts 'be 100% accurate' into a mechanism that prevents fabrication.",
+      "Correct. Instructions shape behavior Claude can control — voice, structure, method, caution — but factual reliability is a limitation of the technology, not a preference to toggle. An accuracy demand does not eliminate hallucination risk, so human verification remains part of the workflow.",
+      "Tempting because stakes-raising feels motivating, but a model does not become more factually grounded because the instructions threaten rejection. Consequences change nothing about the underlying failure mode, and the team would be dropping a real control for a fake one.",
+      "Tempting because a compliance check sounds rigorous, but asking Claude to grade its own accuracy produces confident self-affirmation, not verification. The check must compare claims against authoritative sources, which is exactly the step Henrik wants to drop."
+    ],
+    "principle": "instructions cannot legislate factual accuracy",
+    "relatedConcept": "System-level instructions govern controllable behavior; hallucination risk is managed by verification, not by rules.",
+    "overallExplanation": "Instructions cannot legislate factual accuracy: they steer tone, format, and approach, but fabrication risk is inherent to the technology, so citation verification stays in the workflow no matter what the rules say."
+  },
+  {
+    "id": 517,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Zainab, resident-services manager at a property-management company, oversees a Project whose instructions were appended to by four different administrators over a year. One line says replies must stay under 100 words; another added later demands complete step-by-step move-out procedures in every response. Outputs now swing unpredictably between the two styles. What should she do?",
+    "options": [
+      "Audit the full instruction set, resolve the contradictions, and publish one coherent, prioritized version",
+      "Add a new rule at the top stating that in any conflict, instructions added earlier override those added later",
+      "Delete all the instructions and run the Project without any, since accumulated rules clearly cause more harm than good",
+      "Ask each teammate to append a clarifying rule whenever they encounter a case the current instructions leave ambiguous"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Contradictory directives are why the outputs oscillate — the model cannot satisfy both a hard word cap and mandatory full procedures. Effective instructions are internally consistent and prioritized, which requires someone to reconcile the accumulated set into one coherent voice.",
+      "Tempting because a precedence rule sounds like engineering, but it leaves the contradictions in place and adds a meta-rule on top of the pile. Arbitrary seniority-by-date also has no relationship to which directive is actually right for residents today.",
+      "Tempting because the rules are causing harm, but zero instructions means zero standing guidance on tone, structure, or required content — trading unpredictable outputs for consistently generic ones. The cure for bad instructions is good instructions, not none.",
+      "Tempting because it responds to real ambiguity, but per-person appending is precisely the process that produced the contradictions. More uncoordinated additions grow the conflict surface; the set needs consolidation under one editorial hand, not more contributors."
+    ],
+    "principle": "instructions must be internally consistent, which takes deliberate reconciliation",
+    "relatedConcept": "Accumulated multi-author rules drift into contradiction; periodic consolidation restores a coherent instruction set.",
+    "overallExplanation": "Instructions must be internally consistent: a full audit that resolves the word-cap-versus-full-procedures conflict into one prioritized version fixes the oscillation that layered, multi-author additions created."
+  },
+  {
+    "id": 518,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Kenji, brand manager at a craft brewery, maintains a Project for the team's social-media copy. A teammate wants to paste this month's seasonal-release tasting notes and launch dates directly into the standing project instructions so the campaign 'gets top priority.' How should Kenji handle campaign-specific material?",
+    "options": [
+      "Add the campaign details to the instructions as proposed, since instructions are the most reliably followed part of a Project",
+      "Add the details to the instructions and also require them in every prompt, so the campaign cannot be missed either way",
+      "Keep all campaign information away from the Project entirely, since Projects should contain only permanent material",
+      "Keep durable brand-voice rules in the instructions and supply campaign specifics in the chat prompt or a dated knowledge file"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because instructions are reliably applied, but that is exactly the danger: October's tasting notes would keep steering every draft long after the launch, and the instructions become a graveyard of expired campaigns someone must remember to clean out.",
+      "Tempting because double coverage sounds safe, but it duplicates temporary content in two places that will fall out of sync, and it still plants expiring material in the standing configuration. Redundancy of a mistake is not a safeguard.",
+      "Tempting as a tidy rule, but it overshoots: campaign material has a legitimate place in the Project as a clearly dated knowledge file, or simply in the prompt for the chats that need it. The point is separating durable from temporary, not banning the temporary.",
+      "Correct. Instructions should carry what is true of every output — brand voice, audience, format — while time-boxed specifics travel with the task, in the prompt or a dated knowledge file. That keeps the standing configuration clean when the campaign ends."
+    ],
+    "principle": "instructions hold durable defaults, not expiring campaign details",
+    "relatedConcept": "Separate what applies to every chat from what applies to this month's task — only the former belongs in instructions.",
+    "overallExplanation": "Instructions hold durable defaults: brand-voice rules belong in the standing configuration, while seasonal tasting notes and launch dates travel with the individual prompt or a dated knowledge file that is easy to retire."
+  },
+  {
+    "id": 519,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Create effective system-level instructions",
+    "type": "single",
+    "question": "Dominic, volunteer coordinator at an animal-shelter network, set his personal account-level preferences so Claude always writes in a warm, informal tone. He is puzzled that drafts produced by his three teammates in their shared adoption-outreach Project still come out formal and stiff. What explains this, and what should he do?",
+    "options": [
+      "Have each teammate copy his preference text into their own personal settings so everyone's accounts match",
+      "Personal preferences shape only his own account's chats; shared tone standards belong in the Project's instructions",
+      "Account preferences take time to propagate across a team, so the teammates' outputs will align within a few days",
+      "Ask each teammate to tell Claude at the start of their chats to adopt Dominic's saved personal preferences"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because it would roughly work at first, but four private copies of a shared standard drift the moment one person edits theirs, and new teammates start from nothing. Standards meant for the whole team belong in configuration the whole team shares.",
+      "Correct. Account-level preferences are personal — they shape how Claude responds to Dominic, not to anyone else. The tone standard he wants the whole team to follow is exactly what project instructions are for: one shared directive applied to every chat in the Project.",
+      "Tempting because propagation delays are a familiar software idea, but it is not how this works: personal preferences never extend to other people's accounts, at any time. Waiting will change nothing about the teammates' output.",
+      "Tempting because Claude will adjust tone when asked, but this makes the standard depend on three people remembering a ritual phrase in every chat — and 'Dominic's saved preferences' is not something their accounts can see. It is per-chat improvisation, not configuration."
+    ],
+    "principle": "personal preferences are per-account; shared standards go in project instructions",
+    "relatedConcept": "Instruction scope matters — account-level settings follow the individual, while project instructions govern every chat in the shared Project.",
+    "overallExplanation": "Personal preferences are per-account: they never reach teammates' chats, so a tone standard the whole team must follow belongs in the shared Project's instructions where it applies to everyone."
+  },
+  {
+    "id": 520,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions",
+    "type": "multi",
+    "question": "Freya, PMO analyst at a construction firm, spent the weekend overhauling her team Project — rewriting the instructions and swapping several knowledge files. On Monday teammates complain that outputs 'suddenly changed,' and one has concluded Claude is broken. Which two practices should Freya adopt for this and future updates? (Choose two.)",
+    "options": [
+      "Announce configuration changes to the Project's users, covering what changed, why, and what differences to expect",
+      "Quietly roll back the entire overhaul, since a configuration a team relies on should never be changed",
+      "Keep a brief change log of configuration updates so shifts in output behavior can be traced to their cause",
+      "Tell teammates that output variation is inherent randomness in the technology and requires no explanation"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. A configuration is shared infrastructure: when its behavior changes, the people who depend on it need to know what changed and why. Informing users converts a confusing shift into an expected one and preempts the 'Claude is broken' diagnosis.",
+      "Tempting because the rollback would end Monday's complaints, but freezing a configuration forever guarantees it goes stale — the opposite of maintenance. The overhaul was presumably needed; the failure was communication, so fix that rather than undoing the work.",
+      "Correct. A change log gives configuration updates a memory: when outputs shift, anyone can check what was edited and when, separating real regressions from expected consequences of an update. It is the lightweight record that makes shared configurations maintainable.",
+      "Tempting because outputs do vary run to run, but Monday's shift has a specific, known cause — Freya's overhaul — and attributing it to randomness is simply untrue. Misinforming users erodes the trust the configuration needs to be useful."
+    ],
+    "principle": "communicate configuration changes and keep a change log",
+    "relatedConcept": "Maintaining a shared configuration includes informing its users — silent updates read as malfunctions.",
+    "overallExplanation": "Communicate configuration changes and keep a change log: telling users what changed and why turns a mysterious behavior shift into an expected one, and the log lets future shifts be traced to their cause."
+  },
+  {
+    "id": 521,
+    "domain": "Configuration and Knowledge Management",
+    "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions",
+    "type": "single",
+    "question": "Santiago, training lead at an accounting firm, must update the team's Project for the new reporting standards: replacing most knowledge files and substantially rewriting the instructions. Twenty-five staff use the Project daily for client-facing work. How should he carry out the update?",
+    "options": [
+      "Make all the changes directly in the live Project at once, since staff complaints will quickly surface any problems",
+      "Replace the knowledge files but keep the old instructions untouched, limiting the amount of change staff experience",
+      "Run representative test prompts against the updated configuration and compare results to expectations before rolling it out",
+      "Add the new knowledge files alongside the old ones so both standards remain available during the transition"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because it is fast and feedback will come, but the feedback arrives as errors in client-facing work produced by twenty-five people. Using the whole team as unwitting testers puts the discovery cost on the highest-stakes outputs.",
+      "Tempting because it minimizes disruption, but instructions written for the old standards will now steer drafts grounded in the new documents — a half-updated configuration that contradicts itself. Knowledge and instructions must be updated together to stay coherent.",
+      "Correct. A significant configuration change should be validated the same way it will be used: run the tasks staff actually perform against the new setup, compare outputs to what the new standards require, and fix gaps before twenty-five people depend on it.",
+      "Tempting because a transition buffer sounds prudent, but co-resident old and new standards give Claude two contradictory authorities to draw from, producing exactly the inconsistent answers an update is meant to prevent. Superseded sources should exit when their replacement arrives."
+    ],
+    "principle": "test an updated configuration on representative tasks before rollout",
+    "relatedConcept": "Maintenance quality shows at update time — validate against real tasks first, and never leave a configuration half-migrated.",
+    "overallExplanation": "Test the updated configuration on representative tasks before rollout: comparing real-task outputs against the new standards catches gaps cheaply, instead of letting twenty-five staff discover them in client-facing work."
   }
 ]

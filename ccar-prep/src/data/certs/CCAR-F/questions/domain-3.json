@@ -11,7 +11,9 @@
       "User-level CLAUDE.md files require explicit activation per project; have the new hire run /memory in the repository once to register the senior engineer's file",
       "The conventions should be copied into ~/.claude/CLAUDE.md on each teammate's machine so every developer carries an identical personal configuration"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. ~/.claude/CLAUDE.md is user-level configuration: it applies only to that user and is never shared with teammates through version control. Team-wide conventions belong in the project-level CLAUDE.md checked into the repository, where every clone receives them automatically.",
       "Tempting because a fresh environment often explains odd behavior, but nothing here indicates a broken installation. The reasoning error is blaming the tool when the configuration hierarchy explains the symptom exactly: user-level files simply never travel with the repository.",
@@ -34,7 +36,9 @@
       "Keep the monolithic root CLAUDE.md but add a table of contents and instruct Claude to read only the sections that apply to the current task",
       "Convert the entire standards document into a skill so that developers can invoke it on demand whenever they need the team's conventions"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because it reduces each session's context, but it moves shared standards into unshared user-level files, guaranteeing drift between developers and leaving new hires with nothing. It solves token waste by abandoning consistency, which is the wrong trade-off.",
       "Correct. The @import syntax keeps CLAUDE.md modular: standards live in focused external files, and each package's CLAUDE.md imports only what applies, curated by the maintainers who hold the domain knowledge. Sessions load relevant context without the monolith's noise.",
@@ -57,7 +61,9 @@
       "Put the conventions in the project CLAUDE.md and package the release-notes workflow as a project-scoped skill invoked on demand",
       "Put the conventions in each developer's ~/.claude/CLAUDE.md and the release-notes workflow in ~/.claude/commands/ for fast personal access"
     ],
-    "correct": [2],
+    "correct": [
+      2
+    ],
     "optionExplanations": [
       "Tempting because CLAUDE.md guarantees the content is always present, but stuffing an occasional multi-step workflow into always-loaded memory wastes tokens in every session for something used once a sprint. Always-loaded scope should be reserved for universal standards.",
       "Tempting because skills are versioned and shareable, but conventions placed in a skill only apply when someone invokes it — generated code in ordinary sessions would ignore the team's standards. Universal rules need the always-loaded mechanism, not on-demand invocation.",
@@ -80,7 +86,10 @@
       "Add argument-hint so developers are prompted for the required parameters whenever they invoke the skill without arguments",
       "Move the skill to ~/.claude/skills/ under a different name so each developer runs a personal variant that cannot affect teammates"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. context: fork runs the skill in an isolated sub-agent context, so verbose exploratory output stays out of the main session — exactly the mechanism for skills that produce heavy discovery output like codebase analysis.",
       "Correct. allowed-tools in skill frontmatter restricts which tools the skill may use during execution; limiting it to the write operations it needs is the deterministic way to prevent the destructive source-file edits observed in testing.",
@@ -103,7 +112,9 @@
       "Keep the conventions in the root CLAUDE.md but preface the section with a note telling Claude to apply it only when the current task involves Terraform",
       "Ask infrastructure engineers to add the conventions to their personal ~/.claude/CLAUDE.md files since they are the only developers who need them"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Rule files in .claude/rules/ with a YAML frontmatter paths field activate conditionally: the conventions load only when Claude edits files matching the glob, which cuts irrelevant context and token usage in every non-Terraform session while keeping the rules versioned and shared.",
       "Tempting because a skill would keep the content out of unrelated sessions, but it depends on an engineer remembering to invoke it — forget once and Terraform work proceeds without the conventions. Conditional loading should be automatic and path-driven, not memory-driven.",
@@ -126,7 +137,9 @@
       "Remove the paths frontmatter entirely so testing.md loads unconditionally into every session regardless of which files are being edited",
       "Relocate all test files into src/tests/ so the existing glob matches them and the directory structure mirrors the rule configuration"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Glob-pattern rules can target files by type regardless of directory location — exactly the advantage of path-specific rules over directory-bound configuration when conventions apply to files spread throughout a codebase. A **/*.test.tsx pattern matches every co-located test.",
       "Tempting because directory-level CLAUDE.md files do scope instructions, but tests are spread across dozens of directories: you would duplicate the conventions everywhere, keep every copy in sync, and update the set each time tests appear in a new directory. Glob rules exist to avoid this.",
@@ -149,7 +162,9 @@
       "Use direct execution with a comprehensive upfront prompt specifying exactly how every one of the 45+ files should be modified in a single pass",
       "Split the work across parallel Claude Code sessions, one per service, so each session's context stays small enough to finish without planning"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This task has plan mode's signature traits: large-scale multi-file changes, multiple valid approaches, and architectural implications for infrastructure. Planning first enables safe exploration and a deliberate approach choice, then direct execution implements the committed plan.",
       "Tempting because migrations feel mechanical, but the approach decision has infrastructure-wide retry and pooling consequences — discovering it mid-migration means rework across every file already edited. Incremental execution defers exactly the decision that must come first.",
@@ -172,7 +187,9 @@
       "Restart the session at the end of discovery and rely on the model to re-derive the important findings during implementation",
       "Ask Claude to keep its discovery output brief so that file listings and search results consume fewer tokens in the main session"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The Explore subagent exists precisely to isolate verbose discovery output: exploration happens in a separate context and only summaries return, preserving the main conversation's window for planning and implementation across a multi-phase task.",
       "Tempting because just-in-time reading limits context growth, but abandoning discovery on a sprawling legacy codebase forfeits the system-level understanding the modernization needs — changes get made without knowing what they affect. It trades context safety for rework risk.",
@@ -195,7 +212,9 @@
       "Start a fresh session for each attempt so earlier misinterpretations cannot contaminate the next generation of the script",
       "Ask Claude to restate the specification in its own words before coding, and correct any misreadings before implementation begins"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When prose descriptions are interpreted inconsistently, concrete input/output examples are the most effective way to communicate the expected transformation — a real record and its converted form pin down ambiguities (like the address delimiter) that no prose phrasing settles.",
       "Tempting because stricter wording feels more precise, but the failures show the prose itself is ambiguous — 'split the address' still does not say on what. More emphatic prose multiplies words without adding the disambiguating information an example carries.",
@@ -218,7 +237,9 @@
       "Provide a few input/output examples of cached versus uncached API responses so Claude can infer the intended caching behavior from the data",
       "Prompt Claude to generate three alternative caching implementations and choose whichever one looks most complete after reviewing the code"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The interview pattern is designed for unfamiliar domains: Claude asks questions that surface considerations the developer has not anticipated — cache invalidation strategies, failure modes, staleness tolerance — so the design is informed before implementation begins.",
       "Tempting because test-driven iteration is a powerful refinement technique, but it presumes you can already specify expected behavior and edge cases. He cannot write meaningful invalidation or failure-mode tests for requirements he has not yet discovered.",
@@ -241,7 +262,10 @@
       "Set the CLAUDE_HEADLESS=true environment variable in the workflow so the CLI detects it is running inside an automated pipeline",
       "Instruct Claude in the prompt to respond only with valid JSON and have the posting script strip any surrounding prose before parsing"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. The -p (or --print) flag is the documented mechanism for non-interactive mode: Claude Code processes the prompt, writes the result to stdout, and exits — which is exactly what prevents CI jobs from hanging on interactive input.",
       "Correct. --output-format json with --json-schema enforces structured output at the CLI level, producing machine-parseable findings a script can reliably post as inline PR comments — no fragile prose parsing required.",
@@ -264,7 +288,9 @@
       "Run the review only once when the pull request is opened, so subsequent commits can never generate duplicate findings",
       "Restrict each re-run to the lines changed in the newest commit so earlier findings fall outside the scope of the review"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Feeding prior findings into the re-run's context and instructing Claude to report only new or still-unaddressed issues fixes duplication at the source: the model knows what has already been raised and can also confirm which earlier issues remain open.",
       "Tempting because post-hoc deduplication seems simple, but Claude phrases the same finding differently across runs, so string matching both misses duplicates and can suppress genuinely new findings with similar wording. It patches the symptom downstream of the cause.",
@@ -274,5 +300,610 @@
     "principle": "give re-runs the prior findings; ask only for new or unaddressed issues",
     "relatedConcept": "CI review quality depends on managing context across runs, not just on the single-run prompt.",
     "overallExplanation": "Give re-runs the prior findings and ask only for new or still-unaddressed issues. Duplicate comments are a context problem across runs, and the fix is supplying that context, not filtering output downstream."
+  },
+  {
+    "id": 313,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization",
+    "type": "multi",
+    "question": "Claude Code follows your team's database-migration conventions perfectly in the tech lead's sessions, ignores them entirely for two other engineers on the same repository, and behaves inconsistently in the shared CI environment. Which two diagnostic steps most directly identify the cause? (Choose two.)",
+    "options": [
+      "Run /memory in each environment to verify which memory files are actually being loaded into the session",
+      "Check whether the conventions live in the tech lead's user-level ~/.claude/CLAUDE.md instead of project-level configuration shared through version control",
+      "Reinstall Claude Code on the two affected engineers' machines to rule out a corrupted local installation before investigating configuration",
+      "Ask the two engineers to restate the conventions in their prompts at the start of every session until the inconsistency resolves itself"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. /memory is the diagnostic command for exactly this symptom: it shows which memory files are loaded in a given session, so comparing its output across the three environments immediately reveals whether the conventions file is present for the tech lead but absent for the others.",
+      "Correct. Instructions working for one user and failing for teammates is the signature of user-level configuration: ~/.claude/CLAUDE.md applies only to that user and never travels through version control, so colleagues and CI receive nothing. Confirming the file's location pinpoints the hierarchy mistake and its fix.",
+      "Nothing in the symptom pattern suggests broken software — the tool works everywhere; only the loaded configuration differs. Reinstalling skips the configuration hierarchy, which explains per-user divergence exactly, and delays the two checks that actually diagnose it.",
+      "Manual restating is a workaround, not a diagnostic: it masks the symptom session by session while the misplaced configuration stays misplaced, and CI cannot restate anything. The goal is to find why loading differs, not to compensate by hand."
+    ],
+    "principle": "diagnose loading with /memory, then check which hierarchy level holds the instructions",
+    "relatedConcept": "Per-user behavioral divergence points to user-level vs project-level CLAUDE.md placement; /memory shows what each session loaded.",
+    "overallExplanation": "Inconsistent instruction-following across users is diagnosed by verifying what loads (/memory) and where the instructions live (user-level files never propagate through version control). Reinstalls and manual prompt repetition address neither question."
+  },
+  {
+    "id": 314,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization",
+    "type": "single",
+    "question": "A payments team's single-package repository has a CLAUDE.md that has grown to 1,900 lines mixing testing standards, API conventions, and deployment procedures. Engineers struggle to review changes to it, and unrelated edits keep colliding in the one file. The content must all remain team-shared and loadable. What reorganization does the configuration system support for this?",
+    "options": [
+      "Split the monolith into focused topic files in .claude/rules/ — such as testing.md, api-conventions.md, and deployment.md — as the modular alternative to one large CLAUDE.md",
+      "Move the full document unchanged into a single standards.md file and replace CLAUDE.md's content with one @import line referencing it",
+      "Compress the document by rewriting all 1,900 lines into terse bullet fragments so the single file becomes short enough to review comfortably",
+      "Distribute the three sections into each engineer's ~/.claude/CLAUDE.md according to which area of the codebase they most frequently work on"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The .claude/rules/ directory is the supported way to organize topic-specific rule files as an alternative to a monolithic CLAUDE.md. Each topic — testing, API conventions, deployment — becomes a focused, independently reviewable file, edits stop colliding, and everything stays project-scoped and shared through version control.",
+      "A single @import of the whole document is relocation, not modularization: the monolith survives intact in standards.md with the same review burden and the same edit collisions, just reachable through one extra hop. The problem was the file's structure, which this leaves untouched.",
+      "Compression trades clarity for length: conventions stripped to terse fragments lose the context that makes them followable, and the file still mixes three unrelated topics whose edits still collide. Line count was a symptom; the missing structure is the disease.",
+      "Scattering shared standards into personal user-level files destroys the property that matters most — team-wide consistency. User files never propagate through version control, engineers' copies drift immediately, and anyone touching an unfamiliar area works without that area's rules."
+    ],
+    "principle": "organize topic-specific rules in .claude/rules/ instead of one monolith",
+    "relatedConcept": ".claude/rules/ holds focused rule files (testing.md, api-conventions.md, deployment.md) as the modular alternative to a giant CLAUDE.md.",
+    "overallExplanation": "Splitting a monolithic CLAUDE.md into focused topic files under .claude/rules/ is the supported modular organization: independently reviewable, collision-free, and still project-shared. Wholesale @import relocation, compression, and per-user scattering each miss the structural fix."
+  },
+  {
+    "id": 315,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization",
+    "type": "single",
+    "question": "In a product monorepo, the packages/mobile directory follows React Native conventions — navigation patterns, platform-split file rules, native module guidelines — that are meaningless in the web and backend packages. Universal engineering standards already live in the root CLAUDE.md. Where should the mobile conventions go so they apply when engineers work in that package?",
+    "options": [
+      "In a CLAUDE.md file inside packages/mobile, using the directory level of the configuration hierarchy to scope the conventions to work in that subtree",
+      "In the root CLAUDE.md under a heading stating that the following section applies only when the files being edited belong to the mobile package",
+      "In each mobile engineer's ~/.claude/CLAUDE.md, since they are the only developers who regularly work inside the mobile package's code",
+      "In a skill that mobile engineers invoke at the start of any session in which they expect to modify files inside the mobile package"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The CLAUDE.md hierarchy has a directory level for exactly this: a CLAUDE.md inside packages/mobile scopes the React Native conventions to work in that subtree, keeps them out of web and backend sessions, and remains version-controlled so every engineer who enters the package gets them automatically.",
+      "A conditional heading keeps the full mobile section loading into every session — web, backend, and all — and delegates the \"applies only to mobile\" decision to model inference on every task. Token cost stays universal and enforcement stays probabilistic when the hierarchy offers deterministic scoping.",
+      "User-level placement misdescribes the boundary: the conventions belong to a place in the repository, not to a set of people. Any non-mobile engineer touching the package gets no guidance, the copies drift across machines, and nothing reaches new team members on clone.",
+      "Skill invocation makes convention loading depend on memory — forget once and mobile code is generated without the platform rules. Always-applicable conventions for a code area deserve automatic loading tied to location, not an on-demand workflow trigger."
+    ],
+    "principle": "directory-level CLAUDE.md scopes conventions to a subtree",
+    "relatedConcept": "The hierarchy's directory level puts subtree-specific conventions where they load automatically for work in that location.",
+    "overallExplanation": "Package-specific conventions belong in a directory-level CLAUDE.md inside that package: automatically loaded for work there, absent everywhere else, and shared via version control. Root-file headings, user files, and skills all scope by the wrong mechanism."
+  },
+  {
+    "id": 316,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization",
+    "type": "single",
+    "question": "A staff engineer wants Claude Code to always follow her personal working style — concise explanations, commit messages in her preferred format, and her habit of running tests before any commit — across the dozen repositories she contributes to, without imposing any of it on teammates or appearing in any repository. Where does this configuration belong?",
+    "options": [
+      "In her user-level ~/.claude/CLAUDE.md, which applies to all of her sessions across every project while remaining invisible to teammates",
+      "In each of the twelve repositories' project CLAUDE.md files, marked with a comment noting the preferences are hers and optional for others",
+      "In a .claude/rules/ file with a paths glob broad enough to match every file, added to whichever repository she is currently working in",
+      "In a personal skill she invokes at the start of each session to load her preferences into the conversation before beginning any work"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. User-level ~/.claude/CLAUDE.md is precisely the scope described: it applies to that user's sessions in every project on her machine and is never shared through version control, so personal style preferences follow her everywhere without touching teammates or repositories.",
+      "Project CLAUDE.md files load for everyone who clones the repository — an \"optional, personal\" comment does not stop Claude from applying the instructions in every teammate's session. It also means maintaining the same preferences in twelve places and pushing personal style into shared review.",
+      "A match-everything rule file committed to a repository is project-scoped by definition: teammates receive her personal preferences, reviewers must approve them, and she must replicate the file across all twelve repositories. Every property of the requirement points away from repository placement.",
+      "A skill loads only when invoked, so any session where she forgets the incantation runs without her preferences — the opposite of \"always.\" Always-on personal configuration is what the user level of the hierarchy exists for; on-demand invocation is the wrong loading model."
+    ],
+    "principle": "personal, cross-project, always-on preferences belong at the user level",
+    "relatedConcept": "~/.claude/CLAUDE.md applies to one user across all projects and never propagates to teammates via version control.",
+    "overallExplanation": "Personal preferences that should follow one engineer across every project — and never reach teammates — are exactly what user-level ~/.claude/CLAUDE.md scopes. Project files and rules are shared by design, and skills load only on invocation."
+  },
+  {
+    "id": 317,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Create and configure custom slash commands and skills",
+    "type": "single",
+    "question": "Your database team codified a multi-step migration procedure — schema diff, backfill plan, rollback script, reviewer checklist — and wants it available as a /generate-migration slash command to every engineer automatically when they clone or pull the repository. Where must the command file be created for that distribution model?",
+    "options": [
+      "In the .claude/commands/ directory of the repository, so the command ships with the project through version control",
+      "In ~/.claude/commands/ on each engineer's machine, with the onboarding guide instructing new hires to copy the file there manually",
+      "In the project CLAUDE.md as a documented procedure section, since always-loaded memory makes a separate command file unnecessary",
+      "In .claude/skills/ on the tech lead's machine, shared with the team by exporting the skill whenever the procedure changes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Project-scoped commands live in .claude/commands/ inside the repository, which is exactly what makes them team-wide: version control distributes the command to every engineer on clone or pull, updates propagate like any other change, and the procedure gets reviewed alongside code.",
+      "User-scoped ~/.claude/commands/ is for personal commands — distributing a team asset this way makes onboarding manual, guarantees stale copies as the procedure evolves, and gives version control no role in propagating updates. The scope contradicts the distribution requirement.",
+      "CLAUDE.md is always-loaded context, so a once-a-week multi-step procedure would tax every session's tokens while providing no invocation mechanism — engineers still could not run /generate-migration. On-demand workflows belong in commands, not in universal memory.",
+      "A skill living on one person's machine is not shared tooling: export-on-change is a manual distribution chore that version control already solves, and any lapse leaves the team running divergent versions of a procedure whose consistency is the whole point."
+    ],
+    "principle": "team-shared slash commands live in the repo's .claude/commands/",
+    "relatedConcept": "Project-scoped commands distribute through version control; ~/.claude/commands/ is for personal, unshared commands.",
+    "overallExplanation": "Commands the whole team should receive on clone belong in the repository's .claude/commands/ directory, where version control handles distribution and review. Home-directory copies, CLAUDE.md prose, and manual skill exports all break the automatic-distribution requirement."
+  },
+  {
+    "id": 318,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Create and configure custom slash commands and skills",
+    "type": "single",
+    "question": "Your team's /scaffold-service skill generates a new microservice from two required inputs: the service name and its type (worker, api, or stream). Engineers keep invoking it bare — just /scaffold-service — and the skill proceeds with guessed defaults, producing wrongly named services that must be deleted and regenerated. Which frontmatter change addresses this?",
+    "options": [
+      "Add argument-hint to the SKILL.md frontmatter so engineers are prompted for the required parameters when they invoke the skill without arguments",
+      "Add context: fork to the SKILL.md frontmatter so the scaffolding runs in an isolated sub-agent context where wrong guesses cannot pollute the session",
+      "Add allowed-tools to the SKILL.md frontmatter restricting the skill to read-only tools so it cannot create files until the arguments are supplied",
+      "Rename the skill to /scaffold-service-name-type so the required parameters are visible in the command name engineers type at invocation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. argument-hint is the frontmatter option for exactly this failure: when developers invoke the skill without arguments, it prompts them for the required parameters — service name and type — instead of letting the skill proceed on guessed defaults. The wasted generate-delete-regenerate cycle disappears at the invocation step.",
+      "context: fork addresses output isolation — keeping verbose or exploratory skill output from polluting the main conversation. The problem here is missing inputs at invocation, which forking does nothing about: the isolated skill would still scaffold a wrongly named service from guesses.",
+      "allowed-tools restricts which tools a skill may use during execution; it is a safety boundary, not an input-collection mechanism. A read-only restriction would break the skill's legitimate purpose — creating files — rather than prompting anyone for the missing name and type.",
+      "Encoding parameter names into the command name documents the requirement but enforces nothing: a bare invocation still runs, still guesses, and still produces a service that must be deleted. The frontmatter offers a real prompting mechanism; a longer name is a hint without teeth."
+    ],
+    "principle": "argument-hint prompts for required parameters at invocation",
+    "relatedConcept": "SKILL.md frontmatter roles: argument-hint collects inputs, context: fork isolates output, allowed-tools bounds execution.",
+    "overallExplanation": "Skills invoked without their required inputs need argument-hint frontmatter, which prompts the developer for parameters instead of proceeding on guesses. Forking isolates output and allowed-tools bounds execution — neither collects the missing arguments."
+  },
+  {
+    "id": 319,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Create and configure custom slash commands and skills",
+    "type": "single",
+    "question": "An engineer relies on the team's shared release-notes skill from .claude/skills/ but wants a stricter personal version: extra security-change callouts and a different section order. Her teammates want the shared skill exactly as it is. How should she set up her customized version without disrupting anyone?",
+    "options": [
+      "Create a personal variant in ~/.claude/skills/ under a different name, leaving the shared project skill untouched for the rest of the team",
+      "Edit the shared skill in .claude/skills/ directly, since her stricter format is a superset and teammates will benefit from the added callouts",
+      "Create a skill with the identical name in ~/.claude/skills/ so her user-scoped copy quietly takes precedence over the project version in her sessions",
+      "Maintain a long-lived local branch of the repository where the shared skill file carries her modifications, rebasing it as the team's version evolves"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Personal skill customization is done by creating a variant in ~/.claude/skills/ with a different name, precisely to avoid affecting teammates. She invokes her stricter version by its own name, the shared skill stays untouched for the team, and no repository change or coordination is needed.",
+      "\"Superset\" is her judgment, not the team's decision: editing the shared skill pushes her section order and extra callouts into every teammate's release notes without agreement, and version control turns a personal preference into a reviewed team change nobody requested.",
+      "Deliberately shadowing the shared name invites confusion the different-name guidance exists to prevent: her sessions silently run different behavior under the same invocation teammates use, team updates to the shared skill stop reaching her, and debugging \"why do our outputs differ\" becomes a hunt.",
+      "A permanently diverged branch is heavy machinery for a personal preference: every rebase risks conflicts in a file she does not own, accidental pushes leak her variant to the team, and the user-scoped skills directory already exists to hold exactly this kind of personal tooling."
+    ],
+    "principle": "personal skill variants go in ~/.claude/skills/ under a different name",
+    "relatedConcept": "Personal customization of shared skills uses user-scoped variants with distinct names so teammates are unaffected.",
+    "overallExplanation": "Customize shared skills by creating a personal variant in ~/.claude/skills/ with a different name — teammates keep the untouched project skill, and no shadowing or branch divergence enters the picture. Same-name overrides and direct edits both create silent behavioral drift."
+  },
+  {
+    "id": 320,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Create and configure custom slash commands and skills",
+    "type": "multi",
+    "question": "Your team's /explore-alternatives skill brainstorms architecture options for a named component, generating long chains of exploratory reasoning. Two complaints have surfaced: the speculative output floods the main conversation and lingers in context long after a direction is chosen, and engineers who invoke it bare get brainstorming about a component the skill guessed. Which two frontmatter options fix these issues? (Choose two.)",
+    "options": [
+      "context: fork, so the exploratory brainstorming runs in an isolated sub-agent context instead of polluting the main conversation",
+      "argument-hint, so engineers invoking the skill without naming a component are prompted for the required parameter",
+      "allowed-tools, restricting the skill to file-write operations so its speculative reasoning cannot trigger destructive actions",
+      "Moving the skill to ~/.claude/skills/, so each engineer's brainstorming stays isolated inside their own personal configuration"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. context: fork is the frontmatter option for skills that produce exploratory context — like brainstorming alternatives — running them in an isolated sub-agent context so speculative reasoning never enters the main session. Only the useful conclusion comes back, and chosen-direction sessions stay clean.",
+      "Correct. argument-hint handles the bare-invocation failure: when the skill is invoked without arguments, the engineer is prompted for the required component name instead of the skill guessing. The two frontmatter options address the two complaints exactly.",
+      "allowed-tools is a real frontmatter option but aims at a problem nobody reported: no destructive actions occurred, and restricting to file-write operations does nothing about context flooding or missing arguments. It is the right mechanism for a different failure mode.",
+      "Relocating the skill to user scope changes who has it, not how it behaves: each engineer's main conversation still floods with speculative output, bare invocations still guess, and the team loses the shared, version-controlled skill in the bargain."
+    ],
+    "principle": "fork isolates exploratory output; argument-hint collects required inputs",
+    "relatedConcept": "context: fork suits brainstorming skills whose speculative context should not persist in the main session; argument-hint fixes bare invocations.",
+    "overallExplanation": "Brainstorming skills pair context: fork — isolating exploratory reasoning in a sub-agent so the main conversation stays clean — with argument-hint, which prompts for the required component when invoked bare. allowed-tools and user-scoping solve different problems."
+  },
+  {
+    "id": 321,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply path-specific rules for conditional convention loading",
+    "type": "single",
+    "question": "Your REST conventions — response envelope shape, pagination contract, error code registry — govern handler code in two places: src/api/ and services/gateway/src/routes/. They currently sit in the root CLAUDE.md, loading into every session including frontend work. How do you scope them to load only when editing handler code in either location?",
+    "options": [
+      "Create one .claude/rules/ file with YAML frontmatter listing both globs, paths: [\"src/api/**/*\", \"services/gateway/src/routes/**/*\"], so it activates for matching files in either tree",
+      "Place duplicate CLAUDE.md files inside src/api/ and services/gateway/src/routes/, each containing a full copy of the REST conventions text",
+      "Keep the conventions in the root CLAUDE.md but move them under a heading instructing Claude to apply the section only during API-related tasks",
+      "Create a rules file with the single glob paths: [\"**/api/**\"], relying on both directories containing the substring \"api\" somewhere in their paths"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A .claude/rules/ file's YAML frontmatter paths field takes multiple glob patterns, so one rule file can activate for both directory trees. The conventions live in a single maintained place, load only when matching files are edited, and stay out of frontend sessions entirely.",
+      "Duplicate directory-level files do scope correctly, but at the price path rules exist to avoid: two full copies of the conventions to keep synchronized, with drift guaranteed the first time someone updates one and forgets the other. One rule file with two globs has no such failure mode.",
+      "An instruction-scoped heading still loads the full conventions into every session — frontend included — spending the tokens the change was meant to save, and it makes application depend on the model's per-task inference rather than deterministic path matching.",
+      "The gateway routes directory does contain \"api\" in neither of its segments — services/gateway/src/routes/ would never match — and substring-driven globs also overmatch unrelated paths like src/api-docs/. Globs should state the intended trees explicitly, not gamble on naming coincidences."
+    ],
+    "principle": "one rule file can scope to multiple trees via a list of paths globs",
+    "relatedConcept": "The YAML frontmatter paths field accepts multiple glob patterns, avoiding duplicated directory-level convention copies.",
+    "overallExplanation": "A single .claude/rules/ file with both globs in its paths frontmatter scopes the conventions to exactly the two handler trees — one maintained copy, deterministic loading, zero cost to unrelated sessions. Duplicated files drift and prose headings still load everywhere."
+  },
+  {
+    "id": 322,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply path-specific rules for conditional convention loading",
+    "type": "single",
+    "question": "An engineer created .claude/rules/terraform.md with frontmatter paths: [\"terraform/*\"] to load infrastructure conventions conditionally. The rule works when editing terraform/main.tf but never activates for terraform/modules/vpc/main.tf or anything else under the module subdirectories, where most of the team's work happens. What is wrong and how do you fix it?",
+    "options": [
+      "The single-level glob terraform/* matches only files directly under terraform/; change it to terraform/**/* so files in nested subdirectories also match",
+      "Rules files activate only for the directory containing .claude/; move the rules directory into terraform/ so the conventions attach to that subtree",
+      "The paths field requires each directory to be listed individually; enumerate every module subdirectory in the list and update it as modules are added",
+      "Conditional rules cannot match nested paths at all; move the Terraform conventions back into the root CLAUDE.md where they load unconditionally"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is glob semantics: terraform/* matches a single path segment, so only files immediately under terraform/ activate the rule, while nested files like terraform/modules/vpc/main.tf need the recursive pattern. Changing the frontmatter to terraform/**/* makes the rule fire for the whole subtree, which is what the team intended.",
+      "The rules mechanism is not location-bound in that way — .claude/rules/ files scope by their paths globs, not by where the directory sits. Relocating configuration into the Terraform tree adds a nonstandard layout while leaving the actual defect, the non-recursive glob, unfixed.",
+      "Enumerating every module directory works today and breaks with the next module added — a silent gap each time the tree grows. Glob patterns exist precisely so one recursive expression covers current and future subdirectories without a maintenance treadmill.",
+      "Nested matching works fine with the right pattern, so retreating to unconditional loading surrenders the entire benefit: Terraform conventions back in every frontend and backend session, tokens spent everywhere, for a defect one glob character pair fixes."
+    ],
+    "principle": "use recursive globs (dir/**/*) when conventions cover a whole subtree",
+    "relatedConcept": "Single-segment globs match one level; **/ patterns are what make path-scoped rules cover nested directories.",
+    "overallExplanation": "terraform/* is a single-level glob, so nested module files never match; the recursive terraform/**/* covers the whole subtree. Relocating the rules directory, enumerating subdirectories, or abandoning conditional loading all misdiagnose a one-pattern fix."
+  },
+  {
+    "id": 323,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply path-specific rules for conditional convention loading",
+    "type": "multi",
+    "question": "A platform team is decomposing its root CLAUDE.md. Two convention sets need conditional loading: SQL migration rules for files under db/migrations/, and MDX documentation style rules for .mdx files scattered through every feature directory in the repository. Which two statements correctly describe how to implement this with path-specific rules? (Choose two.)",
+    "options": [
+      "Create .claude/rules/ files with YAML frontmatter paths globs so each convention set loads only when Claude edits files matching its patterns",
+      "Use a file-type glob such as **/*.mdx for the documentation rules, since glob patterns apply conventions by type regardless of directory location",
+      "Register each rules file in the root CLAUDE.md with an @import line, since rules files only activate after being imported into the main memory file",
+      "Place a CLAUDE.md in every feature directory that contains .mdx files, since per-directory files are how scattered file types receive conventions"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This is the path-specific rules mechanism: files in .claude/rules/ carry YAML frontmatter paths fields with glob patterns, and each rule loads only when editing files matching its globs — SQL rules for db/migrations/**, MDX rules for their own pattern — cutting irrelevant context from every other session.",
+      "Correct. Glob patterns are the right scoping for conventions that follow a file type across the tree: **/*.mdx activates the documentation rules wherever an MDX file lives, exactly the advantage path-specific rules hold over directory-bound configuration for scattered files.",
+      "No import registration step exists for rule activation — .claude/rules/ files with paths frontmatter activate on their own when matching files are edited. @import is a separate modularity mechanism for composing CLAUDE.md content, not a prerequisite for rules.",
+      "Per-directory CLAUDE.md files would mean duplicating the MDX style rules across every feature directory and adding another copy each time docs appear somewhere new — the exact maintenance burden the glob-pattern approach exists to eliminate for scattered file types."
+    ],
+    "principle": "rules scope by frontmatter globs; file-type patterns follow scattered files",
+    "relatedConcept": ".claude/rules/ + paths globs load conventions conditionally; **/*.ext patterns beat per-directory files for spread-out types.",
+    "overallExplanation": "Path-specific rules are self-activating: .claude/rules/ files with paths frontmatter load when matching files are edited, and file-type globs like **/*.mdx follow scattered files anywhere in the tree. No @import registration exists, and per-directory duplication is the anti-pattern globs replace."
+  },
+  {
+    "id": 324,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply path-specific rules for conditional convention loading",
+    "type": "single",
+    "question": "Enthusiastic after adopting path-specific rules, a team moves everything out of CLAUDE.md — including universal security requirements and core coding standards that genuinely apply to every file — into .claude/rules/ files, giving those universal ones paths: [\"**/*\"]. A reviewer questions the design. What is the right division?",
+    "options": [
+      "Keep universal, always-applicable standards in the project CLAUDE.md and use path-scoped rules for conventions tied to specific file types or code areas",
+      "Keep everything as rules files, since a paths: [\"**/*\"] rule loads more efficiently than the equivalent content placed in the project CLAUDE.md",
+      "Move the universal standards into each developer's user-level configuration so the project's rules directory contains only path-scoped conventions",
+      "Convert the universal standards into a skill invoked at session start, keeping both CLAUDE.md and the rules directory reserved for scoped content"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The mechanisms divide by applicability: CLAUDE.md is the home for universal, always-loaded standards, while path-scoped rules earn their value by activating conditionally for specific file types or areas. A match-everything rule gains nothing from the rules mechanism — conditional loading that never excludes anything is just indirection.",
+      "There is no efficiency gain: a rule matching every file loads for every edit exactly as CLAUDE.md content does, with the same token cost. The claim mistakes the mechanism for the benefit — savings come from conventions not loading where irrelevant, which **/* forfeits by construction.",
+      "User-level placement breaks the team property that universal standards most need: nothing propagates through version control, so each developer's copy drifts and new engineers clone a repository whose security requirements exist only on veterans' machines.",
+      "A session-start skill makes universal standards contingent on someone remembering to invoke them — forget once and code is generated without the security requirements. Always-applicable content needs the always-loaded mechanism, which is precisely what CLAUDE.md provides."
+    ],
+    "principle": "universal standards stay in CLAUDE.md; rules are for genuinely scoped conventions",
+    "relatedConcept": "Path-scoped rules pay off through conditional loading; a **/* rule is CLAUDE.md content wearing a costume.",
+    "overallExplanation": "The division is by applicability: universal standards belong in always-loaded CLAUDE.md, and path-specific rules are for conventions scoped to file types or areas. A paths: [\"**/*\"] rule loads everywhere anyway, so it adds indirection without any conditional-loading benefit."
+  },
+  {
+    "id": 325,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Determine when to use plan mode vs direct execution",
+    "type": "single",
+    "question": "A production incident traces to one function: a stack trace shows the payment validator throwing on records whose expiry date field is null, and the fix is an added conditional in that single file. The on-call engineer's team habitually opens plan mode for every Claude Code task, and she asks whether this one needs it. What do you advise?",
+    "options": [
+      "Use direct execution — this is a well-scoped single-file fix with a clear stack trace, exactly the profile where plan mode adds overhead without value",
+      "Use plan mode anyway, since payment code is business-critical and critical code paths always justify the extra exploration phase before any change",
+      "Use plan mode with the Explore subagent first to map every caller of the validator before deciding whether the conditional is the right fix",
+      "Split the work between modes: plan the conditional's placement in plan mode, then switch to direct execution to type the actual change into the file"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Direct execution is appropriate for simple, well-scoped changes — a single-file bug fix with a clear stack trace, adding a validation conditional, is the canonical example. Plan mode's value lies in large-scale changes, multiple valid approaches, and architectural decisions, none of which this fix presents.",
+      "Criticality does not change the decision criteria: plan mode is selected for scope and approach ambiguity, not for the importance of the code. A one-conditional fix has one obvious approach; the safeguard critical code deserves here is a test for the null case, not a planning phase with nothing to plan.",
+      "The Explore subagent exists to isolate verbose discovery during genuinely large investigations. Mapping every caller to add a null guard indicated by a specific stack trace is ceremony — the failing path is already identified, and the fix does not change the function's contract for other callers.",
+      "Mode-splitting is the right pattern for large migrations where investigation precedes a multi-file implementation. Applied to a one-line conditional it is pure overhead: the \"plan\" is a sentence, and the transition costs more than the decision it formalizes."
+    ],
+    "principle": "well-scoped single-file fixes with clear diagnostics take direct execution",
+    "relatedConcept": "Plan mode earns its cost on scale and approach ambiguity; a stack-trace-guided one-file fix has neither.",
+    "overallExplanation": "A single-file fix with a clear stack trace is direct execution's canonical case — plan mode's criteria are large-scale change, multiple valid approaches, and architectural implications, none present here. Criticality argues for a regression test, not a planning phase."
+  },
+  {
+    "id": 326,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Determine when to use plan mode vs direct execution",
+    "type": "single",
+    "question": "Your team must sync inventory data to a new fulfillment partner. Two viable designs exist — an event-driven push through the message queue, or a scheduled batch pull — with different infrastructure requirements for queue capacity, retry handling, and monitoring. An engineer wants to start coding the event-driven version immediately since it was mentioned first. What do you recommend?",
+    "options": [
+      "Enter plan mode to explore the existing codebase and compare both integration approaches before committing to either implementation",
+      "Proceed with direct execution on the event-driven design, since working code will reveal any infrastructure problems faster than analysis can",
+      "Implement thin prototypes of both designs in direct execution and keep whichever one reaches a working end-to-end sync first",
+      "Ask Claude in a single prompt to declare which approach is better and then implement the winner immediately in the same session"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Choosing between integration approaches with different infrastructure requirements is a signature plan mode case: safe exploration of the codebase and a deliberate comparison happen before any code is committed, preventing the costly rework of discovering mid-build that the wrong architecture was chosen.",
+      "\"First mentioned\" is not a selection criterion, and infrastructure mismatches — queue capacity, retry semantics — surface after substantial build investment, when switching means discarding working code. Direct execution fits well-understood changes, not unmade architectural decisions.",
+      "Racing two prototypes doubles the build cost to answer a question exploration answers cheaply, and \"first to work end-to-end\" measures implementation ease rather than operational fit — retry behavior and monitoring burden appear in production, not in a thin prototype.",
+      "A one-prompt verdict skips the ingredient that makes the comparison meaningful: exploration of this codebase's actual queue usage, load patterns, and operational tooling. Plan mode exists to ground the recommendation in the code before implementation locks it in."
+    ],
+    "principle": "competing approaches with infrastructure implications call for plan mode first",
+    "relatedConcept": "Plan mode's criteria include choosing between integration approaches with different infrastructure requirements.",
+    "overallExplanation": "When two viable designs carry different infrastructure requirements, plan mode's explore-and-compare phase is the cheap way to choose before code hardens the decision. Building first, racing prototypes, or a context-free verdict all defer the comparison until it is expensive."
+  },
+  {
+    "id": 327,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Determine when to use plan mode vs direct execution",
+    "type": "single",
+    "question": "An engineer ran a thorough plan mode session for an ORM migration: Claude explored the codebase, compared approaches, and produced a detailed migration plan she fully approves. She keeps prompting in plan mode expecting the repository files to start changing, but nothing is ever modified. What should she understand about the workflow?",
+    "options": [
+      "Plan mode is for exploration and design without committing changes; the intended workflow is to approve the plan and proceed to direct execution for implementation",
+      "Plan mode applies its accumulated changes in a single batch only after the session ends, so she should close the session and let the edits flush to disk",
+      "The plan must first be saved into CLAUDE.md so implementation sessions can load it as context before any file modification is permitted to begin",
+      "File modification stays locked until the plan is exported as a custom slash command, which is the artifact Claude Code executes against the repository"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Plan mode's purpose is safe codebase exploration and design before committing to changes — by design it does not modify files. The documented workflow combines the two modes: plan the approach in plan mode, then execute the approved plan with direct implementation. Her plan is done; the next step is switching modes.",
+      "No end-of-session batch application exists — plan mode never queues edits for later. Closing the session would simply discard her momentum; the plan is a design artifact to carry into direct execution, not a transaction waiting to commit.",
+      "No such persistence gate exists: nothing requires a plan to pass through CLAUDE.md before implementation. CLAUDE.md holds standing project instructions; the approved plan flows into implementation directly by continuing into direct execution.",
+      "Slash commands are reusable prompt workflows, not compiled plan artifacts, and no export step gates file modification. The mechanism this option invents replaces a simple mode switch with machinery Claude Code does not have."
+    ],
+    "principle": "plan mode designs without modifying; implementation happens in direct execution",
+    "relatedConcept": "The combined workflow: plan mode for investigation and approach choice, then direct execution to implement the approved plan.",
+    "overallExplanation": "Plan mode intentionally makes no file changes — it is the safe exploration and design phase. The intended workflow pairs it with direct execution: approve the plan, switch modes, implement. No batch flush, CLAUDE.md gate, or command export is involved."
+  },
+  {
+    "id": 328,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Determine when to use plan mode vs direct execution",
+    "type": "multi",
+    "question": "Your team is triaging four upcoming Claude Code tasks and deciding which ones warrant plan mode before implementation begins, based on scope, architectural weight, and how many valid approaches each task admits. Which two of these tasks should start in plan mode? (Choose two.)",
+    "options": [
+      "Restructuring the monolith's order-processing module into two services, with open questions about where the transactional boundary should sit",
+      "Replacing the deprecated logging library across roughly 60 files, where two viable integration approaches differ in their infrastructure demands",
+      "Fixing a null-pointer exception in one utility function, pinpointed by a stack trace from last night's error monitoring alert",
+      "Adding a date-range validation conditional to a single reporting endpoint that currently accepts end dates earlier than start dates"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Service decomposition is architectural work with an unresolved design question — where the transactional boundary sits — and broad blast radius. That combination of architectural implications and multiple valid answers is precisely what plan mode's exploration phase is for.",
+      "Correct. A 60-file library migration with two viable integration approaches carrying different infrastructure demands matches plan mode's criteria on both axes: large-scale multi-file change and an approach decision that must be made before implementation to avoid rework across every touched file.",
+      "A stack-trace-pinpointed null-pointer fix in one function is direct execution's textbook case: the scope is one file, the diagnosis is done, and there is essentially one way to write the guard. A planning phase would have nothing to decide.",
+      "A single-endpoint validation conditional is the guide's own example of a simple, well-scoped change suited to direct execution — clear requirement, one obvious implementation, no architectural surface. Plan mode would add ceremony without reducing any risk."
+    ],
+    "principle": "plan mode for architectural scope and approach ambiguity; direct execution for pinpointed fixes",
+    "relatedConcept": "Selection criteria: multi-file scale, multiple valid approaches, architectural implications — versus well-scoped single-file changes.",
+    "overallExplanation": "The service split and the 60-file migration carry architectural weight and competing approaches — plan mode territory. The stack-traced null fix and the single-endpoint validation are well-scoped direct-execution changes where planning has nothing to decide."
+  },
+  {
+    "id": 329,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply iterative refinement techniques for progressive improvement",
+    "type": "single",
+    "question": "A data team is iterating with Claude Code on a CSV normalization module. Feedback each round is impressionistic — \"still chokes on weird rows,\" \"the quoting is off again\" — and fixes for new cases keep silently breaking previously working ones, with nobody able to say exactly which behaviors have regressed. What refinement approach fixes this loop?",
+    "options": [
+      "Write a test suite covering expected behavior, edge cases, and performance requirements first, then iterate by sharing the specific test failures with Claude",
+      "Continue the conversational refinement but require reviewers to describe each defect in at least a paragraph so Claude receives richer prose context",
+      "Restart from scratch in a fresh session each round so accumulated confusion from earlier iterations cannot influence the next version of the module",
+      "Switch to plan mode so Claude designs the complete normalization architecture upfront before any further code is written or revised"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Test-driven iteration is the named technique for this failure: the suite pins down expected behavior, edge cases, and performance requirements as executable facts, every iteration is guided by concrete failing tests instead of impressions, and regressions surface instantly because previously passing tests break visibly.",
+      "Longer prose is still prose: \"the quoting is off again\" in paragraph form remains unverifiable and unanchored, and nothing detects when a fix for one complaint reverses an earlier one. The loop's defect is the absence of executable criteria, not insufficient word count.",
+      "Fresh sessions discard the problem's history without recording it — the new session re-learns requirements from the same impressionistic feedback and re-breaks the same undocumented behaviors. Regression protection requires persisted expectations, which tests provide and session resets do not.",
+      "Plan mode addresses approach selection before large or ambiguous work; this module's design is settled and the failures are behavioral edge cases discovered over time. An upfront architecture pass produces no mechanism for catching the next regression, which is the actual complaint."
+    ],
+    "principle": "write the test suite first; iterate by sharing failures",
+    "relatedConcept": "Test-driven iteration converts vague feedback into failing tests that guide fixes and expose regressions immediately.",
+    "overallExplanation": "Test-driven iteration fixes both reported problems at once: a suite covering expected behavior and edge cases turns vague complaints into specific failures to share, and previously working behavior is guarded because regressions break visible tests. Prose volume and fresh sessions guard nothing."
+  },
+  {
+    "id": 330,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply iterative refinement techniques for progressive improvement",
+    "type": "single",
+    "question": "A review of Claude-generated connection-pool code found three defects: the retry logic can double-acquire connections, the timeout handling leaks them under load, and the pool-exhaustion path deadlocks with the retry behavior. The team fixed them one per iteration, and each fix has broken one of the other two areas twice now. How should the next iteration be run?",
+    "options": [
+      "Present all three issues together in one detailed message, since the fixes interact and must be reasoned about jointly rather than sequentially",
+      "Continue one fix per iteration but reverse the order, addressing the deadlock first since it is the most severe of the three defects",
+      "Open three parallel sessions, one per defect, and merge the three resulting patches once each session has produced its isolated fix",
+      "Ask Claude to rewrite the entire connection pool from scratch, since three defects in one component indicate the generation is unsalvageable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The rule is to match batching to issue coupling: interacting problems belong in a single detailed message so the model reasons about all constraints jointly, while sequential fixing suits independent issues. Retry, timeout, and exhaustion behavior share connection-lifecycle state — the observed fix-one-break-another cycle is the signature of coupled fixes applied separately.",
+      "Reordering does not decouple: whichever defect is fixed first, its fix still alters lifecycle behavior the other two depend on, and the regression cycle continues. Severity determines urgency, not the batching strategy that coupling dictates.",
+      "Parallel sessions maximize the interaction problem — three fixes to the same shared-state component designed with zero mutual awareness, merged blind. The merge point is exactly where double-acquires and deadlocks would be reintroduced.",
+      "Three related defects in intricate concurrency code do not make the component unsalvageable, and a rewrite discards behavior already validated while re-rolling the dice on fresh defects. The failure was iteration strategy, not the generation itself."
+    ],
+    "principle": "interacting issues go in one message; sequential fixing is for independent ones",
+    "relatedConcept": "Batching strategy follows issue coupling: joint reasoning for interacting fixes, sequential iteration for unrelated ones.",
+    "overallExplanation": "When fixes interact — here through shared connection-lifecycle state — present all issues in a single detailed message so they are reasoned about jointly. Sequential fixing suits independent problems; applied to coupled ones it produces exactly this fix-one-break-another cycle."
+  },
+  {
+    "id": 331,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply iterative refinement techniques for progressive improvement",
+    "type": "single",
+    "question": "Your legacy-data migration script mishandles records with null fields: Claude's version fabricates a default date of birth and an empty-string middle name instead of propagating the nulls to the new schema. Two rounds of prose correction — \"never invent values for missing fields\" — have not fully fixed the behavior. What should the next iteration include?",
+    "options": [
+      "Specific test cases with example input records containing null fields and the exact expected output showing nulls preserved in the new schema",
+      "A sterner restatement of the rule, elevated to the top of the prompt in bold, stating that fabricating values is strictly forbidden in all cases",
+      "The interview pattern, having Claude ask clarifying questions about the migration's requirements before attempting another revision of the script",
+      "A fresh session with only the original migration specification, removing the accumulated correction attempts that may be confusing the model"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Fixing edge case handling calls for specific test cases with example input and expected output — a record with null date of birth alongside the exact expected row showing null preserved makes the required behavior unmistakable in a way prose prohibitions have already failed to do. This is the named technique for null-handling defects in migration scripts.",
+      "The rule has been stated twice; volume and typography add emphasis, not information. \"Never invent values\" still leaves the concrete question — what does the output row look like when date of birth is null? — unanswered, and that gap is where the fabrication lives.",
+      "The interview pattern surfaces unanticipated considerations in unfamiliar domains; here the requirement is already known precisely — preserve nulls — and the developer needs to communicate it effectively, not discover it. Asking Claude to generate questions defers the fix available now.",
+      "The corrections were not the problem — they were correct but under-specified. A stripped-down session discards that signal entirely and reverts to the original specification whose silence on null handling produced the fabrication in the first place."
+    ],
+    "principle": "fix edge cases with concrete test cases: example input, expected output",
+    "relatedConcept": "Null-handling defects yield to specific input/expected-output test cases where prose prohibitions keep failing.",
+    "overallExplanation": "Edge case fixes need concrete test cases — an input record with nulls and the exact expected output — because examples carry the disambiguating information that prose rules like \"never invent values\" lack. Emphasis, interviews, and session resets add no new specification."
+  },
+  {
+    "id": 332,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Apply iterative refinement techniques for progressive improvement",
+    "type": "single",
+    "question": "After Claude Code generates a large reporting module, review finds five unrelated issues in different files: a misnamed variable, a missing log statement, an unused import, an off-spec date format, and a missing docstring. A developer packs all five plus extensive context into one sprawling message; the response fixes three, mangles one, and misses one entirely. What iteration strategy fits this situation?",
+    "options": [
+      "Fix the issues sequentially in separate iterations, since they are independent problems that do not need to be reasoned about jointly",
+      "Resend the same five-issue message with stronger wording demanding that every listed item be addressed completely before responding",
+      "Combine the five fixes into one message again but also include the full text of every affected file so no context is missing this time",
+      "Write a test suite covering all five issues first, then share the failing tests so the fixes are guided by executable criteria"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The batching rule runs both directions: interacting problems belong in a single message, but independent problems are fixed sequentially. These five defects share no coupling — each fix touches different code with no mutual constraints — so sequential iterations give each one full attention and make each result independently verifiable.",
+      "The failure was not compliance but attention spread across an overloaded message; sterner wording re-runs the same overload. Nothing about a demand changes the structural mismatch between five unrelated tasks and one sprawling prompt.",
+      "More context compounds the problem: the message was already sprawling, and full file dumps bury five small independent asks under even more material. Volume is the failure mode here, not the cure for it.",
+      "Tests are powerful for behavioral defects, but a missing docstring, an unused import, and a misnamed variable are not naturally test-expressible, and writing a suite to coordinate five trivial independent fixes is heavy machinery where five quick sequential iterations suffice."
+    ],
+    "principle": "independent issues are fixed sequentially, not batched into one message",
+    "relatedConcept": "Batching follows coupling: single detailed messages for interacting fixes, one-at-a-time iteration for unrelated ones.",
+    "overallExplanation": "Unrelated defects are fixed sequentially — the single-message strategy exists for interacting problems whose fixes must be reasoned about jointly. Overloading one prompt with five independent asks spreads attention thin, which is exactly the partial, mangled result observed."
+  },
+  {
+    "id": 333,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Integrate Claude Code into CI/CD pipelines",
+    "type": "single",
+    "question": "Your CI pipeline has one Claude Code job generate the implementation for small feature tickets and then, in the same session, review its own diff before the PR opens. Human reviewers keep catching subtle bugs the automated review approved — bugs sitting plainly in the generated code. What change most improves the automated review's detection rate?",
+    "options": [
+      "Run the review as an independent Claude instance without the generation session's context, since a generator reviewing its own output retains the reasoning that produced the bugs",
+      "Keep the single session but append a system prompt instruction telling Claude to review its own code with maximum skepticism, as if written by a stranger",
+      "Have the same session review the diff three times consecutively and post only the findings that appear in at least two of the three review passes",
+      "Lower the review's reported-severity threshold so the session surfaces more candidate findings for the human reviewers to confirm or dismiss"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A session that generated code retains the reasoning context behind its decisions, making it less likely to question them during review — the named session-isolation problem. An independent review instance approaches the diff without that context and evaluates what the code actually does, which is why it catches issues self-review approves.",
+      "Skepticism instructions cannot remove the reasoning context that causes the blind spot: the session still knows why each choice was made and still evaluates its intent rather than its text. Independent review outperforms self-review instructions precisely because isolation, not attitude, is the missing ingredient.",
+      "Three passes by the same session share the same generation context and therefore the same blind spots — consensus among correlated reviewers measures consistency, not correctness. The repeated approvals would simply be more confident versions of the same miss.",
+      "A lower threshold changes how much the session reports, not what it can see: the approved bugs were not suppressed low-severity findings but genuine misses caused by retained reasoning. The result is more noise for humans while the blind spot persists."
+    ],
+    "principle": "review with an independent instance, not the session that generated the code",
+    "relatedConcept": "Session context isolation: generators retain the reasoning behind their bugs, so CI review needs a fresh instance.",
+    "overallExplanation": "The generating session retains the reasoning that produced the bugs, so it is structurally less likely to question them — run CI review as an independent instance without that context. Skepticism prompts, repeated self-passes, and looser thresholds all leave the blind spot intact."
+  },
+  {
+    "id": 334,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Integrate Claude Code into CI/CD pipelines",
+    "type": "single",
+    "question": "Your CI review job checks out the repository and runs claude -p on each pull request. Developers report that it keeps flagging the team's own established patterns — the custom error-wrapper, the repository-standard dependency injection style — as defects, because the CI-invoked instance knows nothing about the project's conventions. What is the right mechanism to fix this?",
+    "options": [
+      "Document the project's conventions and review criteria in CLAUDE.md, which the CI-invoked Claude Code instance loads as project context from the checkout",
+      "Embed the full conventions document as a string inside each pipeline's workflow YAML prompt, keeping the three pipeline definitions updated as conventions change",
+      "Maintain a growing suppression list in the posting script that filters out any finding whose text resembles a previously dismissed convention complaint",
+      "Restrict the review to files changed in the current PR so the reviewer encounters fewer of the project-specific patterns it tends to misjudge"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. CLAUDE.md is the mechanism for providing project context — conventions, review criteria, standards — to CI-invoked Claude Code: the job checks out the repository, so the file is right there to load, one copy serves every pipeline, and updates travel with the code they describe.",
+      "Embedding conventions in workflow YAML creates parallel copies of project knowledge outside the repository's own context mechanism: three pipelines to update on every convention change, drift the moment one is missed, and prompt strings doing the job CLAUDE.md exists for.",
+      "Text-similarity suppression treats symptoms downstream and cuts both ways — phrasing varies enough to leak known false positives through while occasionally swallowing genuine findings that resemble dismissed ones. The reviewer stays ignorant of the conventions; the list just hides the evidence.",
+      "The reviewer misjudges project patterns wherever it meets them, including inside changed files — narrowing scope reduces encounters, not misunderstanding, and it sacrifices cross-file context legitimate reviews need. The missing ingredient is convention knowledge, which scoping cannot supply."
+    ],
+    "principle": "CLAUDE.md carries project conventions to CI-invoked Claude Code",
+    "relatedConcept": "CI context provisioning: review criteria and conventions in CLAUDE.md load from the checkout on every automated run.",
+    "overallExplanation": "CLAUDE.md is how CI-invoked Claude Code receives project context: document the conventions and review criteria there, and every pipeline's checkout supplies them automatically. YAML-embedded prompts drift, suppression lists mask, and scope-narrowing avoids rather than informs."
+  },
+  {
+    "id": 335,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Integrate Claude Code into CI/CD pipelines",
+    "type": "multi",
+    "question": "Your nightly CI job uses Claude Code to generate test cases for modules changed that day. Engineers reject most of its output: roughly half the suggestions duplicate scenarios the existing suite already covers, and much of the rest are trivial getter/setter tests nobody considers worth keeping. Which two changes most directly improve the generated tests? (Choose two.)",
+    "options": [
+      "Provide the existing test files in the job's context so generation avoids suggesting scenarios the suite already covers",
+      "Document the team's testing standards, criteria for valuable tests, and available fixtures in CLAUDE.md to steer generation away from low-value output",
+      "Raise the generation temperature so the model produces more varied and creative test suggestions across each nightly run",
+      "Add the --json-schema flag to the job so the generated tests are emitted in a strictly validated structured format"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Duplicate suggestions come from generating blind: with the existing test files in context, the model can see which scenarios are already covered and propose only what is missing — the direct, documented fix for redundant test generation in CI.",
+      "Correct. Low-value output is a criteria problem: documenting testing standards, what the team considers a valuable test, and the available fixtures in CLAUDE.md gives the CI-invoked instance the judgment baseline it lacks, steering generation toward tests engineers will actually keep.",
+      "Temperature changes variance, not knowledge: the model still cannot see the existing suite, so it duplicates differently, and randomness has no notion of which tests the team values. Both reported defects are information gaps that sampling parameters cannot fill.",
+      "--json-schema governs output structure, making results machine-parseable — a formatting concern. The complaints are about content quality: duplicated and trivial scenarios arrive just as readily in a perfectly validated schema."
+    ],
+    "principle": "show the existing suite; encode test-value criteria in CLAUDE.md",
+    "relatedConcept": "CI test generation quality depends on context (existing tests) and criteria (standards and fixtures documented in CLAUDE.md).",
+    "overallExplanation": "Duplicates fall away when the existing test files are provided in context, and triviality falls away when CLAUDE.md documents testing standards, valuable-test criteria, and fixtures. Temperature and output-schema flags address neither information gap."
+  },
+  {
+    "id": 336,
+    "domain": "Claude Code Configuration & Workflows",
+    "objective": "Integrate Claude Code into CI/CD pipelines",
+    "type": "single",
+    "question": "Your merge-request pipeline runs claude -p for automated review and pipes the output to a script that posts inline comments, which requires each finding as an object with file, line, severity, and description fields. The prompt says \"respond only in JSON,\" but every few days the output arrives with prose preamble or missing fields and the posting step crashes. What is the robust fix?",
+    "options": [
+      "Use --output-format json with --json-schema specifying the findings structure, enforcing machine-parseable output at the CLI level instead of via prompt instructions",
+      "Harden the prompt by adding a complete example of valid output and a warning that any deviation from pure JSON will cause the pipeline to fail",
+      "Wrap the posting script in a recovery layer that strips leading prose, inserts default values for missing fields, and retries parsing until it succeeds",
+      "Have the pipeline rerun the review job automatically whenever parsing fails, accepting the occasional doubled cost as the price of eventual valid output"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The CLI provides deterministic enforcement for exactly this integration: --output-format json with --json-schema produces structured findings conforming to the declared shape, so the posting script always receives parseable objects with the required fields. Prompt-level JSON instructions are probabilistic; the flags are not.",
+      "Examples and warnings improve the odds but keep the guarantee probabilistic — the current instruction already fails every few days, and a threat in the prompt does not bind the output. A structural requirement in a pipeline should ride on the CLI's enforcement mechanism, not on compliance.",
+      "A repair layer normalizes the symptom while inventing data: default severities and guessed field values turn malformed reviews into confidently wrong PR comments, and each new deviation pattern needs new stripping logic. It is permanent scaffolding around a solved problem.",
+      "Retry-until-valid leaves the failure rate in place and pays for it repeatedly — nondeterministic reruns may fail consecutively, delaying merges unpredictably. Deterministic output enforcement costs nothing extra and removes the failure class entirely."
+    ],
+    "principle": "enforce CI output shape with --output-format json and --json-schema, not prompt promises",
+    "relatedConcept": "The CLI's structured-output flags give pipelines schema-conformant findings that scripts can parse unconditionally.",
+    "overallExplanation": "Pipelines need deterministic output contracts: --output-format json with --json-schema enforces the findings structure at the CLI level, eliminating prose preambles and missing fields. Prompt hardening, repair layers, and reruns all manage the failure instead of removing it."
   }
 ]

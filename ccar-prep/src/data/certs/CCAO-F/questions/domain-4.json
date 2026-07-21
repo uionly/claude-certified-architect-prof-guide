@@ -11,7 +11,9 @@
       "Skip the analysis step, since Claude adapts to any task and detailed requirements will emerge naturally once the team starts using it",
       "Ask Claude to estimate the exact cost savings the project will deliver so she can lead the proposal with a financial figure"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because a concrete proposal feels like progress, but a solution designed before the requirements are understood usually solves the wrong problem. Jumping to a deliverable skips the analysis step this stage exists for, and leadership reactions to a premature proposal anchor the project on guesses.",
       "Correct. Using Claude to analyze requirements means feeding it what you know about the process and letting it surface requirements, edge cases, and gaps you have not considered. This structures the discovery work before any solution is designed, which is exactly how an Associate applies Claude to requirements analysis.",
@@ -34,7 +36,10 @@
       "Ask Claude to confirm that the project will succeed so he can include that assurance in his pitch to the HR director",
       "Defer all analysis until after launch, since real usage data will reveal the requirements more accurately than any upfront review"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Turning raw stakeholder input into themes and follow-up questions is a core requirements-analysis move: Claude accelerates the synthesis, and the clarifying questions drive a better second round with the actual stakeholders.",
       "Correct. Comparing the source material against real user needs exposes exactly where the use case will strain — missing policies, contradictory guidance, ambiguous rules. Finding these gaps before building is the point of use-case analysis.",
@@ -57,7 +62,9 @@
       "Ask Claude to write the leadership briefing first, then work backward to find sources that support whatever it produced",
       "Avoid using Claude entirely, because regulatory topics change too often for any AI tool to contribute usefully"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because a plain chat answer is fast, but Claude's training data has a cutoff and recent regulatory changes may be missing or outdated. For a currency-sensitive topic, relying on training knowledge alone risks briefing leadership on stale rules.",
       "Correct. Research mode is designed for exactly this: gathering current information with sources. Pairing it with verification of the claims that matter most — the regulatory specifics going to leadership — reflects the principle that research outputs are drafts to validate, not finished facts.",
@@ -80,7 +87,9 @@
       "Have Claude draft a memo announcing that turnaround time will improve, then determine the process changes afterward",
       "Ask each team to use Claude however they prefer and assume the aggregate effect will shorten the workflow"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Process optimization with Claude works by giving it a faithful picture of the real workflow so it can spot bottlenecks, redundant handoffs, and restructuring options — and then validating those ideas with the people who know the process's unwritten constraints.",
       "Tempting because industry benchmarks sound authoritative, but a generic workflow ignores this firm's specific systems, staffing, and compliance constraints. Imposing it as written skips both analysis of the actual process and the judgment of the teams running it.",
@@ -103,7 +112,9 @@
       "Generate ten complete versions in separate chats and publish the one that looks best without further changes",
       "Draft the checklist entirely by hand first, then ask Claude only to check the spelling before publishing"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because thorough upfront prompting is a good habit, but expecting a publishable deliverable from a single generation ignores how design actually converges. Even a strong first draft needs review against real needs, and one-shot publishing skips the evaluation step entirely.",
       "Correct. Artifacts are built for iterative development: Claude produces a working draft you can see, and each round of feedback refines it. Treating the first output as a starting point and iterating toward the real requirement is the core solution-design loop.",
@@ -126,7 +137,9 @@
       "Cancel the initiative, since a solution that cannot be fully realized with built-in features is not worth pursuing",
       "Present the full vision to leadership as ready to deploy and resolve the integration question after approval"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Recognizing the boundary of the Associate role — and escalating technical implementation to Developers or Architects while still delivering the value available through built-in features — is exactly the judgment this credential expects. Partial value now plus a proper escalation beats stalling or overreaching.",
       "Tempting because self-sufficiency feels efficient, but system integration is squarely the domain of technical practitioners. A tutorial-built integration into a government case-management system carries reliability and security risks an Associate is not positioned to manage.",
@@ -149,7 +162,10 @@
       "Replace the entire reporting workflow at once, including the review step, to maximize the visible time savings in the first month",
       "Have each staff member write their own prompts from scratch each week so the integration stays flexible and unconstrained"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Integrating at a single well-defined step, with existing review intact, lets the team learn where Claude helps and where it fails while the safety net still catches errors. Incremental augmentation is the standard pattern for introducing Claude into a live workflow.",
       "Correct. A shared Project with the template and standing instructions turns individual prompting into a repeatable team workflow: consistent outputs, no weekly re-explaining, and one place to refine the setup as the team learns.",
@@ -172,7 +188,9 @@
       "Use Claude only to sort incoming emails by topic, since drafting customer-facing text is too risky for any AI involvement",
       "Let agents paste customer emails into their personal Claude accounts whenever they feel a draft would help"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Draft-plus-review is the classic augmentation pattern: Claude removes the blank-page work and raises consistency, while the agent's review keeps a human accountable for every customer-facing message. Speed improves without giving up the trust safeguard.",
       "Tempting because full automation maximizes measured speed, but customer-facing messages are exactly where errors are costly and hard to retract. Sampling after sending means most mistakes reach customers unreviewed — review must come before send, not after.",
@@ -195,7 +213,9 @@
       "Tell the executives that Claude eliminated errors in renewal letters, since the pilot team caught every mistake before letters went out",
       "Show a live demonstration of Claude writing an impressive letter and let the demo speak for itself instead of presenting pilot data"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Credible stakeholder communication pairs measured value with honest limitations. Presenting both the savings and the continued need for review sets accurate expectations, builds trust with skeptics, and protects the program when the first visible error inevitably occurs.",
       "Tempting because it seems to maximize buy-in, but hiding limitations sets expectations the program cannot meet. When an error surfaces later, the omission reads as misrepresentation and skeptics gain ammunition — overselling trades short-term approval for long-term credibility.",
@@ -218,7 +238,9 @@
       "Reply that Claude should never be used on legal documents in any capacity, so the request cannot be accommodated at all",
       "Suggest the executive raise the idea with the legal team directly and avoid stating her own view about what Claude can and cannot do"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Communicating limitations means reframing an overreaching request into what the tool genuinely supports: Claude as an accelerant for summarization and flagging, with legal judgment and accountability staying human. This gives the executive real value without endorsing an inappropriate use.",
       "Tempting because deferring to seniority avoids friction, but 'instructing Claude to be careful' does not make it a substitute for legal counsel — outputs can be confidently wrong, and no one accountable would review them. Agreeing transfers legal risk onto an unvalidated tool.",
@@ -228,5 +250,509 @@
     "principle": "correct overreach by reframing to the appropriate use",
     "relatedConcept": "Communicating limitations means steering stakeholders from full automation toward human-accountable assistance.",
     "overallExplanation": "Correct overreach by reframing to the appropriate use: when a stakeholder asks for full automation of expert judgment, explain what Claude genuinely accelerates and where human accountability must remain."
+  },
+  {
+    "id": 411,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "single",
+    "question": "Olivia, an innovation lead at a cruise line, has collected twenty candidate Claude use-case ideas from staff, ranging from drafting shore-excursion descriptions to summarizing guest feedback. Leadership wants a recommendation on where to start. How should she use Claude at this stage?",
+    "options": [
+      "Describe the candidate use cases to Claude and ask it to help organize and assess them against criteria like frequency, effort saved, error risk, and data sensitivity — then review the ranking with the teams involved",
+      "Pick the idea a senior executive mentioned in the kickoff meeting and use Claude to write the launch announcement for it",
+      "Pilot all twenty ideas simultaneously so the strongest use cases reveal themselves through natural competition",
+      "Paste the list into Claude and commit to whichever single idea it names as the winner, since an unbiased tool makes the fairest call"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Analyzing use cases means evaluating them systematically: Claude can structure the portfolio against explicit criteria — how often the task occurs, what errors would cost, what data it touches — producing a reasoned shortlist that the people who own each process then sanity-check.",
+      "Executive enthusiasm is one input, not an analysis. Skipping straight to announcing a favorite bypasses the comparative evaluation the twenty ideas need, and risks launching a low-value or high-risk use case simply because it had a sponsor.",
+      "Twenty simultaneous pilots spread attention, support, and review capacity so thin that none gets a fair test — and the riskier ideas run unexamined. Prioritization exists precisely because organizations cannot vet everything at once.",
+      "Claude can structure and accelerate the assessment, but it lacks the organizational knowledge — team capacity, political realities, data constraints — that determines what should launch first. Delegating the final call to the tool removes the human judgment the decision requires."
+    ],
+    "principle": "prioritize use cases with explicit criteria, not enthusiasm",
+    "relatedConcept": "Use-case analysis ranks candidate ideas against frequency, impact, risk, and data sensitivity before anything is built.",
+    "overallExplanation": "Prioritize use cases with explicit criteria: have Claude structure the assessment across frequency, effort, risk, and data sensitivity, then validate the ranking with the process owners."
+  },
+  {
+    "id": 412,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "single",
+    "question": "Samuel, a guest-services program manager at a theme park, is scoping a Claude use case for triaging written guest complaints. Stakeholders describe what they want only in vague terms: 'faster' and 'more accurate' routing. Before any build starts, what is the most valuable way to use Claude?",
+    "options": [
+      "Share the stakeholder descriptions and sample complaints, and ask Claude to help translate the vague goals into concrete, testable requirements — categories, routing rules, and what a correct triage looks like — plus questions to take back to stakeholders",
+      "Begin building immediately, since 'faster and more accurate' is a sufficiently clear target for a simple triage task",
+      "Ask Claude to define industry-standard complaint categories and adopt them wholesale, since theme parks resemble each other closely",
+      "Ask Claude to estimate the exact percentage improvement in routing accuracy the project will achieve, to anchor the requirements document"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Requirements analysis converts vague aspirations into testable specifics: what the complaint categories are, where each type routes, and what counts as a correct decision. Claude accelerates this translation and surfaces the clarifying questions that stakeholders must answer before building.",
+      "'Faster and more accurate' names a wish, not a requirement — without defined categories and correctness criteria, the team cannot configure the triage or judge whether outputs are right. Building against vagueness produces a solution nobody can evaluate.",
+      "Generic industry categories ignore this park's actual complaint mix, staffing structure, and escalation paths. Borrowed taxonomies are a starting prompt at best; adopting them wholesale substitutes resemblance for the analysis of this operation's real needs.",
+      "Claude has no access to the park's historical routing data, so a precise improvement percentage would be an invented number. Anchoring a requirements document on a fabricated statistic plants a hallucination at the foundation of the project."
+    ],
+    "principle": "translate vague goals into testable requirements first",
+    "relatedConcept": "Claude's early value is converting stakeholder wishes into concrete categories, rules, and success criteria plus the questions that remain open.",
+    "overallExplanation": "Translate vague goals into testable requirements first: use Claude to turn 'faster and more accurate' into defined categories, routing rules, and correctness criteria before anything is built."
+  },
+  {
+    "id": 413,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "multi",
+    "question": "Rosa, an office manager at a construction firm, is analyzing the company's document-approval process — submittals, change orders, permits — before proposing where Claude could help. She has the written SOP and access to the field supervisors who live with the process daily. Which two actions best use Claude for this analysis? (Choose two.)",
+    "options": [
+      "Provide the SOP and ask Claude to map the steps, then flag ambiguities, undefined exceptions, and points where the document is silent about who decides",
+      "Ask Claude to draft targeted interview questions she can take to the field supervisors to uncover how the process really runs versus how the SOP says it runs",
+      "Ask Claude to calculate the exact number of hours per month the firm currently loses to the approval process, using the SOP as the data source",
+      "Have Claude mark the requirements as complete once the SOP review is done, so supervisor interviews can be skipped and the build can start sooner"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Turning a process document into an explicit step map and a list of gaps — ambiguities, unhandled exceptions, missing decision owners — is a core analysis move. The flagged holes are precisely where a Claude-assisted process would otherwise break.",
+      "Correct. SOPs describe the official process; the real one lives with the people who run it. Claude drafting sharp interview questions equips Rosa to capture the workarounds, delays, and unwritten rules that requirements must account for.",
+      "An SOP describes steps, not time spent — it contains no volume or duration data from which hours lost could be computed. Any precise monthly figure Claude produced would be fabricated, and a fabricated number in a proposal is worse than no number.",
+      "Claude cannot certify requirements as complete; only the people who operate the process can confirm the analysis matches reality. Skipping supervisor input to save time builds the solution on the documented process rather than the actual one."
+    ],
+    "principle": "map the documented process, then interview for the real one",
+    "relatedConcept": "Requirements analysis pairs Claude's gap-finding on written sources with human input from the people who actually run the process.",
+    "overallExplanation": "Map the documented process and interview for the real one: Claude flags gaps in the SOP and drafts the questions that surface how work actually flows — humans confirm completeness."
+  },
+  {
+    "id": 414,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Apply Claude to analyze requirements and use cases",
+    "type": "single",
+    "question": "Tunde, practice manager for a group of veterinary clinics, is assessing a staff suggestion: have Claude answer clients' phone questions about same-day appointment availability. Analyzing the use case, he realizes availability lives in the clinics' scheduling system, which Claude has no connection to. What is the right conclusion?",
+    "options": [
+      "The use case as proposed is not feasible with the inputs Claude can access, so he should rescope it to what works with available information — such as drafting responses to common non-scheduling questions — and note the integration need for future escalation",
+      "Proceed anyway, since Claude can reasonably infer likely appointment availability from general knowledge of veterinary clinic scheduling patterns",
+      "Reject AI assistance for the clinics entirely, since this first suggestion revealed a data-access limitation",
+      "Ask reception staff to read the day's full schedule aloud to Claude each morning so it can answer availability questions for the rest of the day"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Analyzing a use case includes checking whether the inputs it depends on are actually available to the tool. When they are not, the sound conclusion is to rescope to what current access supports and record the integration requirement for technical escalation — not to force or abandon the idea.",
+      "Claude cannot infer a specific clinic's real-time openings from general patterns; any availability it stated would be a confident guess. Telling clients invented appointment slots is a hallucination with direct operational and trust consequences.",
+      "One infeasible proposal does not condemn the whole space — plenty of clinic tasks, like drafting client communications or summarizing intake notes, need only information staff can provide. Treating a single scoping failure as a verdict on AI forfeits the viable use cases.",
+      "A schedule read aloud at opening is stale within the hour as bookings and cancellations flow in, so afternoon answers would be confidently wrong. Feeding a live system's state through manual morning updates mistakes a data-freshness problem for a one-time input problem."
+    ],
+    "principle": "check input availability before committing to a use case",
+    "relatedConcept": "Use-case feasibility depends on whether the required data is accessible to Claude — rescope around available inputs and escalate integration needs.",
+    "overallExplanation": "Check input availability before committing: a use case that depends on live system data Claude cannot reach should be rescoped to available information, with the integration flagged for escalation."
+  },
+  {
+    "id": 415,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Claire, an events manager at a conference-organizing company, must plan a two-day industry summit: venue milestones, speaker logistics, catering, and marketing deadlines. She wants Claude's help producing the project plan. What is the most effective approach?",
+    "options": [
+      "Give Claude the event's fixed facts — dates, venue constraints, budget bounds, and known commitments — and ask for a draft plan with milestones, dependencies, and risks, then pressure-test the details against vendor and venue realities before adopting it",
+      "Ask Claude to 'plan a two-day conference' and adopt its output directly, since event planning follows universal patterns the model already knows",
+      "Ask Claude for a plan and accept the specific vendor lead times it states, since checking each one would erase the time savings of using the tool",
+      "Build the plan entirely by hand first, then paste it into Claude and ask only for a nicer visual layout of the schedule"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Planning with Claude works when the model gets the real constraints: fixed dates, budget, venue rules, existing commitments. It then drafts structure — milestones, dependencies, risk flags — fast, and the human verifies the operational specifics no model can know, like actual vendor lead times.",
+      "A generic prompt yields a generic plan: template milestones detached from this summit's dates, venue, and budget. Adopting it directly means the plan's specifics are decorative, and every real constraint gets discovered as a surprise later.",
+      "Vendor lead times are facts about specific businesses that Claude cannot know — stated numbers would be plausible inventions. Verifying the load-bearing details is not overhead that erases the value; drafting speed is the saving, verification is the safety.",
+      "Hand-building the whole plan first forfeits Claude's main planning contribution — rapidly generating structure, surfacing forgotten dependencies, and stress-testing sequencing. Reducing the tool to formatting uses it where it adds least."
+    ],
+    "principle": "feed real constraints in, verify operational specifics out",
+    "relatedConcept": "Claude drafts plan structure — milestones, dependencies, risks — from stated constraints; humans validate the real-world specifics before adoption.",
+    "overallExplanation": "Feed real constraints in and verify specifics out: Claude turns dates, budget, and commitments into a structured draft plan, and humans confirm the vendor-level facts before it becomes the plan."
+  },
+  {
+    "id": 416,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Renata, operations lead at an architecture firm, must recommend one of three project-management software vendors to the partners. She wants Claude's help with the comparison but knows pricing and feature sets change frequently. What is the strongest way to leverage Claude here?",
+    "options": [
+      "Ask Claude to build a comparison framework — evaluation criteria, weighting, and a scoring structure suited to the firm's needs — then fill it with current pricing and feature details she gathers from the vendors themselves",
+      "Ask Claude to state each vendor's current pricing tiers from its training knowledge and base the recommendation on those figures",
+      "Ask Claude which vendor it prefers and present that preference to the partners as an independent third-party assessment",
+      "Skip Claude for this task entirely, since any comparison involving prices is outside what an AI assistant can usefully support"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This splits the work by strength: Claude excels at structuring the evaluation — criteria that matter for an architecture firm, sensible weighting, a consistent scoring approach — while the volatile facts (current pricing, feature lists) come from authoritative, current sources.",
+      "Pricing changes faster than any training snapshot, so figures recalled from training knowledge may be outdated or wrong. A vendor recommendation to the partners built on stale numbers fails at exactly the detail level partners will check.",
+      "Claude's stated 'preference' is not an independent assessment — it reflects patterns in training data, not an evaluation of this firm's needs against current offerings. Presenting it as third-party diligence misrepresents what the output is.",
+      "Prices being volatile constrains how Claude should be used, not whether. The framework, criteria, tradeoff analysis, and final write-up are substantial contributions; abandoning all of that over one verifiable input type discards most of the available value."
+    ],
+    "principle": "let Claude build the framework; supply the volatile facts yourself",
+    "relatedConcept": "Effective research support separates structure (criteria, weighting, synthesis) from current facts, which come from authoritative sources.",
+    "overallExplanation": "Let Claude build the framework and supply the volatile facts yourself: evaluation structure is where the model excels, while current pricing and features must come from the vendors."
+  },
+  {
+    "id": 417,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Vikram, executive assistant to the leadership team at a commercial real-estate developer, has listed his dozen recurring weekly tasks and wants to identify which ones Claude could meaningfully speed up. Which task profile should he prioritize as the strongest candidates?",
+    "options": [
+      "Text-heavy, repetitive tasks with clear success criteria — like turning meeting transcripts into standard summaries or reformatting weekly status inputs — where output quality is easy to check",
+      "The tasks requiring the most personal judgment and discretion, like deciding which executive requests to prioritize, since those consume the most mental energy",
+      "Tasks involving confidential board compensation discussions, since the highest-sensitivity work is where efficiency gains matter most",
+      "The tasks he finds most enjoyable, since familiarity with a task makes AI collaboration on it most comfortable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The strongest optimization candidates share a profile: language-centric, recurring, governed by clear criteria that make outputs quick to verify. Summarizing transcripts and standardizing status inputs fit exactly — high frequency multiplies the savings, and easy checking keeps risk low.",
+      "Prioritization judgments depend on unstated organizational context — relationships, politics, shifting priorities — that lives in Vikram's head, not in any prompt. Judgment-heavy discretionary calls are among the weakest candidates, however tiring they are.",
+      "Sensitivity is a reason for caution, not a selection criterion: board compensation material likely falls under data-handling restrictions and would need policy review before any tool touches it. Leading the initiative with the riskiest data inverts sensible sequencing.",
+      "Enjoyment is irrelevant to where assistance pays off — if anything, the tedious repetitive tasks he least enjoys are where delegation to a tool yields the most relief. Candidate selection should follow task structure, not personal preference."
+    ],
+    "principle": "best candidates: repetitive, text-heavy, easy to verify",
+    "relatedConcept": "Process-optimization targeting favors frequent language tasks with clear success criteria over judgment-heavy or sensitive work.",
+    "overallExplanation": "The best optimization candidates are repetitive, text-heavy tasks with clear success criteria — frequency multiplies the savings and verifiability keeps the risk manageable."
+  },
+  {
+    "id": 418,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Leverage Claude for research, planning, and process optimization",
+    "type": "single",
+    "question": "Ines, sustainability coordinator at a food manufacturer, assembles a monthly sustainability report from five site managers' updates, which arrive in wildly different formats and levels of detail — making consolidation slow and inconsistent. How can she best leverage Claude to optimize this process?",
+    "options": [
+      "Work with Claude to design a standardized update template for the site managers, then have Claude draft each month's consolidated report from the structured updates for her review",
+      "Leave the inputs as they are and simply ask Claude each month to 'make the combined report better' after she has manually assembled it",
+      "Have Claude generate plausible content for any site whose update arrives late, so the report is never delayed by missing inputs",
+      "Ask each site manager to write their section with Claude independently, with no shared format, so every site keeps its own reporting style"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Real optimization often starts upstream: a standard template fixes the root cause — chaotic inputs — and structured updates then make the consolidation step fast and reliable for Claude to draft. The process improves end to end, not just at the final formatting pass.",
+      "Polishing the output leaves the actual bottleneck untouched: she still manually wrestles five incompatible formats together every month. 'Make it better' applied after the painful step is cosmetic assistance, not process optimization.",
+      "Generating content for a silent site fabricates operational data — invented waste figures or energy numbers in an official report. A late input is a process problem to manage with the manager involved, never a gap for the model to fill with plausible fiction.",
+      "Five independent Claude-assisted styles reproduce today's inconsistency with new tooling. The consolidation pain comes from the absence of a shared structure, and individual usage without standardization does nothing to remove it."
+    ],
+    "principle": "optimize the inputs, not just the final step",
+    "relatedConcept": "Process optimization addresses root causes — standardizing upstream inputs so downstream assembly becomes fast, consistent, and automatable.",
+    "overallExplanation": "Optimize the inputs, not just the final step: a Claude-designed standard template fixes the chaotic-updates root cause, and structured inputs make the monthly consolidation fast and reliable."
+  },
+  {
+    "id": 419,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "single",
+    "question": "Kwame, membership coordinator at a gym chain, has built a Claude Project to answer front-desk staff questions about membership policies, loaded with the policy handbook. Before rolling it out to forty locations, what development step should he take?",
+    "options": [
+      "Test the Project against a set of real questions staff have actually asked, compare its answers with the known correct policy answers, and refine the instructions and knowledge until the error pattern is acceptable",
+      "Roll it out to all forty locations at once, since the policy handbook is loaded and the Project therefore cannot answer incorrectly",
+      "Ask Claude within the Project whether it feels ready for deployment, and proceed if it responds affirmatively",
+      "Rewrite the policy handbook from scratch before any testing, since testing is only meaningful once documentation is perfect"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Developing a solution includes validating it against reality before it faces users: real historical questions, answers checked against known-correct policy, and iterative refinement of instructions and knowledge based on the observed failures. Testing with real cases is the core pre-rollout discipline.",
+      "Loaded knowledge does not guarantee correct answers — questions can be ambiguous, policies can conflict, and the Project may misread edge cases. Skipping validation sends whatever failure modes exist straight to forty locations simultaneously.",
+      "A model's self-assessment of readiness is not evidence; it will generate a plausible, agreeable response either way. Readiness is established by comparing outputs against known correct answers, not by asking the system to grade itself.",
+      "Testing against the current handbook is exactly how Kwame discovers which parts of the documentation cause wrong answers — the test results should drive any rewriting. Demanding perfect documentation before any testing inverts the develop-test-refine loop."
+    ],
+    "principle": "test against real cases before rollout",
+    "relatedConcept": "Solution development validates outputs against known-correct answers on real user questions, refining configuration until failures are acceptable.",
+    "overallExplanation": "Test against real cases before rollout: run actual staff questions through the Project, compare with known-correct policy answers, and refine until the error pattern is acceptable."
+  },
+  {
+    "id": 420,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "single",
+    "question": "Petra, a proposal writer at an engineering-services firm, is iterating on a Claude-drafted proposal template. The second draft still buries the client-benefit summary deep in the document and uses passive voice throughout. What is the most productive next move in the iteration?",
+    "options": [
+      "Give Claude specific, targeted feedback — move the client-benefit summary to the first page, convert passive constructions to active voice — and review the revision against those two points",
+      "Regenerate the draft repeatedly with the identical request until a version happens to have the right structure and voice",
+      "Ask Claude to 'make it better overall' so it can apply its own judgment about what a strong proposal requires",
+      "Abandon the iteration and write the template manually, since two imperfect drafts show the approach has failed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Iteration converges when feedback names the exact gaps: what is wrong, where, and what right looks like. Two concrete directives give Claude an actionable target and give Petra clear criteria for checking the next revision — this is how drafts improve instead of merely changing.",
+      "Identical input reliably reproduces similar output; regeneration without new information is a lottery, not a method. The problems are known and nameable, so the efficient move is to state them rather than hope randomness fixes them.",
+      "Vague feedback yields drift: Claude will change something, but nothing anchors the changes to the two actual problems. When the reviewer already knows what is wrong, withholding those specifics discards the most valuable input the iteration has.",
+      "Two drafts with identified, fixable issues is normal early iteration, not failure — the structural and voice problems are precisely the kind targeted feedback resolves in one pass. Quitting here abandons the loop at the moment it is about to pay off."
+    ],
+    "principle": "iterate with named defects, not vague wishes or rerolls",
+    "relatedConcept": "Effective iteration states what is wrong, where, and what correct looks like, so each revision closes identified gaps.",
+    "overallExplanation": "Iterate with named defects: telling Claude exactly what to fix — summary placement, passive voice — converges in one pass where rerolls and 'make it better' merely shuffle the draft."
+  },
+  {
+    "id": 421,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "multi",
+    "question": "Diego, training lead at an agricultural cooperative, is designing a Claude-supported workflow for producing seasonal safety-training materials for member farms. Which two design choices give the solution the best chance of working well? (Choose two.)",
+    "options": [
+      "Develop each training document as an artifact, so every deliverable evolves as one revisable piece rather than fragments scattered across chat responses",
+      "Start with the simplest version that delivers value — one flagship module produced end to end — and extend the workflow based on what member-farm feedback reveals",
+      "Design the most elaborate possible setup up front — every module type, language variant, and format — before any member farm has seen a single output",
+      "Skip collecting user feedback after launch, since the design already reflects the requirements gathered at the start"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Training documents are evolving deliverables, and artifacts keep each one as a single revisable object through successive refinement rounds — the natural container for content that will be reviewed, corrected, and reissued seasonally.",
+      "Correct. A minimal end-to-end slice — one module produced, delivered, and reacted to — tests every assumption in the design cheaply. What member farms actually find useful then steers the expansion, which is how iterative solution design de-risks the build.",
+      "Elaborate up-front construction bets the entire design on untested assumptions; if farms find the modules too long or the format wrong, all that variant-building is rework. Breadth before validation is the classic over-design failure iteration exists to avoid.",
+      "Initial requirements are a hypothesis, and real usage is the test: farms will surface gaps and confusions no upfront gathering predicted. A solution that stops listening at launch freezes its mistakes in place instead of iterating past them."
+    ],
+    "principle": "build the smallest valuable slice and grow it on feedback",
+    "relatedConcept": "Sound solution design pairs artifacts for evolving deliverables with an iterative start-small approach steered by real user feedback.",
+    "overallExplanation": "Build the smallest valuable slice and grow it on feedback: artifacts hold each evolving deliverable, and one validated end-to-end module beats an elaborate untested design."
+  },
+  {
+    "id": 422,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Use Claude to support solution design, development, and iteration",
+    "type": "single",
+    "question": "Hana, a communications specialist at an energy utility, asked Claude for two alternative structures for the utility's storm-outage customer notifications — one status-first, one action-first. Both look plausible. How should she decide between the designs?",
+    "options": [
+      "Evaluate both against the documented requirements — what customers must learn first, regulatory wording obligations, and channel length limits — and involve the customer-care team that fields the follow-up calls",
+      "Choose the version she personally finds more elegant, since design decisions ultimately come down to professional taste",
+      "Ask Claude which of its two designs is better and adopt its choice, since it produced both and knows them best",
+      "Send both versions to customers in alternating storms indefinitely, so no decision between the designs ever has to be made"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Generating alternatives is Claude's contribution; choosing between them is an evaluation against the requirements the design must serve — customer information priorities, regulatory language, channel constraints — validated by the team that sees the consequences in follow-up calls.",
+      "Personal elegance is not a requirement anyone documented: outage notifications succeed by getting the right information to stressed customers within regulatory and channel constraints. Taste-based selection abandons the criteria the design exists to meet.",
+      "Asking the generator to judge its own alternatives produces a fluent rationalization, not an evaluation grounded in this utility's requirements and customers. The decision inputs — regulations, call-center experience, customer priorities — live with humans, not the model.",
+      "Permanently alternating structures means customers never learn what to expect from outage messages, and inconsistency in regulated communications is itself a risk. Deferring the decision forever is not a design strategy; comparison against criteria is."
+    ],
+    "principle": "alternatives come from Claude; selection comes from requirements",
+    "relatedConcept": "Design iteration uses Claude to generate options and human evaluation against documented requirements to choose among them.",
+    "overallExplanation": "Alternatives come from Claude, selection from requirements: compare both structures against documented customer, regulatory, and channel criteria with the team that handles the fallout."
+  },
+  {
+    "id": 423,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "single",
+    "question": "Margot, managing editor at a magazine publisher, wants to integrate Claude into the nine-step freelance-pitch review workflow. Several steps — a printed log sheet, a physical routing folder, a duplicate summary typed for a retired archive system — exist only because of constraints from the print era. What should her integration approach be?",
+    "options": [
+      "First re-examine which steps still serve a purpose, redesign the workflow around its actual goals, and then integrate Claude into the steps that remain — rather than accelerating obsolete steps",
+      "Apply Claude to speed up each of the nine steps exactly as they are, since faithfully preserving the existing process is the safest form of integration",
+      "Have Claude generate the duplicate archive summaries faster, since that step is the most obviously tedious one to staff",
+      "Discard the entire review workflow and let Claude judge pitches without any defined process, since structure is what slows the team down"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Integration includes the option to redesign, not merely augment: steps that exist only because of vanished constraints should be removed, not accelerated. Rebuilding around the workflow's real goals first means Claude's effort lands on work that still deserves to exist.",
+      "Faithfully automating a process locks in its fossils — Claude would be speeding up a printed log and a feed to a retired system. Making obsolete steps faster is the classic integration mistake of paving the old path instead of asking where the path should go.",
+      "The duplicate summaries feed a system that no longer exists; the correct treatment of that step is deletion, not acceleration. Optimizing the most tedious step feels productive precisely when the step itself is the waste.",
+      "The opposite extreme: pitch review encodes editorial judgment, accountability, and fairness that a structureless model-decides arrangement abandons. Redesign means rebuilding the process around its goals, not dissolving the process into unreviewed AI decisions."
+    ],
+    "principle": "redesign before you accelerate",
+    "relatedConcept": "Workflow integration asks whether each step should still exist before applying Claude — automating obsolete steps entrenches them.",
+    "overallExplanation": "Redesign before you accelerate: remove the print-era steps that no longer serve a purpose, then integrate Claude into the workflow that remains — never speed up work that shouldn't exist."
+  },
+  {
+    "id": 424,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "single",
+    "question": "Stefan, operations lead at a travel agency, is about to integrate Claude into the itinerary-drafting workflow, where agents currently spend hours assembling custom trip documents. Leadership will ask in a quarter whether the integration worked. What should Stefan do before the rollout begins?",
+    "options": [
+      "Record baseline measurements of the current workflow — drafting time per itinerary, revision rounds, error reports — so post-rollout results can be compared against real pre-integration numbers",
+      "Skip measurement setup, since agents will simply be asked afterward whether they feel the tool made their work faster",
+      "Plan to report the number of Claude conversations agents open per week, since usage volume is the standard measure of integration success",
+      "Wait until the quarter ends and then reconstruct the old workflow's performance from memory to build the comparison"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Integration success is a before-and-after claim, and the 'before' must be captured before it disappears. Baseline drafting time, revision counts, and error rates turn the quarterly question into a factual comparison instead of a debate over impressions.",
+      "Feelings about speed are shaped by novelty, enthusiasm, and frustration with individual incidents — they neither quantify the change nor persuade a skeptical leader. Anecdote is a supplement to measurement, not a substitute for it.",
+      "Conversation counts measure activity, not outcomes: agents could open many chats while itineraries take just as long or contain more errors. Usage volume says the tool is touched, not that the workflow improved.",
+      "Retrospective reconstruction inherits every bias of memory, and once the new workflow is live the old one can no longer be observed. A baseline invented after the fact is indistinguishable from a number chosen to flatter the result."
+    ],
+    "principle": "capture the baseline before the workflow changes",
+    "relatedConcept": "Demonstrating integration value requires pre-rollout measurements of time, revisions, and errors to compare against post-rollout results.",
+    "overallExplanation": "Capture the baseline before the workflow changes: pre-rollout measurements of time, revisions, and errors are the only credible basis for the before-and-after answer leadership will ask for."
+  },
+  {
+    "id": 425,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "single",
+    "question": "Amina, a regional manager at a restaurant chain, built a well-configured Claude Project that drafts weekly inventory-variance summaries for store managers. A month after launch, only two of her fifteen managers use it; the rest still write summaries manually. What is the most likely gap and the right response?",
+    "options": [
+      "The integration stopped at the tool: she should show managers how it fits their weekly routine — walkthroughs, example prompts, where it saves them time — and gather their feedback on what feels awkward",
+      "Issue a directive that all fifteen managers must use the Project weekly, since resistance to new tools only responds to mandates",
+      "Rebuild the Project from scratch with different instructions, since low adoption necessarily means the configuration is defective",
+      "Accept the low uptake, since two adopters out of fifteen is the normal ceiling for AI tools in restaurant operations"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An integration is not the artifact but the changed working habit: managers need to see where the tool enters their actual weekly routine, what to type, and what they get back. Enablement plus listening for friction is what converts a built tool into an adopted workflow.",
+      "Mandates produce compliance theater — perfunctory usage without engagement — and mask the real friction instead of surfacing it. If managers do not understand where the tool helps, forcing clicks does not create the time savings the integration was for.",
+      "Two managers using it successfully is evidence the configuration works; thirteen never trying it points at awareness and enablement, not defects. Rebuilding a functioning Project addresses the part of the system that is not broken.",
+      "Thirteen managers hand-writing summaries the tool already drafts is not a ceiling — it is an enablement gap with a known fix. Declaring low adoption 'normal' abandons the integration's value based on an invented industry statistic."
+    ],
+    "principle": "integration includes enablement, not just configuration",
+    "relatedConcept": "A workflow integration succeeds when people change how they work — which requires training, examples, and feedback loops, not just a built tool.",
+    "overallExplanation": "Integration includes enablement: a working Project becomes a working workflow through walkthroughs, examples, and feedback on friction — not through mandates or rebuilds."
+  },
+  {
+    "id": 426,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Integrate Claude into existing workflows to augment or redesign them",
+    "type": "multi",
+    "question": "Lucas, an administrator at a primary school, is integrating Claude into the weekly parent-newsletter workflow, which currently ends with the principal's review and sign-off before anything is sent. Which two integration choices are appropriate? (Choose two.)",
+    "options": [
+      "Place Claude at the drafting stage — turning the week's raw updates into a newsletter draft — while keeping the principal's review and sign-off exactly where it is",
+      "Run the Claude-assisted workflow in parallel with the existing manual process for a few weeks, comparing outputs before switching over",
+      "Send Claude's newsletter directly to parents without the principal's review, since removing the sign-off step is where the real time savings are",
+      "Overhaul every school communication channel — newsletters, report comments, and emergency notices — in the same rollout to leverage the momentum"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The drafting step is where the manual effort lives, and the sign-off is the safeguard for parent-facing content. Inserting Claude upstream of an intact review step captures the time savings while accountability for what families receive stays with the principal.",
+      "Correct. A parallel run is a low-risk integration pattern: the school compares Claude-assisted drafts against the manual process on real weekly content, learning failure modes while the proven workflow still produces the actual newsletter.",
+      "Parent communications are external, trust-sensitive content — exactly where removing review is most dangerous. The sign-off catches errors before they reach families; cutting it converts drafting mistakes directly into public ones for marginal time savings.",
+      "Bundling every channel — including emergency notices — into one rollout multiplies risk exactly when the school understands the tool least. Integration succeeds step by step; momentum is a reason to sequence the next workflow, not to change everything at once."
+    ],
+    "principle": "insert Claude upstream of intact review, and pilot in parallel",
+    "relatedConcept": "Safe workflow integration targets the effortful drafting step, preserves external-facing sign-off, and proves itself in a parallel run before switchover.",
+    "overallExplanation": "Insert Claude upstream of an intact review and pilot in parallel: draft with the tool, keep the principal's sign-off, and compare against the manual process before switching over."
+  },
+  {
+    "id": 427,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "single",
+    "question": "Nora, a library director, is introducing Claude to help her staff draft program announcements and summarize community feedback. Several long-tenured librarians are anxious that the tool is a first step toward eliminating their roles. How should Nora communicate about the initiative?",
+    "options": [
+      "Name the specific tasks Claude will assist with, be explicit that judgment, community knowledge, and final review remain with staff, and invite the team to help decide where the tool is and is not used",
+      "Avoid discussing the staffing question at all, since raising it will only legitimize and amplify the anxiety",
+      "Promise that nothing about anyone's job will ever change in any way as a result of the tool, to settle the issue immediately",
+      "Tell the team that the decision has been made at her level and their role is to adopt the tool rather than debate it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Credible communication to worried staff is concrete and participatory: exactly which tasks the tool drafts, exactly what stays human — judgment, community knowledge, review — and a genuine role for the team in shaping usage. Specificity plus involvement addresses fear better than reassurance.",
+      "Silence does not neutralize a fear staff already share aloud; it cedes the narrative to speculation and signals the concern is unspeakable. The anxiety is the communication task, not a topic to route around.",
+      "A promise of zero change is neither honest nor believable — the tool exists to change how drafting work gets done. Staff sense overpromising, and when routine tasks visibly shift, the broken absolute costs Nora the credibility the initiative depends on.",
+      "Command framing confirms the fear's premise: decisions about their work happening without them. It converts anxious staff into resistant ones and discards the librarians' knowledge of which tasks are safe to delegate — input the integration actually needs."
+    ],
+    "principle": "answer job fears with specifics and participation",
+    "relatedConcept": "Communicating value to worried staff means naming what the tool does, what stays human, and giving the team a real voice in the boundaries.",
+    "overallExplanation": "Answer job fears with specifics and participation: name the assisted tasks, state plainly what stays human, and let staff help draw the boundaries rather than avoiding or overriding the concern."
+  },
+  {
+    "id": 428,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "single",
+    "question": "Ibrahim, marketing head at a car-dealership group, is briefing sales staff before they start using Claude to draft vehicle-listing descriptions and customer follow-up emails. Several staff assume that whatever Claude writes is factually reliable. What must his briefing convey?",
+    "options": [
+      "That Claude can state specific-sounding details — trim features, fuel figures, availability — that are plausible but wrong, so every factual claim in a draft must be checked against the vehicle record before anything is published or sent",
+      "That factual errors only occur when prompts are poorly written, so staff who prompt carefully can publish drafts without further checking",
+      "That the tool's limitations are best left unmentioned during onboarding, since dwelling on weaknesses discourages adoption before staff see the benefits",
+      "A detailed explanation of how large language models are trained on text corpora, so staff can reason about reliability from first principles"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The core limitation to communicate is hallucination in exactly the form this workflow will meet it: confident, specific vehicle details that may not match the actual car. Pairing that warning with a concrete rule — verify against the vehicle record before publishing — makes the limitation operational.",
+      "Good prompting reduces errors but cannot eliminate fabricated specifics; the model can produce a wrong trim detail from a careful prompt. Teaching staff that care at the prompt exempts them from checking builds a false safety rule into customer-facing content.",
+      "Staff who assume reliability will publish unverified specs, and the first wrong towing capacity or price in a listing becomes a customer dispute the briefing could have prevented. Omitting limitations trades a manageable onboarding message for real-world failures.",
+      "Sales staff need operational guidance, not machine-learning theory: what kind of errors appear in their drafts and what to do about them. Technical depth mismatched to the audience obscures the one behavior — verify before sending — the briefing must instill."
+    ],
+    "principle": "translate limitations into an operational verification rule",
+    "relatedConcept": "Communicating limitations means describing hallucination as it will appear in the team's own outputs, paired with the concrete checking step that contains it.",
+    "overallExplanation": "Translate limitations into an operational rule: warn that plausible-but-wrong vehicle details will appear, and require checking every factual claim against the record before publishing."
+  },
+  {
+    "id": 429,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "single",
+    "question": "Chen, development director at an arts nonprofit, has used Claude successfully for grant-proposal drafting and now must explain the initiative to two audiences: the board, which approves budgets and worries about reputational risk, and the volunteer writers who would use the tool. How should he shape the two communications?",
+    "options": [
+      "Tailor each message to its audience's decisions — for the board, outcomes, costs, risks, and safeguards; for the volunteers, what the tool helps with day to day, its limits, and how their review role works",
+      "Deliver the identical presentation to both groups, since consistency of message matters more than relevance to either audience",
+      "Give the board a purely technical walkthrough of Projects and prompting, since decision-makers need implementation depth above all",
+      "Emphasize only successes with both audiences, saving any mention of limitations until someone encounters a problem firsthand"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Communicating value and limitations is audience work: the board decides on budget and risk, so it needs outcomes, costs, failure modes, and safeguards; volunteers decide how to work, so they need practical usage, limits they will hit, and their responsibility in review. Same facts, framed for each decision.",
+      "One deck for both means the board sits through usage mechanics it cannot act on while volunteers get governance framing that never tells them what to do on Monday. Consistency of facts matters; identical framing serves neither audience's actual decision.",
+      "Boards evaluate outcomes, exposure, and cost — not feature mechanics. A technical walkthrough answers questions the board is not asking and leaves its real ones, about reputational risk and safeguards, unaddressed at the moment approval is decided.",
+      "Success-only messaging sets expectations that the first hallucinated citation in a grant draft will shatter — in front of the board, that reads as concealment. Limitations disclosed upfront are context; limitations discovered by accident are scandal."
+    ],
+    "principle": "frame the same truth for each audience's decision",
+    "relatedConcept": "Stakeholder communication adapts framing — governance and risk for approvers, practical usage and review duties for users — without changing the facts.",
+    "overallExplanation": "Frame the same truth for each audience's decision: boards need outcomes, risks, and safeguards; users need day-to-day guidance and their review role — one message shaped two ways."
+  },
+  {
+    "id": 430,
+    "domain": "Workflow Integration and Solution Design",
+    "objective": "Communicate Claude's value and limitations to stakeholders",
+    "type": "multi",
+    "question": "Tessa, operations director at a sports-club franchise, is writing the expectations section of a one-page brief for franchise owners ahead of a Claude rollout for member communications and schedule announcements. Which two statements belong in the brief because they set accurate expectations? (Choose two.)",
+    "options": [
+      "\"Claude speeds up drafting and summarizing considerably, but outputs need staff review before anything goes to members\"",
+      "\"Some requests, like connecting Claude directly to our club-management software, are technical work we would escalate to specialists rather than attempt ourselves\"",
+      "\"Claude automatically verifies its statements against each club's live schedule database before responding\"",
+      "\"Once a Project is configured with our templates, its outputs no longer require review before sending\""
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This is the honest value-plus-limitation pairing: real, describable speed gains on drafting and summarizing, tied to the standing safeguard that member-facing content passes staff review. It promises what the tool delivers and nothing more.",
+      "Correct. Setting scope expectations is part of limitation communication: system integrations are technical work beyond built-in features, and telling owners upfront that such requests get escalated to specialists prevents both improvised connections and inflated assumptions.",
+      "Claude has no live connection to club schedule databases and does not automatically verify claims against operational systems. This statement plants exactly the false reliability belief that leads owners to send unchecked schedule announcements to members.",
+      "Configuration improves consistency but does not eliminate errors — a Project can still produce a wrong date or misstate a policy in a fluent, on-template draft. Promising review-free operation removes the safeguard on precisely the content members act on."
+    ],
+    "principle": "promise the real gains, keep the review, state the scope",
+    "relatedConcept": "Accurate expectation-setting pairs genuine value claims with the review requirement and is explicit about which requests exceed built-in features.",
+    "overallExplanation": "Promise the real gains, keep the review, and state the scope: accurate briefs pair drafting speed-ups with mandatory staff review and name the technical requests that get escalated."
   }
 ]

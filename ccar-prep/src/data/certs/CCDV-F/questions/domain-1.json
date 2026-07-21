@@ -11,7 +11,9 @@
       "A supervisor agent that spawns a subagent per invoice so each document is processed in an isolated context",
       "A single large prompt that asks Claude to perform extraction, classification, and routing in one completion with no intermediate checks"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When a task decomposes into a known, fixed sequence of steps, a workflow with predefined steps is simpler, cheaper, and more predictable than an agent. Agents earn their complexity only when the path through the task cannot be determined in advance.",
       "Tempting because agents are the more powerful abstraction, but autonomy adds nondeterminism, latency, and cost with no benefit when the steps are already known. This over-engineers a fixed pipeline and makes failures harder to trace to a specific step.",
@@ -34,7 +36,9 @@
       "Two identical peer agents that both run the full investigation so their answers can be compared for agreement at the end",
       "A workflow with a hard cap of five search calls per investigation so the context can never fill up during a run"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because a bigger window delays the failure, but it does not remove it: raw search results still accumulate and dilute the model's attention on the original question. It treats context exhaustion as a capacity problem when it is a structure problem.",
       "Correct. A manager/supervisor hierarchy isolates noisy intermediate work inside subagents: each subagent burns its own context on raw results and returns only distilled findings, so the supervisor's context stays focused on the question and the synthesis.",
@@ -57,7 +61,9 @@
       "Use claude.ai with a detailed project prompt, since the web interface already exposes Claude's coding ability",
       "Wait for the task requirements to stabilize and script each coding task as a fixed prompt-chained workflow instead"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because a raw-API loop maximizes control, but the team would spend its three weeks rebuilding the loop, tool execution, context compaction, and permissioning that already exist. Custom harnesses make sense when requirements genuinely exceed what the SDK exposes, not as a default.",
       "Correct. The Claude Agent SDK packages the production agent loop — tool execution, file and shell access, context management, and hooks for deterministic controls — so a small team ships in weeks and customizes only where its needs are unique.",
@@ -80,7 +86,9 @@
       "Lower the sampling temperature so the model follows its instructions more consistently across runs",
       "Add a second Claude call that reviews each planned edit and advises the agent on whether to proceed"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting because prompt emphasis does shift behavior, but instructions are probabilistic and can be diluted or overridden by whatever else enters context. A rule that must hold every time cannot live only in the prompt.",
       "Correct. Hooks execute as deterministic code in the harness, outside the model's reasoning, so a pre-tool-use hook inspects each action and blocks writes to the protected path with certainty. Deterministic guardrails belong in code, not in instructions.",
@@ -103,7 +111,10 @@
       "Anthropic-hosted deployment is required for the agent to use tools, since tool execution only works on Anthropic's servers",
       "Self-hosting removes the need for API authentication because the model runs entirely inside the company's own network"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. The defining benefit of self-hosting is control: the team owns the runtime, network boundaries, and infrastructure placement of the agent's execution environment, which matters for organizations with strict environment requirements.",
       "Correct. The defining benefit of a managed deployment is offloading operations: Anthropic runs the agent's execution environment, so the team trades some control for far less infrastructure to build, patch, and scale.",
@@ -126,7 +137,9 @@
       "Return the text content of the tool-use response directly to the user, since the model has finished generating for that request",
       "Send the tool result to the API as a brand-new conversation containing only the tool output so the model can summarize it cleanly"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "Tempting if unfamiliar with tool use, but \"tool_use\" is a normal, expected stop reason — the model is pausing for the client to act, not failing. Retrying with more tokens misreads the protocol and discards a valid in-progress turn.",
       "Correct. The tool-use loop is: model requests a tool, the client executes it, the client returns a tool_result in the growing conversation, and the cycle repeats until the model signals completion with \"end_turn\". The client, not the model, runs the tools.",
@@ -149,7 +162,9 @@
       "Increase max_tokens on every request so the model has more room to produce complete answers late in the session",
       "Add an instruction telling the agent to ignore earlier tool outputs unless they are directly relevant to the current clause"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Context-window management — pruning stale tool outputs and compacting history into summaries — keeps the working context small and relevant, which restores speed, cost, and coherence in long agent sessions. Retain conclusions, drop the raw bulk.",
       "Tempting because stronger models degrade more gracefully, but every model's attention is diluted by a context stuffed with stale full-text outputs, and the top tier raises per-token cost on an already bloated prompt. It pays more to reason over garbage.",
@@ -172,7 +187,10 @@
       "Adopting any of these frameworks makes agent behavior deterministic, since the framework controls the model's sampling",
       "These frameworks replace the need for tool definitions, because the framework infers what external actions the agent can take"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. LangGraph's core abstraction is the graph: nodes for steps and edges for transitions, giving explicit, inspectable control flow — a natural fit when a team wants workflow structure to be first-class and visible.",
       "Correct. PydanticAI builds agent interactions around Pydantic models, so inputs and outputs are typed and validated at the framework boundary — a natural fit when structured data contracts matter most.",
@@ -182,5 +200,408 @@
     "principle": "frameworks organize orchestration; they don't change the model's nature",
     "relatedConcept": "Agentic frameworks like Strands, LangGraph, and PydanticAI differ in their core abstraction — graphs, typed contracts, or agent loops — and the choice should match how the team wants to express control flow.",
     "overallExplanation": "Frameworks organize orchestration but don't change the model's nature. Strands, LangGraph, and PydanticAI differ in core abstraction — graphs, typed contracts, agent loops — and the right choice matches how the team wants to express control flow."
+  },
+  {
+    "id": 109,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Architecture",
+    "type": "single",
+    "question": "Keiko, an SRE at a video-streaming platform, is building an assistant that diagnoses production incidents. Every incident is different: the useful next check depends on what the previous metric query or log search revealed, and no two investigations follow the same path. A teammate proposes hard-coding the team's ten-step diagnostic checklist as a fixed prompt chain. What should Keiko build instead?",
+    "options": [
+      "A prompt-chained workflow that runs the full ten-step checklist in the same order for every incident",
+      "A single completion with every runbook pasted into the prompt so the model can produce a diagnosis in one shot",
+      "An agent with metric, log, and deployment-history tools that selects its next step based on what earlier tool results reveal",
+      "A batch job that pre-executes all diagnostic tools before the model sees anything, then sends every output in one request"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "A fixed chain fits tasks whose steps are known in advance; incident diagnosis is the opposite — the right next check depends on live findings, so a rigid checklist wastes calls on irrelevant steps and misses the branches that actually matter.",
+      "Pasting runbooks produces advice, not investigation: the model cannot query metrics or logs, so it can only guess at causes. Diagnosis requires acting on the live system, which means tools plus iteration, not a one-shot completion.",
+      "Correct. When the path through a task cannot be predetermined and each step's outcome shapes the next, an agent that chooses tools dynamically is the right architecture — this is precisely the case where agents justify their extra cost and nondeterminism.",
+      "Pre-running every tool ignores that useful diagnostic queries are discovered mid-investigation — you cannot know which log filter to run until the metrics point somewhere. It also floods the context with mostly irrelevant output."
+    ],
+    "principle": "choose an agent when each step depends on the results of the last",
+    "relatedConcept": "The workflow-versus-agent decision cuts both ways: dynamic, findings-driven investigations are the canonical case for agentic tool selection.",
+    "overallExplanation": "Choose an agent when each step depends on the results of the last. Incident diagnosis is findings-driven — the path cannot be scripted in advance — which is exactly the case where an agent's dynamic tool selection earns its cost over a fixed workflow."
+  },
+  {
+    "id": 110,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Architecture",
+    "type": "single",
+    "question": "Omar is designing a market-research system at a consumer-insights firm: a supervisor agent will coordinate three worker subagents that each investigate a different data source. A junior engineer suggests the supervisor should also read every raw article and dataset itself so nothing gets lost in translation. In a manager/supervisor hierarchy, what is the supervisor's proper role?",
+    "options": [
+      "Decompose the request into subtasks, delegate each to a worker, and synthesize the distilled summaries the workers return",
+      "Re-execute each worker's investigation itself so every finding is independently verified before synthesis",
+      "Receive each worker's complete raw context — every tool output and intermediate thought — so no detail is lost",
+      "Stay out of task assignment and let workers watch a shared queue, claiming whichever subtask they prefer"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The supervisor's job is coordination: break the request down, route subtasks to workers, and integrate the condensed findings they send back. Keeping its context free of raw source material is what lets it reason clearly about the overall question.",
+      "Duplicating every worker's investigation defeats the purpose of delegation — the supervisor's context fills with the same raw material the hierarchy exists to keep out, and the cost roughly doubles for no architectural gain.",
+      "Forwarding full raw contexts upward recreates the single-agent context-exhaustion problem inside the supervisor. The hierarchy works because workers absorb the noise and pass up only distilled findings.",
+      "A self-serve queue removes the decomposition and synthesis intelligence that makes the pattern effective; nobody is shaping subtasks to fit the question or integrating results, so coverage gaps and overlap go unnoticed."
+    ],
+    "principle": "supervisors decompose, delegate, and synthesize — they do not do the workers' reading",
+    "relatedConcept": "In a manager/supervisor hierarchy the coordination layer stays clean by consuming distilled worker output, never the raw intermediate material.",
+    "overallExplanation": "Supervisors decompose, delegate, and synthesize — they do not redo the workers' reading. The hierarchy's value comes from workers absorbing raw material in their own contexts and passing only distilled findings up to a coordinator kept clean for synthesis."
+  },
+  {
+    "id": 111,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Architecture",
+    "type": "multi",
+    "question": "Elif, a staff engineer at a game studio, chairs an architecture review covering two proposed AI features and asks the team to state accurate tradeoffs between predefined workflows and autonomous agents before any design is approved. Which two statements are accurate? (Choose two.)",
+    "options": [
+      "Agents are the cheaper option overall, because they skip steps that a fixed workflow would run unnecessarily",
+      "Workflows keep control flow in code, which makes their behavior more predictable and each step easier to test in isolation",
+      "Workflows cannot contain model calls, so any feature that uses an LLM must be built as an agent",
+      "Agents fit tasks where the number and order of steps cannot be known up front, at the price of less predictable latency and token spend"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because agents can skip irrelevant work, but their exploratory tool calls, longer accumulated contexts, and retries typically cost more than a lean fixed pipeline; cost predictability is a workflow strength, not an agent one.",
+      "Correct. In a workflow the sequence lives in ordinary code: each step can be unit-tested, logged, and reasoned about independently, which is exactly why fixed, decomposable tasks favor workflows over autonomous agents.",
+      "Workflows are defined by predetermined structure, not by an absence of LLM calls — prompt chaining is a workflow made entirely of model calls. This conflates 'uses a model' with 'is an agent', which are different questions.",
+      "Correct. The defining case for an agent is a path that cannot be scripted in advance; the accepted tradeoff is variability in how long each run takes and how many tokens it consumes."
+    ],
+    "principle": "workflows buy predictability and testability; agents buy flexibility at variable cost",
+    "relatedConcept": "The core architecture tradeoff: predetermined control flow in code versus model-directed control flow, each with distinct cost and predictability profiles.",
+    "overallExplanation": "Workflows buy predictability and testability because control flow lives in code; agents buy flexibility for unscriptable paths at the price of variable latency and spend. Neither is universally cheaper, and workflows can absolutely contain model calls."
+  },
+  {
+    "id": 112,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Architecture",
+    "type": "single",
+    "question": "Viktor's team at an energy utility runs an agent that performs database schema migrations: each step alters tables that the next step depends on, and the plan evolves as constraints are discovered along the way. To speed things up, a teammate proposes splitting the steps across four parallel subagents. Why is this the wrong use of subagents?",
+    "options": [
+      "Subagents can only be used for read-only tasks, and schema migration requires write access to the database",
+      "Subagents pay off for independent subtasks that run in isolation; these steps are ordered and share evolving state, so splitting them adds handoff overhead without any real parallelism",
+      "Subagents inherit the supervisor's full context automatically, so four copies of it would exceed the model's context window",
+      "Parallel subagents require an agentic framework such as LangGraph, which the team has not adopted yet"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "There is no read-only restriction on subagents — they can be given whatever tools their task requires, including write access. The objection to this design is about task coupling, not tool permissions.",
+      "Correct. Subagents improve execution when subtasks are independent enough to run in isolation and report back a summary. Here every step consumes the previous step's outcome, so nothing can actually run concurrently and each handoff loses shared state.",
+      "Subagents are valuable precisely because they do not carry the parent's full context — each starts with a scoped brief. The inheritance premise is backwards, and context capacity is not the flaw in this plan.",
+      "Spawning subagents does not require any particular framework; a custom harness or the Agent SDK can orchestrate them. The proposal fails on task structure, not on missing tooling."
+    ],
+    "principle": "subagents suit independent, isolatable subtasks — not tightly coupled sequential steps",
+    "relatedConcept": "The role of subagents is isolation and parallelism; a task whose steps share evolving state gains neither and pays handoff overhead.",
+    "overallExplanation": "Subagents suit independent, isolatable subtasks, not tightly coupled sequential steps. When every step depends on the previous step's outcome and shared evolving state, splitting the work yields no parallelism — only handoff overhead and lost context."
+  },
+  {
+    "id": 113,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "single",
+    "question": "Noor is adding an AI planning capability to her company's industrial-IoT orchestration engine, a mature Java system with its own scheduler, state store, and tool-execution sandbox. The engine must own every turn: it decides when the model is called, persists conversation state itself, and executes actions through its existing sandbox. File-editing and shell tooling are irrelevant here. What construction approach fits best?",
+    "options": [
+      "A minimal custom agent loop on the Messages API, with the engine dispatching tool calls and persisting conversation state in its own store",
+      "The Claude Agent SDK, since production agents should always start from the SDK regardless of the host environment",
+      "Claude Code in headless mode, wrapped by the engine, since it already ships a hardened agent loop",
+      "A fixed prompt-chained workflow, since custom agent loops are discouraged in production systems"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When the surrounding system must own scheduling, state, and tool execution — and the SDK's coding-oriented tooling adds nothing — a thin custom loop over the Messages API gives exactly the per-turn control required without fighting a harness's assumptions.",
+      "'Start from the SDK' is a sensible default, not a law. Here the host engine already provides the loop's responsibilities — state, dispatch, sandboxing — so the SDK's harness would duplicate or conflict with infrastructure the team must keep.",
+      "Claude Code's loop is built around a coding assistant's needs — repository context, file and shell tools — none of which this integration uses. Wrapping a coding CLI inside an orchestration engine adds a foreign process boundary for no benefit.",
+      "Planning against live system state is findings-driven, not a fixed sequence, and 'custom loops are discouraged' is not a real rule — custom harnesses are the documented path when requirements diverge from what packaged options assume."
+    ],
+    "principle": "build a custom loop when the host system must own the harness's responsibilities",
+    "relatedConcept": "Custom agent loops and harnesses are the right construction choice when an existing system already provides state, scheduling, and tool execution that a packaged harness would duplicate.",
+    "overallExplanation": "Build a custom loop when the host system must own the harness's responsibilities. The Agent SDK is the default for greenfield agents, but a mature engine that already handles state, scheduling, and sandboxed execution is better served by a thin loop over the Messages API."
+  },
+  {
+    "id": 114,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "single",
+    "question": "Amara's team at an adtech firm runs an Agent SDK coding agent whose system prompt says to run the code formatter after editing any file. In practice the model skips the formatter on roughly one edit in twenty, and unformatted code keeps reaching CI. The team wants formatting to happen after every single file edit, without exception. What should they add?",
+    "options": [
+      "A stronger system-prompt instruction that repeats the formatting rule at both the top and the bottom of the prompt",
+      "A second Claude call at the end of each session that reviews the diff and formats anything the agent missed",
+      "A post-tool-use hook in the harness that runs the formatter automatically whenever a file-write tool completes",
+      "A lower sampling temperature so the model follows its formatting instruction more consistently across edits"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Prompt emphasis shifts probabilities but cannot reach certainty — the instruction can still be crowded out by whatever else fills the context during a long session. A rule that must hold every time cannot live only in the prompt.",
+      "An end-of-session review narrows the gap but is still a probabilistic model judgment, and it leaves unformatted code in place for the whole session — including any mid-session commits or CI triggers that fire before the review runs.",
+      "Correct. Hooks execute deterministic code at defined points in the agent lifecycle; a hook that fires after every file-write tool call runs the formatter unconditionally, converting a model tendency into a mechanical guarantee.",
+      "Temperature tunes sampling variability, not adherence to a specific procedural rule; even conservative sampling leaves a nonzero chance the model omits the step. This treats an enforcement problem as a decoding knob."
+    ],
+    "principle": "hooks turn 'the model usually does it' into 'the harness always does it'",
+    "relatedConcept": "Hooks handle deterministic follow-up actions — like formatting after every edit — that should never depend on the model remembering an instruction.",
+    "overallExplanation": "Hooks turn 'the model usually does it' into 'the harness always does it'. A post-tool-use hook runs the formatter as deterministic code after every file write, which no amount of prompt emphasis or model self-review can guarantee."
+  },
+  {
+    "id": 115,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "single",
+    "question": "Sanjay's team at an HR-tech company is adopting the Claude Agent SDK for a benefits-enrollment agent. A new graduate on the team assumes the SDK makes the agent work out of the box with nothing left to build. Which piece of the system remains squarely the team's responsibility to design?",
+    "options": [
+      "The core loop that sends each tool result back to the model and continues until the model finishes its turn",
+      "The machinery that compacts a long session's context so the conversation can continue past the window limit",
+      "The plumbing that executes built-in file and shell tools and streams their results into the conversation",
+      "The agent's system prompt, its domain-specific custom tools, and the permission policy governing what it may do"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "The agent loop — dispatching tool calls and feeding results back until the turn completes — is precisely what the SDK packages so teams stop reimplementing it. It is infrastructure the team consumes, not something they design.",
+      "Context management, including compaction of long sessions, ships with the SDK's harness; teams tune its behavior rather than build it. Mistaking this for custom work is the reverse of the actual division of labor.",
+      "Built-in tool execution is part of the SDK's value proposition — the harness runs those tools and wires their results into the transcript. The team's design work starts where the built-ins stop.",
+      "Correct. The SDK supplies the loop, tooling, and context machinery, but it cannot know this agent's job: the team must author the system prompt, define custom tools for the enrollment systems, and set the permission policy that bounds the agent's actions."
+    ],
+    "principle": "the SDK provides the harness; the team provides the agent's identity, tools, and boundaries",
+    "relatedConcept": "Agent construction with the SDK is a division of labor: loop and context machinery come packaged, while prompts, custom tools, and permissions are always the builder's job.",
+    "overallExplanation": "The SDK provides the harness; the team provides the agent's identity, tools, and boundaries. Loop mechanics, built-in tool execution, and context management come packaged — the system prompt, domain tools, and permission policy never do."
+  },
+  {
+    "id": 116,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "multi",
+    "question": "Petra is evaluating hooks as a safety layer for an agent at a robotics company before it is allowed to issue commands to lab equipment. Reviewing the mechanism with her team, she asks which properties of hooks the design can actually rely on. Which two statements are accurate? (Choose two.)",
+    "options": [
+      "Hooks run as deterministic code at defined points in the agent lifecycle, such as before or after a tool call executes",
+      "Hooks are special instructions inside the system prompt, so a sufficiently persuasive injected input could talk the model out of honoring them",
+      "A pre-tool-use hook can block a pending tool call based on its own logic, regardless of what the model intended",
+      "Hooks consume context-window tokens on every request, so heavy hook usage degrades the model's attention over long sessions"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Hooks are code the harness executes at fixed lifecycle points — they fire every time their trigger condition occurs, unaffected by what the model is thinking or what has entered its context.",
+      "This describes prompt instructions, not hooks. Hooks live outside the model's reasoning entirely, which is exactly why they hold firm against prompt injection in situations where in-context instructions can be overridden.",
+      "Correct. Because a pre-tool-use hook intercepts the action before it executes, it can deny or allow the call by its own criteria — the model proposes an action, but the hook decides whether it runs.",
+      "Hooks execute in the harness process, not inside the prompt; they add no tokens to the request. Confusing harness-side code with in-context content misreads where hooks actually run."
+    ],
+    "principle": "hooks are harness code, not prompt content — they intercept actions deterministically",
+    "relatedConcept": "Hooks provide the deterministic-action layer of agent construction: lifecycle-triggered code that can gate tool calls outside the model's reasoning.",
+    "overallExplanation": "Hooks are harness code, not prompt content: they run deterministically at defined lifecycle points, can gate a pending tool call on their own logic, cost no context tokens, and cannot be talked out of anything by injected text."
+  },
+  {
+    "id": 117,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "single",
+    "question": "Callum's food-delivery company runs a custom-loop support agent. Once or twice a day a session goes off the rails: the agent calls the restaurant-search tool thirty or forty times in a row with slight variations, burning tokens until someone kills the process manually. The team needs runaway sessions stopped reliably. What is the right fix in the harness?",
+    "options": [
+      "Add a system-prompt rule telling the agent never to call the same tool more than three times in one session",
+      "Enforce a turn and budget ceiling in the loop code that halts the session gracefully when the limit is reached",
+      "Remove the restaurant-search tool from the agent's tool set, since it is the one being called repeatedly",
+      "Cap tool usage by lowering max_tokens so that long tool-calling sessions become impossible to sustain"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "A prompt rule is a request, not a control — the same degraded judgment driving the repeated calls can just as easily ignore the instruction. Runaway protection has to bind even when the model's reasoning is exactly what has failed.",
+      "Correct. The harness owns the loop, so it can count iterations and spend, then stop deterministically when a ceiling is hit — a stopping condition in code is the reliable backstop for a loop the model is no longer steering well.",
+      "The tool is essential to the agent's job; deleting it fixes the symptom by destroying the feature. The defect is unbounded looping, which would simply reappear with whichever tool the agent leans on next.",
+      "max_tokens limits a single response's output length, not how many times the loop iterates — each tool-calling turn is a fresh request with its own budget. This misplaces a loop-level control at the message level."
+    ],
+    "principle": "runaway loops are stopped by harness-level iteration and budget limits, not prompt requests",
+    "relatedConcept": "A custom agent loop must include its own deterministic termination conditions — turn caps and spend ceilings — because the model cannot be trusted to self-limit when its judgment degrades.",
+    "overallExplanation": "Runaway loops are stopped by harness-level iteration and budget limits, not prompt requests. The loop code owns termination: count turns and spend, and halt gracefully at the ceiling — a deterministic control that holds precisely when model judgment fails."
+  },
+  {
+    "id": 118,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Construction with Claude",
+    "type": "single",
+    "question": "Ingrid is the architect for a claims agent at a European telecom. The regulator requires that the agent's execution environment — where its tools run and its session state lives — sit inside the company's own in-region VPC with company-controlled network egress rules. Sending inference requests to the Claude API is acceptable. Which deployment model satisfies this?",
+    "options": [
+      "Self-host the agent harness inside the company VPC, keeping tool execution and state in-region while calling the Claude API for inference",
+      "Use an Anthropic-hosted managed agent deployment, since managed platforms assume responsibility for meeting customer regulations",
+      "Self-host and also download the model weights into the VPC so that no traffic of any kind ever leaves the network",
+      "Run the agent through claude.ai and restrict workspace membership to employees who are located in the region"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Self-hosting places the agent's runtime, tool execution, and state exactly where the team deploys it — inside their VPC under their egress rules — while inference still flows to the Claude API, which the regulator explicitly permits.",
+      "A managed deployment moves the execution environment onto Anthropic-operated infrastructure, which is the very thing the regulator says must live in the company's VPC. Offloading operations is normally a benefit, but here it violates the constraint.",
+      "Claude's weights are not distributed for customer-side hosting, so this describes an unavailable architecture. Self-hosting an agent means hosting the harness and its runtime, not the model itself — and the regulator did not require it anyway.",
+      "claude.ai is an end-user interface, not an embeddable agent runtime; its execution environment does not sit inside the company's VPC, and membership restrictions change who logs in, not where tools execute or state resides."
+    ],
+    "principle": "when regulation pins the execution environment, self-host the harness; inference can still be API-based",
+    "relatedConcept": "The self-hosted versus managed decision is about where the agent's runtime lives — self-hosting satisfies environment-placement requirements without moving the model.",
+    "overallExplanation": "When regulation pins the execution environment, self-host the harness — the runtime, tools, and state live in the company VPC while inference still goes to the Claude API. Managed hosting relocates exactly the environment the regulator constrained."
+  },
+  {
+    "id": 119,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "single",
+    "question": "Rosa leads a modernization effort at an enterprise-software vendor: an AI system must upgrade a deprecated logging library across the company's repositories. The set of affected services is unknown until a scan runs, some repos need one edit while others need dozens, and each repo can be handled independently of the rest. Which pattern fits this job?",
+    "options": [
+      "A fixed pipeline with one stage per repository, defined up front from last quarter's service inventory",
+      "An evaluator-optimizer loop in which one model proposes edits and another critiques them until the diff is approved",
+      "An orchestrator that scans to discover the affected repos, dynamically delegates each one to a worker, and merges the results",
+      "A single agent that upgrades every repository sequentially in one session so all decisions share one context"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "A pipeline requires knowing the stages in advance, but the affected set is only discoverable at runtime and last quarter's inventory is already stale. Fixed structure fits fixed work, and this work is not fixed.",
+      "Evaluator-optimizer improves the quality of a single output through critique cycles; it says nothing about how to fan work out across an unknown number of independent repositories, which is the actual problem here.",
+      "Correct. Orchestrator-workers is built for exactly this shape: the orchestrator determines the subtasks dynamically — here by scanning — delegates each independent unit to a worker with its own context, and synthesizes the outcomes.",
+      "One sequential session serializes work that is embarrassingly parallel and accumulates every repo's diffs and tool output in a single context, inviting the slowdown and drift that long single-agent sessions are known for."
+    ],
+    "principle": "orchestrator-workers fits work whose subtasks are discovered at runtime and are independent",
+    "relatedConcept": "Pattern selection follows task shape: fixed known stages suggest a pipeline, while a runtime-discovered fan-out of independent units suggests orchestrator-workers.",
+    "overallExplanation": "Orchestrator-workers fits work whose subtasks are discovered at runtime and run independently: the orchestrator scans, delegates each unit to an isolated worker, and merges results. Pipelines need stages known up front; this job's fan-out is only knowable after the scan."
+  },
+  {
+    "id": 120,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "single",
+    "question": "Lucia runs localization at a startup that translates marketing copy into eight languages. First-pass Claude translations are decent, but reviewers keep flagging the same issues — tone drift and off-glossary terminology — and the team has written those review criteria down precisely. Drafts improve markedly when critiqued and revised. Which pattern should Lucia implement?",
+    "options": [
+      "An evaluator-optimizer loop where a generator drafts, an evaluator checks the draft against the written criteria, and revision repeats until it passes",
+      "A routing step that classifies each source text by language and sends it to a language-specific prompt",
+      "An orchestrator that splits each document into paragraphs and translates them in parallel workers for speed",
+      "A memory store that saves every past translation so the generator can look up how similar sentences were handled"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Evaluator-optimizer shines when output quality demonstrably improves with iteration and the evaluation criteria can be articulated — both conditions Lucia has. The loop automates the exact critique-and-revise cycle her reviewers perform by hand.",
+      "Routing dispatches inputs to specialized handlers, but the target language is already known for every job, and dispatch does nothing about the quality problem — the first draft would still ship unreviewed.",
+      "Parallel sectioning addresses throughput, not quality, and fragmenting marketing copy across workers risks worse tone consistency — the very defect reviewers keep flagging in the first place.",
+      "Reference material can improve the first draft, but the reported gap is between drafts and revised output — the improvement comes from critique against explicit criteria, which a lookup store does not perform."
+    ],
+    "principle": "use evaluator-optimizer when quality improves with critique and the criteria are expressible",
+    "relatedConcept": "The evaluator-optimizer pattern pairs a generating model with a critiquing model in a loop, automating iterative refinement against articulated standards.",
+    "overallExplanation": "Use evaluator-optimizer when output demonstrably improves with critique and the review criteria can be written down. A generator-evaluator loop automates the revise cycle reviewers were doing manually, gating each draft against the team's explicit standards."
+  },
+  {
+    "id": 121,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "single",
+    "question": "An edtech company's tutoring agent works with each student over many short sessions spread across a semester. Students complain that every session starts from zero: the agent has forgotten their weak topics, preferred explanation style, and where the last session left off. Each session necessarily begins with a fresh context window. Which pattern addresses this?",
+    "options": [
+      "Keep one never-ending session per student open for the whole semester so nothing is ever lost from context",
+      "Move to the model tier with the largest context window so more of each conversation fits before truncation",
+      "Begin each session by asking the student to summarize their own history, since self-reported context is the most current",
+      "Give the agent a persistent memory store it writes distilled notes to at session end and reads from at session start"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "A semester-long session accumulates months of transcript, guaranteeing context bloat, degraded attention, and eventually hard window limits — long-lived state belongs outside the conversation, not inside one endless transcript.",
+      "Window size does not create persistence across sessions: a new session starts empty no matter how large the window is. The complaint is about state surviving between conversations, which raw capacity cannot fix.",
+      "Students are unreliable narrators of their own weak topics and progress, and re-collecting history burns the start of every session gathering data the system already generated — it outsources the system's memory to the user.",
+      "Correct. The memory pattern persists distilled state — weak topics, style preferences, last position — outside the context window, loading it at session start so continuity survives resets without dragging full transcripts along."
+    ],
+    "principle": "cross-session continuity comes from external memory, not from bigger or longer contexts",
+    "relatedConcept": "Memory is a core agent pattern: distilled state written to durable storage and selectively reloaded, decoupling what the agent knows from any single context window.",
+    "overallExplanation": "Cross-session continuity comes from external memory, not bigger or longer contexts. The agent writes distilled notes to durable storage at session end and reloads them at session start, so knowledge survives every context reset."
+  },
+  {
+    "id": 122,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "single",
+    "question": "Hana is designing support automation for a consumer-electronics retailer. Incoming messages fall into clearly distinct buckets — warranty claims, device troubleshooting, and order status — and each bucket is best served by a different prompt, tool set, and escalation rule. Handling all three in one generalist prompt has produced mediocre answers everywhere. What should she build?",
+    "options": [
+      "A longer generalist prompt that includes detailed instructions and few-shot examples for all three buckets at once",
+      "A routing step that classifies each incoming message and dispatches it to the specialized handler for its category",
+      "An evaluator-optimizer loop that critiques the generalist's answer repeatedly until it is good enough to send",
+      "A supervisor that forwards every message to all three specialized handlers and merges their three answers"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Cramming three specializations into one prompt is what produced the mediocrity: instructions compete, examples dilute each other, and every message pays the token cost of two irrelevant playbooks.",
+      "Correct. Routing is the pattern for inputs that fall into distinct categories with different optimal handling: a cheap classification step up front lets each downstream handler stay small, focused, and independently tunable.",
+      "Iterative critique polishes an answer but cannot supply the category-specific tools and escalation rules the generalist lacks; it spends extra model calls improving output from what is fundamentally the wrong handler.",
+      "Fanning every message to all three handlers triples cost and latency and then requires a merge step to reconcile answers built on different assumptions — classification up front is cheaper and cleaner than reconciliation after."
+    ],
+    "principle": "route categorically distinct inputs to specialized handlers instead of growing one generalist",
+    "relatedConcept": "Routing is a workflow pattern that separates classification from handling, so each category gets a focused prompt and tool set that can be tuned independently.",
+    "overallExplanation": "Route categorically distinct inputs to specialized handlers instead of growing one generalist prompt. A classification step up front keeps each handler focused with its own prompt, tools, and escalation rules — fixing the mediocrity a shared prompt created."
+  },
+  {
+    "id": 123,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "multi",
+    "question": "Devika, tech lead at a sports-analytics company, must decide whether her team builds its multi-step agent directly on the Claude API or adopts an agentic abstraction framework such as Strands, LangGraph, or PydanticAI. She asks the team to ground the debate in accurate claims about what frameworks do and do not change. Which two statements are accurate? (Choose two.)",
+    "options": [
+      "Frameworks reduce orchestration boilerplate — state handling, step wiring, retries — at the cost of an abstraction layer that can obscure the underlying API calls during debugging",
+      "Tool calling only works through a framework, because the raw Messages API cannot return tool-use requests to client code",
+      "Adopting a framework removes the need for context-window management, since frameworks handle context automatically",
+      "Starting with direct API calls and adopting a framework only when orchestration complexity demands it keeps early versions easier to reason about"
+    ],
+    "correct": [
+      0,
+      3
+    ],
+    "optionExplanations": [
+      "Correct. The framework tradeoff is boilerplate for opacity: you write less orchestration code, but when something misbehaves, the prompts and calls the framework assembled on your behalf sit one layer further from view.",
+      "The Messages API natively supports tool use — the model returns tool-use blocks and client code executes them in a loop. Frameworks wrap this cycle for convenience; they are not what makes it possible.",
+      "No framework abolishes the physics of a finite context window; compaction, pruning, and isolation still have to be designed for long-running work. Frameworks may offer helpers, but the responsibility does not disappear.",
+      "Correct. A recurring recommendation in agent building is to start simple: direct calls keep every prompt and decision visible, and a framework earns its place once multi-step state and wiring genuinely hurt."
+    ],
+    "principle": "frameworks trade boilerplate for abstraction; start simple and adopt one when complexity warrants",
+    "relatedConcept": "The framework-versus-direct-API decision weighs orchestration convenience against debugging transparency — neither tool calling nor context management is exclusive to frameworks.",
+    "overallExplanation": "Frameworks trade orchestration boilerplate for an abstraction layer that can obscure debugging, so starting with direct API calls and adopting a framework only when complexity demands keeps early systems transparent. Tool use and context management exist with or without them."
+  },
+  {
+    "id": 124,
+    "domain": "Agents and Workflows",
+    "objective": "Agent Patterns and Frameworks",
+    "type": "single",
+    "question": "Anders maintains a crop-advisory agent at an agritech firm with a custom tool-use loop. When the field-sensor API times out, his harness currently lets the exception propagate, killing the whole session mid-conversation and losing the farmer's context. He wants the agent to handle tool failures the way a capable assistant would. What should the loop do when a tool call fails?",
+    "options": [
+      "Let the session terminate, since continuing a conversation after any tool failure risks the model reasoning over bad data",
+      "Return an empty successful result for the failed call so the conversation continues without alarming the model",
+      "Catch the failure and send it back as an error-flagged tool result so the model can see what happened and adapt its approach",
+      "Silently retry the identical tool call in the harness until it succeeds, keeping the failure invisible to the model"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Crashing turns a recoverable hiccup into a total loss of the session and its accumulated context. Tool failures are expected events in an agent loop, and the protocol has a first-class way to represent them.",
+      "An empty 'success' is worse than an honest error: the model now reasons over the false premise that the sensor query worked and returned nothing, inviting confident advice built on a fabricated absence of data.",
+      "Correct. Reporting the failure back as an error-marked tool result keeps the loop alive and informed — the model can retry with different parameters, fall back to another tool, or tell the farmer the sensor data is temporarily unavailable.",
+      "Unbounded invisible retries stall the conversation indefinitely against a real outage and hide information the model could act on; a bounded retry is reasonable, but the model should eventually learn the tool is failing."
+    ],
+    "principle": "tool failures flow back into the loop as error results, not exceptions or fake successes",
+    "relatedConcept": "In the tool-use loop pattern, errors are conversation content: an error-flagged tool result lets the model adapt, which neither crashing nor concealment allows.",
+    "overallExplanation": "Tool failures should flow back into the loop as error-flagged results, not exceptions or fake successes. The model can then adapt — retry differently, use another tool, or inform the user — which is impossible when the harness crashes or conceals the failure."
   }
 ]

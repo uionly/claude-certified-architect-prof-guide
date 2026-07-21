@@ -11,7 +11,9 @@
       "Increase max_tokens on each response so the model has enough output budget to re-derive earlier instructions from the long history before answering",
       "Restart the session after every turn and rely on the model to reconstruct the incident state from the user's latest message alone"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Context bloat is treated at the source: prune tool results down to task-relevant fields before they enter context, and compact older turns into summaries that preserve decisions and key facts. A smaller, higher-relevance context reduces drift, latency, and cost simultaneously — the three symptoms are one disease.",
       "Tempting because more room postpones the hard limit, but drift here comes from attention diluted across a mass of irrelevant, stale content, not merely from nearing the cap. A bigger window fits more noise; it does not make the noise less distracting, and cost and latency keep climbing with context size.",
@@ -34,7 +36,9 @@
       "Reduce the number of sources consulted per question to whatever fits comfortably in one context window, accepting narrower research coverage",
       "Raise the temperature for the research phase so the model explores sources more broadly without needing to retain each page in context"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is context isolation through subagents: each subagent burns its own context window on raw page content and returns only the distilled findings, so the orchestrating agent's context stays small and relevant. The pattern converts an unbounded reading workload into bounded, parallelizable units without polluting the main thread.",
       "Tempting because instruction reminders can help mildly with drift, but the root cause — a context stuffed with dozens of full pages — remains. This treats the attention symptom while leaving the bloat in place, and the reminder itself competes with the same noise for attention.",
@@ -57,7 +61,9 @@
       "Alternate the rules between system and user placement each turn, since repeating instructions across both roles is the primary mechanism for making them binding",
       "Put the rules in the final user message each turn and leave the system prompt empty, since models weight the most recent message most heavily and earlier content is ignored"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The system prompt is the place for durable, application-defined behavior — role, tone, policy, scope — while user turns carry the variable, per-request content. This separation gives standing instructions consistent authority across turns and keeps untrusted or changing input structurally distinct from trusted instructions, which also supports caching and injection resistance.",
       "Tempting because system placement does carry weight, but stuffing per-turn customer input into the system prompt erases the trusted-instructions/untrusted-input boundary — a security and behavior hazard — and churns the prompt every request, defeating caching. Placement is about role separation, not a universal accuracy buff.",
@@ -80,7 +86,10 @@
       "Ask the model at the end of the prompt to double-check its work carefully before responding, relying on self-review to catch format deviations",
       "Move the extraction task to the largest model tier, since format inconsistency primarily signals insufficient model capability rather than prompt gaps"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Few-shot examples are the highest-leverage tool for format fidelity: showing correct extractions — including a worked case where a missing field becomes null — demonstrates the exact behavior descriptions struggle to convey, directly attacking both the format drift and the invented-optional-fields failure.",
       "Correct. Explicit output constraints remove the ambiguity the model is currently filling with guesses: an exact schema, closed enum lists, a fixed date format, and a stated null convention give the model a specification to satisfy rather than a style to improvise. Constraints plus examples are the standard pairing for structured extraction.",
@@ -103,7 +112,9 @@
       "Truncate every review to its first two sentences before insertion, since injected instructions statistically tend to appear in the later parts of user-submitted text",
       "Raise the temperature for summarization requests so the model is less likely to follow any single instruction in the prompt, including injected ones"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The fix is structural separation of instructions from data: explicit delimiters (such as XML-style tags) mark where untrusted content begins and ends, the standing instructions define delimited content as data-only, and input sanitization catches boundary-breaking attempts. This is prompt-level injection hygiene — treating user content as payload, not prose continuous with your instructions.",
       "Tempting because it costs one line, but a lone plea buried in the prompt is a soft control with no structural boundary — the injected text still sits in-line with instructions, indistinguishable as data. Recency weighting is not an enforcement mechanism, and 'will refuse' vastly overstates what an unenforced instruction achieves.",
@@ -126,7 +137,9 @@
       "A second model call that reviews the first response and confirms it is valid JSON, replacing hand-written validation with a more flexible model-based check",
       "A try/except around json.loads that silently retries once on failure and otherwise writes whatever parsed, since a parse success means the data is safe to consume"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Model output is a probabilistic external input and must be treated like one: parse defensively (tolerating fences or wrapper prose), validate structure and values against a schema, and define what happens on failure — retry with the validation error, fall back, or queue for review. Nothing unvalidated should reach a system of record.",
       "Tempting because instructions do raise the success rate, but a prompt is a request, not a guarantee — sampling means occasional deviations survive any phrasing. Removing validation because the prompt 'requires' valid JSON confuses reducing a failure's probability with eliminating the failure mode.",
@@ -136,5 +149,308 @@
     "principle": "treat model output as untrusted input: parse defensively, validate against a schema, and define the failure path",
     "relatedConcept": "Structured-output patterns, response validation, and skepticism toward confident output are what make model responses safe for downstream systems to consume.",
     "overallExplanation": "Treat model output as untrusted input: parse defensively, validate against a schema, and define a failure path before anything reaches a system of record. Skepticism toward confident, well-formed output is what makes model responses safe for downstream consumption."
+  },
+  {
+    "id": 607,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Context Engineering",
+    "type": "single",
+    "question": "Amara, an engineer at an insurance carrier, automates claims intake as one long Claude conversation that classifies the claim, extracts policy fields, checks coverage, and drafts the adjuster letter in sequence. By the letter-drafting turn, the context holds every raw document and intermediate result, and drafting quality is noticeably worse than when she tests that step in isolation. Which restructuring addresses the cause?",
+    "options": [
+      "Decompose the pipeline into discrete workflow steps, giving each step a fresh context that receives only the distilled outputs it needs from the step before it",
+      "Add an instruction at the start of the conversation stating that the final step matters most, so the model reserves attention for the letter-drafting turn",
+      "Reverse the step order so letter drafting happens first while the context is still small, letting the extraction steps absorb the accumulated bulk instead",
+      "Repeat the full claim documents immediately before the drafting turn, so the relevant material appears twice and outweighs the intermediate noise"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is context isolation through a multi-step agentic workflow: each stage starts clean and receives only the distilled artifacts it needs — the classification, the extracted fields, the coverage decision — so the drafting step sees exactly its inputs and none of the accumulated raw material. The isolated-test quality becomes the production quality.",
+      "Tempting because it names the symptom, but attention cannot be pre-reserved by announcement — the drafting turn still executes inside a window crowded with raw documents and stale intermediates. A meta-instruction adds one more line to the noise it is trying to overcome.",
+      "The letter cannot be drafted before classification, extraction, and coverage checking produce the facts it depends on — the step order is a data dependency, not a preference. Reshuffling would break correctness while leaving the accumulation problem intact for the other steps.",
+      "Duplicating the documents grows the very bloat that is degrading quality and doubles the token cost of the most context-sensitive turn. Adding more volume to outweigh noise is the wrong direction; the fix is subtracting what the step does not need."
+    ],
+    "principle": "chain discrete workflow steps with fresh contexts, passing distilled artifacts forward instead of the whole conversation",
+    "relatedConcept": "Context isolation through multi-step workflows keeps each stage operating at isolated-test quality — the alternative to one ever-growing conversation.",
+    "overallExplanation": "One accumulating conversation drags every stage's raw material into the final step; a multi-step workflow gives each stage a fresh context fed only the distilled outputs it needs. Isolation restores the quality Amara sees in isolated testing."
+  },
+  {
+    "id": 608,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Context Engineering",
+    "type": "single",
+    "question": "Jonas, a developer at an industrial-equipment manufacturer, builds a technician assistant by concatenating all thirty of the company's service manuals — thousands of pages — into every request's context. Answers increasingly cite the wrong machine's procedures, and every request is slow and expensive, even though any single question concerns exactly one machine. What should Jonas change?",
+    "options": [
+      "Prepend a table of contents to the concatenated manuals so the model knows where each machine's section begins before it starts reading",
+      "Ask the model to first list which manuals it plans to ignore, then answer, so irrelevant content is explicitly dismissed before reasoning begins",
+      "Load context on demand: identify the machine from the question and retrieve only the relevant manual sections, keeping each request small, cheap, and free of competing look-alike procedures",
+      "Move the manuals from the user message into the system prompt, since system-prompt content is held separately and does not count toward the context window"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "A table of contents adds navigation for a reader who pages through documents, but the model still receives — and attends over — every token of all thirty manuals. The wrong-machine confusions come from look-alike procedures coexisting in context, and an index leaves them all there.",
+      "Tempting because it sounds like explicit focusing, but content 'dismissed' in a preliminary list remains fully present in the window, still competing for attention and still billed. A model cannot un-read context; exclusion has to happen before content enters the request.",
+      "Correct. The task tells you what is relevant — one machine per question — so the context should contain only that machine's material, retrieved when the question arrives. Just-in-time loading eliminates the cross-machine confusion at its source while cutting per-request cost and latency dramatically.",
+      "The system prompt is part of the same context window and its tokens count and bill like any others. This invents an exemption; relocating the bloat changes its label, not its cost or its interference with the answer."
+    ],
+    "principle": "load only task-relevant context on demand instead of preloading an entire knowledge base into every request",
+    "relatedConcept": "Preventing context bloat starts before the request is sent: retrieval scoped to the question keeps look-alike content from competing in the window.",
+    "overallExplanation": "Stuffing all thirty manuals into every request creates cost, latency, and cross-machine confusion the task never required. Retrieving only the relevant sections per question keeps context small and free of competing procedures."
+  },
+  {
+    "id": 609,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Context Engineering",
+    "type": "single",
+    "question": "Zanele, an engineer at an electric utility, operates a grid-monitoring agent whose database tool returns the complete raw record for every queried substation — hundreds of fields of firmware metadata, historical readings, and internal identifiers. After a handful of tool calls the conversation is mostly unread payload, and both answer quality and per-request cost suffer. Where is the highest-leverage fix?",
+    "options": [
+      "Cap the agent at three tool calls per conversation so payload accumulation stays bounded, regardless of what the monitoring task actually requires",
+      "Redesign the tool contract so calls return only task-relevant fields — supporting field selection, filtering, and summarized responses — so verbose payloads never enter the context at all",
+      "Raise max_tokens so the agent's answers can quote larger portions of each payload, ensuring the important fields are never skipped over",
+      "Instruct the agent to re-read the full conversation and rank the accumulated payloads by importance before composing each answer"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "A hard call cap trades task capability for context hygiene: monitoring questions that legitimately need five substations become unanswerable, while three full raw records still flood the window. It rations the symptom instead of shrinking the payloads that cause it.",
+      "Correct. Tool output pruning is most effective at the tool boundary: when the contract returns selected fields, filtered rows, or summaries, the hundreds of irrelevant fields never consume context in the first place. Every downstream symptom — bloat, degraded answers, cost — shrinks at once, for every future conversation.",
+      "max_tokens governs how much the model may generate, not what pollutes its input context. Encouraging longer answers that quote more payload adds output cost on top of the input bloat — both terms of the problem get worse.",
+      "Re-reading and ranking happens inside the same crowded window, spending more attention and tokens on content that mostly should not be there. Prioritization cannot recover what irrelevant volume degrades; prevention at the source can."
+    ],
+    "principle": "prune tool output at the tool boundary: design contracts that return task-relevant fields, not full raw payloads",
+    "relatedConcept": "Tool output pruning is a context-engineering discipline applied at design time — the cheapest place to stop bloat is before it enters the window.",
+    "overallExplanation": "The highest-leverage fix for payload-driven bloat is the tool contract itself: field selection, filtering, and summarized responses keep verbose records out of context entirely, improving quality and cost for every conversation at once."
+  },
+  {
+    "id": 610,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Context Engineering",
+    "type": "multi",
+    "question": "Callum, an engineer at a biotech company, runs a lab-automation agent through multi-hour protocols. Midway through long runs the conversation approaches the context window, and once older turns are dropped, the agent repeats completed steps and forgets safety constraints that were established early on. Which two techniques address this failure? (Choose two.)",
+    "options": [
+      "Raise max_tokens on every request, since a larger output allowance also expands the total context the model can retain across the run",
+      "Compact the older conversation into a summary that explicitly preserves the protocol, safety constraints, completed steps, and open items, replacing the raw turns it covers",
+      "Rely on the model's training data to reconstruct dropped turns, since a model that has seen similar protocols can infer what its own earlier messages must have said",
+      "Persist durable run state — completed steps, decisions, safety constraints — to external memory such as a state file the agent reads back when needed, independent of the conversation window"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "max_tokens caps the size of a single response; it neither enlarges the context window nor preserves anything across it. This confuses the output budget with context capacity, and the dropped-turn amnesia would continue exactly as before.",
+      "Correct. Compaction is the in-window remedy: replace older raw turns with a deliberate summary that carries forward exactly what the run cannot afford to lose — the protocol, its safety constraints, what is done, and what remains. The agent keeps its operative memory at a fraction of the token cost.",
+      "Training data contains protocols in general, not this run's specifics — which reagent batch was used, which steps completed, which constraint the operator added at turn three. Inference from priors is guessing, and guessing about completed steps and safety rules is precisely the observed failure.",
+      "Correct. External memory decouples critical state from the context window entirely: a state file recording steps, decisions, and constraints survives any amount of context pressure and can be re-read on demand. For multi-hour agents, durable state belongs outside the conversation."
+    ],
+    "principle": "long-running agents survive context limits via compaction that preserves critical state plus external memory outside the window",
+    "relatedConcept": "Compaction and externalized memory are the two standard defenses when an agent's lifetime exceeds what one context window can hold.",
+    "overallExplanation": "When runs outlive the window, compact older turns into summaries that keep the protocol, constraints, and progress — and persist durable state to external memory the agent can re-read. Dropped raw turns then cost nothing critical."
+  },
+  {
+    "id": 611,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "single",
+    "question": "Ines, a developer at a micromobility startup, ships an internal code-review assistant whose system prompt says 'Review the diff and leave helpful, high-quality comments. Don't be annoying.' Reviews are wildly inconsistent: some are nitpicky style essays, others miss obvious bugs, and engineers disagree about what the bot is even for. What is the most effective prompt revision?",
+    "options": [
+      "Add emphasis to the existing wording — capitalizing HELPFUL and HIGH-QUALITY — since models weight emphasized instructions more heavily than plain text",
+      "Append 'be consistent across reviews' to the prompt, since explicitly naming the observed failure is the most direct way to make it stop",
+      "Remove the system prompt entirely so the model falls back to its default reviewing behavior, which is more consistent than any custom instruction",
+      "Replace the vague adjectives with explicit, specific instructions: what to check (correctness, security, missing tests), what to skip, severity labels to use, and the expected comment format, phrased as what to do rather than only what to avoid"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Capitalizing an adjective does not define it — HELPFUL is exactly as ambiguous as helpful, and the model must still improvise what qualifies. Emphasis can nudge priority among clear instructions, but it cannot manufacture the specification this prompt is missing.",
+      "Consistency is the symptom of underspecification, not a behavior the model can simply switch on: without a definition of what a review should contain, each response is a fresh improvisation. Naming the failure adds words without adding the missing criteria.",
+      "Tempting as a reset, but no prompt means no task definition at all — the model still improvises scope, tone, and format, now with even less guidance. Defaults are generic, not consistent with what this team actually needs from reviews.",
+      "Correct. The failure is instruction vagueness: 'helpful' and 'high-quality' delegate every real decision to the model's guess. Spelling out the checks, exclusions, severity scheme, and comment format — as positive instructions — replaces improvisation with specification, which is what makes behavior reproducible across reviews."
+    ],
+    "principle": "instruction clarity means specific, positive, explicit criteria — vague adjectives delegate the real decisions to the model's guesswork",
+    "relatedConcept": "Claude follows explicit instructions well; inconsistency across responses usually traces to prompts that never actually specified the behavior.",
+    "overallExplanation": "Vague adjectives like 'helpful' force the model to improvise scope and format anew each time. Explicit criteria — what to check, what to skip, how to label and format — turn improvisation into specification and inconsistency into repeatability."
+  },
+  {
+    "id": 612,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "single",
+    "question": "Petra, an engineer at a pharmaceutical company, builds a regulatory-summary prompt that concatenates task instructions, two worked examples, a forty-page source document, and the reviewer's question into one undifferentiated block of text. The model sometimes summarizes one of the worked examples instead of the source document, or treats sentences from the document as if they were instructions. What prompt change fixes this?",
+    "options": [
+      "Structure the prompt with XML-style tags — such as instructions, example, and document sections — and refer to those tags from the instructions, so each piece of text has an unambiguous role",
+      "Move the worked examples to the very end of the prompt, since models do not confuse content that appears after the main document with the document itself",
+      "Delete the worked examples entirely, since example content in a prompt inherently causes role confusion that no formatting technique can prevent",
+      "Set the temperature to zero, since confusing one prompt section for another is a sampling-randomness problem rather than a prompt-structure problem"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When instructions, examples, source material, and the question flow together as one block, the model must guess where each role begins and ends — and sometimes guesses wrong. XML-style tags draw explicit boundaries, and instructions that reference the tags ('summarize the document section') make each component's role unambiguous. This is the standard structure for complex multi-part prompts.",
+      "Position does not confer role: an example at the end is still undelimited text the model must classify by inference. Reordering shuffles which confusions occur rather than eliminating the ambiguity that causes them.",
+      "Tempting because removing the confused-about content removes those specific errors, but it sacrifices the format guidance the examples provide — and the document-text-as-instructions confusion remains. Examples are not the problem; missing boundaries are, and delimiting fixes both confusions at once.",
+      "Role confusion persists at temperature zero — the model deterministically picks its best interpretation of an ambiguous prompt, which can deterministically be the wrong one. Sampling settings cannot supply structural boundaries the prompt never drew."
+    ],
+    "principle": "delimit multi-part prompts with XML-style tags and reference the tags in instructions so every span has an explicit role",
+    "relatedConcept": "Tag-based structure is the standard Claude technique for prompts that combine instructions, examples, documents, and queries in one request.",
+    "overallExplanation": "One undifferentiated block forces the model to guess which text is instruction, example, or source. XML-style tags with tag-referencing instructions make each component's role explicit — the standard fix for multi-part prompt confusion."
+  },
+  {
+    "id": 613,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "single",
+    "question": "Mateo, a developer at a fitness-app company, maintains a meal-plan generation prompt. Each time a user complains, he edits the prompt on instinct and ships the change if that user's case now looks good — and each fix seems to break something else a week later. Nothing about the prompt's history or its performance over time is recorded anywhere. Which practice should he adopt?",
+    "options": [
+      "Freeze the prompt permanently, since a prompt that keeps changing can never converge on stable behavior across a diverse user base",
+      "Ship each edit to a random half of users and keep whichever variant draws fewer complaints per week, iterating purely on complaint volume",
+      "Build a representative test set including past failures, change one aspect of the prompt at a time, evaluate candidates against the whole set before shipping, and keep prompt versions under version control",
+      "Rewrite the prompt from scratch after every complaint, since accumulated instructions are the primary source of regressions when iterating on prompts"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Freezing preserves whatever defects exist today and abandons improvement entirely — the current prompt is demonstrably generating complaints. The problem is not that the prompt changes; it is that changes ship without evaluation against anything beyond one case.",
+      "Tempting because it looks like an experiment, but complaint volume is a slow, noisy, one-sided signal — silent failures never register, and a week per iteration is glacial. It also tests whole edits against live users instead of catching regressions before they ship.",
+      "Correct. This is iterative refinement as a discipline: a representative test set (seeded with past failures) reveals whether an edit fixes the target case without breaking others, single-variable changes make cause and effect attributable, and versioned prompts make every change comparable and reversible. Whack-a-mole becomes measurable progress.",
+      "Total rewrites maximize behavioral churn — every rewrite re-rolls all the behaviors users currently rely on, and with no test set or history, each one is a fresh gamble. Regressions come from unevaluated changes, not from the existence of accumulated instructions."
+    ],
+    "principle": "iterate on prompts systematically: representative test set, one change at a time, evaluate before shipping, version everything",
+    "relatedConcept": "Prompt iteration without a test set and version history is whack-a-mole; the refinement loop is what turns edits into measured improvements.",
+    "overallExplanation": "Instinct edits validated on one case trade one failure for another invisibly. A representative test set, single-variable changes, pre-ship evaluation, and version control make prompt iteration attributable, reversible, and cumulative."
+  },
+  {
+    "id": 614,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "multi",
+    "question": "Sana, an engineer at a retail bank, uses five few-shot examples in the intent-classification prompt for a support chatbot. All five examples are short and politely phrased, and four of the five demonstrate the same 'card_lost' intent. In production — where messages are long, frustrated, or ambiguous — accuracy is poor, and outputs sometimes echo the examples' phrasing verbatim. Which two changes improve the example set? (Choose two.)",
+    "options": [
+      "Rebalance the examples across the intents the classifier must distinguish, since a set dominated by one label biases the model toward predicting that label",
+      "Remove all examples and rely on intent-name definitions alone, since few-shot examples inherently cause verbatim copying that definitions avoid",
+      "Make the examples representative of real traffic — long, emotional, and ambiguous messages included — so the demonstrated mapping covers the inputs the model actually sees",
+      "Rewrite each example in a different output format, so the model learns the underlying task rather than memorizing any single response format"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Few-shot examples teach a distribution as well as a task: four of five demonstrating 'card_lost' tells the model that label is the usual answer, skewing predictions toward it on ambiguous inputs. Balancing examples across the intent set removes the demonstrated bias.",
+      "Definitions describe intents, but examples demonstrate the mapping from messy real messages to labels — the part definitions convey poorly. The verbatim echoing comes from unrepresentative, homogeneous examples, not from the existence of examples; fixing the set beats deleting it.",
+      "Correct. Examples that are all short and polite teach a mapping for short, polite inputs; production's long, frustrated, ambiguous messages fall outside everything demonstrated. Sampling examples from real traffic — hard cases included — aligns the demonstration with the distribution the classifier must handle.",
+      "Tempting as anti-memorization, but output-format consistency is precisely what few-shot examples should demonstrate for a classifier: every example ending in a clean label is the contract. Varying formats teaches that the output shape is negotiable, adding a new failure mode."
+    ],
+    "principle": "few-shot sets must mirror real input diversity and stay balanced across labels, while keeping the output format identical",
+    "relatedConcept": "Example selection is prompt design: models generalize from the distribution, difficulty, and balance of the demonstrations, not just their count.",
+    "overallExplanation": "A few-shot set that is label-skewed and easier than production traffic teaches the wrong distribution twice over. Balance examples across intents and draw them from realistic, hard inputs — while holding the output format constant."
+  },
+  {
+    "id": 615,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "single",
+    "question": "Owen, an engineer at a CRM vendor, builds an agent with a dozen tools. The agent keeps calling the export_report tool for quick record lookups where the search_records tool is appropriate. Owen has been growing a section of the system prompt with rules about which tool to use in which situation, but misrouting persists as more tools are added. Where should this guidance primarily live?",
+    "options": [
+      "In the final user message of each turn, since tool selection happens last and is dominated by the most recent text in the context",
+      "In each tool's own definition: a precise name and description stating what the tool does, when to use it, and when a sibling tool is the better choice",
+      "In a separate reference document the agent can fetch with an additional tool call whenever it feels unsure which tool applies",
+      "In the system prompt exclusively, expanded with a rule for every pairwise combination of tools, since tool definitions cannot influence which tool the model selects"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Injecting routing rules into every user turn pollutes the conversational channel with static guidance, repeats tokens endlessly, and still separates the advice from the tools it describes. Recency is not the mechanism by which tool choice goes right.",
+      "Correct. Tool names and descriptions are the primary signal the model consults when choosing among tools — guidance placed there is read exactly at the decision point, scales as tools are added, and can disambiguate siblings directly ('for quick lookups use search_records; export_report is for generating full report files'). This is instruction placement matched to component.",
+      "Tempting because it keeps the system prompt lean, but it makes correct routing depend on the model first recognizing its own uncertainty and spending an extra call — the misrouting happens precisely when the model is confidently wrong. Guidance must be present at decision time, not behind a fetch.",
+      "The premise is backwards: tool definitions are central inputs to tool selection, not invisible to it. A system prompt enumerating every pairwise rule grows quadratically with the tool count — the exact scaling failure Owen is already experiencing."
+    ],
+    "principle": "put tool-selection guidance in tool names and descriptions — the component the model reads when choosing a tool",
+    "relatedConcept": "Prompt placement across components: system prompts set global behavior, while per-tool descriptions govern when and how each tool is used.",
+    "overallExplanation": "Tool descriptions are read at the moment of tool choice, so that is where usage criteria belong — including when a sibling tool is the better fit. System-prompt rule lists scale poorly and sit far from the decision they try to steer."
+  },
+  {
+    "id": 616,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Prompt Engineering",
+    "type": "single",
+    "question": "Lin, a developer at an accounting-software company, needs Claude to return only a raw JSON object from an invoice-parsing endpoint. Despite instructions saying 'respond with JSON only', responses regularly begin with 'Here is the extracted invoice data:' or wrap the object in markdown code fences, and a strict downstream parser rejects them. Which prompt-level technique most directly constrains the output shape?",
+    "options": [
+      "Increase max_tokens so the model has room for both its preamble and the JSON, then have the parser read only the tail end of each response",
+      "Repeat the 'JSON only' instruction at the beginning, middle, and end of the prompt, since threefold repetition is the threshold at which formatting instructions become binding",
+      "Prefill the assistant's response with an opening brace so generation begins mid-JSON-object with no room for a preamble, optionally adding a stop sequence to end output cleanly",
+      "Set the temperature to zero, which disables the model's ability to produce any text that was not explicitly requested in the prompt"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "This accommodates the preamble instead of preventing it, then bets the parser on fragile tail-scanning heuristics — fences, trailing remarks, and nested braces all break naive extraction. The output shape remains unconstrained; only the cleanup moved.",
+      "There is no repetition threshold that converts a request into a guarantee — instructions influence probability, and three copies of the same sentence still leave preambles possible while bloating the prompt. Repetition is emphasis, not enforcement.",
+      "Correct. Prefilling the assistant turn with an opening brace puts the model mid-JSON before it generates a single token — there is simply no position for 'Here is...' or an opening fence to occupy. It is the most direct prompt-level output constraint for this failure, and a stop sequence can cleanly bound the other end.",
+      "Temperature zero makes sampling nearly deterministic; it does not filter output down to what was 'explicitly requested'. If the model's most probable completion opens with a preamble, temperature zero reproduces that preamble consistently."
+    ],
+    "principle": "prefill the assistant response to constrain output shape at the strongest point — the first generated token",
+    "relatedConcept": "Assistant prefill and stop sequences are prompt-level output constraints that succeed structurally where repeated instructions merely raise probabilities.",
+    "overallExplanation": "Instructions raise the odds of clean JSON; prefilling the assistant turn with an opening brace removes the preamble's position entirely, forcing generation to begin inside the object. Stop sequences can bound the tail the same way."
+  },
+  {
+    "id": 617,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Output Handling",
+    "type": "single",
+    "question": "Farah, an engineer at a civic-tech nonprofit, ships an assistant that answers residents' questions about municipal code. Spot checks find answers citing specific-sounding section numbers — delivered fluently and without hedging — for provisions that do not exist. The fabricated answers are indistinguishable in tone from the correct ones. What should Farah's team implement?",
+    "options": [
+      "Verify every cited section against the actual municipal-code database before answers reach residents, treating fluent confidence as no signal of accuracy, and flag or block answers whose references fail the check",
+      "Filter responses by linguistic confidence markers, discarding hedged answers and keeping assertive ones, since fabricated content is statistically more tentative in its phrasing",
+      "Add the instruction 'only cite sections that actually exist' to the system prompt, which removes the model's ability to generate references absent from its training data",
+      "Attach a general accuracy disclaimer to every answer instead of validating references, since checking output against a source database reintroduces the manual work the assistant was built to eliminate"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The observation that fabricated and correct answers read identically is the core lesson: confidence of tone carries no information about accuracy. The remedy is programmatic verification against the authoritative source — citations either resolve in the municipal-code database or the answer is flagged — so trust rests on a check, not on how the output sounds.",
+      "Farah's own spot checks refute this premise: the fabrications arrive fluent and unhedged. Filtering on assertiveness would preferentially keep confident fabrications while discarding honestly hedged correct answers — selecting for exactly the wrong property.",
+      "Tempting because it names the desired behavior, but the model has no internal existence-check to switch on — it generates plausible citations from patterns either way. An instruction may shift probabilities; it cannot substitute for verification of what actually got generated.",
+      "A blanket disclaimer shifts the burden onto residents least equipped to verify legal citations, and it marks correct and fabricated answers identically. Automated lookup against the code database is cheap deterministic validation, not the manual work the assistant replaced."
+    ],
+    "principle": "confident tone is not evidence — verify checkable claims like citations against the authoritative source before they reach users",
+    "relatedConcept": "Skepticism toward confident output is an output-handling discipline: fluency and accuracy are uncorrelated, so validation must be external.",
+    "overallExplanation": "Fabricated citations read exactly like real ones, so tone can never be the filter. Programmatic verification against the authoritative database — with a flag-or-block path for failures — is what makes the answers safe to serve."
+  },
+  {
+    "id": 618,
+    "domain": "Prompt and Context Engineering",
+    "objective": "Output Handling",
+    "type": "multi",
+    "question": "Noor, an engineer at a warehouse-robotics company, consumes Claude-generated JSON task assignments in a dispatch service. At production volume, a small percentage of responses carry a wrong field type, an unknown enum value, or an unexpected extra field — and a single bad assignment can send a robot to a nonexistent bay. Which two patterns make this pipeline robust? (Choose two.)",
+    "options": [
+      "Accept any response that parses as JSON, since syntactic validity at the parser level implies the field values inside are trustworthy",
+      "Constrain the response shape at generation time — for example by defining a tool or structured-output schema with typed, enumerated fields — so conforming structure is how the model must respond",
+      "Have the model append a self-assessment line certifying that its own JSON is valid, and process only the responses that include the certification",
+      "Validate every response against the expected schema before dispatch, and on failure follow a defined path — such as retrying with the validation errors included — keeping unvalidated output away from the robots"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "Parsing proves syntax and nothing more: a wrong type, an off-enum value, or a fabricated bay number can all ride inside perfectly parseable JSON straight to a robot. Equating parseability with trustworthiness is the exact misplaced confidence this pipeline cannot afford.",
+      "Correct. Constraining generation with a typed schema — via tool definitions or structured output — attacks malformation at the source: fields, types, and enums are specified to the model as the required response shape, collapsing most of the wrong-type and unknown-enum failures before any output exists.",
+      "A self-certification is generated by the same probabilistic process as the JSON it vouches for — a model that produced a bad enum can just as fluently certify it. Verification only counts when performed by something other than the thing being verified.",
+      "Correct. Schema validation before dispatch is the last line of defense, and the failure path completes it: retry with the validation errors fed back, or quarantine for review — but never let unvalidated output reach hardware. Generation-time constraints reduce failures; validation catches the remainder."
+    ],
+    "principle": "constrain structure at generation time with a schema and validate every response before it reaches actuators — with a defined failure path",
+    "relatedConcept": "Structured-output patterns and response validation are complementary layers: the schema shapes what the model produces, validation gates what downstream systems consume.",
+    "overallExplanation": "Robustness comes in two layers: a typed schema constrains the model's output shape at generation time, and pre-dispatch validation with a defined failure path catches whatever still deviates. Parseable is not the same as safe."
   }
 ]

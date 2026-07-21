@@ -11,7 +11,9 @@
       "Wrap every API call in a single catch-all retry loop that re-sends the identical request up to ten times, since retrying resolves most intermittent failures regardless of type",
       "Add a global exception handler that shows users a friendlier error message, then monitor whether complaint volume drops before investing in deeper changes"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The core debugging skill is isolating the problem's origin: 429/529 are transient integration-layer errors that call for retry with exponential backoff (and rate-limit management), while a 200 response with unparseable JSON is a model-output problem that retrying identically won't reliably fix — it needs response validation, defensive parsing, and a corrective reprompt or stricter output constraints. Different error types demand different recovery strategies.",
       "Tempting because 'a better model' feels like a universal upgrade, but 429 and 529 are traffic and capacity signals, not capability signals — a stronger tier does nothing for rate limits and may worsen cost. This treats every symptom with one blunt remedy instead of diagnosing distinct causes.",
@@ -21,5 +23,55 @@
     "principle": "isolate whether a failure originates in the integration layer or in model output, then match the recovery strategy to the error type",
     "relatedConcept": "Trace analysis and error-type identification are what turn intermittent LLM app failures from mysteries into two well-understood buckets with known fixes.",
     "overallExplanation": "Isolate whether a failure originates in the integration layer or in model output, then match the recovery strategy to the error type — backoff and retries for transient API errors, validation and reprompting for malformed output. Error-type identification is what turns intermittent failures into well-understood buckets with known fixes."
+  },
+  {
+    "id": 402,
+    "domain": "Eval, Testing, and Debugging",
+    "objective": "Debugging and Error Handling",
+    "type": "single",
+    "question": "Leo supports a hotel-booking assistant that answers policy questions by retrieving passages from a document store before generating. A customer received a confidently wrong answer about cancellation fees. Leo has full traces of the request: the user message, the retrieval call with its returned passages, and the model's final generation. What should he do first?",
+    "options": [
+      "Rewrite the system prompt to emphasize accuracy on cancellation policies, since a wrong answer means the instructions were too weak",
+      "Upgrade to a more capable model tier, since confidently wrong answers indicate the current model cannot handle policy reasoning",
+      "Add automatic retries to the generation call so that a second sample can replace answers like this one",
+      "Walk the trace to see whether retrieval returned the wrong or empty passage, or returned the right one that the model then misread"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Prompt changes are a fix, not a diagnosis — if retrieval fetched the wrong document, no accuracy exhortation will help, and Leo would be tuning the one component the trace might prove entirely innocent.",
+      "A model upgrade assumes the failure is model capability before checking the evidence; if the correct policy text never reached the context, the strongest available tier would still answer from the wrong material.",
+      "Retrying with the same retrieved passages re-rolls the dice on identical inputs — if the failure is upstream in retrieval, every retry inherits it, and if it is a model misreading, retries mask the problem rather than explain it.",
+      "Correct. The trace already contains the answer to debugging's first question: where the failure originated. Comparing what retrieval returned against what the model said cleanly separates an integration-layer defect from a model-output defect and dictates the fix."
+    ],
+    "principle": "trace analysis first: locate where the pipeline diverged before changing prompts or models",
+    "relatedConcept": "Problem-origin isolation in multi-step systems means reading the trace step by step — a wrong answer can be born in retrieval, in generation, or in the glue between them.",
+    "overallExplanation": "Trace analysis comes first: locate where the pipeline diverged before changing anything. Comparing the retrieved passages against the model's answer isolates whether the defect lives in the integration layer (retrieval) or in model output (misreading), and each demands a different fix."
+  },
+  {
+    "id": 403,
+    "domain": "Eval, Testing, and Debugging",
+    "objective": "Debugging and Error Handling",
+    "type": "single",
+    "question": "Mateo, an engineer at an online-ticketing company, sees intermittent failures from his Claude integration in production logs. A teammate wrapped the failing calls in the same exponential-backoff retry policy the service already uses for 429 rate-limit errors, but these failures are HTTP 400 invalid_request_error responses and the retries never succeed. What should Mateo do?",
+    "options": [
+      "Capture the failing request payloads and fix the malformed structure causing the 400, reserving backoff retries for transient errors",
+      "Increase the retry count and widen the backoff window, since intermittent failures generally resolve when given enough attempts",
+      "Treat the 400s as overload signals and shed traffic during peak sales windows until the error rate drops back down",
+      "Switch to a larger model tier, since request-validation limits are looser on more capable models"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A 400 means the request itself is invalid — the same request gets the same rejection every time. The fix is diagnostic: capture the payloads that fail, find the malformed field or structure, and correct the code path that builds it. Backoff belongs to transient errors like 429 and 529.",
+      "More retries only help errors that are transient by nature; a request the API deems invalid is rejected deterministically, so extra attempts add latency and log noise while fixing nothing about the underlying payload.",
+      "Overload is signaled by 429 and 529 responses, not 400. Shedding traffic sacrifices revenue during the busiest sales windows to appease an error class that has nothing to do with load.",
+      "Request validation is not looser on larger models — a malformed request is rejected regardless of tier, so switching models changes cost and behavior while leaving the actual defect in the request-building code untouched."
+    ],
+    "principle": "match recovery to error type: 400s are deterministic client bugs to fix, not transients to retry",
+    "relatedConcept": "Error-type identification drives recovery selection — retry-with-backoff suits transient 429/529 responses, while invalid_request errors demand payload diagnosis in the integration layer.",
+    "overallExplanation": "Match the recovery strategy to the error type: a 400 invalid_request_error is a deterministic client-side bug that no retry policy can outlast. Capture the failing payloads and fix the request construction, keeping exponential backoff for genuinely transient 429/529 errors."
   }
 ]

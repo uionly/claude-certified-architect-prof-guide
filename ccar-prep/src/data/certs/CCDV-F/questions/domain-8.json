@@ -11,7 +11,9 @@
       "Lower the temperature for all tool-calling requests, since parameter guessing and wrong-tool selection are symptoms of sampling variance rather than prompt content",
       "Merge both tools into a single query_shipments tool with one free-text parameter, letting the backend infer intent so the model no longer has to choose"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Tool descriptions and schemas are the model's only documentation — it selects tools and constructs arguments entirely from them. Precise descriptions ('use this when…', parameter semantics, ID formats with examples, return shape) are the highest-leverage fix for wrong-tool selection and malformed arguments, and the first thing to exhaust before adding architecture.",
       "Tempting because routing sounds like control, but the dispatcher must be described too — the same underspecification now afflicts three tools instead of two, plus an extra round-trip per call. It adds moving parts to work around documentation that was never written; fix the descriptions first.",
@@ -34,7 +36,10 @@
       "Have the tool return a generic success acknowledgment even on failure, so the agent loop always continues smoothly and errors never distract the model mid-task",
       "Let exceptions propagate uncaught, since crashing the loop guarantees a human reviews every failure rather than allowing the model to attempt unsupervised recovery"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Agentic recovery depends on the error being visible and actionable in-band: a structured tool result that names the problem and hints at the remedy lets the model correct its arguments or choose another path on the next iteration, keeping the loop alive. Error results are part of the tool's interface, not an afterthought.",
       "Correct. Model-constructed arguments are untrusted input: plausible-looking but invalid IDs, malformed values, and out-of-scope requests all arrive with confidence. Validating existence, formats, ranges, and authorization server-side before any state change is what stood between this tool and a wrong-invoice adjustment.",
@@ -57,7 +62,9 @@
       "Let all tools execute automatically but cap refunds at a small amount per transaction, since bounded losses make human review unnecessary at any volume",
       "Have the agent describe intended refunds in its text replies without executing them, keeping the refund tool permanently disabled and relying on staff to act on the descriptions manually"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Approval patterns should be risk-proportional: reversible, read-only operations run automatically to preserve speed, while consequential, hard-to-reverse actions (moving money, canceling bookings) require human confirmation before execution. This is the standard human-in-the-loop tool pattern — autonomy where it's safe, gating exactly where it isn't.",
       "Tempting as the maximally cautious position, but forcing a human to approve every availability lookup destroys the product's responsiveness while adding no safety — lookups can't move money. Uniform gating ignores that risk varies by action; review capacity should be spent where consequences live.",
@@ -80,7 +87,9 @@
       "Use a network transport for both, since stdio is a deprecated legacy mode retained only for debugging and local subprocess servers cannot access the filesystem",
       "MCP servers define their transport per tool rather than per server, so each sample-tracking tool must individually declare whether it is a stdio tool or an HTTP tool"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The transports map to deployment topology: stdio suits local servers launched as a subprocess by the client — ideal for Claude Desktop on each scientist's laptop — while network transports (like streamable HTTP) suit shared remote servers that many clients reach over the network, where authentication and access control become the server's responsibility.",
       "Tempting because one transport sounds simpler, but stdio's model is a client-spawned local subprocess wired to stdin/stdout — it is not a network protocol, and improvising forwarding recreates a network service with none of HTTP's auth, routing, and infrastructure support. 'No authentication concerns' is exactly backwards for anything remotely reachable.",
@@ -103,7 +112,9 @@
       "Author a Claude Skill containing the telemetry API documentation and example curl commands, so any Claude instance can learn to call the platform when needed",
       "Rely on Claude's built-in web-access tooling to reach the telemetry platform's internal endpoints, avoiding any custom integration work across the five applications"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The requirements — one capability shared across many Claude applications, owned and versioned by a single team, maintained independently of any consumer — are precisely MCP's design case: a server exposes the operations as tools once, and every application connects as a client. New apps next quarter get the integration by configuration, not reimplementation.",
       "Tempting because custom tools are the lightest path for a single application, but five parallel implementations mean five schemas, five error-handling styles, and five things to update when the telemetry API changes — the platform team also loses the independent ownership they explicitly asked for. Right tool type, wrong sharing model.",
@@ -126,7 +137,9 @@
       "A custom function-calling tool named generate_actuarial_report that takes the raw data and returns the finished report from deterministic code, bypassing model judgment",
       "A set of custom slash commands, one per report section, which analysts invoke in sequence to assemble each report manually from its parts"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. This is the Skill design case: packaged procedural knowledge — multi-step instructions, templates, house conventions — plus supporting resources like a rendering script, loaded when the matching task arises. The need is teaching Claude how to perform a workflow, not connecting it to an external system, and Skills are the mechanism for exactly that.",
       "Tempting because MCP does distribute capabilities, but its purpose is connecting Claude to external systems and data through executable tools — standing up a server so tools can return static procedure text adds transport, deployment, and configuration overhead to deliver what is fundamentally instructions and files. Infrastructure is the wrong container for knowledge.",
@@ -136,5 +149,307 @@
     "principle": "Skills package procedural knowledge and resources for how to do a task; MCP connects Claude to external systems — match the mechanism to the need",
     "relatedConcept": "Choosing among Skills, MCPs, and custom tools starts with one question: does Claude need to know something, or reach something?",
     "overallExplanation": "Skills package procedural knowledge — instructions, templates, and supporting scripts — for how to do a task, while MCP connects Claude to external systems. The choice starts with one question: does Claude need to know something, or reach something?"
+  },
+  {
+    "id": 807,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Aisha, a developer at a real-estate listings company, defines a custom search_listings tool in her Messages API request and asks Claude to find condos. The response comes back with stop_reason \"tool_use\" and a tool_use block containing arguments — but her database is never queried and the conversation stalls. She assumed the API would run the tool. What is she missing?",
+    "options": [
+      "Custom tools are client-side: her application must detect the tool_use block, execute the search itself, and send the result back in a tool_result block for the model to continue",
+      "The tool definition is missing an endpoint URL field, which is how the Messages API knows which server to call when the model decides to use a custom tool",
+      "Tool execution requires streaming mode, because tool invocations are delivered as server-sent events that non-streaming responses silently discard",
+      "The model chose not to run the tool, and stop_reason \"tool_use\" merely reports that a tool was considered; she should re-send the request with a firmer instruction to execute it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. With custom (client-side) tools, the API's role ends at emitting the tool_use block: the model has decided what to call and with which arguments, and it is the calling application's job to execute that call and return a tool_result in the next message. The request-execute-respond loop lives in her code — that is the agentic harness dispatch pattern.",
+      "There is no endpoint URL in a custom tool definition — tools are described by name, description, and input schema only, precisely because the API never contacts your systems. Anthropic's servers have no route to her database; only server-side tools that Anthropic itself operates execute without client involvement.",
+      "Streaming changes how the response is delivered, not who executes tools: a non-streaming response carries the same tool_use content block, fully intact. Tying execution to transport confuses the delivery mechanism with the client's responsibility to act on the model's tool call.",
+      "stop_reason \"tool_use\" means the opposite of hesitation: the model has committed to a tool call and paused, awaiting the result before it can proceed. Re-prompting with firmer wording just produces another tool_use block that will equally go unexecuted until her code closes the loop."
+    ],
+    "principle": "custom tools are executed by your application, not the API — handle stop_reason tool_use, run the call, and return a tool_result to continue",
+    "relatedConcept": "The tool-use loop is a client responsibility: the model selects and parameterizes calls, while the harness dispatches them and feeds results back; only Anthropic-operated server tools skip that loop.",
+    "overallExplanation": "Custom tools are client-side: the API returns a tool_use block and stops, and your application must execute the call and reply with a tool_result block. The model parameterizes the call; your harness dispatches it — nothing runs unless your code runs it."
+  },
+  {
+    "id": 808,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Petra, an engineer at a travel-booking startup, ships a create_booking tool whose input schema defines cabin_class, trip_type, and departure_date all as unconstrained strings. Traces show the model sending cabin_class \"premium econ\", trip_type \"round trip please\", and dates like \"next Friday\", which her backend rejects. How should she revise the schema?",
+    "options": [
+      "Constrain the parameters in the schema itself — an enum for cabin_class, an enum for trip_type, and a description specifying an exact date format such as ISO 8601 with an example",
+      "Keep the open string fields but add a normalization microservice behind the tool that uses fuzzy matching to map whatever the model sends onto valid backend values",
+      "Remove the structured parameters in favor of a single request_text string, letting the backend's own parser extract cabin, trip type, and date from the model's natural phrasing",
+      "Add a required confirmation boolean that the model must set to true, prompting it to double-check its other argument values before submitting the booking"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The input schema is a contract the model actively uses when constructing arguments: enums enumerate the only legal values, and format guidance with an example in the field description tells it exactly how a date must look. Constraining at the schema prevents malformed calls at the source instead of repairing them downstream.",
+      "Fuzzy normalization papers over the ambiguity rather than removing it: 'next Friday' still needs a reference date the service does not have, and silent best-guess mapping risks booking something the user did not ask for. The model would have produced valid values if the schema had told it what valid meant.",
+      "Collapsing structure into free text abandons the main benefit of function calling — typed, validated arguments — and moves intent extraction into a backend parser that will face the same ambiguities with less context than the model had. It maximizes exactly the failure mode she is trying to eliminate.",
+      "A confirmation flag adds a field without adding information: the model still has no way to know that 'premium econ' is not a legal cabin class or what date format the backend expects. Self-checking against an unstated contract cannot succeed; the contract has to be stated in the schema."
+    ],
+    "principle": "encode validity in the input schema — enums for closed value sets, explicit formats with examples for structured fields — so the model can only construct legal calls",
+    "relatedConcept": "Schema design is preventive error handling: every constraint expressed as an enum, type, or documented format is a class of malformed tool call that never happens.",
+    "overallExplanation": "Encode validity in the schema itself: enums for closed sets like cabin class and trip type, and explicit format specifications with examples for dates. The model constructs arguments from the schema, so constraints stated there prevent malformed calls instead of repairing them."
+  },
+  {
+    "id": 809,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Omar, a staff engineer at an e-commerce operations platform, auto-generated a Claude tool for each of the 32 endpoints in the internal orders REST API — separate tools for fetching an order, its line items, its shipments, its refunds, and so on. Agents now spend many turns chaining lookups, sometimes pick near-duplicate tools, and frequently exhaust context mid-task. What should he do?",
+    "options": [
+      "Redesign the tool set around agent tasks rather than API endpoints — fewer, consolidated tools such as one order-details call that returns an order with its items and shipments together",
+      "Keep all 32 tools but sort them alphabetically in the tools array, since tool ordering is the primary signal the model uses when choosing among similar options",
+      "Split the 32 tools across two sequential Claude sessions, sixteen each, so no single context window has to hold the entire tool catalog at once",
+      "Add a selector tool the model must call first, which takes a task description and returns the name of the endpoint tool the model should invoke next"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Tool sets should be designed for the agent's tasks, not mirrored from an API's surface area: consolidating related lookups into fewer, purpose-shaped tools removes the near-duplicate choices that cause wrong selections, cuts the multi-turn chaining that burns context, and shrinks the definition overhead every request carries.",
+      "Alphabetical position is not how the model disambiguates tools — selection is driven by names, descriptions, and schemas matched against the task. Reordering leaves 32 overlapping, endpoint-shaped choices exactly as confusable as before and does nothing about the chained-lookup context drain.",
+      "Splitting the catalog across sessions means whichever half the agent is in, some tasks need tools that live in the other half — turning an oversized tool set into an incomplete one. The problem is the granularity of the tools, not merely their count per session.",
+      "A selector tool adds a routing hop to every operation while keeping all 32 confusable tools in play; the selector's own guidance now must describe them all, restating the documentation problem one level up. Indirection around a badly shaped tool set is complexity, not consolidation."
+    ],
+    "principle": "shape tools around agent tasks, not API endpoints — fewer consolidated tools beat a 1:1 mirror of the backend surface",
+    "relatedConcept": "Tool set construction is a design activity: each tool should map to a meaningful unit of agent work, with overlap eliminated so selection is unambiguous and context is spent on the task.",
+    "overallExplanation": "Design the tool set around agent tasks, consolidating endpoint-level lookups into fewer purpose-shaped tools. A 1:1 mirror of a REST API produces overlapping choices, long chains of calls, and context exhaustion — problems that ordering tricks and routing layers cannot fix."
+  },
+  {
+    "id": 810,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "multi",
+    "question": "Hana, a backend engineer at a log-analytics vendor, gives a Claude agent a query_logs tool that returns raw search hits. A typical call brings back hundreds of entries with dozens of metadata fields each, flooding the context window; multi-step investigations degrade sharply after two or three queries. Which two changes to the tool would address this? (Choose two.)",
+    "options": [
+      "Trim the tool's response to the fields an investigation actually uses — timestamp, severity, service, message — instead of returning every metadata field on every hit",
+      "Add result-shaping parameters to the schema — a max_results limit, field filters, and pagination — so the model can request narrow slices and drill down only where needed",
+      "Raise the request's max_tokens so the model has more room to generate its analysis after the large tool results have been loaded into context",
+      "Instruct the model in the system prompt to mentally ignore the irrelevant metadata fields in each tool result and focus only on the columns that matter"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Tool output is loaded into the context window verbatim, so every unused metadata field on every hit is context spent on nothing. Returning a concise, task-relevant projection of the data is the single highest-leverage change — the same investigations consume a fraction of the window.",
+      "Correct. Result-shaping parameters let the model match data volume to the question: a first broad query capped at a handful of results, then filtered, paginated drill-downs where the evidence points. Giving the model control over slice size turns context spend into a decision instead of a fixed cost per call.",
+      "max_tokens bounds the model's generated output, not the input context that tool results consume — raising it does nothing about hundreds of verbose hits occupying the window. The pressure here is on the input side, and no output budget adjustment relieves it.",
+      "Attention is not context economy: instructed to ignore fields, the model still pays for every token of them in the window, and the degradation Hana observes comes from that volume, not from misdirected focus. Data that should not influence the task is data the tool should not return."
+    ],
+    "principle": "tool results are context — return concise, task-relevant fields and give the model parameters to control result volume",
+    "relatedConcept": "Tool response design is context engineering: verbose outputs degrade multi-step agent work, and the fix belongs in the tool's projection and query parameters, not in the model's attention.",
+    "overallExplanation": "Tool results occupy the context window verbatim, so return only task-relevant fields and add limits, filters, and pagination the model can use to request narrow slices. Output budgets and ignore-this instructions do not reduce what the results cost."
+  },
+  {
+    "id": 811,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Gabriel, a developer at a sports-media company, runs a stats agent whose harness works when Claude calls one tool at a time, but intermittently gets API errors after turns where the model emits several tool_use blocks at once. His code executes only the first requested tool, returns that single tool_result, and drops the rest. What must his harness do instead?",
+    "options": [
+      "Execute every tool_use block the assistant turn contains and return a tool_result for each one, matched by its tool_use id, in the next user message",
+      "Set a flag in the request that disables parallel tool calls, since emitting multiple tool_use blocks in one turn signals a malfunctioning model that should be constrained",
+      "Return the first tool's result and append a text note telling the model to re-request the other tools one at a time in its following turns",
+      "Batch all the requested tool_use blocks into a single combined tool_result whose content concatenates every tool's output under one shared id"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When the model requests multiple tools in one turn, every tool_use block carries an id, and the following user message must supply a matching tool_result for each id. A harness that answers only one leaves dangling tool calls, which is exactly the malformed-conversation state the API rejects — the loop must dispatch and answer them all.",
+      "Parallel tool calls are normal, intended behavior — the model batches independent lookups to finish tasks in fewer turns, which is a capability worth keeping, not a malfunction. The harness's job is to handle the protocol correctly, not to disable model efficiency to accommodate incomplete dispatch code.",
+      "The protocol expects results for the pending calls, not commentary: unanswered tool_use blocks still lack their tool_results, so the malformed state persists regardless of the note. This also converts one efficient parallel turn into a slow sequence of retries — a workaround stacked on the original bug.",
+      "Results are correlated to calls by id — one concatenated blob under a single id answers one call and orphans the others, and the model can no longer tell which output belongs to which request. Each tool_use block needs its own tool_result; correlation is the point of the ids."
+    ],
+    "principle": "answer every tool_use block — the next message must carry one tool_result per requested call, matched by tool_use id",
+    "relatedConcept": "Agentic harness dispatch must handle parallel tool calls as a first-class case: execute all requested calls and correlate each result to its id, or the conversation state is malformed.",
+    "overallExplanation": "A harness must return one tool_result per tool_use block, matched by id, in the next user message — parallel tool calls are intended behavior, and dropping or merging results leaves the conversation malformed. Dispatch all requested calls and correlate every result."
+  },
+  {
+    "id": 812,
+    "domain": "Tools and MCPs",
+    "objective": "Tool Implementation",
+    "type": "single",
+    "question": "Nadia, an engineer at an events-ticketing marketplace, wires a Claude agent to an issue_refund tool. When the payment provider is slow, the tool times out; the agent, seeing no success, reasonably calls issue_refund again — and several customers have now been refunded twice. The agent's retry behavior is desirable for transient failures. How should Nadia fix the tool?",
+    "options": [
+      "Make the refund operation idempotent — derive or accept an idempotency key per refund so retried calls return the original outcome — and report timeouts as an ambiguous status the model can check before retrying",
+      "Instruct the agent in its system prompt to never call issue_refund twice for the same order, relying on it to remember which refunds it has already attempted within the session",
+      "Increase the tool's timeout to comfortably exceed the payment provider's slowest observed response, so the ambiguous in-flight state can no longer occur in practice",
+      "Remove the agent's retry behavior entirely, treating any tool failure as final and surfacing it to a human queue so no automated second attempt is ever made"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A timeout means the outcome is unknown — the refund may have succeeded after the client gave up — so safety must live in the operation's semantics: with an idempotency key, a retry of the same refund returns the original result instead of charging twice. Honest ambiguous-status reporting then lets the model verify before acting, and retries become safe rather than forbidden.",
+      "Session memory is the wrong ledger for money: the instruction can be diluted under context pressure, the agent may legitimately believe the first call failed outright, and a new session knows nothing of previous attempts. Duplicate-suppression for consequential operations belongs in the system that executes them.",
+      "A longer timeout shrinks the window but cannot close it — providers have outages, networks partition, and the slowest observed response is not the slowest possible one. The design still equates 'no reply' with 'did not happen,' and that inference is exactly what double-refunded the customers.",
+      "Abolishing retries sacrifices the agent's ability to ride out ordinary transient failures, sending every hiccup to a human queue and reintroducing the toil the agent exists to remove. The retry was the correct instinct; the tool's non-idempotent handling of it was the defect to fix."
+    ],
+    "principle": "make consequential tools idempotent and report ambiguous outcomes honestly — retries should be safe by design, not forbidden by instruction",
+    "relatedConcept": "Tools that mutate external systems must assume the agent will retry after timeouts; idempotency keys and verifiable status make that behavior safe for state-changing operations.",
+    "overallExplanation": "Timeouts leave outcomes unknown, and agents will retry — so consequential tools must be idempotent, with keys that make a retried refund return the original result, and must report ambiguity the model can check. Prompt rules and longer timeouts leave the race intact."
+  },
+  {
+    "id": 813,
+    "domain": "Tools and MCPs",
+    "objective": "MCP Server Development",
+    "type": "single",
+    "question": "Ryo, a platform engineer at a legal-tech firm, is authoring an MCP server for the contract repository. His draft exposes everything as tools: fetch_contract_text for reading documents, search_contracts for querying, and start_review_template, which just returns a fixed instruction block users paste to kick off a standard review. A reviewer says he is using one MCP primitive where the protocol offers three. What is the better mapping?",
+    "options": [
+      "Expose contract documents as resources for context access, keep model-invoked operations like search as tools, and offer the standard review kickoff as an MCP prompt users invoke",
+      "Keep everything as tools, since resources and prompts are optional legacy primitives that mainstream MCP clients no longer negotiate during initialization",
+      "Expose everything as resources, since tools are reserved for operations that mutate external state and the contract repository is read-only end to end",
+      "Move the review template into the server's transport-level configuration so it is injected automatically into every session the client opens against the server"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. MCP's primitives map to different interaction patterns: resources expose data like documents for clients to read into context, tools are operations the model invokes during reasoning, and prompts are user-selected templates for standard workflows. Matching each capability to its primitive lets clients present them properly — documents browsable, search callable, the review kickoff a pickable prompt.",
+      "Resources and prompts are current, first-class parts of the protocol that servers declare and clients negotiate as capabilities — not legacy leftovers. Cramming data access and user templates into tools works mechanically but hides document browsing and workflow entry points behind an interface meant for model-invoked actions.",
+      "The tool primitive is not restricted to mutations — a search operation the model invokes with parameters mid-reasoning is a canonical read-only tool. Making everything a resource would leave no way for the model to execute parameterized queries, since resources are read by the client, not called with arguments like functions.",
+      "Transports (stdio, streamable HTTP) carry protocol messages; they have no mechanism for injecting content into sessions, and forcing the template into every session would spend context even when no review is happening. A prompt exposes it exactly when a user chooses to start that workflow."
+    ],
+    "principle": "map MCP capabilities to the right primitive: resources for data, tools for model-invoked operations, prompts for user-invoked templates",
+    "relatedConcept": "MCP's three primitives encode who initiates each interaction — the client reads resources, the model calls tools, the user selects prompts — and good servers preserve that distinction.",
+    "overallExplanation": "Use each MCP primitive for its interaction pattern: documents as resources, search as a model-invoked tool, and the standard review kickoff as a user-invoked prompt. The primitives encode who initiates what, and collapsing them into tools hides that structure from clients."
+  },
+  {
+    "id": 814,
+    "domain": "Tools and MCPs",
+    "objective": "MCP Server Development",
+    "type": "single",
+    "question": "Beatriz, an engineer at a manufacturing-execution software company, writes a Python MCP server that Claude Desktop launches over stdio. It worked until she added progress reporting with print() statements for operators. Now the client fails immediately with parse errors and the server shows as disconnected, though her tool logic is untouched. What is wrong?",
+    "options": [
+      "Her print() calls write to stdout, which on a stdio server is the JSON-RPC protocol channel — the log lines corrupt the message stream, so diagnostics must go to stderr or a file instead",
+      "Python cannot reliably host stdio MCP servers because its default output buffering delays protocol frames; the server must be rewritten on a socket-based transport to work with Claude Desktop",
+      "MCP servers must declare a logging capability during initialization before emitting any output at all, and the missing declaration causes the client to reject the session outright",
+      "Claude Desktop restricts each stdio message to a fixed maximum size, and the progress lines push her responses over that limit, truncating the JSON mid-frame"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Over the stdio transport, stdout is not a console — it is the wire: the client parses everything the server process writes there as JSON-RPC messages. Interleaved human-readable print() lines are unparseable frames, exactly matching the parse errors and disconnect. Stdio servers must keep stdout pure protocol and send logs to stderr or a file.",
+      "Python hosts stdio MCP servers perfectly well — official SDK support targets it — and buffering nuances do not produce parse errors from otherwise-valid frames. This misdiagnoses contamination of the protocol channel as a language or transport limitation, prescribing a rewrite where a one-line logging fix is needed.",
+      "There is no requirement to pre-declare logging before a server may produce output, and capability negotiation would not explain why the failure began exactly when print() calls were added. The breakage tracks the writes to stdout, not the initialization handshake.",
+      "The symptom is malformed messages, not oversized ones: short human-readable text between JSON frames breaks parsing at any size. A size-limit theory fails to explain why small print() lines cause immediate errors while her previous larger tool responses flowed fine."
+    ],
+    "principle": "on a stdio MCP server, stdout is the protocol channel — never print logs to it; route diagnostics to stderr or a file",
+    "relatedConcept": "The stdio transport runs JSON-RPC over the server process's stdin/stdout, so any stray write to stdout is protocol corruption — a classic MCP server-authoring pitfall.",
+    "overallExplanation": "With the stdio transport, the server's stdout carries the JSON-RPC stream, so print() debugging corrupts the protocol and disconnects the client. Keep stdout pure protocol and write logs to stderr or a file — the standard rule of stdio MCP server authoring."
+  },
+  {
+    "id": 815,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "single",
+    "question": "Tarek, a developer at a brand-monitoring agency, needs his Claude application to pull current public news coverage about client brands and cite the source pages. He has sketched a design: a custom headless-browser scraping service, a results cache, and an MCP server wrapping it all, sized at several sprints of work. His tech lead suggests a simpler route. What is it?",
+    "options": [
+      "Enable Anthropic's built-in web search tool in the API request, which lets Claude search the public web and return results with source citations without any infrastructure to build or host",
+      "Author a Claude Skill containing instructions on how to construct effective news-search queries, since knowing how to search is what the model is actually missing",
+      "Paste each client's recent coverage into the system prompt on a daily schedule, refreshed by a cron job, so no live retrieval is needed inside any conversation",
+      "Build only the custom scraper tool but skip the MCP wrapper, connecting it directly as a client-side function tool to halve the engineering effort involved"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The need — current public web content with source citations — is exactly what the built-in web search tool provides as a server-side capability: enable it in the request and Anthropic operates the search and returns cited results. When a built-in tool covers the requirement, it beats custom infrastructure on cost, maintenance, and time by construction.",
+      "A Skill supplies procedural knowledge, but knowledge is not the gap — the model has no live access to the web without a tool, and no amount of query-writing guidance retrieves a single page. This mistakes a capability problem (reach) for a knowledge problem (technique).",
+      "A daily prompt dump is stale within hours in the news cycle, bloats every request with coverage mostly irrelevant to the conversation at hand, and still requires the scraping pipeline to populate it. It combines the infrastructure cost of the custom build with worse freshness than live search.",
+      "Halving the custom build still leaves scraping infrastructure to write, host, and maintain against anti-bot defenses — engineering spent duplicating a capability the platform already ships with citations included. Trimming the wrapper optimizes the wrong decision; the build-versus-built-in choice comes first."
+    ],
+    "principle": "check built-in tools before building — when a platform-provided capability like web search covers the need, custom infrastructure is pure overhead",
+    "relatedConcept": "The tool-type decision starts from the cheapest sufficient option: built-in tools for covered capabilities, with custom tools, Skills, and MCPs reserved for needs the platform does not meet.",
+    "overallExplanation": "Enable the built-in web search tool: it delivers live public-web results with citations as a platform capability, no infrastructure required. The tool-type tradeoff starts by checking whether a built-in already covers the need before any custom build is sized."
+  },
+  {
+    "id": 816,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "single",
+    "question": "Sigrid, the sole engineer on an internal HR-analytics assistant at a mid-sized retailer, needs Claude to query one internal headcount API. Exactly one application will ever use this integration, her team owns both sides, and there are no plans to share it. Following a conference talk, she starts scaffolding a standalone MCP server with its own deployment pipeline. What should she reconsider?",
+    "options": [
+      "Defining the headcount query as a custom tool inside her application is sufficient here — MCP's server, transport, and deployment overhead buys reuse and independent ownership that this single-app integration does not need",
+      "MCP is mandatory for any integration touching HR data, because the protocol layer is what provides the audit and compliance guarantees personnel systems require",
+      "Custom function tools cannot call internal REST APIs from application code, so despite the overhead an MCP server is the only mechanism that can reach the headcount service",
+      "She should skip both mechanisms and paste the full headcount dataset into the system prompt, since a single-application integration does not justify any tool development at all"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. MCP earns its infrastructure when a capability is shared across applications or owned separately from its consumers; with one app, one team, and no reuse on the horizon, an in-app custom tool delivers the identical capability with no server to deploy, version, or operate. Matching mechanism weight to actual scope is the heart of the tool-type tradeoff.",
+      "No such mandate exists — MCP is a connectivity protocol, not a compliance framework, and it confers no audit guarantees by itself. Whatever logging and access controls HR data requires must be built into the integration regardless of whether a protocol layer sits in the middle.",
+      "This inverts reality: a custom tool is application code, free to call any REST API it can reach — the tool handler receiving Claude's arguments simply makes the HTTP request. Reachability was never the differentiator between the two mechanisms; reuse and ownership are.",
+      "A pasted dataset is stale from the moment it is captured, consumes context on every request whether relevant or not, and cannot answer parameterized questions the way a live query can. Avoiding twenty lines of tool handler by giving up live data entirely is a false economy."
+    ],
+    "principle": "match the mechanism to the scope of reuse — a single-app, single-team integration is a custom tool; MCP's overhead pays off only when capabilities are shared or owned independently",
+    "relatedConcept": "The custom-tool-versus-MCP decision is about consumers and ownership, not capability — both can call the same API, but only one requires standing infrastructure.",
+    "overallExplanation": "For one application, one owning team, and no sharing requirement, an in-app custom tool is the right weight — MCP's server and deployment overhead purchases reuse and independent ownership this case does not need. Scope of reuse, not capability, drives the choice."
+  },
+  {
+    "id": 817,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "single",
+    "question": "Oluwaseun, a product engineer at a small-business accounting platform, is adding sales-tax computation to a Claude bookkeeping assistant. The jurisdiction rules are codified and the results must be exact to the cent every time — an auditor will check them. A teammate proposes authoring a Claude Skill that documents the tax rules and rate tables so the model can work each calculation out in its reasoning. Why is that the wrong mechanism?",
+    "options": [
+      "Exact, auditable computation belongs in deterministic code — a custom tool should run the tax calculation and return the figure, with the model orchestrating rather than performing arithmetic",
+      "Skills cannot contain numeric tables or structured reference data, so the rate schedules that tax computation depends on are impossible to package in that format",
+      "The choice is wrong only at the margin: a well-documented Skill makes model arithmetic reliable enough for audit, but maintaining rate tables in two places creates version skew",
+      "A Skill is close but incomplete — pairing the rules document with a strongly worded accuracy requirement in the system prompt would bring the calculations to audit grade"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Model token generation is probabilistic, and no packaging of instructions changes that — a requirement of cent-exact, auditor-checkable results is a requirement for deterministic execution. The division of labor is the point: code computes the tax through a custom tool; the model interprets the user, invokes the tool, and explains the result.",
+      "Skills routinely bundle reference files, tables, and even scripts alongside instructions — packaging the rate data is not the obstacle. The flaw is what happens next: the model performing multi-step arithmetic in generated text, which stays probabilistic however well the inputs are documented.",
+      "Documentation quality does not convert sampling into computation — a model can misapply a perfectly stated rounding rule on any given generation, and 'reliable enough' has no place in a spec that says exact every time. Version skew is a real but secondary concern; determinism is the disqualifier.",
+      "Prompt emphasis adjusts the model's diligence, not its architecture: strongly worded accuracy demands still resolve to next-token generation, which cannot guarantee identical, exact output across runs. Audit-grade figures need an execution path whose correctness is provable — that path is code."
+    ],
+    "principle": "requirements for exact, repeatable results are requirements for code — put computation in a custom tool and let the model orchestrate, not calculate",
+    "relatedConcept": "The Skill-versus-tool boundary tracks determinism: Skills guide the model's judgment-driven work, while calculations with a single correct answer belong in tool-executed code.",
+    "overallExplanation": "Cent-exact, auditable tax figures require deterministic code — a custom tool computes them while the model orchestrates and explains. Skills shape how the model works, but model arithmetic remains probabilistic no matter how well the rules are documented."
+  },
+  {
+    "id": 818,
+    "domain": "Tools and MCPs",
+    "objective": "Agentic Customization",
+    "type": "multi",
+    "question": "Anders, a developer-productivity lead at a home-furnishings retailer, is equipping Claude Code for his engineers. Two needs top the list: the agent must follow the team's documented release-checklist procedure — steps, conventions, and a validation script — and it must query the live status of tickets in the company's internal tracker during work. Which two mechanisms match these needs? (Choose two.)",
+    "options": [
+      "Package the release-checklist procedure, its conventions, and the validation script as a Claude Skill that loads when release tasks come up",
+      "Stand up an MCP server exposing the ticket tracker's queries as tools, which Claude Code connects to for live status during work",
+      "Publish the release checklist as an MCP server whose single tool returns the checklist document text whenever the model requests it",
+      "Cover the ticket tracker with a Skill containing screenshots of the tracker interface and instructions describing where each status field appears on screen"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The release checklist is procedural knowledge — how to perform a recurring task, with conventions and a bundled validation script — which is precisely what Skills package: instructions plus supporting resources, loaded when the matching task arises. No external system access is involved, so no server is warranted.",
+      "Correct. Live ticket status is external-system reach: the tracker must be queried at task time with parameters, behind authentication, through a typed interface. An MCP server exposing those queries as tools gives Claude Code exactly that, and stays maintainable independently of any one engineer's setup.",
+      "Wrapping a static document in server infrastructure inverts the mechanism-to-need mapping: the checklist needs no live queries, no auth, and no transport — just to be available as instructions when relevant. A Skill delivers that with zero deployment; an MCP server here is overhead serving text.",
+      "Screenshots and interface descriptions give the model knowledge about the tracker while providing no way to reach it — Claude Code cannot query live status by studying pictures of the UI. This applies the knowledge mechanism to a connectivity need, the mirror image of the checklist-as-MCP mistake."
+    ],
+    "principle": "map each need to its mechanism — procedural knowledge becomes a Skill, live external-system access becomes MCP tools",
+    "relatedConcept": "Real deployments mix mechanisms: the know-something needs and the reach-something needs in one project each get the tool type built for them.",
+    "overallExplanation": "The checklist procedure is packaged knowledge — a Skill with instructions and its validation script — while live ticket queries are external reach — an MCP server exposing tracker tools. Matching each need to its mechanism, rather than forcing one mechanism to serve both, is the core tradeoff skill."
   }
 ]

@@ -11,7 +11,10 @@
       "The specific Claude model the team will standardize on across all future projects",
       "The frontend component library the web team prefers for rendering the chat widget"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Volume and latency targets are core infrastructure requirements derived from the business need — they drive model tier, realtime-versus-batch selection, and capacity planning, so they must exist before architecture decisions are made.",
       "Correct. In healthcare, residency and compliance constraints are infrastructure requirements that can eliminate whole classes of designs — they determine acceptable vendors, regions, and data flows and must be known before anything is built.",
@@ -34,7 +37,9 @@
       "The assistant must escalate to a human agent when the customer requests it",
       "The assistant must respond in the customer's chosen language among the bank's five supported languages"
     ],
-    "correct": [1],
+    "correct": [
+      1
+    ],
     "optionExplanations": [
       "This describes what the system does for the user — summarizing transactions is behavior, which makes it a functional requirement owned by the application squad. It's tempting to call it infrastructure because it touches transaction systems, but the integration serves a functional behavior.",
       "Correct. Concurrency and availability targets describe the qualities the underlying platform must provide rather than any user-facing behavior — the classic definition of an infrastructure (non-functional) requirement, driving capacity, scaling, and redundancy decisions.",
@@ -57,7 +62,9 @@
       "The team should have frozen the system at launch and refused all platform changes, including model deprecations",
       "The team skipped user-acceptance testing, which would have surfaced the model deprecation before go-live"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Systems life cycle management covers develop, implement, operate, and maintain — an AI system especially needs a planned operations phase because models deprecate, prompts drift, and quality must be monitored. Disbanding the team at go-live abandoned half the life cycle.",
       "Tempting because model choice is a visible decision, but nothing in the scenario indicates the tier was wrong at design time — the failures (unowned deprecations, unnoticed regressions, no incident response) are all operations-phase gaps, not design-phase ones.",
@@ -80,7 +87,9 @@
       "Switch to the fastest, most economical model tier so the full response arrives in less total time",
       "Move answer generation to the Message Batches API so requests are processed more efficiently in groups"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Streaming addresses perceived latency directly: the client renders tokens as they are generated instead of waiting for the complete response, so users see progress immediately even though total generation time is unchanged.",
       "Tempting because shorter output does finish sooner, but it sacrifices the detailed answers the product exists to give, to solve a complaint that isn't about total time. It changes the product to avoid changing the delivery mechanism.",
@@ -103,7 +112,9 @@
       "Move all daily traffic to the Message Batches API, since batch pricing applies to input tokens",
       "Split the system prompt across several smaller sequential requests so no single call carries the full 30,000 tokens"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Prompt caching is built for exactly this shape: a large, stable prefix reused across many requests. Marking the static portion cacheable lets subsequent requests read it from cache at a fraction of the input-token cost, with no change to prompt content.",
       "Tempting as a token-reduction play, but summarizing changes the prompt's content — the question explicitly rules that out — and risks losing the reference detail legal answers depend on. It trades answer fidelity for savings that caching achieves without any loss.",
@@ -126,7 +137,9 @@
       "Images can only be processed through the Message Batches API, which has a dedicated pipeline for binary attachments",
       "Vision requires a separately licensed model variant, so the team should budget for a specialized image model"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Vision is a native Messages API capability: images are passed as content blocks alongside text in a user message, and the model interprets them directly — including reading and extracting from photographed documents.",
       "Tempting because OCR-then-LLM was the standard pattern before multimodal models, but it adds a service, a failure mode, and a lossy conversion step that discards layout and visual cues Claude's vision can use directly. The premise that Claude only reads text is simply outdated.",
@@ -149,7 +162,10 @@
       "The Batch API guarantees each individual request completes faster than it would as a synchronous call",
       "The Batch API is limited to the smallest model tier, since large models cannot run asynchronously"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. The Batches API is an asynchronous pattern: you submit a batch, processing happens within an up-to-24-hour window, and you retrieve results when complete — a perfect match for latency-tolerant workloads like a weekly audit.",
       "Correct. The core tradeoff of batch is discounted pricing in exchange for giving up realtime delivery — which is precisely why it is the right call when volume is high and nobody is waiting on individual responses.",
@@ -172,7 +188,9 @@
       "Rewrite the loop in a compiled language, since Python's interpreter overhead is the dominant cost per iteration",
       "Add a caching layer that stores each response so repeated runs of the script are faster"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The job is I/O-bound: almost all elapsed time is spent waiting on network responses, so overlapping requests with async concurrency (bounded to respect rate limits) collapses two hours into minutes. Concurrency is the standard remedy for serialized network waits.",
       "max_tokens bounds output length; nothing in the scenario shows truncated summaries needing continuation calls. It's tempting as a 'make each call do more' lever, but it does not overlap the four-second network waits that actually dominate the runtime.",
@@ -195,7 +213,9 @@
       "Add a nightly automated backup of the dashboard configuration so any bad edit can be restored within a day",
       "Ask Claude to review each prompt edit for errors before a human saves it in the dashboard"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Prompts and schemas are application code: version control gives history, attribution, and rollback, and code review catches regressions before production. This is the SDLC-integration principle — model-facing artifacts go through the same pipeline as code.",
       "Tempting as a quick blast-radius reduction, but senior engineers make unreviewed mistakes too, and this preserves the core defects: no history, no review, no attribution, no rollback. It rations access to a broken process instead of fixing the process.",
@@ -218,7 +238,9 @@
       "Freeze all refactoring until the team has manually rewritten the test suite to cover 100% of the legacy code paths",
       "Have Claude rewrite the system in a modern language first, since cross-language rewrites eliminate legacy patterns more completely than refactoring"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Small-scale, verifiable steps are the foundation of safe refactoring at any scale: each change is testable, reviewable, and revertible, and failures localize. Large-scale refactoring succeeds as an accumulation of small verified changes, with or without an AI doing the edits.",
       "Tempting because more review time feels like diligence, but a 400,000-line diff exceeds what any review process can meaningfully verify — reviewers rubber-stamp what they cannot comprehend. The problem is the batch size, and a longer window doesn't shrink it.",
@@ -241,7 +263,9 @@
       "Switch the failing requests to a different model tier, since rate limits are enforced separately per model",
       "Remove the client-side error handling so the HTTP library's default behavior applies, avoiding double-handling of retries"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. 429 is a transient, retryable signal meaning 'slow down': exponential backoff with jitter spreads retries out, honoring server retry guidance recovers fastest, and bounding concurrency addresses the cause. Tight-loop retries amplify exactly the pressure the server is shedding.",
       "Tempting as a fail-fast stance, but 429 is explicitly transient — requests succeed once the client slows down. Failing permanently converts a flow-control signal into a self-inflicted outage during your highest-revenue event.",
@@ -264,7 +288,9 @@
       "The app should lower the model's temperature so it sticks more rigidly to the original screening instructions",
       "Resumes should be converted to images before upload, since Claude's vision path does not interpret embedded text as instructions"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Content boundaries are the design principle here: the system prompt is the trusted instruction channel, and untrusted input must enter as clearly delimited data in the user message. Mixing the two channels invites exactly this injection, and phrase filters alone are an arms race.",
       "Tempting because richer criteria do improve screening, but prompt length is not a security boundary — injected text mixed into the instruction channel competes with instructions regardless of how many there are. It misdiagnoses a channel-separation flaw as an under-specification flaw.",
@@ -287,7 +313,9 @@
       "Upgrade to a model with a larger context window so the day's accumulated tickets fit without degrading responses",
       "Ask the model to prefix each answer with the current ticket ID so agents can detect when context has bled between tickets"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Session hygiene means scoping a conversation to a task: unrelated work items sharing one session guarantees context bleed, stale references, and cross-user data exposure. A session per ticket makes isolation structural rather than hoped-for.",
       "Tempting because it feels like a reset, but an instruction cannot delete conversation history — every earlier ticket is still in context and still attended to. 'Forget' is a request the architecture doesn't enforce; only actually starting a new session removes the content.",
@@ -310,7 +338,9 @@
       "Have the ingestion service strip markdown fences and lowercase all keys before parsing, since those are the observed failure modes",
       "Run every extraction twice and keep the response whose JSON parses, retrying until one of the two attempts succeeds"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Schema design is the load-bearing fix: an explicit typed contract (such as a tool definition whose parameters the model fills) constrains the output's structure, and validation before ingestion catches the residual failures. Structure requested by prose is a suggestion; a schema is a contract.",
       "Tempting because emphatic prompting does improve conformance, but it remains probabilistic — key drift and type drift still occur at some rate, and each new failure mode needs another prompt patch. It hardens a suggestion rather than establishing a contract.",
@@ -333,7 +363,10 @@
       "The API routes requests to a different model family than claude.ai, which explains the behavioral gap",
       "The API automatically inherits the user's claude.ai preferences once both use the same account credentials"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Each interface shapes how Claude interprets instructions: claude.ai adds its own system prompt and product-level behaviors around the model. A prototype's behavior is the model plus that wrapper, not the model alone.",
       "Correct. The raw API is unopinionated — it applies only what you send. Reproducing an interface-shaped prototype means making the implicit explicit: writing your own system prompt, tone guidance, and configuration in the request.",
@@ -356,7 +389,9 @@
       "Stop upgrading models entirely, since the pinned current version will remain available and correct indefinitely",
       "Have production traffic call two model versions simultaneously and merge their outputs so a change in either one is masked"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Model version pinning makes model change an explicit, tested configuration event instead of a silent production surprise. Behavior can shift across releases, so upgrades should pass evals in a controlled rollout before the pin moves — the core of configuration management for model dependencies.",
       "Tempting because format instructions do help, but the model cannot know or replicate 'whatever the previous version did', and the deeper flaw remains: production dependencies changing without the team's knowledge or testing. It patches one symptom of unpinned configuration.",
@@ -379,7 +414,9 @@
       "Both belong in settings.json, since JSON is machine-readable and Markdown files are only documentation for humans",
       "Conventions go in settings.json as custom keys, while permissions are best stated in CLAUDE.md so Claude understands the reasons behind each rule"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The two files serve different layers: CLAUDE.md carries project context and conventions the model reads and follows as instructions, while settings.json carries configuration the tooling enforces — permissions, allowed tools, approval rules. Guidance is probabilistic; settings are deterministic.",
       "Tempting because CLAUDE.md is the file developers touch most, but permission rules written as prose instructions are only followed probabilistically — they are guidance, not enforcement. Access control needs the configuration layer the tooling actually enforces.",
@@ -389,5 +426,862 @@
     "principle": "CLAUDE.md instructs the model; settings.json configures the enforcement layer",
     "relatedConcept": "Configuration management for Claude systems spans both instruction files (CLAUDE.md, prompts) and enforced settings (settings.json, permissions, plugin dependencies) — each concern in its layer.",
     "overallExplanation": "CLAUDE.md instructs the model; settings.json configures the enforcement layer. Conventions and context belong in the instruction file Claude reads, while permissions and approval rules belong in the settings the tooling deterministically enforces."
+  },
+  {
+    "id": 218,
+    "domain": "Applications and Integration",
+    "objective": "Understanding Requirements",
+    "type": "single",
+    "question": "Priya, a platform engineer at an agritech company, receives a product brief for a crop-advisory assistant with one stated requirement: 'it must be fast and accurate.' Her team is about to start designing the integration. What should Priya do with this requirement before design work begins?",
+    "options": [
+      "Work with stakeholders to translate it into measurable targets, such as a p95 latency budget and an accuracy threshold measured against a labeled evaluation set",
+      "Select the fastest available model tier immediately, since that is the only way to guarantee the 'fast' half of the requirement is satisfied",
+      "Build a first version quickly and let beta users' complaints reveal what 'fast' and 'accurate' should mean in practice",
+      "Adopt the latency and accuracy figures a competitor publishes in its marketing benchmarks as the team's official targets"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. 'Fast and accurate' is a business aspiration, not a requirement — it cannot be designed against or verified. Turning it into quantified, stakeholder-agreed targets (latency percentiles, accuracy against an eval set) is the requirements work that makes every later architecture and model decision testable.",
+      "Tempting because it acts decisively on 'fast', but tier selection is a design decision that should satisfy requirements, not substitute for them. Without a latency number, there is no way to know whether the fastest tier is necessary, or whether its quality tradeoff violates the unquantified 'accurate' half.",
+      "Discovering requirements from user complaints means shipping a system nobody could verify, then reworking it under pressure. Beta feedback refines targets; it cannot replace establishing them, and core constraints like accuracy thresholds must exist before design, not after users are harmed by misses.",
+      "Competitor benchmarks reflect a different product, workload, and user base — adopting them skips the actual work of learning what this product's users and business need. Numbers borrowed for their availability rather than their relevance produce targets nobody can defend when tradeoffs get hard."
+    ],
+    "principle": "vague requirements must become measurable targets before design",
+    "relatedConcept": "Understanding requirements includes turning qualitative business language into quantified, verifiable functional and infrastructure targets.",
+    "overallExplanation": "A requirement you cannot measure is a requirement you cannot design for or verify. Translating 'fast and accurate' into agreed latency and accuracy targets is the gate between a business wish and buildable engineering work."
+  },
+  {
+    "id": 219,
+    "domain": "Applications and Integration",
+    "objective": "Understanding Requirements",
+    "type": "multi",
+    "question": "A telecom operator asks its platform team to build a Claude-powered assistant that answers network-outage questions from internal runbooks. Before proposing a solution architecture, the lead engineer schedules a requirements session. Which two clarifying questions will surface constraints that genuinely shape the design? (Choose two.)",
+    "options": [
+      "What are the runbooks like as a corpus — how many, how large, in what formats, and how often are they updated?",
+      "What must the assistant do when a question is not covered by any runbook — refuse, caveat, or escalate to an on-call engineer?",
+      "Which frontend framework does the internal-portal team prefer for building the chat interface?",
+      "Should the integration use streaming responses or wait for complete messages before displaying them?"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The corpus's size, formats, and update cadence are input-data requirements that directly constrain the design — whether content fits in context, whether retrieval is needed, whether vision or parsing is required, and how freshness is maintained. Architecture cannot be chosen without them.",
+      "Correct. Behavior on uncovered questions is a functional requirement with safety implications: an outage assistant that guesses is dangerous. Whether it must refuse, caveat, or escalate determines prompt design, tool needs, and human-in-the-loop workflow, so it must be pinned down before design.",
+      "The portal team's frontend framework is a presentation-layer preference that constrains neither the Claude integration pattern nor the data flow. It is a real decision, but not one the requirements session for the assistant's architecture depends on.",
+      "Streaming versus complete responses is an implementation choice made after requirements exist — it follows from latency expectations and the interface, rather than constraining the solution. Asking it now puts a delivery mechanism ahead of the constraints that should drive it."
+    ],
+    "principle": "elicit input-data characteristics and required behavior at the edges before designing",
+    "relatedConcept": "Requirements gathering for LLM features must cover the source-content corpus and the system's mandated behavior when knowledge runs out.",
+    "overallExplanation": "The questions that matter before design are the ones whose answers eliminate architectures: what the source data looks like, and what the system must do when it cannot answer. Presentation and delivery choices come later."
+  },
+  {
+    "id": 220,
+    "domain": "Applications and Integration",
+    "objective": "Understanding Requirements",
+    "type": "single",
+    "question": "Jonas is running an architecture review at a food-delivery company. He finds that the order-support assistant enables extended thinking with a large budget on every request — including trivial lookups like 'where is my order' — inflating latency and cost. No documented requirement calls for deep reasoning on these flows. What should the review conclude?",
+    "options": [
+      "Design decisions must trace to requirements; a capability no requirement justifies is gold-plating and should be removed from the flows that do not need it",
+      "The configuration should stay, because additional reasoning capacity can only improve answer quality and the costs are the price of robustness",
+      "Extended thinking should be disabled across the entire product, including complex dispute-resolution flows, to standardize behavior everywhere",
+      "The team should retroactively write a requirement that mandates extended thinking so the existing configuration becomes compliant with the process"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Requirements discipline runs both directions: requirements must be satisfied, and design elements must be justified by requirements. Paying latency and cost for reasoning capacity that no user-facing need demands is gold-plating — the review should scope the capability to the flows whose requirements call for it.",
+      "Tempting because more reasoning sounds strictly better, but the scenario states real harms — inflated latency and cost — against no identified benefit on trivial lookups. 'Can only improve quality' ignores that requirements exist precisely to weigh capability against its price per use case.",
+      "Blanket removal repeats the original mistake in reverse: a global configuration decision made without consulting the requirements of each flow. Complex dispute flows may genuinely need deeper reasoning; the fix is matching capability to requirement, not uniformity for its own sake.",
+      "Writing a requirement to launder an unjustified decision inverts the entire practice — requirements would then document the implementation instead of constraining it. This makes the traceability audit pass while preserving the waste it was meant to catch."
+    ],
+    "principle": "every design decision should trace to a requirement — unjustified capability is gold-plating",
+    "relatedConcept": "Requirements traceability works both ways: unmet requirements are defects, and unrequired capabilities are cost and latency without purpose.",
+    "overallExplanation": "Architecture reviews should ask not only 'is every requirement met' but 'does every design decision serve a requirement.' Capability that nothing justifies — like heavy reasoning on trivial lookups — is waste to be scoped out."
+  },
+  {
+    "id": 221,
+    "domain": "Applications and Integration",
+    "objective": "Understanding Requirements",
+    "type": "single",
+    "question": "Keiko is architecting a charter-quote assistant for a maritime shipping firm. In the kickoff, the sales VP demands sub-second responses, the compliance head demands the most thorough possible analysis of every quote, and finance imposes a strict per-query cost ceiling. The three targets cannot all be met at once. What should Keiko do first?",
+    "options": [
+      "Surface the conflict explicitly and drive stakeholders to prioritize and quantify the tradeoffs before committing to any design",
+      "Quietly optimize for the sub-second latency target, since the sales VP represents the revenue-generating side of the business",
+      "Choose the most capable model tier and accept the cost and latency, because compliance thoroughness carries the most organizational risk",
+      "Split the difference by defaulting to a mid-tier model and average settings, then present the finished system to stakeholders"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Conflicting requirements are a business decision, not an engineering one. The architect's job is to make the conflict visible, attach numbers and consequences to each option, and get an agreed prioritization — otherwise the design silently encodes one stakeholder's preference and the others discover it in production.",
+      "Tempting because revenue arguments feel decisive, but silently choosing a winner means engineering made a business tradeoff without authority or transparency. When compliance or finance discovers their requirement was dropped, the rework lands on the team that hid the decision.",
+      "This makes the same mistake with a different winner: it resolves a stakeholder conflict by engineering fiat. Organizational risk weighting is exactly the judgment the business owners must make explicitly — an architect asserting it unilaterally has replaced requirements with opinion.",
+      "Averaging satisfies nobody and hides the tradeoff until the end, when change is most expensive. A mid-tier default may miss the latency target, the thoroughness bar, and the cost ceiling simultaneously — compromise settings are still a decision, made without the people who own the requirements."
+    ],
+    "principle": "conflicting requirements are resolved by stakeholders, not silently by engineers",
+    "relatedConcept": "When business requirements conflict, the architect quantifies the tradeoffs and drives an explicit prioritization before design begins.",
+    "overallExplanation": "Latency, quality, and cost trade against each other; when stakeholders demand all three, the first engineering deliverable is a visible, quantified tradeoff decision — not a design that silently picks a winner."
+  },
+  {
+    "id": 222,
+    "domain": "Applications and Integration",
+    "objective": "Systems Life Cycle",
+    "type": "single",
+    "question": "An energy utility's innovation team built a Claude-based grid-maintenance assistant at an internal hackathon. Leadership, impressed by the demo, pushed it directly to all field technicians the following week. Within days: no acceptance testing had been run, no pilot group existed, and the help desk had no runbook for its failures. Which life-cycle failure best explains this?",
+    "options": [
+      "The implementation phase was skipped — the system moved from development to full operation without acceptance testing, a staged rollout, or operational readiness",
+      "The development phase was inadequate, because a hackathon team cannot produce code of sufficient quality to ever reach production",
+      "The planning phase failed, since a longer and more detailed requirements document would have prevented the post-launch problems",
+      "The maintenance phase was mishandled, because quarterly prompt reviews were not scheduled before the launch date"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Life-cycle frameworks put a deliberate implementation phase between development and operation: acceptance testing against requirements, a pilot or staged rollout to limit blast radius, and operational readiness such as support runbooks. Jumping from demo to org-wide use skipped that entire transition.",
+      "Tempting because hackathon code is often rough, but the scenario's failures are all transition failures, not code-quality findings — nothing was tested or staged, so code quality was never even assessed. Hackathon prototypes can graduate to production; they must simply pass through the phases.",
+      "More planning documentation would not have supplied the missing activities: acceptance testing, piloting, and support preparation happen in implementation regardless of how thorough the plan was. This blames an upstream phase for a gap that lives squarely at the deployment boundary.",
+      "Maintenance governs the system after it is properly in operation; the scenario's harm occurred because the system entered operation without the gate that maintenance assumes. Scheduling quarterly reviews would not have substituted for testing and staged rollout at cutover."
+    ],
+    "principle": "a deliberate implementation phase — test, pilot, ready operations — sits between build and full use",
+    "relatedConcept": "Systems life cycle frameworks treat implementation as its own phase: acceptance testing, staged rollout, and operational readiness before organization-wide use.",
+    "overallExplanation": "Demos become systems by passing through the implementation phase: acceptance testing against requirements, a limited pilot, and operational readiness. Skipping straight from hackathon to full deployment abandons that gate."
+  },
+  {
+    "id": 223,
+    "domain": "Applications and Integration",
+    "objective": "Systems Life Cycle",
+    "type": "multi",
+    "question": "An automotive parts supplier is replacing its decade-old rules-based support bot with a Claude-powered assistant. The program manager asks the engineering lead which life-cycle practices will most reduce the risk of the transition itself. Which two practices should the lead recommend? (Choose two.)",
+    "options": [
+      "Run the new assistant in parallel or shadow mode on real production traffic and compare its behavior to agreed acceptance criteria before switching users over",
+      "Plan an explicit cutover with a rehearsed rollback path, and decommission the legacy bot only after the new system has proven stable in operation",
+      "Decommission the legacy bot on day one of the rollout so users are forced to adopt the new assistant and feedback arrives faster",
+      "Skip production acceptance validation, since the offline evaluation suite already passed and re-testing in production would duplicate effort"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Parallel or shadow running is the classic migration de-risking practice: the new system faces real traffic while the old one still serves users, so gaps surface against acceptance criteria with zero user impact. For an LLM system, real-traffic behavior routinely diverges from offline expectations.",
+      "Correct. A planned cutover with a rollback path bounds the cost of failure — if the new assistant degrades, users return to the legacy system in minutes. Retiring the old system only after proven stability is standard life-cycle discipline for replacement projects.",
+      "Destroying the fallback on day one converts every defect in the new system into a user-facing outage with no retreat. Forcing adoption does accelerate feedback, but it does so by making customers the test environment — the opposite of managed transition risk.",
+      "Offline evals sample expected behavior; production traffic contains the distribution shifts, edge cases, and integration failures that offline suites miss — especially for LLM systems. Treating a passed eval suite as clearance to skip production validation confuses one gate for the whole gauntlet."
+    ],
+    "principle": "replace systems via parallel running and reversible cutover, retiring the old only after stability",
+    "relatedConcept": "Life-cycle management of system replacement: shadow/parallel operation, acceptance validation on real traffic, planned cutover with rollback, then decommissioning.",
+    "overallExplanation": "System replacement is de-risked by keeping both systems alive through the transition: shadow the new one on real traffic, cut over with a rollback plan, and decommission the legacy system only after stability is proven."
+  },
+  {
+    "id": 224,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "Omar, a backend engineer at a cybersecurity vendor, generates incident-report narratives through the Messages API. Analysts complain that some long reports simply end mid-sentence. Omar suspects the model is malfunctioning. What should he check first, and what is the likely fix?",
+    "options": [
+      "Check the response's stop_reason field — a value of max_tokens means the output hit the configured limit, and the fix is raising max_tokens for this workload",
+      "Check whether temperature is set too high, since aggressive sampling causes the model to abandon sentences before completing them",
+      "Check the model's context window, since exceeding it mid-generation makes the API silently drop the remainder of the response",
+      "Check the API status page, since long outputs are randomly truncated under load and the standard remedy is retrying until a complete report arrives"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The API reports why generation stopped in the stop_reason field: end_turn means natural completion, while max_tokens means the response was cut off at the configured output cap. Mid-sentence endings on long outputs are the signature of a max_tokens truncation, fixed by budgeting more output tokens.",
+      "Temperature shapes which tokens are sampled, not when generation halts — a high temperature produces more varied wording, not amputated sentences. This misattributes a hard length cap to a randomness knob and would send Omar tuning a parameter unrelated to the symptom.",
+      "The context window bounds the total tokens a request can involve, and hitting output limits is reported, not silently applied. The plausible-sounding 'silent drop' mechanism does not exist; the API tells you explicitly via stop_reason why the response ended.",
+      "The API does not randomly truncate outputs under load; errors and overload conditions surface as error responses, not shortened text. Retrying without diagnosing would waste tokens and only succeed by accident when reports happen to fit under the unexamined limit."
+    ],
+    "principle": "diagnose truncation by reading stop_reason before blaming the model",
+    "relatedConcept": "stop_reason distinguishes natural completion (end_turn) from output-cap truncation (max_tokens) — the first field to inspect when responses end abruptly.",
+    "overallExplanation": "The API states why generation stopped: stop_reason of max_tokens means the output cap was hit, not that the model failed. Reading that field turns a mysterious truncation into a one-line configuration fix."
+  },
+  {
+    "id": 225,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "Lena builds a fitness-coaching chat feature that calls the Messages API. Users report the coach 'forgets' everything: it asks for their goal every turn even after they stated it. Reviewing the code, Lena sees each request sends only the newest user message in the messages array. What is the correct understanding of the API's behavior?",
+    "options": [
+      "The Messages API is stateless — each request stands alone, so the client must resend the relevant conversation history in the messages array on every turn",
+      "The API maintains conversations server-side, so Lena should pass the session identifier the first response returned to link subsequent requests together",
+      "The API remembers prior turns only when the same API key is used, so the bug is that requests are being signed with rotating keys",
+      "The system prompt persists across requests automatically, so stating the user's goal there once at session start is retained for the whole conversation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Messages API holds no conversation state between requests: the model sees exactly the messages array you send and nothing else. Multi-turn behavior is the client's responsibility — append each user and assistant turn to the history and send it with every request.",
+      "Tempting because many chat products work this way, but the Messages API exposes no server-side conversation storage or session identifier to link requests. Designing around an imagined session mechanism is a common porting mistake from stateful chat platforms.",
+      "API keys authenticate and meter requests; they carry no conversational memory whatsoever. Two requests with the same key are as unrelated as two with different keys — this invents a state mechanism out of an authentication credential.",
+      "The system prompt is part of each individual request, not a persistent setting: it applies only to requests that include it. Nothing 'retains' it between calls — if the next request omits the goal, the model has never seen it."
+    ],
+    "principle": "the Messages API is stateless — the client owns and resends conversation history",
+    "relatedConcept": "Multi-turn conversation state is an application-side concern: each request must carry the full relevant history in its messages array.",
+    "overallExplanation": "Each Messages API request is self-contained: the model knows only what that request includes. A chat application must accumulate the conversation and resend it every turn — there is no server-side session holding it."
+  },
+  {
+    "id": 226,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "multi",
+    "question": "An e-signature platform is adding a contract-status tool that Claude can call during support conversations. A new team member sketches the integration and asks the senior engineer to confirm how tool use actually flows through the Messages API. Which two statements are correct? (Choose two.)",
+    "options": [
+      "The API never executes the tool itself — when Claude decides to call it, the response contains a tool_use block and stops so the application can run the function",
+      "After executing the tool, the application sends the output back as a tool_result content block in a follow-up user-role message so Claude can continue",
+      "Registering the tool's endpoint URL in the request lets the API invoke the service server-side and splice the result into the response automatically",
+      "Tool outputs must be appended to the system prompt of the next request, since that is the channel Claude reads for privileged information"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Client-side tool use is a contract, not remote execution: the model emits a tool_use block naming the tool and its input, the response ends with a tool_use stop_reason, and your code is responsible for actually running the function against your systems.",
+      "Correct. The loop closes by sending a new request whose next user-role message carries a tool_result content block referencing the tool_use id. Claude reads the result and continues the conversation — this request/response round-trip is the fundamental tool-use cycle.",
+      "Tempting because webhook-style callbacks are common elsewhere, but the Messages API's client-side tools have no endpoint registration or server-side invocation of your services — the application is always the executor. Assuming automatic invocation would leave the tool never actually called.",
+      "Tool results have a dedicated, structured channel — the tool_result block tied to its tool_use id — precisely so outputs are matched to calls. Stuffing results into the system prompt breaks that correlation and misuses the instruction channel for per-turn data."
+    ],
+    "principle": "the model requests tools; your code executes them and returns tool_result blocks",
+    "relatedConcept": "The tool_use / tool_result cycle: Claude emits a structured call, the application executes it, and the result returns in the next user message.",
+    "overallExplanation": "Tool use is a request-execute-respond loop: Claude emits a tool_use block, your application runs the function, and the output returns as a tool_result block in the next user message. The API never runs your code for you."
+  },
+  {
+    "id": 227,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "Mateus is building a listener-support assistant for a podcast platform. He put the assistant's persona, tone rules, and refusal policy into the first user message of each conversation, and adherence is inconsistent — the persona drifts once real user turns accumulate. Where does the Messages API intend such instructions to live?",
+    "options": [
+      "In the top-level system parameter of the request, which is the dedicated channel for persistent behavioral instructions separate from the conversation turns",
+      "In a message with role 'system' placed as the first element of the messages array, which the API treats as elevated-priority content",
+      "Repeated verbatim inside every user message, since instructions decay unless they are restated on each conversational turn",
+      "In an assistant-role message at the start of the conversation, so the model reads the rules as commitments it has already made itself"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Messages API provides system instructions through a top-level system parameter, deliberately separated from the user/assistant turn structure. Persona, tone, and policy belong there: it keeps trusted instructions distinct from conversational content and applies them consistently across the exchange.",
+      "Tempting for developers arriving from APIs where system is a message role, but the Claude Messages API takes system content as a top-level request parameter — the messages array holds user and assistant turns. Modeling it as a message misplaces the instruction channel.",
+      "Restating rules every turn bloats every request, mingles instructions with untrusted user content, and still leaves them in the wrong channel. The API already provides a persistent instruction mechanism; manual repetition is a workaround for not using it.",
+      "Fabricating an assistant turn makes the rules look like prior model output rather than operator instructions, which is a weaker and stranger signal than the dedicated channel. It also corrupts the conversation history with a turn that never happened."
+    ],
+    "principle": "persistent behavior instructions belong in the top-level system parameter",
+    "relatedConcept": "The Messages API separates the system prompt (a request parameter) from conversation turns (the messages array of user/assistant roles).",
+    "overallExplanation": "The Messages API gives behavioral instructions a dedicated home: the top-level system parameter. Putting persona and policy there — not in user turns — keeps them consistent, trusted, and separate from conversational content."
+  },
+  {
+    "id": 228,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "A sports-analytics firm extracts box-score statistics from game recaps into a fixed format. The pipeline runs at the API's default sampling settings, and identical inputs produce noticeably varied phrasing and occasional format deviations between runs. For this extraction workload, what parameter change is most appropriate?",
+    "options": [
+      "Lower temperature toward 0 so sampling concentrates on the most probable tokens, making outputs far more consistent run-to-run for deterministic-style extraction",
+      "Raise temperature so the model explores more completions, increasing the chance that at least one run lands on the desired format",
+      "Leave temperature alone, since it only affects generation speed and the variation must come from infrastructure differences between runs",
+      "Reduce max_tokens sharply, since a tighter output budget forces the model to standardize its formatting choices"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Temperature controls sampling randomness: near 0, the model heavily favors its most probable tokens, which is exactly what extraction and classification workloads want — stable, repeatable outputs. Some non-determinism can remain, but variance drops dramatically compared to default sampling.",
+      "Higher temperature widens the sampling distribution, producing more variation — the opposite of what a fixed-format pipeline needs. 'Explore until one run is right' also implies re-running and judging outputs, adding cost to amplify the very randomness causing the problem.",
+      "Temperature has no relationship to generation speed; it shapes which tokens are sampled at each step. Dismissing the primary randomness control and blaming infrastructure would leave the actual variance source untouched while chasing a phantom.",
+      "max_tokens caps output length; it does not influence which tokens are chosen within the budget. A tighter cap risks truncating valid extractions mid-record while doing nothing to standardize phrasing or format decisions."
+    ],
+    "principle": "low temperature for extraction and classification; high temperature only when variety helps",
+    "relatedConcept": "Temperature tunes sampling randomness — deterministic-style workloads (extraction, classification, structured output) run near 0; creative tasks tolerate more.",
+    "overallExplanation": "Match sampling to the task: extraction pipelines want the most probable tokens, so temperature near 0 minimizes run-to-run variance. Temperature governs randomness, not speed, and higher values increase variation."
+  },
+  {
+    "id": 229,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "A newsroom is building a live-summary panel that renders Claude's output as it generates. A developer enables streaming on the Messages API, logs the raw stream, and asks a colleague how the response text actually arrives so she can render it correctly. What is the accurate description?",
+    "options": [
+      "The stream is a sequence of typed server-sent events — text arrives incrementally in content_block_delta events, which the client accumulates until the stream signals completion",
+      "The stream resends the entire message repeatedly, each event containing all text so far, so the client should replace its display with the latest event's full payload",
+      "All of the text arrives in one final event at the end of the stream; the earlier events are keepalive pings that only confirm the connection is healthy",
+      "Streaming requires upgrading the connection to a websocket, since server-sent events cannot carry incremental model output"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Streaming responses arrive as typed SSE events — the message opens, content blocks start, and text flows as incremental deltas in content_block_delta events until the stream completes. The client appends each delta to reconstruct the text, rendering as it goes.",
+      "Tempting because some polling designs work this way, but resending the full message on every event would waste enormous bandwidth on long outputs. The protocol sends deltas — only the new tokens — and the client is responsible for accumulation.",
+      "If text arrived only at the end, streaming would provide no perceived-latency benefit, which is its main purpose. The intermediate events are the payload: they carry the incremental content the panel should render as it arrives.",
+      "The Messages API streams over HTTP using server-sent events; no websocket upgrade is involved. SSE is a standard mechanism for server-to-client incremental delivery and is exactly how streamed model output is transported."
+    ],
+    "principle": "streamed text arrives as incremental deltas the client accumulates",
+    "relatedConcept": "Streaming uses typed SSE events — content_block_delta carries the incremental text, and the client appends deltas until the stream completes.",
+    "overallExplanation": "A streamed response is a series of typed events, with text carried incrementally in content_block_delta events. Clients accumulate deltas to build the message — nothing resends the whole text, and no websocket is required."
+  },
+  {
+    "id": 230,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "A pharmaceutical company wants to build Claude-based literature-screening tooling, but its procurement and compliance teams require that all cloud AI spend and data processing flow through the company's existing hyperscaler agreements. The architect asks whether this rules Claude out. What is the accurate answer?",
+    "options": [
+      "No — Claude models are also offered through third-party cloud platforms such as Amazon Bedrock and Google Vertex AI, so the team can use existing cloud agreements, billing, and controls",
+      "Yes — Claude is available exclusively through Anthropic's own API endpoint, so any hyperscaler-only procurement policy excludes it from consideration",
+      "No — the hyperscaler versions are independent re-implementations of Claude trained by the cloud providers, so they satisfy procurement while behaving like different models",
+      "Yes — cloud-platform access to Claude supports only asynchronous batch workloads, which makes it unsuitable for the interactive screening tools the team plans"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Invoking Claude through third-party vendors is a standard access pattern: platforms like Amazon Bedrock and Google Vertex AI offer Claude models under the cloud provider's contracts, billing, IAM, and compliance envelope. Request conventions and auth differ by platform, but the models are Anthropic's.",
+      "This overlooks the third-party vendor channel entirely. Enterprises with hyperscaler procurement constraints are a primary audience for Bedrock and Vertex availability — declaring Claude excluded would eliminate a fully supported option that exists for exactly this situation.",
+      "The cloud platforms host Anthropic's actual Claude models, not provider-trained re-implementations. Believing they are different models would distort evaluation and model-selection decisions; the real differences are access conventions, authentication, and platform features, not the model weights.",
+      "Cloud-platform access supports interactive, realtime invocation, not just batch processing. This invents a delivery restriction that does not exist and would wrongly steer the architect away from a viable compliant path for interactive tooling."
+    ],
+    "principle": "Claude is reachable through third-party cloud platforms under existing enterprise agreements",
+    "relatedConcept": "Invoking Claude through vendors like Amazon Bedrock and Google Vertex AI trades familiar contracts and controls for platform-specific auth and request conventions.",
+    "overallExplanation": "Claude access is not limited to Anthropic's endpoint: hyperscaler platforms such as Bedrock and Vertex AI serve the same models under existing cloud agreements, with platform-specific authentication and conventions."
+  },
+  {
+    "id": 231,
+    "domain": "Applications and Integration",
+    "objective": "Claude API Mechanics",
+    "type": "single",
+    "question": "A structural-engineering software firm uses Claude to review load-calculation reports, a task requiring long chains of interdependent checks. The model answers quickly but misses errors that require multi-step reasoning across sections. The team's latency budget is generous. Which API capability directly targets this gap?",
+    "options": [
+      "Enable extended thinking with an adequate token budget, giving the model space to reason through the interdependent checks before committing to its final answer",
+      "Increase max_tokens substantially, since permitting a longer answer causes the model to reason more deeply before it begins writing",
+      "Raise the temperature, since more diverse sampling helps the model consider alternative failure hypotheses it would otherwise skip",
+      "Send each report twice and keep the longer of the two responses, since response length correlates with the depth of analysis performed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Extended thinking is the API mechanism for exactly this workload: the model works through intermediate reasoning within a configured thinking budget before producing its answer. The tradeoff — more tokens and latency for better multi-step reasoning — fits a team with headroom in its latency budget.",
+      "max_tokens only raises the ceiling on output length; it does not cause deliberation before answering. A model that misses cross-section dependencies will write a longer shallow review, not a deeper one — length permission is not reasoning capacity.",
+      "Temperature diversifies token sampling; it does not add reasoning steps. Higher randomness on an analytical review mostly increases inconsistency between runs, making the misses less predictable rather than less frequent.",
+      "Length is a poor proxy for rigor, and duplicate calls double cost while adding no reasoning capability to either attempt. This selects between two equally shallow analyses instead of enabling the mechanism designed to deepen the analysis."
+    ],
+    "principle": "extended thinking buys multi-step reasoning depth at the cost of tokens and latency",
+    "relatedConcept": "Thinking is an API capability: a budgeted reasoning phase before the final answer, suited to complex analytical tasks with latency headroom.",
+    "overallExplanation": "When failures stem from insufficient multi-step reasoning, extended thinking is the targeted lever: a budgeted deliberation phase before the answer. Output caps, temperature, and retries change other variables entirely."
+  },
+  {
+    "id": 232,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "A localization startup's overnight translation job wraps every Claude API call in an unlimited retry loop. Last night a malformed request body caused HTTP 400 invalid_request errors, and the job retried the same document for six hours before an engineer killed it. What error-handling principle did the code violate?",
+    "options": [
+      "Retry policy must distinguish error classes: 4xx client errors like 400 will never succeed on retry and need a code fix, while retries belong to transient errors like 429 and 5xx",
+      "Retry loops must always be finite, and six hours simply exceeded a sensible cap — the same policy with a 50-attempt limit would have been correct",
+      "Batch jobs should not use retries at all; any failed document should be silently skipped and reconciled manually at the end of the run",
+      "The job should have escalated to a larger model on repeated failure, since more capable models tolerate malformed request bodies more gracefully"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. HTTP status classes encode retryability: a 400 means the request itself is invalid, so every retry resends the same defect and gets the same answer. Correct clients retry transient signals (429, 5xx, overloaded) with backoff, and fail fast on client errors so the bug surfaces immediately.",
+      "Tempting because a cap would have bounded the damage, but 50 identical retries of an invalid request are 49 more than useful — the deeper defect is retrying a non-retryable error class at all. Caps are hygiene on top of classification, not a substitute for it.",
+      "Retries are entirely appropriate in batch jobs for transient failures; abandoning them would convert every momentary blip into lost work. Silent skipping also hides defects — the malformed-request bug deserves a loud, immediate failure, not quiet reconciliation.",
+      "Request validity is checked before any model processes anything: a malformed body is rejected by the API regardless of the model selected. Escalating model tier spends more money resubmitting the same defective request to the same validation layer."
+    ],
+    "principle": "classify before retrying: client errors need fixes, transient errors need backoff",
+    "relatedConcept": "HTTP status classes encode retryability — 4xx means the request is wrong and retries are futile; 429/5xx are transient and retryable with backoff.",
+    "overallExplanation": "Retry policy starts with error classification. A 400 reports a defective request that no retry can fix — fail fast and fix the code; reserve backoff-retries for transient signals like 429 and 5xx."
+  },
+  {
+    "id": 233,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "A customer-support platform lets Claude create follow-up tickets through a tool call. When a client-side timeout fires, the integration retries the whole request — but the original attempt sometimes had already completed, so duplicate tickets appear. The team wants to keep retrying on timeouts. What design change addresses the duplication?",
+    "options": [
+      "Make the ticket-creation operation idempotent — for example, attach a client-generated idempotency key so the backend deduplicates repeated attempts of the same logical action",
+      "Remove client-side timeouts entirely so no request is ever abandoned before the server finishes, eliminating the ambiguity that causes duplicates",
+      "Stop retrying any request that involves side effects, accepting that transient network failures will permanently drop those ticket creations",
+      "Shorten the timeout aggressively so retries happen before the first attempt could plausibly have completed on the server"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A timeout leaves the client genuinely uncertain whether the side effect happened, so safety must come from the operation itself: idempotency keys or deduplication make 'at least once' delivery behave like 'exactly once' at the business level, letting timeouts and retries coexist with side effects.",
+      "Tempting because it removes the ambiguity, but unbounded waits are worse: a hung connection then blocks the worker forever, and network failures still leave completion unknown. Timeouts are a necessary defense; the fix is making retries safe, not abolishing the timer.",
+      "Never retrying side-effectful operations trades duplicate tickets for silently lost tickets on every transient blip — usually the worse failure mode for a support platform. The engineering answer is making the retry safe, not surrendering reliability to avoid duplication.",
+      "Shortening the timeout increases the number of ambiguous races: more first attempts get abandoned mid-flight while still completing server-side. It manufactures more of exactly the uncertainty that produces duplicates, based on a guess about server timing."
+    ],
+    "principle": "retries plus side effects require idempotency, not luck",
+    "relatedConcept": "Timeout-and-retry is safe only when operations are idempotent — idempotency keys let backends deduplicate repeated attempts of one logical action.",
+    "overallExplanation": "A timed-out request may still have succeeded, so retrying side-effectful operations demands idempotency. Client-generated idempotency keys let the backend collapse duplicates while keeping timeouts and retries in place."
+  },
+  {
+    "id": 234,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "At a weather-data company, developers use Claude to draft substantial pull requests. A subtle unit-conversion bug — knots versus meters per second — shipped last week in an AI-drafted PR that was merged as soon as CI turned green, with no human reading the diff. What should the engineering lead change about the process?",
+    "options": [
+      "Require the same human code review rigor for AI-drafted changes as for human ones — a green CI run is a necessary gate, but reviewers must still verify logic and domain correctness",
+      "Prohibit AI-drafted pull requests for numerical code, since unit handling is a class of logic that language models cannot contribute to safely",
+      "Add a second AI pass that reviews every AI-drafted PR, replacing human review with a cheaper automated judgment layer",
+      "Require developers to retype AI-drafted changes by hand before committing, so the code passes through a human's fingers even if not their judgment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Code review discipline does not relax because a model wrote the diff — if anything, plausible-looking AI output warrants sharper scrutiny, since it reads confidently even when subtly wrong. CI proves the tests pass; it cannot prove the tests cover unit semantics nobody thought to assert.",
+      "A blanket ban discards real productivity over one process failure. The bug shipped because no human reviewed the diff, not because AI touched numerical code — properly reviewed AI-drafted changes to numerical code are as governable as any other contribution.",
+      "An AI reviewer can be a useful additional signal, but replacing human review outsources accountability to another fallible model — potentially sharing the same blind spot that produced the bug. Review exists to put responsible human judgment on the change before it ships.",
+      "Retyping is ritual, not review: transcription engages the fingers while the unit-conversion bug sails through unchanged. It adds toil without adding the missing ingredient, which is a human actually reasoning about the diff's correctness."
+    ],
+    "principle": "AI-drafted code gets full human review — green CI is necessary, not sufficient",
+    "relatedConcept": "Code review is an accountability mechanism: whoever merges owns the change, and AI authorship raises rather than lowers the bar for scrutiny.",
+    "overallExplanation": "The defect was process, not provenance: an unreviewed diff shipped on a green build. AI-drafted changes require the same human review as any code, because CI validates only what the tests already assert."
+  },
+  {
+    "id": 235,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "A music-streaming service enriches track metadata with a TypeScript job. The developer made the function async, yet 5,000 Claude API calls still take hours: profiling shows each iteration of a for-of loop awaits its API call before the next begins. The API's rate limits have plenty of headroom. What is the correct fix?",
+    "options": [
+      "Launch the calls concurrently — for example with Promise.all over batches or a bounded concurrency pool — instead of awaiting each request before starting the next",
+      "Move the loop into Node worker threads, since JavaScript's single-threaded event loop is what forces the API calls to run one at a time",
+      "Raise the HTTP client's timeout so each request has more time to complete, reducing the per-call overhead that accumulates across iterations",
+      "Convert the code to synchronous blocking calls, since async/await adds scheduling overhead that dominates in tight loops over network requests"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Marking a function async does not create concurrency — awaiting inside a loop serializes the requests exactly like synchronous code. Starting many promises and awaiting them together (with a bound to respect rate limits) overlaps the network waits, which is where all the time goes.",
+      "Tempting because 'single-threaded' sounds like the constraint, but network I/O does not occupy the thread — the event loop can hold hundreds of requests in flight concurrently. The serialization comes from the code's await placement, not from a lack of threads.",
+      "Timeout is a failure bound, not a performance lever: requests already complete within it, so raising it changes nothing. The accumulated hours come from running 5,000 waits back-to-back, and no per-call setting can overlap them.",
+      "Async/await overhead is microseconds against seconds of network latency per call, and synchronous blocking would still serialize every request while also freezing the event loop. This doubles down on the actual problem — sequential waiting — to shave an irrelevant cost."
+    ],
+    "principle": "await-in-a-loop is sequential — concurrency comes from overlapping the promises",
+    "relatedConcept": "Async syntax enables concurrency but does not grant it: I/O-bound throughput requires structuring code so many requests are in flight at once.",
+    "overallExplanation": "An async function that awaits each call in a loop is still sequential. Overlapping the requests — Promise.all batches or a bounded pool — is what converts hours of stacked network waits into minutes."
+  },
+  {
+    "id": 236,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "A veterinary-clinic chain builds Messages API request bodies by interpolating clinical notes into a JSON string template with f-strings. Requests intermittently fail with 400 errors — always on notes containing quotation marks, newlines, or backslashes. The author proposes regex-escaping those three characters. What should the reviewer require instead?",
+    "options": [
+      "Build the payload as native data structures and let a proper JSON serializer or the SDK produce the wire format, eliminating the escaping problem as a class",
+      "Extend the regex to escape all characters that are special in JSON, keeping the string template since it makes the request structure easy to read",
+      "Base64-encode every clinical note before insertion so no special characters can reach the JSON layer, decoding on the response side",
+      "Add validation that rejects notes containing quotation marks, newlines, or backslashes, asking clinics to rewrite the affected records"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Hand-assembling JSON by string interpolation is a classic defect generator: any unescaped structural character corrupts the document. Serializers exist to make this a solved problem — construct dicts or objects and serialize, or use the SDK, and the entire failure class disappears.",
+      "Tempting because it patches the observed cases, but hand-maintained escaping chases a spec the serializer already implements — control characters, unicode edge cases, nesting. Every gap ships as an intermittent 400, and the 'readable template' remains a latent injection point.",
+      "Base64 wrapping makes the payload opaque to the model — Claude would receive encoded gibberish instead of clinical text unless it is decoded first, which reintroduces the original problem. It contorts the data to protect a fragile construction method the serializer makes unnecessary.",
+      "Rejecting legitimate clinical content because the client cannot encode it inverts the responsibility: quotation marks and line breaks are normal prose. Asking clinics to rewrite medical records to accommodate a string-template bug is a process cost paid to avoid a one-line code fix."
+    ],
+    "principle": "never build JSON by string interpolation — serialize native data structures",
+    "relatedConcept": "JSON fluency includes knowing that wire formats come from serializers, not templates; interpolated user text is an encoding bug and an injection risk.",
+    "overallExplanation": "Escaping bugs are a symptom of hand-built JSON. Constructing payloads as native structures and serializing them — or using the SDK — eliminates the entire failure class rather than patching character by character."
+  },
+  {
+    "id": 237,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "multi",
+    "question": "A disaster-mapping nonprofit is promoting a volunteer's Claude integration script into its production pipeline. The script currently makes bare API calls with no timeout handling and prints nothing but final results. Which two changes most improve its production readiness? (Choose two.)",
+    "options": [
+      "Add request timeouts and bounded retries with exponential backoff for transient failures such as 429 and overloaded errors",
+      "Add structured logging that records each call's request identifier, token usage, latency, and outcome for debugging and monitoring",
+      "Wrap the entire pipeline in a broad try/except that swallows all exceptions and continues, so no single failure can ever interrupt a run",
+      "Insert a fixed ten-second sleep between all API calls so that no error handling or retry logic is needed anywhere in the script"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Production network calls need failure discipline: timeouts prevent indefinite hangs, and bounded backoff-retries absorb the transient errors any long-running pipeline will encounter. Without them, one flaky request stalls or kills a run that dozens of responders depend on.",
+      "Correct. Observability is what turns a production incident from archaeology into a query: request identifiers correlate failures with provider-side records, and per-call token usage and latency reveal cost drift and degradation before they become outages. Print-nothing scripts are undebuggable at 3 a.m.",
+      "Swallowing every exception converts crashes into silent data corruption — the pipeline 'succeeds' while mapping regions with missing or wrong analysis. Resilience means handling anticipated failures deliberately and surfacing the rest loudly, not suppressing all signals of trouble.",
+      "A fixed sleep neither prevents nor handles failures — networks still drop, servers still return 5xx, and the script still has no answer for them. It also throttles the pipeline permanently to guard against errors it cannot actually absorb, paying constant latency for zero resilience."
+    ],
+    "principle": "production integrations need failure handling and observability, not hope",
+    "relatedConcept": "Promoting a script to production means adding timeout/retry discipline for transient failures and structured logging for debugging and monitoring.",
+    "overallExplanation": "Two things separate a script from a production integration: deliberate failure handling (timeouts, bounded backoff for transient errors) and observability (request ids, usage, latency). Sleeps and swallowed exceptions provide neither."
+  },
+  {
+    "id": 238,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "An airline's operations platform has grown Claude calls in roughly thirty places — crew messaging, delay summaries, baggage queries — each call site with its own copy of the model identifier, retry logic, and response parsing. Updating the pinned model last month required thirty coordinated edits and missed two. What refactoring should the staff engineer drive?",
+    "options": [
+      "Consolidate access behind one internal client module that owns model configuration, retries, and parsing, so call sites express intent and cross-cutting changes happen in one place",
+      "Keep the thirty independent call sites, since duplication lets each product team tune its own integration without coordinating changes with others",
+      "Standardize a project-wide find-and-replace checklist for model updates, making the thirty-edit procedure repeatable instead of ad hoc",
+      "Fork the vendor SDK into the monorepo and hardcode the airline's defaults inside the fork so every call site inherits them from the dependency"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Thirty copies of the same cross-cutting concerns is a textbook abstraction gap: a thin internal wrapper centralizes model pinning, retry policy, logging, and parsing, so the next model migration is one reviewed change instead of a thirty-edit hunt that misses two.",
+      "Tempting as team autonomy, but the scenario shows the copies are not intentional variation — they are the same logic drifting apart by accident. Autonomy worth having lives in parameters and options on a shared client, not in thirty divergent implementations of retries.",
+      "A checklist institutionalizes the failure mode instead of removing it: the process still requires humans to find every copy, and the last migration missed two even with coordination. Making a bad procedure repeatable is not refactoring; it is documenting the debt.",
+      "Forking the SDK buys the worst of both worlds: the team now maintains a diverging copy of vendor code, absorbing every upstream update by hand, to achieve what a thin wrapper module provides without any fork. Defaults belong in your layer, not in patched vendor internals."
+    ],
+    "principle": "centralize cross-cutting integration concerns behind one internal client",
+    "relatedConcept": "DRY applied to LLM integrations: model config, retries, and parsing are cross-cutting concerns that belong in a shared module, not at every call site.",
+    "overallExplanation": "When one logical change requires thirty edits, the abstraction is missing. A single internal client module makes model pinning, retries, and parsing one-place changes and turns call sites into expressions of intent."
+  },
+  {
+    "id": 239,
+    "domain": "Applications and Integration",
+    "objective": "Software Engineering Foundations",
+    "type": "single",
+    "question": "A tax-software firm's unit test suite for its deduction-explainer feature calls the live Claude API on every run. The suite is slow, costs real money on every commit, and fails nondeterministically when responses vary. Developers have started skipping it. How should the team restructure its testing?",
+    "options": [
+      "Mock or stub the API client in unit tests so application logic is verified deterministically and cheaply, and exercise the real model in a separate evaluation or integration suite",
+      "Keep the live calls but set temperature to 0 in tests, which makes the model's responses deterministic and therefore reliable enough for unit assertions",
+      "Delete the tests that touch the Claude integration, since code paths involving a nondeterministic dependency cannot be meaningfully tested at all",
+      "Run the full live suite only before quarterly releases, accepting that commits between releases receive no automated verification of the feature"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Unit tests verify your code — parsing, prompt assembly, error handling — and a mocked client makes them fast, free, and deterministic. Model behavior itself is real and worth testing, but that belongs in a separately run eval or integration suite, not in the per-commit unit path.",
+      "Tempting because low temperature does reduce variance, but it does not guarantee identical outputs, and the suite remains slow and metered — the reasons developers skip it stay intact. Tuning sampling treats a test-architecture problem as a parameter problem.",
+      "Nondeterminism in a dependency is a boundary-design problem, not a testability death sentence: mock the boundary and the application logic tests deterministically. Deleting the tests abandons coverage of parsing and error handling that has nothing nondeterministic about it.",
+      "Quarterly-only verification means a broken integration can sit unnoticed for months of commits, making the eventual failure archaeology. The fix is making per-commit tests cheap enough to run always, not rationing expensive tests until feedback is useless."
+    ],
+    "principle": "unit-test your logic against a mocked client; test the model in a separate eval suite",
+    "relatedConcept": "Testing LLM applications splits cleanly: deterministic unit tests with stubbed clients for application code, and dedicated eval runs for model behavior.",
+    "overallExplanation": "Live API calls do not belong in the per-commit unit path. Stub the client to test application logic deterministically, and give real model behavior its own evaluation suite with its own cadence."
+  },
+  {
+    "id": 240,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "A construction project-management SaaS gives Claude an update_task tool whose 'status' parameter is a free-form string. In production, Claude populates it with values like 'nearly finished' and 'blocked on permits', which the task service rejects. The prompt already lists the valid statuses. What schema change fixes this properly?",
+    "options": [
+      "Constrain the parameter in the tool's JSON Schema — an enum of the valid status values, marked required, with a description of when each applies",
+      "Add a post-processing layer that fuzzy-matches whatever string Claude produces to the nearest official status before calling the task service",
+      "Strengthen the system prompt with capitalized warnings that only the listed statuses may ever be used in the status field",
+      "Have the tool return an error to Claude on invalid statuses and rely on it retrying until it happens to produce an accepted value"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Schema design is the enforcement point for tool inputs: an enum tells the model the complete legal value set in the contract it fills against, and required plus per-value description guidance makes correct population the path of least resistance. Prose lists are advice; schema constraints are structure.",
+      "Fuzzy-matching launders bad values instead of preventing them — 'blocked on permits' silently becomes some official status the mapper guesses, and a wrong guess corrupts project data invisibly. It builds permanent infrastructure to compensate for a one-line schema omission.",
+      "The prompt already lists the statuses and the model still improvises, because free-form strings invite natural language. Louder prose remains probabilistic guidance; the parameter's schema is where the value set becomes part of the structural contract the model fills.",
+      "Error-driven retry works as a backstop, but as the primary mechanism it spends extra round-trips and tokens rediscovering, per call, a value set that could be declared once in the schema. Design the contract to prevent the error, then keep validation as defense in depth."
+    ],
+    "principle": "encode legal values in the tool schema — enums constrain what prompts merely suggest",
+    "relatedConcept": "Tool schema design: enums, required fields, types, and precise parameter descriptions are how applications make model tool calls conform.",
+    "overallExplanation": "When a tool parameter has a closed value set, put the set in the schema as an enum. Prose lists in prompts are suggestions; the JSON Schema is the contract the model actually fills against."
+  },
+  {
+    "id": 241,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "At a biotech research lab, scientists have been individually installing whatever community plugins and MCP servers they find into the shared Claude environment. Sessions now show duplicate and conflicting tool names, and an audit found one unvetted server with broad filesystem access to shared drives. How should the platform team manage plugins going forward?",
+    "options": [
+      "Treat plugins as managed dependencies: maintain a vetted, version-controlled set in shared configuration, and review new additions for capability and access before adoption",
+      "Ban plugins and MCP servers outright, since community-authored extensions can never be made safe enough for a research environment handling shared data",
+      "Let each scientist continue managing a personal plugin list, but circulate a wiki page of known conflicts so people can avoid problematic combinations",
+      "Keep installations open but rename conflicting tools by hand whenever a collision is noticed in a session"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Plugin management is a design responsibility: each plugin extends what the assistant can see and do, so the set must be curated like any dependency — vetted for capabilities and access, version-controlled in shared configuration, and changed through review rather than ad hoc installs.",
+      "A blanket ban forfeits the ecosystem's genuine value and usually drives shadow installs that are harder to audit than a sanctioned path. The audit finding argues for governance — vetting, least-privilege review, a managed set — not for prohibition of the entire mechanism.",
+      "A conflicts wiki documents the chaos without reducing it: the unvetted filesystem-access server remains installed, versions still drift per person, and nothing prevents the next risky addition. Awareness of a problem is not a control on it.",
+      "Hand-renaming collisions treats the visible symptom while the governance gap — anyone installing anything, with any access level — continues generating both conflicts and security exposure. It is per-incident cleanup standing in for dependency management."
+    ],
+    "principle": "plugins extend capability and access — curate them as managed, reviewed dependencies",
+    "relatedConcept": "Plugin management in Claude application design: a vetted, version-controlled plugin set with capability review, not ad hoc per-user installs.",
+    "overallExplanation": "Every plugin changes the assistant's capability surface and access footprint. Managing them as vetted, version-controlled dependencies — with review before adoption — is the design practice that prevents both tool conflicts and unvetted access."
+  },
+  {
+    "id": 242,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "multi",
+    "question": "A supply-chain SaaS team maintains a thorough CLAUDE.md that keeps Claude Code sessions following their conventions perfectly. They assumed those conventions would also govern their product's Messages API integration, but the production assistant ignores them entirely. Which two statements correctly describe the situation? (Choose two.)",
+    "options": [
+      "CLAUDE.md is a Claude Code mechanism — it is read into coding sessions and has no effect on requests the product sends to the Messages API",
+      "For the API integration, equivalent guidance must be supplied explicitly, typically as part of the system prompt the application sends with its requests",
+      "Uploading the CLAUDE.md file in the developer console binds it account-wide, applying its conventions to all API traffic under those keys",
+      "The client SDK automatically discovers a CLAUDE.md in the process's working directory and prepends it to outgoing requests at runtime"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. CLAUDE.md belongs to the Claude Code interface: the tool loads it as session context for coding work. The Messages API knows nothing of it — an API request contains exactly what the application sends, and no file on the developers' machines participates.",
+      "Correct. Each interface supplies its own instruction plumbing, and the raw API's is explicit: whatever conventions should govern the production assistant must travel in the request, normally in the system prompt, shipped and versioned as part of the application.",
+      "No console mechanism binds a CLAUDE.md to an account or its API keys — this imagines Claude Code's file convention grafted onto the API as account-level configuration. API behavior is controlled per request by request content, not by uploaded convention files.",
+      "The SDK is a thin client for the API; it does not scan the filesystem for instruction files or silently modify payloads. Automatic CLAUDE.md discovery is a Claude Code behavior, and expecting it from the SDK confuses the two layers."
+    ],
+    "principle": "CLAUDE.md configures Claude Code sessions — API requests carry only what you send",
+    "relatedConcept": "How Claude interprets instructions differs by interface: Claude Code reads CLAUDE.md; the Messages API receives instructions only through the request itself.",
+    "overallExplanation": "Instruction mechanisms are interface-specific. CLAUDE.md shapes Claude Code sessions, not API traffic; a production API integration must carry its conventions explicitly in its own system prompt."
+  },
+  {
+    "id": 243,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "A municipal water utility's assistant answers account and outage questions well, but auditors found it also confidently answers billing-dispute and legal-liability questions it was never designed for — sometimes incorrectly, in a regulated domain. The model tier and prompt quality are otherwise fine. What design element is missing?",
+    "options": [
+      "Explicit scope boundaries with an escalation path: define the topics the assistant must decline or hand off, instruct and enforce that behavior, and route those requests to staff",
+      "A more capable model tier, so that answers to billing-dispute and liability questions become accurate enough to keep handling them in the assistant",
+      "A standard disclaimer footer appended to every response stating that answers are informational and should not be relied upon for disputes",
+      "A lower temperature setting, which reduces the model's tendency to produce incorrect answers on topics outside its designed coverage"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Applications need designed edges: an explicit statement of what is in and out of scope, prompt instructions that make the assistant decline or redirect out-of-scope topics, and a working handoff so users reach humans. Without that boundary, the model helpfully answers whatever arrives.",
+      "Tempting as a quality fix, but it expands the assistant's de facto mandate instead of defining it — the utility never decided the assistant should adjudicate disputes or discuss liability. In a regulated domain, some topics belong with staff regardless of how accurate the model becomes.",
+      "A blanket disclaimer neither prevents the wrong answers nor absolves them; users act on confident responses whatever the footer says, and regulators judge the behavior, not the boilerplate. It decorates the failure rather than designing the boundary that prevents it.",
+      "Temperature adjusts sampling variability, not topical scope: at any setting the model still attempts out-of-scope questions, just with steadier wording. The failure is that these questions are answered at all, which only a designed scope-and-escalation policy addresses."
+    ],
+    "principle": "design the edges: declared scope, refusal behavior, and a human handoff path",
+    "relatedConcept": "Claude application design includes deciding what the assistant must not answer and engineering the decline-and-escalate behavior for those cases.",
+    "overallExplanation": "An assistant's scope is a design artifact, not an emergent property. Declaring out-of-scope topics, instructing refusal, and routing users to staff is what keeps a helpful model from freelancing in regulated territory."
+  },
+  {
+    "id": 244,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "A community-forum platform uses Claude to write moderation summaries that quote user posts, and the dashboard renders these summaries directly as HTML. A security reviewer notes that a hostile user could craft a post whose content survives into the summary as executable markup. What rendering design should the team adopt?",
+    "options": [
+      "Treat model output as untrusted for rendering — escape or sanitize it before inserting into the page, exactly as the platform would with user-derived content",
+      "Add a system prompt instruction requiring Claude to emit only safe, well-formed HTML free of scripts or event handlers in every summary",
+      "Rely on the model's safety training, since an aligned model will not reproduce malicious markup from a user post into its summary",
+      "Sanitize user posts before they reach the model, which makes the summary output safe to render without any further processing"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Model output that incorporates user content is user-derived content: the standard web-security posture — escape by default, sanitize where rich markup is needed — must apply at the rendering boundary. The defense belongs in code the attacker cannot influence, not in model behavior.",
+      "A prompt instruction is probabilistic guidance, not a security control: adversarial post content is specifically crafted to survive such instructions, and one miss is one stored-XSS incident. Instructions can reduce accidents; the rendering layer must still assume output is unsafe.",
+      "Safety training targets harmful content, not HTML injection semantics — a model can faithfully quote a post containing markup without recognizing it as an attack on the downstream renderer. Alignment is not a sanitizer, and treating it as one leaves the XSS path open.",
+      "Input sanitization helps, but it is insufficient alone: transformations by the model can reassemble or unescape dangerous sequences, and non-post inputs also flow into summaries. Output encoding at the render boundary is the control that holds regardless of what happened upstream."
+    ],
+    "principle": "render model output as untrusted content — escape and sanitize at the boundary",
+    "relatedConcept": "Content boundaries run in both directions: LLM output that embeds user content must pass the same rendering defenses as raw user input.",
+    "overallExplanation": "Summaries that quote users are user-derived content wearing the model's voice. Escaping and sanitizing model output at the rendering boundary is the enforceable control; prompts and alignment are not security layers."
+  },
+  {
+    "id": 245,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "An e-commerce marketplace has Claude generate order-summary emails, and the prompt also asks it to compute each order's refund total from the line items. Audits show the prose is excellent but the arithmetic is occasionally wrong — off by small amounts on long orders. How should the team divide this work?",
+    "options": [
+      "Compute the refund total deterministically in application code and pass the finished figure into the prompt, using Claude only for the language work it excels at",
+      "Add several worked examples of refund arithmetic to the prompt, since multi-shot demonstrations reliably correct a model's calculation errors",
+      "Enable extended thinking on every email generation so the model has enough reasoning capacity to get the arithmetic consistently right",
+      "Generate each email twice and compare the two computed totals, sending the email only when both runs independently agree on the amount"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Application design assigns each layer what it does best: arithmetic is deterministic and belongs in code, where it is exact, testable, and free. The model receives the computed figure and does the genuinely linguistic work — a division of labor that removes the error class entirely.",
+      "Tempting because examples improve many behaviors, but token-by-token generation is not a calculator: demonstrations reduce arithmetic mistakes without eliminating them, and money is a domain where 'usually right' is a defect. No prompt makes probabilistic arithmetic exact.",
+      "Extended thinking improves multi-step reasoning, and would likely raise accuracy at real latency and token cost — but it still cannot guarantee correctness on a task code performs perfectly for free. Paying for probabilistic arithmetic when exact arithmetic is one line of code is a design error.",
+      "Agreement between two probabilistic runs is not proof of correctness — both can share the same systematic slip — and disagreement leaves the pipeline stuck in retries. It doubles cost to approximate a guarantee that a single line of application code provides outright."
+    ],
+    "principle": "deterministic computation belongs in code; the model does the language work",
+    "relatedConcept": "A core Claude application design decision is the seam between code and model: calculations, lookups, and validation in code; understanding and generation in the model.",
+    "overallExplanation": "Do not buy probabilistic arithmetic when exact arithmetic is free. Computing totals in code and handing the model finished figures assigns each layer its strength and eliminates the error class."
+  },
+  {
+    "id": 246,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "multi",
+    "question": "A car-rental platform is designing a support chat where customers can leave and resume conversations across visits and devices. The team is deciding how conversation state should be handled. Which two design decisions are correct? (Choose two.)",
+    "options": [
+      "Key stored transcripts to the authenticated customer and ensure a resumed session can never replay another customer's conversation into the context",
+      "Define a retention and expiry policy for stored conversation data, since transcripts accumulate personal details like addresses and booking history",
+      "Pass a conversation_id parameter on each request so the Messages API stores and recalls the conversation history server-side between visits",
+      "Cache completed conversations in a shared store keyed by question text, so similar questions from other customers can reuse existing transcripts as context"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Persistence makes session hygiene an authorization problem: history is loaded by the application, so the application must guarantee the transcript it replays belongs to the authenticated customer. A keying or lookup bug here is a direct cross-customer data leak into the model's context.",
+      "Correct. Stored transcripts are a personal-data store and must be designed as one: retention limits, expiry, and deletion honor both privacy obligations and users' reasonable expectations. Conversation state that lives forever is a liability accumulating silently.",
+      "The Messages API offers no conversation_id or server-side conversation storage — it is stateless, and each request carries its own history. Designing around this imagined mechanism would leave the resume feature unbuilt and misplace responsibility for state the application must own.",
+      "Reusing one customer's transcript as context for another is a data leak by design — names, bookings, and addresses would flow between accounts through 'similar' questions. Whatever caching the platform adds must never blend conversational state across customers."
+    ],
+    "principle": "the application owns conversation state — scope it per user and give it a lifecycle",
+    "relatedConcept": "Session hygiene for persistent chat: transcripts are per-user personal data requiring strict scoping on replay and a deliberate retention policy.",
+    "overallExplanation": "Cross-visit chat means the application stores and replays state, which raises two design duties: strict per-customer scoping so contexts never mix, and a retention policy because transcripts are accumulating personal data."
+  },
+  {
+    "id": 247,
+    "domain": "Applications and Integration",
+    "objective": "Claude Application Design",
+    "type": "single",
+    "question": "A railway operator's assistant answers signalling questions by concatenating its instructions, excerpts from three different equipment manuals, and the operator's question into one undifferentiated block of text. In testing, the model regularly attributes procedures from one manual to equipment covered by another. What prompt-structure change addresses this?",
+    "options": [
+      "Delimit each component structurally — for example wrap each manual excerpt in labeled tags carrying its source, and separate instructions and the question into their own marked sections",
+      "Limit every request to a single manual excerpt, accepting that questions spanning equipment from multiple manuals can no longer be answered",
+      "Ask the model to begin each answer by listing which manuals it received, so operators can spot attribution mistakes before acting on a procedure",
+      "Raise max_tokens so longer answers give the model room to discuss each manual separately instead of blending them together"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. When sources arrive as one undifferentiated blob, the model has no structural signal for where one document ends and another begins — conflation is the predictable result. Labeled delimiters (such as XML-style tags with source metadata) make document boundaries and roles explicit, which is precisely what attribution requires.",
+      "Tempting because it eliminates cross-document confusion by construction, but it amputates the capability instead of fixing the prompt: cross-manual questions are real operator needs. Structure lets multiple sources coexist distinguishably; restriction just narrows the product.",
+      "An inventory preamble adds a human-detectable symptom report while leaving the cause — indistinguishable sources — fully intact. The model can list three manuals correctly and still misattribute procedures among them; safety-critical attribution should be engineered, not eyeballed.",
+      "The failure is conflation, not compression: the model mixes sources because it cannot tell them apart, not because it lacks room to treat them separately. A longer budget produces longer answers with the same misattributions."
+    ],
+    "principle": "delimit and label every content source so document boundaries are structural, not inferred",
+    "relatedConcept": "Content boundaries in prompt construction: instructions, each document, and the question belong in clearly labeled sections the model can tell apart.",
+    "overallExplanation": "Models attribute reliably only when sources are structurally distinguishable. Wrapping each document in labeled delimiters and separating instructions from data turns an undifferentiated blob into a prompt the model can navigate."
+  },
+  {
+    "id": 248,
+    "domain": "Applications and Integration",
+    "objective": "Configuration Management",
+    "type": "single",
+    "question": "A smart-home company's support summarizer degraded sharply yesterday. The team iterates quickly, editing the production prompt in place several times a week, and now cannot determine which of the recent edits caused the regression or reconstruct what the prompt said when the bad outputs were generated. What configuration practice was missing?",
+    "options": [
+      "Prompt versioning with traceability: treat each prompt revision as an identified, versioned artifact and record which version produced each response, enabling diagnosis and rollback",
+      "A rule that only the most senior engineer may edit the production prompt, reducing the number of people who could have introduced the regression",
+      "A manually maintained changelog document where engineers are asked to note the date and reason each time they adjust the prompt's wording",
+      "An instruction appended to the prompt asking Claude to flag in its output whenever its own behavior differs from previous responses"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Prompt versioning closes the loop the team is missing: every revision gets an identity, and every response records which version generated it. Yesterday's outputs then point to an exact prompt state — diffable against its predecessor and revertible in one step — instead of a guess.",
+      "Restricting editors shrinks the suspect list without creating any evidence: the senior engineer's in-place edits would be exactly as unreconstructable. The gap is that prompt states and outputs are not linked, and no author policy produces that linkage.",
+      "A voluntary changelog decays precisely when it matters — under rapid iteration, entries get skipped, and nothing ties a logged edit to the responses it produced. Versioning must be enforced by the workflow and joined to output records, not remembered as a courtesy.",
+      "The model has no memory of previous responses to compare against and cannot audit its own configuration history; such self-reports would be confabulation. Change tracking is an engineering-system responsibility that cannot be delegated to the artifact being tracked."
+    ],
+    "principle": "version every prompt revision and record which version produced each output",
+    "relatedConcept": "Prompt versioning is configuration management: identified prompt artifacts plus response-level version logging give regressions a diffable, revertible cause.",
+    "overallExplanation": "Fast prompt iteration is safe only with versioned artifacts and output traceability. When each response records the prompt version that produced it, a regression becomes a diff and a rollback instead of a mystery."
+  },
+  {
+    "id": 249,
+    "domain": "Applications and Integration",
+    "objective": "Configuration Management",
+    "type": "single",
+    "question": "An online grocery's services hardcode Claude model identifiers and request parameters in source across a dozen repositories. When a new model version was announced, the team could not trial it in staging without code changes and redeploys everywhere, so the upgrade evaluation stalled for a quarter. What change unblocks this properly?",
+    "options": [
+      "Externalize model identifiers and parameters into per-environment configuration, so staging can pin a candidate version for validation while production stays on the current pin",
+      "Switch every service to the provider's latest-model alias so new versions arrive automatically and no environment ever needs a coordinated upgrade",
+      "Keep the hardcoded identifiers but add a code comment beside each one noting the date it was last reviewed and who approved the choice",
+      "Consolidate on a single shared constant for the model identifier that all environments import, ensuring staging and production always run identical values"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Model choice is configuration, not code: externalizing it per environment lets staging point at a candidate version for evaluation while production remains pinned, turning upgrades into a config change plus validation instead of a dozen coordinated redeploys.",
+      "Tempting as the zero-effort path, but a latest alias means production model behavior changes on the provider's schedule, untested — the classic silent-upgrade failure. The team's problem is friction in deliberate upgrades; the fix cannot be surrendering deliberateness.",
+      "Comments document the hardcoding without curing it: trialing a version still requires editing source and redeploying every service, so the quarterly stall recurs at the next release. Review metadata is not a substitute for moving the value into configuration.",
+      "A shared constant deduplicates the value but enforces the exact constraint that caused the stall — staging cannot diverge to evaluate a candidate while production holds. Environments need independently settable configuration, not a single value welded across both."
+    ],
+    "principle": "model identifiers are per-environment configuration, not source-code constants",
+    "relatedConcept": "Configuration management enables safe model upgrades: staging pins a candidate for validation while production's pin moves only after evals pass.",
+    "overallExplanation": "Upgrades stall when model choice lives in code. Per-environment configuration lets staging evaluate a candidate version while production stays pinned, making adoption a validated config change rather than a mass redeploy."
+  },
+  {
+    "id": 250,
+    "domain": "Applications and Integration",
+    "objective": "Configuration Management",
+    "type": "multi",
+    "question": "A CAD-software firm's development workflow depends on Claude Code with several MCP-server plugins. After one plugin auto-updated and changed its tool behavior, half the team's automation broke while the other half — on older versions — was fine. Which two practices should the team adopt? (Choose two.)",
+    "options": [
+      "Pin plugin and MCP-server versions, adopting updates deliberately after testing, since plugin changes alter the tool surface the team's automation depends on",
+      "Declare the required plugin set and versions in shared, version-controlled project configuration so every developer and CI environment resolves the same dependencies",
+      "Configure all plugins to auto-update silently to the latest release, ensuring version drift between teammates can never occur again",
+      "Have each developer curate a personal plugin list independently, so a bad update affects only the individuals who happened to install it"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The incident is a dependency-management failure: an unpinned plugin changed underneath workflows that depended on its behavior. Pinning versions and promoting updates through testing applies the same discipline the team already uses for libraries to its Claude tooling.",
+      "Correct. A shared, version-controlled declaration of the plugin set makes environments reproducible: every developer and CI run resolves identical plugins at identical versions, and changes to the set arrive through reviewed commits rather than word of mouth.",
+      "Universal silent auto-update does end drift — by making every machine break simultaneously when the next behavioral change ships, with no tested rollback point. It maximizes exposure to exactly the failure that just occurred in exchange for consistency of the untested.",
+      "Personal plugin lists institutionalize the half-broken-half-fine split from the incident: environments diverge permanently, automation works only on some machines, and debugging starts with archaeology of each individual's setup. Blast-radius thinking cannot justify irreproducibility."
+    ],
+    "principle": "plugins are dependencies: pin versions and declare them in shared configuration",
+    "relatedConcept": "Plugin dependencies in Claude system configuration deserve lockfile discipline — pinned versions, shared declaration, tested upgrades.",
+    "overallExplanation": "Treat Claude tooling plugins like any dependency: pinned versions upgraded deliberately after testing, declared in shared version-controlled configuration so every environment resolves the same set."
+  },
+  {
+    "id": 251,
+    "domain": "Applications and Integration",
+    "objective": "Configuration Management",
+    "type": "single",
+    "question": "At a robotics startup, an engineer committed his personal preferences — his favorite permission grants and local tool paths — into the project's shared settings.json in the repository. Teammates' Claude Code sessions promptly broke on machines where those paths do not exist. How should the team organize its settings?",
+    "options": [
+      "Keep team-wide policy in the shared project settings.json under version control, and put personal preferences and machine-specific values in settings.local.json, which is not committed",
+      "Move all settings to each developer's user-level configuration so the repository carries no settings file and no commit can affect anyone else's sessions",
+      "Add a second committed settings file per developer to the repository, named after each engineer, so everyone's personal configuration is versioned alongside the code",
+      "Stop using settings files for the project and rely on verbal team agreements about which permissions and tools everyone should configure by hand"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The settings hierarchy exists for exactly this split: the project's shared settings.json carries team policy every clone should get, while settings.local.json holds personal, machine-specific overrides and stays out of version control. Each concern lives at the layer scoped to it.",
+      "Retreating entirely to user-level configuration throws out shared policy: nothing in the repo establishes the team's common permissions and conventions, so every machine drifts and onboarding becomes manual setup folklore. The fix is layering, not abandonment of the shared layer.",
+      "Per-developer committed files clutter the repository with configuration that is meaningless off its owner's machine and invite the same breakage whenever tooling reads the wrong one. Machine-specific values are deliberately excluded from version control by the local-settings layer.",
+      "Verbal agreements are configuration without enforcement or history — the precise gap settings files close. Hand-configured environments drift immediately, and the team loses the reviewable, reproducible baseline a committed project settings file provides."
+    ],
+    "principle": "shared policy in committed project settings; personal overrides in uncommitted local settings",
+    "relatedConcept": "The settings.json hierarchy separates team-wide, version-controlled configuration from per-developer settings.local.json overrides.",
+    "overallExplanation": "Settings layering solves the conflict: the committed project settings.json defines team policy for every clone, while personal and machine-specific values live in the uncommitted settings.local.json."
   }
 ]

@@ -71,15 +71,26 @@ for (const certCode of certCodes) {
     continue;
   }
 
-  // 3 empty buckets to accumulate each domain's stratified slice into.
-  const sets = [[], [], []];
+  const setCount = blueprint.cert?.practiceSets ?? null;
+  const sets = Array.from({ length: setCount ?? 3 }, () => []);
 
   for (const domain of blueprint.domains) {
     const qPath = join(certDir, `questions/domain-${domain.id}.json`);
     const questions = JSON.parse(readFileSync(qPath, 'utf8'));
-    questions.forEach((q, i) => {
-      sets[i % 3].push(q);
-    });
+    if (setCount) {
+      // The bank holds practiceSets × the official exam distribution, so a
+      // per-objective round-robin yields non-overlapping sets that each match
+      // the real exam's domain/objective distribution and question count.
+      for (const obj of domain.objectives) {
+        const qs = questions.filter((q) => q.objective === obj.objective).sort((a, b) => a.id - b.id);
+        qs.forEach((q, i) => sets[i % setCount].push(q));
+      }
+    } else {
+      // Legacy split for banks without practiceSets: thirds per domain.
+      questions.forEach((q, i) => {
+        sets[i % 3].push(q);
+      });
+    }
   }
 
   const exportsDir = join(root, 'exports', certCode);

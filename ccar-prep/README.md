@@ -11,12 +11,12 @@ No backend: React + Vite + Tailwind, all state client-side, attempt history pers
 
 | Code | Name | Content |
 |---|---|---|
-| CCAR-P | Claude Certified Architect – Professional | ✅ complete (200/200 questions, 7/7 study guides) |
-| CCAO-F | Claude Certified Associate – Foundations | ✅ complete (60/60 questions, 7/7 study guides) |
-| CCDV-F | Claude Certified Developer – Foundations | ✅ complete (53/53 questions, 8/8 study guides) |
-| CCAR-F | Claude Certified Architect – Foundations | ✅ complete (60/60 questions, 5/5 study guides) |
+| CCAR-P | Claude Certified Architect – Professional | ✅ complete (200 questions, 7/7 study guides) |
+| CCAO-F | Claude Certified Associate – Foundations | ✅ complete (180 questions = 3 × 60-question exams, 7/7 study guides) |
+| CCDV-F | Claude Certified Developer – Foundations | ✅ complete (159 questions = 3 × 53-question exams, 8/8 study guides) |
+| CCAR-F | Claude Certified Architect – Foundations | ✅ complete (180 questions = 3 × 60-question exams, 5/5 study guides) |
 
-Cert codes are the official Anthropic exam codes. The three Foundations blueprints (domains, weights, objective strings) are transcribed from the official exam guides published on the [Anthropic Partner Academy](https://anthropic-partners.skilljar.com/page/partner-certifications) (v1.0, effective July 2026), and each question bank matches the real exam's item count (CCAO-F 60, CCDV-F 53, CCAR-F 60).
+Cert codes are the official Anthropic exam codes. The three Foundations blueprints (domains, weights, objective strings) are transcribed from the official exam guides published on the [Anthropic Partner Academy](https://anthropic-partners.skilljar.com/page/partner-certifications) (v1.0, effective July 2026). Each Foundations bank holds **3 distinct, non-overlapping practice sets**, each the size and domain/objective distribution of the real exam (CCAO-F 60, CCDV-F 53, CCAR-F 60 questions per set).
 
 Use the cert switcher in the header (or the `/certs` page) to pick a certification. Certs with no content yet still appear in the switcher/picker with a "coming soon" state.
 
@@ -53,7 +53,7 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 
 ```json
 {
-  "cert": { "name": "...", "code": "...", "totalQuestions": 200, "examMinutesPerQuestion": 1.9 },
+  "cert": { "name": "...", "code": "...", "totalQuestions": 200, "examMinutesPerQuestion": 1.9, "practiceSets": 3 },
   "domains": [
     {
       "id": 1,
@@ -68,6 +68,8 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 ```
 
 `idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to `totalQuestions`; each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+
+`totalQuestions`, `questionCount`, and per-objective `questions` always describe **one real exam** (transcribed from the official guide). The optional `practiceSets` (default 1) says how many distinct full exams the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into `practiceSets` non-overlapping CSVs, each matching the official exam's exact size and distribution.
 
 ## Question schema
 
@@ -129,40 +131,46 @@ After adding content: `npm run validate` (or `node scripts/validate-content.mjs 
 
 ### CCAO-F — Claude Certified Associate – Foundations
 
+3 practice sets × 60 questions (bank = 180). Per-domain bank counts (each set gets ⅓):
+
 | Domain | Weight | Questions | Study guide |
 |---|---|---|---|
-| 1. Prompting and Task Execution | 14% | ✅ 8/8 | ✅ done |
-| 2. Output Evaluation and Validation | 21% | ✅ 13/13 | ✅ done |
-| 3. Product and Model Selection | 12% | ✅ 7/7 | ✅ done |
-| 4. Workflow Integration and Solution Design | 16% | ✅ 10/10 | ✅ done |
-| 5. Configuration and Knowledge Management | 12% | ✅ 7/7 | ✅ done |
-| 6. Governance, Risk, and Responsible Use | 15% | ✅ 9/9 | ✅ done |
-| 7. Troubleshooting and Optimization | 10% | ✅ 6/6 | ✅ done |
-| **Total** | 100% | **60/60** | **7/7** |
+| 1. Prompting and Task Execution | 14% | ✅ 24/24 | ✅ done |
+| 2. Output Evaluation and Validation | 21% | ✅ 39/39 | ✅ done |
+| 3. Product and Model Selection | 12% | ✅ 21/21 | ✅ done |
+| 4. Workflow Integration and Solution Design | 16% | ✅ 30/30 | ✅ done |
+| 5. Configuration and Knowledge Management | 12% | ✅ 21/21 | ✅ done |
+| 6. Governance, Risk, and Responsible Use | 15% | ✅ 27/27 | ✅ done |
+| 7. Troubleshooting and Optimization | 10% | ✅ 18/18 | ✅ done |
+| **Total** | 100% | **180/180** | **7/7** |
 
 ### CCDV-F — Claude Certified Developer – Foundations
 
+3 practice sets × 53 questions (bank = 159). Per-domain bank counts (each set gets ⅓):
+
 | Domain | Weight | Questions | Study guide |
 |---|---|---|---|
-| 1. Agents and Workflows | 14.7% | ✅ 8/8 | ✅ done |
-| 2. Applications and Integration | 33.1% | ✅ 17/17 | ✅ done |
-| 3. Claude Code | 3.1% | ✅ 2/2 | ✅ done |
-| 4. Eval, Testing, and Debugging | 2.6% | ✅ 1/1 | ✅ done |
-| 5. Model Selection and Optimization | 16.8% | ✅ 9/9 | ✅ done |
-| 6. Prompt and Context Engineering | 11.0% | ✅ 6/6 | ✅ done |
-| 7. Security and Safety | 8.1% | ✅ 4/4 | ✅ done |
-| 8. Tools and MCPs | 10.6% | ✅ 6/6 | ✅ done |
-| **Total** | 100% | **53/53** | **8/8** |
+| 1. Agents and Workflows | 14.7% | ✅ 24/24 | ✅ done |
+| 2. Applications and Integration | 33.1% | ✅ 51/51 | ✅ done |
+| 3. Claude Code | 3.1% | ✅ 6/6 | ✅ done |
+| 4. Eval, Testing, and Debugging | 2.6% | ✅ 3/3 | ✅ done |
+| 5. Model Selection and Optimization | 16.8% | ✅ 27/27 | ✅ done |
+| 6. Prompt and Context Engineering | 11.0% | ✅ 18/18 | ✅ done |
+| 7. Security and Safety | 8.1% | ✅ 12/12 | ✅ done |
+| 8. Tools and MCPs | 10.6% | ✅ 18/18 | ✅ done |
+| **Total** | 100% | **159/159** | **8/8** |
 
 ### CCAR-F — Claude Certified Architect – Foundations
 
+3 practice sets × 60 questions (bank = 180). Per-domain bank counts (each set gets ⅓):
+
 | Domain | Weight | Questions | Study guide |
 |---|---|---|---|
-| 1. Agentic Architecture & Orchestration | 27% | ✅ 16/16 | ✅ done |
-| 2. Tool Design & MCP Integration | 18% | ✅ 11/11 | ✅ done |
-| 3. Claude Code Configuration & Workflows | 20% | ✅ 12/12 | ✅ done |
-| 4. Prompt Engineering & Structured Output | 20% | ✅ 12/12 | ✅ done |
-| 5. Context Management & Reliability | 15% | ✅ 9/9 | ✅ done |
-| **Total** | 100% | **60/60** | **5/5** |
+| 1. Agentic Architecture & Orchestration | 27% | ✅ 48/48 | ✅ done |
+| 2. Tool Design & MCP Integration | 18% | ✅ 33/33 | ✅ done |
+| 3. Claude Code Configuration & Workflows | 20% | ✅ 36/36 | ✅ done |
+| 4. Prompt Engineering & Structured Output | 20% | ✅ 36/36 | ✅ done |
+| 5. Context Management & Reliability | 15% | ✅ 27/27 | ✅ done |
+| **Total** | 100% | **180/180** | **5/5** |
 
 App shell: ✅ scaffold · ✅ multi-cert switcher & picker · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links

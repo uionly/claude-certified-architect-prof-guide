@@ -3,7 +3,8 @@
     "name": "Claude Certified Developer – Foundations",
     "code": "CCDV-F",
     "totalQuestions": 53,
-    "examMinutesPerQuestion": 2.26
+    "examMinutesPerQuestion": 2.26,
+    "practiceSets": 3
   },
   "domains": [
     {

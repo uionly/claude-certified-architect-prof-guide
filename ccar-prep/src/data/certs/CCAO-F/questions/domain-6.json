@@ -11,7 +11,9 @@
       "Deciding which nursing candidates advance to interviews based on Claude's ranking of their résumés",
       "Producing the official interpretation of new health regulations for the compliance department to adopt without legal review"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Low-stakes internal drafting from the user's own source material, with human review before anything is distributed, is the archetype of an appropriate use case: real time savings, contained consequences, and clear human accountability for the final product.",
       "Tempting because patient-portal automation promises major efficiency, but unreviewed clinical answers put patient safety behind a tool that can produce confident errors. Health guidance to patients requires clinician judgment and accountability — this is a canonical inappropriate use.",
@@ -34,7 +36,10 @@
       "Having Claude decide which flagged transactions to close as false positives so analysts only see the remainder",
       "Generating personalized investment recommendations that relationship managers forward directly to clients"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Summarizing public guidance for internal awareness, with verification by the accountable team before circulation, is squarely within 'internal productivity' — the human check handles the accuracy risk, and no customer-affecting decision is delegated.",
       "Correct. Brainstorming improvements to an internal checklist is low-stakes ideation about the team's own process — a textbook internal productivity use with no customer data or customer-affecting decision involved.",
@@ -57,7 +62,9 @@
       "Auto-rejecting only the bottom quarter instead of the bottom half, keeping a wider margin of safety around the automated cutoff",
       "Avoiding Claude anywhere near the hiring process, including drafting postings, because employment is too sensitive for any AI involvement"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Claude appropriately supports the hiring process — drafting postings, structuring criteria, organizing materials — while consequential decisions about people remain with accountable humans. This keeps the efficiency gains without delegating judgment that carries fairness and legal weight.",
       "Tempting because the instruction sounds like a safeguard, but telling a model to 'be objective' does not remove bias from its judgments, and automated rejection is still a consequential employment decision made without human review. An instruction is not a fairness control.",
@@ -80,7 +87,9 @@
       "Upload the full spreadsheet but begin the chat by instructing Claude to keep the contents confidential and forget them afterward",
       "Analyze the spreadsheet entirely by hand, since protected student data means no part of the task can involve Claude"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Anonymizing or removing protected identifiers before upload is the standard data-sensitivity safeguard: the analytical value — patterns in request types and timing — survives, while the regulated personal details never leave the university's controlled systems.",
       "Tempting because internal purpose feels safe, but the policy restricts sharing protected records regardless of intent — the classification governs the data, not the motive. 'It's internal' is the most common rationalization behind privacy violations.",
@@ -103,7 +112,9 @@
       "In his personal account, but pasting the transaction records a few rows at a time to limit how much data is exposed in any one message",
       "In neither, because fraud-related topics are too sensitive to ever discuss with an AI assistant in any environment"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Regulated customer data belongs in the environment the organization approved, where contractual data-handling terms and governance apply — and even there, data-classification rules determine what may be included. Familiarity with a personal account is not a factor.",
       "Tempting because the deliverable is the same either way, but the account determines the data-handling terms that apply to what he pastes. Putting regulated customer records into a personal consumer account bypasses every agreement the company put in place — the destination matters, not the output.",
@@ -126,7 +137,10 @@
       "Building the workflow quietly in a personal account first, so she has a working demo before anyone in governance can raise objections",
       "Skipping the review because her team will read every summary, and human review of outputs makes governance approval redundant"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Governance starts with knowing what the policy requires of your specific use case — which tools are approved and how the data involved is classified. Checking before building prevents the common failure of discovering a violation after the workflow is embedded.",
       "Correct. A use case touching customer information is exactly what governance review processes exist for. Routing it through review before deployment is the compliant path and typically surfaces data-handling requirements the team would not have identified alone.",
@@ -149,7 +163,9 @@
       "Proceed, but only with contracts from vendors she personally considers unlikely to object to AI-assisted review",
       "Drop the idea permanently, since any use case a policy does not explicitly authorize must be treated as prohibited forever"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When policy is silent on material that is plainly sensitive — contracts with confidentiality clauses — the governance-aligned move is to ask the people who own the policy before acting. This gets a real answer, often gets the policy improved, and keeps her on the right side of obligations she may not fully see.",
       "Tempting because 'not forbidden' reads as 'allowed', but policy silence on an obviously sensitive category is a gap, not a permission. Confidentiality clauses create contractual obligations that exist independently of the AI policy's coverage.",
@@ -172,7 +188,9 @@
       "Discontinuing AI drafting entirely, since sending any AI-assisted text to donors is inherently deceptive regardless of review",
       "Adding a line to each letter stating it was written entirely by hand, to preserve the personal warmth donors expect"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. The ethical core is accountability and honesty: a human reviews and owns each message, and the organization follows its own disclosure standards rather than hiding the practice. Assistance with drafting is ethically sound when responsibility stays human and no one is deceived.",
       "Tempting because it avoids an awkward conversation, but institutional secrecy about how donor communications are produced is itself the ethical problem — it converts a defensible practice into a concealed one and destroys trust if discovered. Concealment is not a substitute for a considered disclosure standard.",
@@ -195,7 +213,9 @@
       "Exclude the non-English comments from the analysis so that translation variability cannot distort the comparison between neighborhoods",
       "Present Claude's summaries directly as the voice of residents, since removing human interpretation eliminates staff bias from the process"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. When AI output influences decisions about communities, the ethical safeguards are representational fairness checks — do quieter and translated voices survive the summarization? — and human accountability for the decision. Bias review plus human ownership is the core of responsible use in public-sector analysis.",
       "Tempting because a certification sounds like assurance, but a model's self-assessment of its own bias is not a reliable signal — it will produce a confident affirmation either way. Verification must come from humans examining the outputs against the inputs, not from the tool grading itself.",
@@ -205,5 +225,458 @@
     "principle": "check outputs for representational bias and keep humans accountable",
     "relatedConcept": "Ethical implications sharpen when AI output shapes decisions about people — fairness review and human ownership are the safeguards.",
     "overallExplanation": "Check outputs for representational bias and keep humans accountable: summaries that shape public decisions must be examined for whose voices they amplify or drop, with the final judgment owned by people."
+  },
+  {
+    "id": 610,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Marguerite, managing editor at a regional newspaper, is deciding where Claude fits in the newsroom's coverage of a storm that is still unfolding tonight. Which of the following is the most appropriate use?",
+    "options": [
+      "Asking Claude for the latest damage figures and casualty counts, since it answers faster than waiting on reporters",
+      "Turning reporters' verified field notes into clean draft copy that editors review before publication",
+      "Generating plausible quotes from local officials to fill gaps until real interviews can be arranged",
+      "Letting Claude post updates to the paper's social accounts automatically overnight so coverage never pauses"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because speed matters tonight, but a language model is not a live news source: its training knowledge has a cutoff, and it cannot know this evening's damage figures. Treating it as one invites confident fabrications about a breaking event.",
+      "Correct. Drafting from verified source material the newsroom already gathered, with editorial review before anything publishes, is the appropriate pattern: Claude accelerates the writing while the facts come from reporters and accountability stays with editors.",
+      "Tempting because stand-in quotes might feel like scaffolding, but fabricating statements attributed to real officials is invented journalism — a firing-offense misuse no workflow benefit can justify, and one that risks publication the moment a draft slips through.",
+      "Tempting because continuous coverage sounds valuable, but unreviewed automatic publication removes the editorial checkpoint entirely during exactly the kind of fast-moving event where errors are most likely and most damaging."
+    ],
+    "principle": "draft from verified material; never treat the model as a live news source",
+    "relatedConcept": "Appropriate newsroom use keeps facts sourced by humans and publication behind editorial review.",
+    "overallExplanation": "Draft from verified material, never treat the model as a source: Claude can turn reporters' confirmed notes into clean copy for editorial review, but it cannot know tonight's facts and must not publish unreviewed."
+  },
+  {
+    "id": 611,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "multi",
+    "question": "Callum, regional manager at a fitness-club chain, is screening ideas his club managers submitted for using Claude. Company policy allows AI for internal productivity work with human review. Which two ideas are appropriate to approve? (Choose two.)",
+    "options": [
+      "Brainstorming member-engagement campaign concepts that the marketing team will evaluate and develop",
+      "Powering a front-desk kiosk that gives members personalized injury-recovery guidance on demand",
+      "Summarizing anonymized member-survey responses into themes for his review before planning changes",
+      "Ranking personal trainers for contract non-renewal based on Claude's reading of their session notes"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. Ideation for internal evaluation is a low-stakes, high-value use: the output is raw material for humans to judge, no member data or member-affecting decision is involved, and review is built into the next step of the process.",
+      "Tempting because self-service guidance scales beautifully, but injury recovery is health advice to individuals — confident errors could cause real physical harm, and no clinician or human reviewer stands between the model and the member. This is a classic inappropriate deployment.",
+      "Correct. Summarizing anonymized feedback into themes for a manager's review is internal productivity work squarely within policy: the data is de-identified, the output informs rather than decides, and Callum remains accountable for what happens next.",
+      "Tempting because it promises objectivity in an awkward decision, but terminating contracts is a consequential judgment about people — delegating it to an AI ranking removes the human accountability and fairness scrutiny such decisions require."
+    ],
+    "principle": "approve internal assistance; reject health advice and decisions about people",
+    "relatedConcept": "Use-case screening separates outputs humans evaluate from outputs that directly affect individuals' health or livelihoods.",
+    "overallExplanation": "Approve internal assistance and reject the rest: brainstorming and anonymized-feedback summarization keep humans deciding, while unreviewed injury guidance and AI-ranked terminations put member safety and livelihoods behind a tool."
+  },
+  {
+    "id": 612,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Ines, project coordinator at a civil-engineering consultancy, is listing tasks Claude could take on for a bridge-inspection project. The firm's deliverables include documents that must carry a licensed engineer's professional judgment. Which task is appropriate for Claude?",
+    "options": [
+      "Producing the final structural-safety assessment that accompanies the firm's permit application",
+      "Answering the city inspector's technical queries directly on behalf of the engineer of record",
+      "Filling gaps in the survey data with plausible estimated measurements so fieldwork can be reduced",
+      "Drafting client status updates and organizing inspection meeting notes for engineer review before they go out"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because Claude writes technical prose fluently, but a structural-safety assessment is a licensed professional judgment with public-safety and legal weight. Producing it with an AI tool substitutes text generation for the engineering accountability the permit exists to require.",
+      "Tempting because it would take routine queries off the engineer's desk, but the inspector's questions are addressed to the engineer of record precisely because their professional answers carry personal license-backed responsibility. Impersonating that judgment is a serious misuse.",
+      "Tempting because estimation sounds like interpolation, but invented measurements in survey data are fabricated evidence in a safety-critical record. No efficiency gain justifies replacing physical measurement with plausible-sounding numbers.",
+      "Correct. Communications support — status updates, organized meeting notes — is exactly where Claude belongs on this project: real time savings on writing work, with the engineer reviewing before anything leaves the firm and all professional judgments still made by licensed humans."
+    ],
+    "principle": "assist the paperwork; never substitute for licensed professional judgment",
+    "relatedConcept": "Outputs that require a license or professional sign-off mark a hard boundary for AI assistance.",
+    "overallExplanation": "Assist the paperwork, never the professional judgment: drafting updates and organizing notes for engineer review is appropriate, while safety assessments, inspector responses, and measurement estimates belong to licensed humans."
+  },
+  {
+    "id": 613,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Paloma, operations lead at a travel agency, uses Claude daily through claude.ai and wants the agency's website to offer customers an AI assistant that answers booking questions around the clock. She has no development background. What is the appropriate way for her to pursue this idea?",
+    "options": [
+      "Draft the requirements and example interactions herself, then escalate the build to developers or architects as a technical implementation",
+      "Share a link to her claude.ai Project so website visitors can open chats with it directly",
+      "Drop the idea, since anything she cannot build alone within claude.ai is out of reach for the agency",
+      "Have agents copy customer questions from the site into Claude by hand and paste the answers back in real time"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A customer-facing assistant embedded in a website is a technical build — the kind of implementation the Associate role scopes out and escalates to Claude Developers and Architects. Her appropriate contribution is what she knows best: requirements, example interactions, and tone standards.",
+      "Tempting because Projects are shareable with collaborators, but a claude.ai Project is a productivity workspace, not a customer-facing product: it offers none of the access control, safeguards, or integration a public booking assistant needs, and exposes her configuration to strangers.",
+      "Tempting because recognizing her limits is half right, but the conclusion is wrong: the boundary of her personal build capability is not the boundary of the organization's options. Recognizing a technical use case and routing it to the right builders is exactly the Associate skill.",
+      "Tempting because it simulates the feature immediately, but a human copy-paste relay is not 'around the clock', scales to nobody, and inserts untrained real-time AI answers into customer conversations without a designed review model. It is a workaround pretending to be a product."
+    ],
+    "principle": "recognize technical builds and escalate them to developers and architects",
+    "relatedConcept": "Associates contribute requirements and use-case definition; customer-facing integrations are built by technical roles.",
+    "overallExplanation": "Recognize the technical build and escalate: a website booking assistant is developer and architect territory, and Paloma's appropriate role is defining the requirements and example interactions they will build against."
+  },
+  {
+    "id": 614,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Viktor, training coordinator at a pharmaceutical company, is proposing Claude use cases for the commercial-training department. The industry's promotional and medical communications are tightly regulated. Which proposal is the most appropriate?",
+    "options": [
+      "Generating new statements about a drug's efficacy for sales representatives to use in physician conversations",
+      "Drafting responses to physicians' clinical questions that are sent out without medical-affairs review",
+      "Turning already-approved training materials into practice quizzes that trainers review before use",
+      "Summarizing adverse-event reports into conclusions submitted to the regulator without specialist review"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because fresh sales language is always in demand, but efficacy claims are among the most regulated statements a pharmaceutical company makes — each must trace to approved evidence and clear medical-legal review. Generating new claims outside that process is a compliance breach waiting to be spoken aloud.",
+      "Tempting because response drafting is a natural strength, but clinical answers to physicians influence patient care and are regulated communications; sending them without medical-affairs review removes the exact control that makes such correspondence defensible.",
+      "Correct. Reformatting content that has already cleared approval into quizzes, with trainer review before use, adds real efficiency while introducing no new claims: the facts are pre-approved, the transformation is format-only, and a human checks the result.",
+      "Tempting because summarization seems mechanical, but adverse-event reporting is a safety-critical regulatory obligation where nuance determines conclusions. Submitting unreviewed AI summaries to a regulator puts pharmacovigilance behind an unaccountable tool."
+    ],
+    "principle": "transform pre-approved content; never generate new regulated claims",
+    "relatedConcept": "In regulated industries, appropriate use reformats approved material — it does not originate claims or bypass mandated review.",
+    "overallExplanation": "Transform pre-approved content rather than generating regulated claims: quizzes built from approved materials with trainer review add value safely, while new efficacy statements, unreviewed clinical answers, and regulator submissions do not."
+  },
+  {
+    "id": 615,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Identify appropriate and inappropriate use cases",
+    "type": "single",
+    "question": "Anouk, HR wellness coordinator at a furniture manufacturer, is planning employee support after a stressful restructuring announcement. Budget is tight, and a colleague suggests Claude could take on some of the wellbeing workload. Which use is appropriate?",
+    "options": [
+      "Offering employees Claude chats as a substitute for the counseling sessions the company currently pays for",
+      "Drafting a clearly organized guide to the company's support options and resources, which HR reviews before sharing",
+      "Analyzing employees' private messages on the company chat platform to flag individuals who seem distressed",
+      "Letting Claude decide which employees' submitted concerns warrant HR follow-up, so the small team only sees the urgent ones"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because it stretches the budget, but employees in distress need qualified human support — substituting an AI chat for professional counseling puts wellbeing during a crisis behind a tool that cannot carry clinical responsibility and signals the company has withdrawn real care.",
+      "Correct. Producing a clear, well-organized resource guide is classic appropriate use: low-stakes drafting from known information, reviewed by HR before distribution, that makes it easier for employees to reach the humans and services that actually help.",
+      "Tempting because early detection sounds caring, but covertly analyzing private messages is surveillance — a serious privacy violation that destroys the trust a wellness program depends on, regardless of the benevolent intent behind it.",
+      "Tempting because triage would relieve the small team, but deciding whose concerns merit follow-up is a consequential judgment about people at a vulnerable moment. An employee wrongly filtered out by the tool is precisely the failure the process cannot afford."
+    ],
+    "principle": "AI supports the logistics of care; humans provide the care",
+    "relatedConcept": "Wellbeing, counseling, and triage of people's concerns stay with qualified humans — Claude helps with the documents around them.",
+    "overallExplanation": "AI supports the logistics of care while humans provide the care: a reviewed resource guide is appropriate, but counseling substitution, message surveillance, and AI triage of employee concerns are not."
+  },
+  {
+    "id": 616,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "single",
+    "question": "Ruben, loyalty-program analyst at an airline, wants Claude's help analyzing redemption trends. The raw export contains member names, passport numbers, contact details, and complete travel histories — but the trend analysis needs only redemption dates, reward types, and tier levels. What should he upload?",
+    "options": [
+      "Only the columns the analysis requires, with the identifying fields left out of the export entirely",
+      "The full export, since loyalty data is not regulated the way medical or financial records are",
+      "The full export, with an instruction telling Claude to disregard the identifying columns during analysis",
+      "The full export, deleting the chat afterward so the exposure is undone once the analysis is complete"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Data minimization is the operative principle: share only what the task needs. The trend analysis runs entirely on dates, reward types, and tiers, so names, passport numbers, and travel histories should never leave the airline's controlled systems at all.",
+      "Tempting because loyalty data feels mundane, but passport numbers and complete travel histories are regulated personal data under privacy law in most jurisdictions — and sensitivity is judged by the data itself, not by the casual feel of the program it came from.",
+      "Tempting because the instruction names the right intent, but the exposure happens at upload: the identifying fields have already left controlled systems whether or not Claude references them. A processing instruction is not a data-protection control.",
+      "Tempting because cleanup feels like reversal, but deletion afterward does not undo the disclosure that already occurred — the data was shared outside its controls for the duration. Privacy protection works by preventing exposure, not by tidying up after it."
+    ],
+    "principle": "share the minimum data the task requires",
+    "relatedConcept": "Data minimization asks what the analysis needs, not what the export happens to contain.",
+    "overallExplanation": "Share the minimum the task requires: the trend analysis needs dates, types, and tiers, so the identifying columns stay out of the upload — instructions to ignore them and after-the-fact deletion do not prevent the exposure."
+  },
+  {
+    "id": 617,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "single",
+    "question": "Sylvie, account manager at a PR agency, wants Claude's help planning launch messaging for a client's unreleased product. The materials are covered by a nondisclosure agreement between the agency and the client. The agency's own AI policy permits Claude for internal work. What should she do before uploading anything?",
+    "options": [
+      "Proceed, since work performed on the client's behalf counts as the internal agency use the policy permits",
+      "Proceed after replacing the product's name with a codename throughout the uploaded materials",
+      "Check what the client agreement allows and obtain the client's approval, following agency policy, before putting NDA-covered material into any tool",
+      "Use her personal Claude account instead, so the client's material never touches the agency's systems"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because the drafting is internal work, but the material is not the agency's to classify: the NDA is a contractual promise to the client about how their confidential information is handled, and the agency's internal AI permission cannot override an obligation owed to someone else.",
+      "Tempting because a codename feels like anonymization, but the confidential substance — features, positioning, launch timing — is the launch material, not the name. Masking one label while uploading everything the NDA protects satisfies nothing.",
+      "Correct. Third-party confidential data answers to the contract that governs it: the right sequence is checking what the NDA permits and getting the client's approval, alongside the agency's own policy. That protects the client relationship and often surfaces an approved path forward.",
+      "Tempting because it feels like separation, but it is exactly backwards: a personal consumer account has none of the agency's contractual or governance protections, so it moves the client's confidential material to the least controlled environment available."
+    ],
+    "principle": "third-party confidential data answers to the client's agreement, not your convenience",
+    "relatedConcept": "NDAs create obligations that internal AI policies cannot waive — check the contract and get consent first.",
+    "overallExplanation": "Third-party confidential data answers to the client's agreement: NDA-covered launch material goes into a tool only after checking what the contract allows and getting the client's approval, whatever the agency's internal policy permits."
+  },
+  {
+    "id": 618,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "multi",
+    "question": "Agnes, HR analyst at a supermarket chain operating under strict data-protection law, wants Claude to identify themes in an employee-engagement survey. The free-text comments include mentions of health conditions and descriptions of incidents that could identify individuals. Which two steps should she take before the analysis? (Choose two.)",
+    "options": [
+      "Treat the dataset as anonymous, since the survey never asked respondents for their names",
+      "Redact identifying details and sensitive personal references from the free-text comments before analysis",
+      "Include everything as-is, since employees consented to data use when they submitted the survey",
+      "Confirm the workspace she plans to use is approved for employee personal data under the company's data-protection obligations"
+    ],
+    "correct": [
+      1,
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because no name field feels like anonymity, but free text re-identifies people constantly — 'the incident on the night shift in the Malmö bakery' points to one person. Anonymity is a property of the content, not of which fields the form collected.",
+      "Correct. Redacting identifying details and sensitive references — health conditions especially, which most data-protection regimes treat as a special category — lets the theme analysis proceed on what it actually needs while the protected elements stay inside controlled systems.",
+      "Tempting because consent was given, but it was consent to an engagement survey, not to processing in whatever external tool HR later chooses — and health-related data typically carries protections consent-at-submission does not waive. Purpose matters as much as permission.",
+      "Correct. Where the analysis runs is itself a compliance decision: employee personal data may only go into environments the organization has approved under its data-protection obligations. Checking the workspace's status before upload is the input-side control that policy requires."
+    ],
+    "principle": "sanitize free text and verify the environment before uploading employee data",
+    "relatedConcept": "Free-text responses can identify people even in 'anonymous' surveys, and health mentions raise the protection tier.",
+    "overallExplanation": "Sanitize the free text and verify the environment: redaction removes identifying and health-related details the analysis does not need, and confirming the workspace is approved for employee data satisfies the input-side compliance check."
+  },
+  {
+    "id": 619,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+    "type": "single",
+    "question": "Matteo, billing specialist at a waste-management company, learns that a teammate accidentally pasted a file of customers' bank-account details into a Claude chat, against company policy. The teammate deleted the chat and asked Matteo to forget it happened. What should Matteo do?",
+    "options": [
+      "Agree that deleting the chat resolved the matter, since the data is no longer visible to anyone",
+      "Handle it privately by warning the teammate to be more careful and never repeat the mistake",
+      "Wait to see whether any customer complains before deciding if the incident needs to be raised",
+      "Report the incident through the company's privacy or incident process so it can be assessed and handled properly"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because deletion feels like reversal, but the disclosure already happened — regulated financial data left controlled systems in violation of policy, and hiding the trail does not undo the event or the obligations it may trigger. Deletion is cleanup, not resolution.",
+      "Tempting because a quiet word feels proportionate and kind, but privacy incidents are not interpersonal matters: the company may have regulatory notification duties and risk assessments that only its privacy function can perform, and a private warning ensures none of that happens.",
+      "Tempting because no harm may materialize, but incident obligations are triggered by the exposure, not by customer complaints — and notification windows under data-protection rules are typically short. Waiting converts an honest mistake into a concealed breach.",
+      "Correct. Data incidents go to the people equipped to handle them: reporting through the privacy or incident channel lets the company assess the exposure, meet any regulatory duties, and fix the gap that allowed it — which protects the teammate too, since prompt honest reporting beats discovered concealment."
+    ],
+    "principle": "data incidents get reported, not quietly buried",
+    "relatedConcept": "Privacy compliance includes incident response — exposure triggers obligations that deletion and silence cannot satisfy.",
+    "overallExplanation": "Data incidents get reported: pasting customer bank details into a chat is an exposure the privacy team must assess for regulatory duties and fixes, and quiet deletion converts a mistake into concealment."
+  },
+  {
+    "id": 620,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "single",
+    "question": "Greta, content specialist at a sporting-goods retailer, loves a feature in a consumer AI app she uses at home. Company policy designates the enterprise Claude workspace as the approved tool for work involving company content. She is tempted to run product-copy drafts through the consumer app anyway. What should she do?",
+    "options": [
+      "Use the consumer app only for short snippets, since brief excerpts of company content carry no real exposure",
+      "Do company work in the approved workspace, and propose the other tool for evaluation through the governance channel",
+      "Use the consumer app under her personal email address so the activity is not linked to the company",
+      "Run both tools in parallel on each task and simply keep whichever output is better"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because small excerpts feel harmless, but the policy line is the tool, not the word count — unreleased product copy in an unapproved consumer app is outside the company's data-handling terms whether it is a paragraph or a page. Materiality judgments belong to governance, not convenience.",
+      "Correct. Following governance means working within the approved-tool boundary while using the legitimate path to change it: proposing the app for evaluation lets the organization weigh the feature against its data-handling terms, and she loses nothing but the shortcut.",
+      "Tempting because unlinking sounds discreet, but deliberately obscuring policy-violating activity is worse than the violation itself — it is shadow AI with intent. The company's content is equally exposed regardless of which account uploaded it.",
+      "Tempting because comparison sounds rigorous, but 'run both' still sends company content through the unapproved tool on every task — the maximum version of the violation dressed up as quality control."
+    ],
+    "principle": "work inside the approved-tool boundary and change it through the proper channel",
+    "relatedConcept": "Approved-tool lists are governance controls — the remedy for a missing feature is a proposal, not a workaround.",
+    "overallExplanation": "Work inside the approved-tool boundary: company content stays in the enterprise workspace, and the consumer app's appealing feature becomes a proposal for governance to evaluate rather than a private exception."
+  },
+  {
+    "id": 621,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "single",
+    "question": "Idris, bid manager at a facilities-services company, learns the updated AI policy now requires all AI-assisted client deliverables to be recorded in a register and to follow a new disclosure standard. His team's proposal workflow predates the rule, and teammates argue that established workflows are grandfathered. How should Idris respond?",
+    "options": [
+      "Apply the new requirements to the existing workflow, updating the team's process and templates to build them in",
+      "Continue unchanged, since the workflow was fully compliant with the policy that existed when it was created",
+      "Apply the register requirement to new client accounts only, treating long-running accounts as exempt",
+      "Stop using Claude on bids altogether, since the administrative burden now outweighs the benefit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Policy updates apply to ongoing practice, not just to workflows created after the ink dries. Folding the register and disclosure standard into the team's templates makes compliance the default path rather than a per-bid memory test.",
+      "Tempting because the workflow was compliant once, but policies govern current conduct — 'grandfathered' is the team's invention, not a provision of the policy. Each new AI-assisted deliverable sent tomorrow falls under the rules in force tomorrow.",
+      "Tempting as a compromise, but the policy draws no line between new and long-running accounts; deliverables to established clients are exactly as covered. Partial adoption on self-invented criteria is still non-compliance, just with better paperwork.",
+      "Tempting if the register feels burdensome, but abandoning a productive workflow to dodge a recording requirement forfeits real value over minutes of administration. Compliance is a cost of the benefit, not a reason to surrender it."
+    ],
+    "principle": "policy updates apply to existing workflows, not just new ones",
+    "relatedConcept": "Following governance standards means keeping current with policy changes and retrofitting established practice to meet them.",
+    "overallExplanation": "Policy updates apply to existing workflows: the register and disclosure standard govern every AI-assisted deliverable from now on, so the team's templates should build the new requirements in rather than claiming a grandfather clause."
+  },
+  {
+    "id": 622,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "single",
+    "question": "Camille, investor-relations associate at a publicly listed agribusiness, believes Claude could dramatically improve the drafting of the quarterly earnings narrative. Company policy prohibits placing unpublished financial results in any AI tool. She thinks the prohibition may be outdated now that an enterprise workspace exists. What should she do?",
+    "options": [
+      "Split the figures across many separate chats so that no single conversation contains material results",
+      "Proceed in the enterprise workspace, reasoning that an approved environment surely satisfies the intent of the rule",
+      "Raise the use case with the policy owner and request a formal exception or updated ruling before proceeding",
+      "Alter the numbers slightly so they are no longer the real results, then correct them by hand after drafting"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because fragmentation feels like it dilutes exposure, but the prohibition covers the data, not the per-chat dose — every fragment is still unpublished financial information in an AI tool. Structuring activity to slip under a rule is evasion, and it reads that way in any review.",
+      "Tempting because her reasoning about intent may even be right, but employees do not get to overrule explicit prohibitions with their own interpretation. If the enterprise workspace genuinely satisfies the rule's purpose, the policy owner can say so — and only they can.",
+      "Correct. An explicit prohibition with a possibly outdated rationale is a question for the people who own the policy: requesting an exception or updated ruling gets a real decision, may modernize the rule for everyone, and keeps her conduct clean around data where securities rules make missteps severe.",
+      "Tempting because fake numbers technically avoid the prohibition, but near-real stand-in results for a listed company are still market-sensitive in shape, and the hand-correction step invites exactly the transcription errors an earnings document cannot survive. It is a hack, not a compliance path."
+    ],
+    "principle": "explicit prohibitions are changed by their owners, not reinterpreted by users",
+    "relatedConcept": "When a rule seems outdated, the governance-aligned move is an exception request — never a structural workaround.",
+    "overallExplanation": "Explicit prohibitions are changed by their owners: the earnings use case goes to the policy owner as an exception request, not around the rule via chat-splitting, self-approved intent readings, or doctored numbers."
+  },
+  {
+    "id": 623,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Follow organizational AI policies and governance standards",
+    "type": "multi",
+    "question": "Solveig, customer-care manager at a home-appliance manufacturer, is rolling Claude out to her twelve-person team for drafting responses and summarizing case histories. The company has an AI policy that includes a use-case registration requirement. Which two actions align with governance standards for the rollout? (Choose two.)",
+    "options": [
+      "Brief the team on the AI policy and its acceptable-use boundaries as part of the rollout training",
+      "Let each team member develop their own working rules, since autonomy is what drives tool adoption",
+      "Register the use case with the governance team, as the policy requires, before the team goes live",
+      "Defer the governance steps until an incident demonstrates that they are actually necessary"
+    ],
+    "correct": [
+      0,
+      2
+    ],
+    "optionExplanations": [
+      "Correct. A rollout is a multiplication of policy exposure: twelve people making daily judgment calls about customer data need to know where the lines are. Building the policy into training makes acceptable use the default rather than a document nobody opened.",
+      "Tempting because autonomy does help adoption, but twelve private rulebooks mean twelve different interpretations of what may be pasted into a chat about a customer's case. Freedom in how to prompt is healthy; freedom in what data handling means is a governance failure.",
+      "Correct. The registration requirement is not optional paperwork — it is how the organization tracks where AI touches customer data and applies the right reviews. Registering before launch is the compliant sequence and typically surfaces requirements the team would otherwise discover mid-incident.",
+      "Tempting because the steps feel bureaucratic before anything has gone wrong, but governance exists precisely to prevent the first incident, not to be justified by it. Deferring known requirements is a deliberate policy violation with a timestamp."
+    ],
+    "principle": "train the team on policy and register the use case before launch",
+    "relatedConcept": "Team rollouts multiply governance exposure — onboarding covers the policy, and required registrations happen before go-live.",
+    "overallExplanation": "Train on policy and register before launch: briefing the team builds acceptable use into daily habits, and registering the use case fulfills the requirement that lets governance apply the right controls from day one."
+  },
+  {
+    "id": 624,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Yara, insights lead at a fashion retailer, asked Claude to draft customer personas for the coming season. The drafts lean hard on demographic stereotypes — assigning bargain-hunting to older women and tech-driven impulse buying to young men — in ways her research does not support. What is the right way to handle these outputs?",
+    "options": [
+      "Use the personas as-is, since AI output reflects genuine patterns in real-world customer behavior",
+      "Treat the drafts as biased raw material: check them against actual customer research, revise the stereotyped elements, and own the result",
+      "Ask Claude to confirm that the personas are free of bias and proceed once it does so",
+      "Abandon AI assistance for audience work entirely, since stereotyping cannot be reviewed out of a draft"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Tempting because 'the data made it so' feels objective, but generative outputs reproduce patterns in training text, which encode social stereotypes as readily as facts — and her own research contradicts these. Treating fluent stereotype as market truth launders bias into strategy.",
+      "Correct. The ethical practice is critical review with human ownership: the drafts are starting material to be tested against real research, the stereotyped shortcuts revised, and the final personas something Yara stands behind. Bias in, judgment applied, accountable output.",
+      "Tempting because a bias check sounds diligent, but the model affirming its own neutrality is not evidence of anything — it will produce a confident yes either way. Bias detection requires humans comparing outputs to real data, not the tool grading itself.",
+      "Tempting because the drafts were genuinely bad, but the premise is false: stereotyped elements are exactly the kind of flaw review catches and revision fixes, as her own spotting of them proves. Abandoning the tool forfeits value the review process already secured."
+    ],
+    "principle": "AI drafts inherit societal bias; review against real evidence and own the result",
+    "relatedConcept": "Generated content about groups of people needs bias review against actual research before it shapes decisions.",
+    "overallExplanation": "AI drafts inherit societal bias: personas that stereotype by age and gender get checked against real customer research and revised under human ownership — neither shipped as objective truth nor used to write off the tool."
+  },
+  {
+    "id": 625,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Bram, marketing associate at a home-fitness equipment startup, is told by his manager to use Claude to write two dozen enthusiastic customer reviews and post them on retailer sites under invented names. The manager notes that competitors 'obviously do it too.' What should Bram do?",
+    "options": [
+      "Write them, keeping every claim factually accurate about the product so the reviews are not really deceptive",
+      "Write them, but post from obviously generic names so attentive readers can infer they are promotional",
+      "Have a human edit each review before posting, since human review is what resolves ethical concerns about AI content",
+      "Decline, explain that fabricated reviews are deceptive regardless of the tool used, and propose gathering genuine customer reviews instead"
+    ],
+    "correct": [
+      3
+    ],
+    "optionExplanations": [
+      "Tempting because factual accuracy feels like honesty, but the deception is the existence of the reviews, not their content: they impersonate customers who do not exist. Accurate claims delivered through fabricated endorsers still deceive — and fake reviews violate consumer-protection rules and platform terms.",
+      "Tempting because it gestures at disclosure, but a hint that attentive readers might catch is not transparency — the reviews work precisely on everyone who does not catch it. Deception with a wink is still deception.",
+      "Tempting because human review genuinely is the standard safeguard for AI content, but review addresses quality and accuracy — it cannot repair an output whose purpose is to deceive. Polishing fake testimonials makes them more effective, not more ethical.",
+      "Correct. The ethical line is the fabrication itself: AI does not launder deception, and 'competitors do it' does not either. Declining, naming the problem, and offering the legitimate alternative — soliciting real customers for real reviews, which Claude can help draft outreach for — is the right response."
+    ],
+    "principle": "AI does not launder deception — fabricated endorsements are unethical whatever writes them",
+    "relatedConcept": "Ethical judgment attaches to the purpose of the content; a tool that makes deception cheaper does not make it acceptable.",
+    "overallExplanation": "AI does not launder deception: fake reviews under invented names deceive regardless of factual accuracy, subtle hints, or editing passes, and the ethical move is declining and proposing genuine customer reviews instead."
+  },
+  {
+    "id": 626,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Noor, team lead at a market-research agency, notices her analysts have begun pasting Claude outputs into client deliverables essentially verbatim. Two subtle errors reached clients last month, and she senses the team's own analytical judgment is getting rusty. What is the most responsible way to address this?",
+    "options": [
+      "Re-establish working norms: analysts verify claims, apply their own judgment, and take personal ownership of everything that ships",
+      "Ban Claude from the deliverable workflow so the analysts are forced to rebuild their skills from scratch",
+      "Accept the situation, since the efficiency gains across the team clearly outweigh two small errors",
+      "Add a project instruction requiring Claude to be accurate, making analyst-side verification unnecessary"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The ethical issue is eroding human accountability: outputs shipped without engaged judgment mean nobody truly stands behind the work. Restoring verification and ownership norms keeps the efficiency of AI drafting while ensuring a person remains answerable for every claim a client receives.",
+      "Tempting because a ban would force engagement, but it treats the tool as the problem when the problem is the practice around it. Prohibition sacrifices legitimate productivity and dodges the actual leadership task: defining how responsible use works on her team.",
+      "Tempting because the trade sounds pragmatic, but errors reaching clients are a symptom of absent review — and unexamined outputs mean the next error could be large. Normalizing unverified work quietly transfers the cost of mistakes to clients who trusted the agency's judgment.",
+      "Tempting because it feels like fixing the source, but instructions cannot make a model reliably accurate, and treating them as a substitute for verification institutionalizes the exact abdication causing the errors. The control that failed was human, and only humans can restore it."
+    ],
+    "principle": "overreliance erodes accountability — keep human judgment engaged on everything that ships",
+    "relatedConcept": "The ethics of AI-assisted work rest on humans staying critically engaged rather than becoming a pass-through.",
+    "overallExplanation": "Overreliance erodes accountability: the fix is restored norms of verification and personal ownership of shipped work — not banning the tool, accepting silent errors, or pretending an instruction can replace human judgment."
+  },
+  {
+    "id": 627,
+    "domain": "Governance, Risk, and Responsible Use",
+    "objective": "Understand the ethical implications of AI usage",
+    "type": "single",
+    "question": "Emeka, senior consultant at an economics advisory firm, discovers that a market-sizing report his team sent to a client contains a significant error that originated in AI-assisted analysis and survived review. A colleague suggests telling the client 'the AI made a mistake' to soften the reputational damage. How should the firm respond?",
+    "options": [
+      "Attribute the error to the AI tool as suggested, since that is factually where the mistake originated",
+      "Correct the figure quietly in the next scheduled report to avoid drawing the client's attention to the error",
+      "Own the error as the firm's, correct it with the client promptly, and strengthen the verification step that let it through",
+      "Discontinue AI assistance in client work, since responsibility cannot be clearly assigned when a tool is involved"
+    ],
+    "correct": [
+      2
+    ],
+    "optionExplanations": [
+      "Tempting because the origin story is technically true, but the client bought the firm's professional judgment, and the firm chose the tool, ran the process, and signed the report. Blaming the AI is an attempt to outsource accountability to something that cannot hold it — which deepens the trust problem rather than softening it.",
+      "Tempting because it avoids an awkward conversation, but the client is currently relying on a number the firm knows is wrong, possibly in live decisions. Quiet correction later converts an honest error into a period of knowing concealment — a far worse ethical position.",
+      "Correct. Accountability for AI-assisted work stays with the humans and organization that produced it: prompt, honest correction protects the client's decisions, and fixing the review step addresses the actual failure — a verification process that let the error through.",
+      "Tempting because it feels like decisive accountability, but the premise is false: responsibility was never unclear — it is the firm's, tool or no tool. Abandoning a productive capability misdiagnoses a process failure as an attribution puzzle."
+    ],
+    "principle": "accountability for AI-assisted work stays with the people who ship it",
+    "relatedConcept": "A tool cannot hold responsibility — errors are owned, disclosed, and fixed by the humans whose name is on the work.",
+    "overallExplanation": "Accountability stays with the people who ship the work: the firm owns the error, corrects it with the client promptly, and fixes the verification gap — because 'the AI made a mistake' is an excuse, not an accountability structure."
   }
 ]

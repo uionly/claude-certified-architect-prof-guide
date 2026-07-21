@@ -11,7 +11,9 @@
       "Cap the reviewer at a maximum of three findings per pull request so it is forced to surface only the issues it considers most important",
       "Ask the model to review each file twice and report only the findings that appear in both passes, filtering out unstable low-confidence output"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Explicit categorical criteria — report bugs and security issues, skip minor style and local patterns — give the model a decision rule it can actually apply. General instructions like 'be conservative' fail to improve precision because they never define what conservative means for this review.",
       "Tempting because it operationalizes 'high confidence', but self-reported confidence scores are poorly calibrated — the model is confident in many of its false positives. This doubles down on confidence-based filtering, the very approach that already failed.",
@@ -34,7 +36,9 @@
       "Reduce the reviewer to security findings only, since that is the highest-stakes category and the one where accuracy matters most",
       "Lower the model temperature for the performance category so its findings become more deterministic and less speculative across runs"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. High false-positive categories undermine developer confidence in the accurate categories, so the proportionate move is disabling the offender temporarily while its criteria are improved. Trust in security and correctness recovers immediately, and performance returns once it earns its place.",
       "Tempting because it preserves coverage and sets expectations, but developers triaging a noisy stream do not parse disclaimers — the 70% noise still trains them to dismiss the tool. Labeling bad findings does not stop them from eroding trust in good ones.",
@@ -57,7 +61,10 @@
       "Add fifty or more examples covering every code pattern in the repository so the model can match each new finding against a known case",
       "Add an instruction telling the model to strictly imitate the format of its own first finding in each review for the rest of that review's output"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. Few-shot examples demonstrating the specific desired output format (location, issue, severity, suggested fix) are the most effective technique for achieving consistently formatted, actionable output when detailed instructions alone produce inconsistent results.",
       "Correct. Examples distinguishing acceptable code patterns from genuine issues — with the reasoning for the judgment — reduce false positives while letting the model generalize that judgment to novel patterns rather than matching only pre-specified cases.",
@@ -80,7 +87,9 @@
       "Split the pipeline so narrative contracts are first rewritten into a standardized structured format before any extraction is attempted",
       "Raise the extraction temperature so the model searches the document more creatively when fields are not found in their expected locations"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Few-shot examples demonstrating correct extraction from documents with varied structures — narrative prose versus structured schedules — are the established fix for empty or null extraction of fields that are actually present. The examples show the model where and how information appears in each format.",
       "Tempting because it targets the symptom directly, but mandating populated fields when the model has not located the information invites fabrication — the model satisfies the instruction by inventing values. It converts silent misses into confident errors.",
@@ -103,7 +112,9 @@
       "Force tool_choice to {\"type\": \"tool\", \"name\": \"extract_invoice\"} since invoices are the most common document type in the pipeline",
       "Keep tool_choice unset and add a system prompt instruction requiring the model to always respond with a tool call rather than text"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. tool_choice: \"any\" guarantees the model calls a tool rather than returning conversational text, while preserving its ability to select which extraction schema matches the document — exactly the requirement when multiple schemas exist and the document type is unknown.",
       "Tempting because \"auto\" does let the model consider all tools, but it also permits a plain text response — which is precisely the 8% failure mode being observed. \"auto\" is the current effective behavior, not the fix.",
@@ -126,7 +137,9 @@
       "Enable strict schema validation on the tool definition so any response containing fabricated or malformed field values is rejected automatically",
       "Split extraction into two tool calls, one for fields that are always present and a second call for the fields that are sometimes missing"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Required fields force the model to produce a value even when the source contains none, and fabrication is how it satisfies the schema. Designing fields as optional and nullable when documents may lack the information gives the model a truthful output path — null — and removes the incentive to invent.",
       "Tempting because the instruction states the right policy, but the schema still demands a value the model does not have, so the structural pressure to fabricate remains and prompt compliance is probabilistic. The constraint and the instruction are in direct conflict, and the schema wins.",
@@ -149,7 +162,9 @@
       "Replace the Pydantic layer with strict JSON schema enforcement on the tool definition so invalid extractions cannot be produced in the first place",
       "Route every extraction that fails validation directly to a human review queue, since a failed first attempt indicates the document is too hard for the model"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Retry-with-error-feedback appends the specific validation errors — along with the document and the failed extraction — so the model knows exactly what to fix. Semantic errors like sums that do not reconcile or swapped fields are precisely the class this feedback loop corrects.",
       "Tempting because different sampling might land on a valid arrangement, but it is retrying blind — the model still does not know what was wrong, so success is luck and errors may even worsen. Feedback, not randomness, is what converts a retry into a correction.",
@@ -172,7 +187,9 @@
       "The validation rule is too strict for this field; relax it to accept any alphanumeric string so these documents stop failing the validation stage",
       "The model is underpowered for invoice extraction; move the failing 30% of documents to a more capable model tier and keep the retry loop unchanged"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Retry-with-error-feedback fixes format and structural errors, but it is ineffective when the required information simply is not in the provided source. The remedy is upstream: provide the document that contains the PO number, or make the field nullable so absence is represented truthfully.",
       "Tempting because richer feedback usually helps retries, but no prompt refinement can extract a value that does not exist in the input. Pattern examples would at best teach the model to fabricate plausible-looking PO numbers — a worse failure than a validation error.",
@@ -195,7 +212,10 @@
       "Both workloads can move to the Batches API because batches usually complete quickly enough that developers will rarely notice pre-merge delay",
       "The nightly job's agentic test-generation loop can run inside a single batch request since the Batches API executes tool calls between turns"
     ],
-    "correct": [0, 1],
+    "correct": [
+      0,
+      1
+    ],
     "optionExplanations": [
       "Correct. The Batches API trades latency for a 50% cost saving with a processing window of up to 24 hours and no latency SLA — ideal for latency-tolerant overnight analysis, unacceptable for a blocking pre-merge gate where developers wait.",
       "Correct. custom_id fields correlate batch requests with responses, so failures are identified individually and only failed items are resubmitted — with modifications such as chunking oversized documents — instead of paying to rerun everything.",
@@ -218,7 +238,9 @@
       "Split the corpus into 50 smaller sequential batches so that any prompt problem is contained to the batch in which it is first observed",
       "Run the entire corpus through the synchronous API instead, since interactive calls make it easier to inspect and correct extractions as they stream back"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Refining the prompt on a sample set before batch-processing large volumes maximizes first-pass success and avoids paying for iterative resubmission of a quarter-million documents. Sample-scale iteration is cheap and fast; corpus-scale iteration is neither.",
       "Tempting because the first run does produce evaluation data, but it is the most expensive evaluation imaginable — thousands of dollars and a day per iteration, with every prompt defect replicated 250,000 times before anyone sees it.",
@@ -241,7 +263,9 @@
       "Rewrite the self-review prompt to demand the model adopt an adversarial mindset and assume its own code contains at least three defects",
       "Have the same session review the code three times consecutively and merge only when all three reviews return no new findings"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. A model reviewing in its generation session retains the reasoning that produced the code, making it unlikely to question its own decisions. An independent instance without that context evaluates the code on its merits and catches the subtle issues self-review rationalizes away.",
       "Tempting because more deliberation sounds like deeper review, but extended thinking extends reasoning that starts from the same generation context — the model thinks longer inside the same blind spot. Independent instances outperform both self-review instructions and extended thinking here.",
@@ -264,7 +288,9 @@
       "Run the single-pass review three times and post only findings that appear in at least two runs, filtering out the unstable feedback",
       "Enforce a repository policy capping pull requests at five files so the existing single-pass reviewer always operates within its effective range"
     ],
-    "correct": [0],
+    "correct": [
+      0
+    ],
     "optionExplanations": [
       "Correct. Splitting a large review into per-file local passes plus a separate cross-file integration pass addresses attention dilution directly: each file gets consistent depth, contradictory judgments disappear, and the integration pass still catches cross-file data-flow issues.",
       "Tempting because 18 files sounds like a capacity problem, but the files already fit in context — the failure is attention quality across many files in one pass, which a larger window does not improve. Bigger context changes what fits, not how evenly it is analyzed.",
@@ -274,5 +300,609 @@
     "principle": "split large reviews: per-file passes for local issues, an integration pass for cross-file flow",
     "relatedConcept": "Multi-pass architectures counter attention dilution that single-pass review suffers on large changesets.",
     "overallExplanation": "Split large reviews into per-file passes plus a cross-file integration pass. Attention dilution — not context capacity — is what makes single-pass review erratic on large changesets."
+  },
+  {
+    "id": 413,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+    "type": "single",
+    "question": "A CI code reviewer at a payments company labels findings with severity, but classification is erratic: an unvalidated-input bug is 'critical' in one pull request and 'minor' in a nearly identical one a week later, so teams cannot build triage automation on the labels. What prompt change most directly produces consistent severity classification?",
+    "options": [
+      "Define explicit severity criteria in the prompt with concrete code examples illustrating what qualifies for each severity level",
+      "Require the model to output a written justification for each severity rating so inconsistent classifications can be audited afterwards",
+      "Run the severity classification three times per finding and assign the median severity to smooth out run-to-run variation",
+      "Derive severity automatically from the finding's category, mapping every security finding to critical and every style finding to minor"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Consistent classification comes from defining explicit severity criteria with concrete code examples for each level, giving the model an anchored rubric to apply instead of an unstated internal scale that drifts between runs and pull requests.",
+      "Tempting because justifications aid auditing, but they document the inconsistency rather than prevent it — the model still classifies against an undefined scale, and each rationale will sound plausible for whichever label it happened to choose.",
+      "Tempting because aggregation smooths sampling noise, but the variance here comes from missing criteria, not randomness alone — the median of three unanchored ratings is still unanchored, and the approach triples cost while leaving the rubric undefined.",
+      "Tempting because category mapping is deterministic, but it discards genuine severity judgment: an SQL injection and a verbose debug log are both security-adjacent yet differ enormously in impact. Fixed mappings trade one inconsistency for systematic misclassification."
+    ],
+    "principle": "anchor severity levels with explicit criteria and concrete examples",
+    "relatedConcept": "Consistent classification requires a rubric in the prompt — defined criteria plus example code for each severity level.",
+    "overallExplanation": "Explicit severity criteria with concrete code examples for each level are what make classification consistent. Justifications, voting, and fixed category mappings all leave the underlying rubric undefined."
+  },
+  {
+    "id": 414,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+    "type": "single",
+    "question": "A documentation-quality bot reviews pull requests with the instruction 'check that comments are accurate'. It now flags comments that are merely terse, informal, or missing implementation detail, and developers are drowning in notices about comments that are not actually wrong. Which revised instruction best restores precision?",
+    "options": [
+      "Flag a comment only when its claimed behavior contradicts the actual behavior of the code it describes",
+      "Flag comments conservatively and report only those you are highly confident are problematic",
+      "Flag a comment only when it is shorter than the function it documents, since terse comments are the main complaint source",
+      "Flag comments in two passes and report only the ones flagged in both, filtering out unstable judgments"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This replaces a vague quality judgment with a precise, checkable criterion: a contradiction between claimed and actual behavior. Terse or informal comments no longer qualify, which removes exactly the class of false positives flooding developers.",
+      "Tempting because it aims directly at precision, but 'be conservative' and 'high confidence' give the model no definition of what a problematic comment is — the canonical example of a vague instruction that fails to improve precision over specific criteria.",
+      "Tempting because it is at least concrete, but comment length has no relationship to accuracy — a one-line comment can be perfectly correct and a long one can contradict the code. It swaps a vague criterion for a specific but wrong one.",
+      "Tempting because agreement across passes filters randomness, but the model's judgment that informal comments are 'inaccurate' is stable — those false positives pass the two-run filter easily while the underlying criterion stays undefined."
+    ],
+    "principle": "precise contradiction criteria beat vague accuracy judgments",
+    "relatedConcept": "'Flag only when claimed behavior contradicts actual code behavior' is the model explicit criterion; 'check comments are accurate' is the vague anti-pattern.",
+    "overallExplanation": "Replace vague quality judgments with a checkable criterion: flag only when the comment's claimed behavior contradicts what the code does. Conservatism instructions and stability filters leave the criterion undefined."
+  },
+  {
+    "id": 415,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+    "type": "single",
+    "question": "A structured extraction system reviews vendor contracts and flags 'anything unusual or risky' for legal review. Legal now receives dozens of flags per contract — ordinary boilerplate, formatting quirks, standard jurisdiction clauses — and reports that real problems are buried in the noise. How should the prompt be redesigned?",
+    "options": [
+      "Enumerate the specific clause categories to flag, such as auto-renewal and uncapped liability, and the categories to skip, such as standard boilerplate",
+      "Add 'be conservative and flag only clauses you are highly confident are risky' to the existing instruction",
+      "Require the model to quote the exact clause text with every flag so legal can dismiss weak flags faster",
+      "Limit the model to five flags per contract so it must prioritize the most serious clauses it finds"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Precision comes from categorical criteria that define what to report and what to skip. Enumerated clause types give the model a decision rule; 'unusual or risky' asked it to invent one, which is why boilerplate and quirks are being flagged.",
+      "Tempting because it addresses the volume directly, but general instructions like 'be conservative' or 'only high-confidence findings' fail to improve precision — the model has no definition of risky to be confident about, so the same flags arrive with more hedging.",
+      "Tempting because verbatim quotes speed triage, but this optimizes the dismissal workflow rather than reducing false positives — legal still wades through dozens of flags per contract, just with the evidence attached to each one.",
+      "Tempting because a cap guarantees a manageable volume, but it rations quantity without defining relevance: a contract with seven genuine problems loses two, while a clean contract still yields five manufactured flags to fill the quota."
+    ],
+    "principle": "define flag and skip categories instead of asking for risk judgment",
+    "relatedConcept": "Vague instructions delegate criteria-setting to the model; explicit categorical lists are what improve precision.",
+    "overallExplanation": "Enumerated flag and skip categories give the model a decision rule it can apply. Conservatism instructions, evidence quoting, and volume caps all leave 'risky' undefined and precision unchanged."
+  },
+  {
+    "id": 416,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+    "type": "multi",
+    "question": "A CI bot reviews new test files and posts findings in three categories: missing edge cases, incorrect assertions, and redundant coverage. The first two are accurate, but redundant-coverage findings are wrong roughly two-thirds of the time, and developers have begun ignoring the bot entirely. Improving the redundancy criteria will take several sprints. Which two actions should the team take? (Choose two.)",
+    "options": [
+      "Temporarily disable the redundant-coverage category so the accurate categories can regain developer trust while its criteria are reworked",
+      "Rewrite the redundancy prompt with explicit criteria defining what counts as redundant, such as duplicating an existing test's assertions on identical inputs, and what does not",
+      "Have the bot self-rate confidence for each redundancy finding and suppress everything below a threshold of 8 out of 10",
+      "Reduce the bot's output to a maximum of two findings per category per pull request to lower the overall noise level"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A category with a two-thirds false positive rate spends down trust in every accurate category — developers are already ignoring the whole bot. Disabling it temporarily restores confidence in edge-case and assertion findings immediately while the fix proceeds offline.",
+      "Correct. The lasting fix is explicit categorical criteria defining what qualifies as redundant and what does not, replacing whatever vague notion the model is currently applying. This is the work that lets the category return once precision recovers.",
+      "Tempting because it operationalizes confidence, but self-reported confidence scores are poorly calibrated — the model is confident in many of its wrong redundancy calls, so the threshold suppresses some findings while the noise that erodes trust continues to flow.",
+      "Tempting because it guarantees lower volume, but a per-category cap does not change which findings are wrong — two bad redundancy findings per PR still train developers to dismiss the bot, and real edge-case findings get squeezed out by the quota."
+    ],
+    "principle": "disable the noisy category now; fix it with explicit criteria",
+    "relatedConcept": "Trust repair (disable the offender) and precision repair (explicit criteria) are complementary, not alternatives.",
+    "overallExplanation": "Disable the high false-positive category to stop the trust damage, and rebuild it on explicit criteria defining redundancy. Confidence thresholds and volume caps change neither what is wrong nor why."
+  },
+  {
+    "id": 417,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Apply few-shot prompting to improve output consistency and quality",
+    "type": "single",
+    "question": "A support agent has four MCP tools with thorough, well-differentiated descriptions covering inputs, outputs, and boundaries. Tool selection is reliable for clear requests, but for ambiguous ones like 'my order is wrong' the agent inconsistently chooses between lookup_order and open_billing_dispute across near-identical transcripts. What is the most effective improvement?",
+    "options": [
+      "Add 2-4 few-shot examples of ambiguous requests that show the reasoning for why one tool was chosen over the plausible alternative",
+      "Expand both tool descriptions further, adding more example queries and edge cases to sharpen the boundary between them",
+      "Add a keyword-based pre-router that inspects each message and restricts the agent to one tool before the model sees the request",
+      "Add a few-shot example for every request phrasing observed in production logs so each incoming message matches a known case"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The descriptions already differentiate the tools; the failure is judgment on genuinely ambiguous requests. Targeted few-shot examples that demonstrate the reasoning for choosing one plausible tool over another teach a decision pattern the model can generalize to novel ambiguous phrasings.",
+      "Tempting because descriptions are the primary selection mechanism, but they are already thorough and well-differentiated — 'my order is wrong' is ambiguous in itself, not because the tools' boundaries are unclear. More description text cannot disambiguate the request.",
+      "Tempting because it makes routing deterministic, but keywords cannot resolve what is genuinely ambiguous either — 'wrong' appears in both billing and fulfillment complaints — and the router bypasses the model's language understanding, adding a brittle layer to maintain.",
+      "Tempting because full coverage sounds thorough, but few-shot prompting works by teaching generalizable judgment from a handful of examples, not by enumerating cases. An example per phrasing bloats every request with tokens and still misses tomorrow's novel wording."
+    ],
+    "principle": "few-shot with reasoning resolves ambiguity that descriptions cannot",
+    "relatedConcept": "2-4 targeted examples showing why one action beats a plausible alternative teach judgment that generalizes.",
+    "overallExplanation": "When tool descriptions are already clear, ambiguous-request failures call for 2-4 few-shot examples showing the reasoning behind the choice. The examples teach generalizable judgment, not case matching."
+  },
+  {
+    "id": 418,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Apply few-shot prompting to improve output consistency and quality",
+    "type": "single",
+    "question": "An extraction pipeline processes field-technician inspection reports containing informal measurements like 'roughly 200 feet of piping' and 'took about half a day'. The schema has numeric fields, and audits show the model outputs invented precise values such as 213 feet where the source only said 'roughly 200'. What most effectively reduces these hallucinated precisions?",
+    "options": [
+      "Add few-shot examples demonstrating correct handling of informal measurements, showing how approximate source language maps to the schema's fields",
+      "Add a prompt instruction stating that the model must never guess and must only output values stated verbatim in the document",
+      "Lower the temperature to zero so the extraction becomes deterministic and stops inventing values that vary between runs",
+      "Change the numeric fields to strings so the model can copy the informal phrasing directly without converting it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Few-shot examples are an established technique for reducing hallucination in extraction, and informal measurements are a named case: examples demonstrating how 'roughly 200 feet' should be represented teach the model the intended convention instead of leaving it to improvise false precision.",
+      "Tempting because it states the right policy, but 'never guess' is a vague prohibition that gives the model no positive pattern for what to output when the source is approximate — the numeric field still demands a number, and the instruction competes with that structural pressure.",
+      "Tempting because determinism removes run-to-run variation, but temperature governs sampling randomness, not fidelity — a zero-temperature model consistently outputs the same invented 213 feet. The hallucination is a handling-convention gap, not a sampling artifact.",
+      "Tempting because strings preserve the source wording, but it breaks the numeric contract with downstream systems and merely relocates the interpretation problem — every consumer must now parse 'roughly 200 feet' itself, without the context the extraction step had."
+    ],
+    "principle": "few-shot examples teach conventions for approximate source language",
+    "relatedConcept": "Hallucination in extraction drops when examples demonstrate the intended handling of informal measurements.",
+    "overallExplanation": "Few-shot examples showing how informal measurements map into the schema give the model a convention to follow. Prohibitions, zero temperature, and string fields leave the interpretation gap unfilled."
+  },
+  {
+    "id": 419,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Apply few-shot prompting to improve output consistency and quality",
+    "type": "single",
+    "question": "A CI assistant proposes missing tests for changed code. For untested functions it performs well, but for branch-level gaps its judgment is erratic — it proposes tests for trivial logging branches while skipping unhandled error paths in the same diff. Detailed prose instructions about 'high-value tests' have not helped. What should the team add to the prompt?",
+    "options": [
+      "Few-shot examples of branch-level coverage gaps that demonstrate which gaps merit a test and which do not, with the reasoning for each judgment",
+      "A rule that every uncovered branch in the diff receives a proposed test so no error path can be missed by the assistant",
+      "An instruction to rank all detected gaps by importance and propose tests only for the top three in each pull request",
+      "Integration with the coverage tool's branch report so the assistant receives the authoritative list of uncovered branches"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Branch-level coverage gaps are a named ambiguous case where few-shot examples excel: demonstrations that show why an unhandled error path merits a test while a trivial logging branch does not teach a judgment the model can generalize, where prose instructions about value have already failed.",
+      "Tempting because it guarantees error paths are covered, but exhaustive proposals bury the valuable tests in noise — every logging branch and defensive default gets a suggested test, recreating the false-positive flood that erodes developer trust in review tooling.",
+      "Tempting because ranking forces prioritization, but the model's importance judgment is exactly what is erratic — the top three of a miscalibrated ranking still includes trivial branches and omits error paths. The judgment itself needs examples, not a quota on its output.",
+      "Tempting because authoritative gap data sounds like the fix, but detecting the branches is not the failure — deciding which merit tests is. A complete uncovered-branch list makes the input more accurate while leaving the value judgment as uncalibrated as before."
+    ],
+    "principle": "demonstrate which coverage gaps merit tests, with reasoning",
+    "relatedConcept": "Branch-level test-gap judgment is an ambiguous case that few-shot examples calibrate where prose cannot.",
+    "overallExplanation": "Erratic branch-level judgment calls for few-shot examples showing which gaps merit tests and why. Exhaustive proposals, ranking quotas, and better gap detection all sidestep the miscalibrated judgment."
+  },
+  {
+    "id": 420,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Apply few-shot prompting to improve output consistency and quality",
+    "type": "multi",
+    "question": "A document-analysis subagent in a research pipeline extracts study details from academic papers. Papers with dedicated methodology sections extract cleanly, but papers embedding methods inside results, or citing inline instead of in bibliographies, produce garbled extractions. The team is designing a few-shot set to fix this. Which two principles should guide it? (Choose two.)",
+    "options": [
+      "Include examples spanning the structural variants that fail today, such as inline citations versus bibliographies and embedded versus dedicated methodology sections",
+      "Keep the set to a small number of targeted examples whose demonstrated handling generalizes, rather than enumerating an example for every known journal format",
+      "Show only the most common paper structure in the examples so the model has one canonical pattern to imitate for every input",
+      "Draw all examples from the same journal so formatting is consistent and the model is not confused by conflicting demonstrations"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Few-shot examples demonstrating correct handling of varied document structures — inline citations versus bibliographies, methodology sections versus embedded details — are the established pattern for exactly this failure: structure-driven extraction errors on formats the examples never showed.",
+      "Correct. Few-shot prompting works because a small set of targeted demonstrations teaches judgment that generalizes to novel formats. Enumerating every journal's layout bloats each request with tokens and still cannot anticipate the next unfamiliar structure.",
+      "Tempting because a canonical pattern maximizes consistency on common papers, but the failures are on the uncommon structures — showing only the typical format teaches the model nothing about the variants that are garbling extractions today.",
+      "Tempting because consistent formatting looks cleaner, but uniform examples are the problem, not the cure: the model needs to see that correct extraction looks different across structures. Homogeneous demonstrations encode exactly the brittleness being debugged."
+    ],
+    "principle": "cover the failing structural variants with a few targeted examples",
+    "relatedConcept": "Variety across few-shot examples is what teaches structure-robust extraction; volume and uniformity are anti-patterns.",
+    "overallExplanation": "Span the failing structural variants with a small targeted set. Variety teaches generalizable handling; canonical-only or single-journal examples encode brittleness, and per-format enumeration never ends."
+  },
+  {
+    "id": 421,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Enforce structured output using tool use and JSON schemas",
+    "type": "single",
+    "question": "A pipeline asks Claude to 'respond only with valid JSON matching this schema' and parses the assistant's text. About 5% of responses fail parsing — markdown code fences, trailing commas, explanatory preambles — and the team keeps adding prompt rules and regex cleanup with each new variant. What change eliminates this failure class?",
+    "options": [
+      "Define an extraction tool whose input schema is the target structure and read the structured data from the tool_use block in the response",
+      "Extend the JSON-repair layer to strip code fences and fix trailing commas before parsing, covering the known failure patterns",
+      "Add a retry that re-sends the request with the parse error appended whenever the response fails to parse as JSON",
+      "Strengthen the prompt with explicit prohibitions on markdown fences, commentary, and trailing commas, plus a correct example response"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Tool use with a JSON schema is the most reliable approach for schema-compliant structured output: the model emits a structured tool_use block rather than free text, which eliminates JSON syntax errors as a class instead of patching each new variant.",
+      "Tempting because it handles the known patterns cheaply, but repair is an arms race — each model or prompt change surfaces new malformations, and aggressive regex fixes risk silently corrupting valid content. The failure class remains; only today's symptoms are patched.",
+      "Tempting because retry-with-error-feedback is a legitimate pattern, but it belongs to semantic validation failures. Spending a second full request to fix syntax the API can guarantee outright doubles cost and latency for the affected 5% without eliminating the class.",
+      "Tempting because prompt rules do raise compliance, but text-mode output keeps syntax probabilistic — some fraction of responses will always drift into fences or commentary. The team has been running this experiment already; the 5% failure rate is the result."
+    ],
+    "principle": "tool_use makes structured output structural, not probabilistic",
+    "relatedConcept": "Prompted JSON-in-text is always probabilistic; tool use with a schema eliminates syntax errors as a class.",
+    "overallExplanation": "Move extraction to tool use with a JSON schema and read the tool_use block. Repair layers, retries, and stricter prompts manage the symptom; the structured channel removes the failure class."
+  },
+  {
+    "id": 422,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Enforce structured output using tool use and JSON schemas",
+    "type": "single",
+    "question": "An insurance intake system classifies incoming documents with an enum field of six document types. Reviewers find two failure modes: genuinely novel document types get shoehorned into whichever enum value is closest, and ambiguous documents get a confident but arbitrary label. Which schema change addresses both failure modes?",
+    "options": [
+      "Add an 'unclear' enum value for ambiguous documents and an 'other' value paired with a free-text detail field for types outside the current list",
+      "Replace the enum with a free-text category field so the model can describe each document in its own words",
+      "Expand the enum to thirty document types compiled from historical data so nearly every incoming document has an exact match",
+      "Keep the six types but add a prompt instruction telling the model to choose carefully when a document does not clearly fit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The 'other' + detail pattern gives novel types a truthful destination and captures what they are, and an 'unclear' value gives ambiguity an honest label instead of a confident guess. Both failure modes stem from a closed enum offering no legitimate exit.",
+      "Tempting because free text can express anything, but it abandons the categorical contract downstream systems rely on — routing rules and analytics need stable values, and free-text labels fragment into dozens of spellings for the same concept.",
+      "Tempting because broader coverage reduces shoehorning today, but any closed list eventually meets a document outside it, and thirty fine-grained options make every boundary between categories harder to judge. Extensibility, not enumeration, is the structural fix.",
+      "Tempting because care sounds like the missing ingredient, but the schema still forces one of six values — a careful model with no honest option must still guess. The pressure is structural, and no instruction removes it while the enum stays closed."
+    ],
+    "principle": "give enums honest exits: 'unclear' for ambiguity, 'other' plus detail for novelty",
+    "relatedConcept": "Closed enums force confident guesses; extensible enum patterns are a schema-level accuracy control.",
+    "overallExplanation": "Add 'unclear' for ambiguous cases and 'other' with a detail field for novel types. Closed enums force guessing; free text breaks the categorical contract; bigger lists just delay the problem."
+  },
+  {
+    "id": 423,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Enforce structured output using tool use and JSON schemas",
+    "type": "single",
+    "question": "A document pipeline defines extract_metadata plus three enrichment tools that all depend on the metadata being extracted first. In roughly one run out of ten, the model calls an enrichment tool first and works from incomplete data. The prompt already states that metadata extraction must happen first. How should the team guarantee the ordering?",
+    "options": [
+      "Set tool_choice to {\"type\": \"tool\", \"name\": \"extract_metadata\"} on the first request, then handle enrichment in follow-up turns",
+      "Set tool_choice to \"any\" so the model is required to call a tool on the first request instead of replying with text",
+      "Move the ordering instruction to the top of the system prompt and repeat it in the final user message for emphasis",
+      "List extract_metadata first in the tools array so the model encounters it before the enrichment tools when selecting"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Forced tool selection makes the first call deterministic: the model must invoke extract_metadata, and enrichment proceeds in subsequent turns once metadata exists. This is the API mechanism for guaranteeing a specific tool runs before others.",
+      "Tempting because \"any\" does remove text-only responses, but it leaves the model free to choose which tool — the observed failure is calling the wrong tool first, not skipping tools, and \"any\" does nothing to constrain that choice.",
+      "Tempting because placement and repetition raise compliance, but prompt instructions are probabilistic — the prompt already states the ordering and one run in ten violates it. When ordering is a hard dependency, the guarantee must come from the API, not from emphasis.",
+      "Tempting because ordering feels like a signal, but position in the tools array is not a selection mechanism and carries no guarantee — the model selects from descriptions and context, so the one-in-ten misordering would persist."
+    ],
+    "principle": "force the specific tool when a step must run first",
+    "relatedConcept": "The tool_choice forced form is the deterministic answer to tool-ordering dependencies.",
+    "overallExplanation": "Force extract_metadata with tool_choice and run enrichment in follow-up turns. \"any\" guarantees a tool but not which one, and prompt emphasis or array ordering remain probabilistic."
+  },
+  {
+    "id": 424,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Enforce structured output using tool use and JSON schemas",
+    "type": "single",
+    "question": "A multinational's invoice extraction uses tool use with a strict schema, and every output validates. Yet downstream reconciliation keeps failing: '04/03/25' from European suppliers is read as April 3rd, and amounts like '1.234,56' are parsed with the wrong separator convention. What prompt-level change addresses these errors?",
+    "options": [
+      "Include format normalization rules in the prompt alongside the schema, specifying how ambiguous date and number formats should be interpreted and output",
+      "Tighten the schema so date fields require ISO 8601 strings and amount fields require plain decimals, rejecting any other format",
+      "Add a retry loop that re-sends the request with the validation error whenever an extracted date or amount fails schema validation",
+      "Post-process the extracted values in code, converting dates and amounts into canonical formats after extraction completes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The outputs are schema-valid but semantically wrong because the source formatting is ambiguous. Normalization rules in the prompt — how to interpret day-first dates from European suppliers, which separator convention applies — travel alongside the schema and fix interpretation at the point where context exists.",
+      "Tempting because stricter formats sound safer, but the model already emits schema-valid values — the problem is that it interpreted '04/03/25' as the wrong date before formatting it. Output-format constraints cannot correct an upstream misreading of the source.",
+      "Tempting because retry-with-error-feedback fixes many extraction problems, but these values pass validation — a wrong-but-well-formed date raises no error to feed back. The loop never triggers on semantically wrong, schema-valid output.",
+      "Tempting because code-level conversion is deterministic, but by post-processing time the ambiguity is unresolvable — a canonicalizer receiving April 3rd cannot know the supplier meant March 4th. Interpretation needs the document context only the extraction step has."
+    ],
+    "principle": "pair strict schemas with normalization rules for ambiguous source formats",
+    "relatedConcept": "Schemas constrain output shape; normalization rules in the prompt govern interpretation of inconsistent source formatting.",
+    "overallExplanation": "Schema-valid but misinterpreted values need format normalization rules in the prompt beside the schema. Stricter output formats, retries, and post-processing all act after the misreading has already happened."
+  },
+  {
+    "id": 425,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Implement validation, retry, and feedback loops for extraction quality",
+    "type": "single",
+    "question": "Developers dismiss about 40% of a CI security reviewer's findings, but the platform team cannot say which kinds of code constructs drive the dismissals — feedback arrives as unstructured complaints in chat. They want to iterate on the prompt systematically rather than by anecdote. What should they add to the reviewer's output?",
+    "options": [
+      "A detected_pattern field on each structured finding recording the code construct that triggered it, so dismissal rates can be analyzed per pattern",
+      "A severity field on each finding so the team can check whether developers dismiss low-severity findings more than critical ones",
+      "A full copy of the prompt and model response attached to each finding so engineers can replay any dismissed case manually",
+      "A confidence score on each finding so the team can suppress the low-confidence findings that are most likely to be dismissed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Tracking which code constructs trigger findings via a detected_pattern field turns dismissals into analyzable data: the team can see that, say, findings on builder-pattern chaining are dismissed 90% of the time and fix the prompt's criteria for exactly that pattern.",
+      "Tempting because severity correlates with attention, but it explains how much developers care, not why findings are wrong — a critical-severity false positive is still a false positive, and severity buckets cannot localize which constructs the prompt misjudges.",
+      "Tempting because full replay data supports deep investigation, but raw prompt-response pairs are unstructured — engineers must manually reconstruct what triggered each dismissed finding, which is the anecdote-driven process the team is trying to escape.",
+      "Tempting because it promises automatic noise reduction, but self-reported confidence is poorly calibrated, and suppression hides the evidence — dismissed findings are the signal for prompt iteration, and filtering them out removes the data before it can be analyzed."
+    ],
+    "principle": "tag findings with the triggering construct to make dismissals analyzable",
+    "relatedConcept": "A detected_pattern field converts unstructured dismissal feedback into per-construct false-positive analysis.",
+    "overallExplanation": "A detected_pattern field on each finding lets dismissal rates be analyzed per code construct, turning anecdotes into targeted prompt fixes. Severity, raw transcripts, and confidence suppression cannot localize the miscalibration."
+  },
+  {
+    "id": 426,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Implement validation, retry, and feedback loops for extraction quality",
+    "type": "single",
+    "question": "An accounts-payable pipeline extracts invoices whose source documents sometimes contain genuine arithmetic mistakes — line items that do not add up to the printed total. The team wants extractions to stay faithful to the document while ensuring these discrepancies never flow into payment silently. What schema design achieves this?",
+    "options": [
+      "Extract stated_total as printed and a calculated_total summed from line items, flagging the invoice when the two values disagree",
+      "Add a validation rule that rejects any extraction whose line items do not sum to the stated total, triggering the standard retry loop",
+      "Instruct the model to correct the total during extraction whenever the line items clearly indicate the printed value is wrong",
+      "Route every invoice through human review before payment since some fraction of source documents contain arithmetic errors"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Extracting calculated_total alongside stated_total is the self-correction validation flow: extraction stays faithful to the printed document, the arithmetic check is explicit in the output, and disagreement raises a flag instead of a silent payment error.",
+      "Tempting because it catches the mismatch, but it misdiagnoses it: a faithful extraction of an internally inconsistent document is correct output, and retrying it wastes requests on an error the model cannot fix because the document itself is wrong.",
+      "Tempting because it delivers a clean number, but the extraction now silently diverges from the source document — auditors comparing output to the invoice see a fabricated total, and a model 'correction' can itself be wrong with no trace that anything was altered.",
+      "Tempting because human review guarantees a catch, but reviewing every invoice to find rare arithmetic errors squanders reviewer capacity — the discrepancy is mechanically detectable, so review should be routed only to the flagged cases."
+    ],
+    "principle": "extract both stated and calculated values; flag disagreement",
+    "relatedConcept": "The stated_total/calculated_total pair encodes semantic validation directly in the extraction schema.",
+    "overallExplanation": "Extract stated_total and calculated_total and flag disagreement. Faithful extraction of a wrong document is not an extraction error — retries, silent correction, and blanket review all misplace the check."
+  },
+  {
+    "id": 427,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Implement validation, retry, and feedback loops for extraction quality",
+    "type": "single",
+    "question": "A contracts team extracts payment terms with Claude. Some contracts are internally inconsistent — the body says Net 30 while the signed schedule says Net 45 — and the extraction currently returns whichever value the model happened to weight, with nothing indicating the document disagreed with itself. What schema change fixes this?",
+    "options": [
+      "Add a conflict_detected boolean and capture both conflicting values with their locations when a document states inconsistent terms",
+      "Add a prompt rule that the signed schedule always overrides the contract body, so extraction resolves the inconsistency deterministically",
+      "Run the extraction twice and flag the contract for review whenever the two runs return different payment-term values",
+      "Set temperature to zero so the model resolves each internal inconsistency the same way on every run of the pipeline"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Inconsistent source data needs a conflict_detected flag with both values captured: downstream consumers learn the document disagrees with itself, legal decides which term governs, and the silent arbitrary pick — the actual failure — is eliminated.",
+      "Tempting because precedence rules exist in contract law, but encoding one blanket heuristic hides the conflict rather than surfacing it — whether the schedule governs is a legal judgment that varies by contract, and a wrong automatic pick is now invisible.",
+      "Tempting because disagreement between runs can indicate ambiguity, but it is an unreliable detector — a model that consistently favors the schedule returns Net 45 twice, and the internal conflict passes undetected while costs double on every document.",
+      "Tempting because determinism removes run-to-run variance, but a consistent arbitrary choice is still arbitrary — temperature zero makes the silent pick repeatable without ever revealing that the document contained two different terms."
+    ],
+    "principle": "surface internal inconsistencies with a conflict flag, never resolve them silently",
+    "relatedConcept": "conflict_detected booleans turn inconsistent source data into a visible downstream decision.",
+    "overallExplanation": "A conflict_detected boolean with both values captured surfaces the document's self-contradiction for a human decision. Precedence heuristics, double runs, and zero temperature all leave the conflict hidden."
+  },
+  {
+    "id": 428,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Implement validation, retry, and feedback loops for extraction quality",
+    "type": "multi",
+    "question": "An architect is designing the validation-retry loop for a pipeline extracting structured results from medical lab reports. Validation failures are expected from day one: some from inconsistent report layouts, some because certain fields exist only in physician notes the pipeline does not receive. Which two design decisions are correct? (Choose two.)",
+    "options": [
+      "On validation failure, send a follow-up request containing the original report, the failed extraction, and the specific validation errors",
+      "Classify failures before retrying: retry format and structural errors with feedback, and route missing-source-information failures to input fixes instead",
+      "Retry each failed extraction up to five times with the identical request, since sampling variation resolves most transient extraction errors",
+      "Increase the temperature on each successive retry so the model explores different interpretations of reports that failed on the first pass"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Retry-with-error-feedback is the core loop: including the document, the failed output, and the specific validation errors tells the model exactly what to fix, which is what makes retries effective for format and structural failures.",
+      "Correct. Retries cannot recover information absent from the source — fields living only in physician notes the pipeline never receives will fail forever. Classifying failures first sends each class to the remedy that can work: feedback retries for format errors, input or schema fixes for absence.",
+      "Tempting because resampling fixes some transient flakiness, but identical requests carry no information about what was wrong — format errors repeat, and the missing-notes failures burn five guaranteed-futile attempts per document at pipeline scale.",
+      "Tempting because exploration sounds like it escapes repeated mistakes, but higher temperature adds randomness, not understanding — outputs drift further from the schema, and no temperature setting can surface values that exist only in documents the model never saw."
+    ],
+    "principle": "feed errors back on retry, and never retry what the source cannot answer",
+    "relatedConcept": "A retry loop needs two parts: error feedback for fixable failures and triage that recognizes unfixable ones.",
+    "overallExplanation": "Effective loops pair retry-with-error-feedback for format and structural failures with triage that routes missing-information failures to input or schema fixes. Blind resampling and temperature escalation fix neither class."
+  },
+  {
+    "id": 429,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design efficient batch processing strategies",
+    "type": "single",
+    "question": "A regulatory-filing processor must complete extraction on every filing within 30 hours of receipt, and finance requires the Message Batches API's 50% discount. Batches can take up to 24 hours to process, and filings arrive continuously around the clock. Which submission strategy satisfies both constraints?",
+    "options": [
+      "Accumulate incoming filings and submit a batch every 4 hours, so the worst-case wait plus the 24-hour processing window stays inside 30 hours",
+      "Submit one consolidated batch each midnight, since a single daily batch minimizes per-batch overhead and simplifies failure tracking",
+      "Submit a batch every 12 hours as a balance between batch size efficiency and the 30-hour service commitment",
+      "Process all filings through the synchronous API, since it is the only way to be certain that no filing ever breaches the deadline"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. With a 4-hour accumulation window, the worst-case filing waits 4 hours and then processes within 24, totaling 28 hours — inside the 30-hour SLA with margin. Submission frequency is derived from the SLA minus the batch processing window.",
+      "Tempting because daily batches are operationally simple, but a filing arriving just after midnight waits nearly 24 hours and can then process for another 24 — a 48-hour worst case that breaches the SLA by a wide margin.",
+      "Tempting because 12 hours feels like a reasonable middle ground, but the arithmetic fails: a worst-case 12-hour wait plus 24 hours of processing is 36 hours, six hours past the deadline. The window must be bounded by SLA minus processing time, not by intuition.",
+      "Tempting because synchronous calls guarantee timeliness, but the SLA leaves ample room for batching — and abandoning batch processing doubles cost on the entire corpus, violating the finance constraint the design was required to meet."
+    ],
+    "principle": "submission cadence = SLA minus the 24-hour batch window",
+    "relatedConcept": "Batch scheduling against an SLA is arithmetic: accumulation window plus worst-case processing must fit inside the deadline.",
+    "overallExplanation": "A 4-hour submission cadence keeps worst-case latency at 28 hours, meeting the 30-hour SLA while retaining the 50% discount. Daily and 12-hour cadences breach the math; synchronous processing forfeits the savings."
+  },
+  {
+    "id": 430,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design efficient batch processing strategies",
+    "type": "single",
+    "question": "A weekly batch job analyzes 40,000 support-call transcripts. This week's results show 700 requests failed — investigation reveals that unusually long transcripts exceeded the model's context limit. The remaining 39,300 succeeded normally. What is the correct recovery for the failed portion?",
+    "options": [
+      "Identify the failed requests by custom_id and resubmit only those, after chunking the oversized transcripts to fit within the context limit",
+      "Resubmit the full 40,000-transcript batch with the oversized transcripts chunked, so all results come from a single consistent run",
+      "Resubmit the 700 failed transcripts unchanged through the synchronous API, which handles individual requests more robustly than batch mode",
+      "Log the 700 failures and proceed with the 39,300 successes, since a 98% completion rate is within tolerance for weekly analytics"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. custom_id exists to correlate batch requests with responses, so failures are identified individually and only the failed items are resubmitted — with the modification that addresses the cause, chunking transcripts that exceeded the context limit.",
+      "Tempting because a single run feels cleaner, but it pays for 39,300 already-successful analyses again — at scale, rerunning entire batches for a 1.75% failure rate is precisely the waste that per-request custom_id tracking is designed to avoid.",
+      "Tempting because synchronous calls are easier to monitor, but the failure cause is context-limit overflow, which applies identically to synchronous requests — the same transcripts fail again at double the per-token cost and without the fix.",
+      "Tempting because 98% sounds acceptable, but the failures are not random: they are systematically the longest calls, which often carry the most escalation-relevant content. Silently dropping them biases the weekly analysis exactly where it matters."
+    ],
+    "principle": "resubmit failures by custom_id, modified to fix the failure cause",
+    "relatedConcept": "Batch recovery is selective: custom_id isolates failures, and the resubmission carries the fix (e.g., chunking).",
+    "overallExplanation": "Use custom_id to isolate the 700 failures and resubmit only them with oversized transcripts chunked. Full reruns waste spend, unchanged synchronous retries re-fail, and dropping the failures biases the analysis."
+  },
+  {
+    "id": 431,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design efficient batch processing strategies",
+    "type": "single",
+    "question": "A nightly job uses an agentic loop: for each changed module, Claude reads source files via tools, inspects existing tests, then generates new test cases. The team wants to move the job to the Message Batches API for the 50% saving, but the loop's tool calls happen mid-conversation. How should they proceed?",
+    "options": [
+      "Restructure the job so file contents and existing tests are collected up front and embedded in each batch request as a single-turn generation",
+      "Submit the agentic loop as-is, since the 24-hour batch window gives ample time for tool execution rounds between model turns",
+      "Keep the loop synchronous but schedule it during off-peak hours, when API pricing is discounted for overnight workloads",
+      "Split the loop across sequential batches, one batch per tool round, submitting the next batch when the previous one completes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Batches API does not support multi-turn tool calling within a request, so batch-compatible jobs must be single-turn. Here the needed context — source files and existing tests — is knowable up front, so pre-collecting it and embedding it in each request preserves the workflow and captures the 50% saving.",
+      "Tempting because the overnight window seems to leave room for tool rounds, but the limitation is structural, not temporal: a batch request cannot pause for tool execution and resume. Requests needing mid-conversation tool results cannot run inside a batch at all.",
+      "Tempting because off-peak scheduling is a familiar cost lever, but the API has no time-of-day pricing — the 50% saving comes only from the Batches API. Overnight synchronous execution pays full price for a workload that is perfectly latency-tolerant.",
+      "Tempting because it technically sequences tool rounds through batches, but each round can take up to 24 hours with no latency SLA — a several-round loop could take days — and the orchestration complexity is unnecessary when the required context is known before submission."
+    ],
+    "principle": "batches are single-turn: pre-collect context instead of tool rounds",
+    "relatedConcept": "No multi-turn tool calling in the Batches API — restructure agentic jobs into self-contained requests.",
+    "overallExplanation": "Pre-collect files and tests and submit single-turn generation requests. Batches cannot execute tools mid-request, off-peak pricing does not exist, and chaining batches per tool round multiplies the 24-hour window."
+  },
+  {
+    "id": 432,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design efficient batch processing strategies",
+    "type": "single",
+    "question": "An operations team generates a daily exception report: previous-day data is ready at midnight, executives read the report at 9 a.m., and the team submits a batch at midnight because 'batches always finish within an hour in our experience'. Twice this month the report was missing at 9 a.m. What is the correct architectural conclusion?",
+    "options": [
+      "The Batches API offers no latency SLA and may take up to 24 hours, so a deadline-bound overnight report should run on the synchronous API instead",
+      "The team should submit the same batch twice at midnight and use whichever completes first, halving the probability of missing the deadline",
+      "The team should split the submission into ten smaller batches, since smaller batches are prioritized and complete more predictably",
+      "The team should keep the batch but poll it hourly and escalate to support for expedited completion if it is unfinished by 6 a.m."
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Observed typical latency is not a guarantee: batch processing has no latency SLA and a window of up to 24 hours, so any workflow with a deadline shorter than that window is mismatched with the batch model. A nine-hour budget belongs on the synchronous API.",
+      "Tempting because redundancy reduces some risks, but both submissions sit in the same processing system under the same load conditions — slow periods affect them together — and the design doubles cost while still resting on a latency assumption the API never made.",
+      "Tempting because smaller units often move faster in queues, but no such prioritization is documented and no per-batch latency guarantee exists at any size — ten small batches are ten chances to be slow, with the same unbounded worst case.",
+      "Tempting because monitoring adds visibility, but there is no expedite mechanism to escalate to — the window is up to 24 hours by design. Polling tells the team earlier that the report will be late without providing any way to prevent it."
+    ],
+    "principle": "never build deadlines on observed batch latency; there is no SLA",
+    "relatedConcept": "Typical batch turnaround is not a contract — deadline-bound workloads belong on the synchronous API.",
+    "overallExplanation": "Observed fast turnaround is not an SLA: batches may take up to 24 hours, so a 9 a.m. deadline needs the synchronous API. Duplicate submissions, smaller batches, and polling do not create a guarantee."
+  },
+  {
+    "id": 433,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design multi-instance and multi-pass review architectures",
+    "type": "single",
+    "question": "A platform team runs a verification pass over AI-generated code changes before human review. Reviewer capacity covers only a third of the findings the pass produces, and today reviewers pick findings to check in arbitrary order. How should the verification pass be changed so that limited review attention lands on the right findings?",
+    "options": [
+      "Have the pass self-report confidence alongside each finding and calibrate routing thresholds against review outcomes, sending low-confidence findings to humans first",
+      "Route findings to reviewers in descending severity order, since critical findings are the ones where a verification mistake costs most",
+      "Have reviewers check the first third of findings in each run's output order, keeping the routing rule simple and auditable",
+      "Suppress the findings the verification pass seems least certain about so the remaining volume matches reviewer capacity"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The pattern is verification passes that self-report confidence alongside each finding to enable calibrated review routing — the scores are made trustworthy by calibrating thresholds against actual review outcomes, and scarce reviewer attention concentrates where verification is least certain.",
+      "Tempting because severity reflects stakes, but it measures impact if true, not likelihood of being wrong — a confidently verified critical finding needs less human checking than a shaky medium one, so severity-only routing spends attention on the wrong axis.",
+      "Tempting because it is simple and reproducible, but output order carries no information about which findings deserve scrutiny — the sample is arbitrary, so the same reviewer capacity catches strictly fewer verification errors than informed routing would.",
+      "Tempting because it fits volume to capacity, but silently suppressing uncertain findings inverts the logic: the least-certain findings are exactly the ones that need human eyes, and uncalibrated suppression discards them with no outcome data ever collected."
+    ],
+    "principle": "self-reported confidence, calibrated on outcomes, routes review attention",
+    "relatedConcept": "Verification passes emit per-finding confidence; calibration against review outcomes makes the routing trustworthy.",
+    "overallExplanation": "Have the pass emit per-finding confidence and calibrate routing thresholds on review outcomes. Severity ranks impact rather than doubt, arbitrary sampling wastes capacity, and suppression hides what most needs checking."
+  },
+  {
+    "id": 434,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design multi-instance and multi-pass review architectures",
+    "type": "single",
+    "question": "A CI pipeline has Claude Code implement a fix for each incoming ticket and then, in the same session, runs a 'review the change you just made' step before opening the pull request. Post-merge defect rates are no lower than before the review step was added. What change to the pipeline is most likely to make the automated review effective?",
+    "options": [
+      "Run the review as a separate independent Claude instance that receives the diff without the implementing session's conversation and reasoning",
+      "Include the prior review's findings in the same session and instruct it to report only new or still-unaddressed issues on each iteration",
+      "Instruct the same session to review the diff as if it had been written by another developer it has never worked with",
+      "Add a second same-session review round after the first, so the change is examined twice before the pull request opens"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A session that generated code retains the reasoning behind its decisions and is unlikely to question them — which is why the review step adds nothing. An independent instance receives only the diff, evaluates it without the generator's rationalizations, and catches what self-review approves.",
+      "Tempting because that is a real CI practice, but it solves a different problem — duplicate comments across re-reviews after new commits. It does nothing about the core defect here: the reviewing session still carries the reasoning context that produced the change.",
+      "Tempting because reframing sounds like fresh eyes, but the pretense does not remove the context — the session still holds the actual reasoning that justified every decision, and role-play instructions cannot make it forget why it believed the code was correct.",
+      "Tempting because two examinations feel more thorough, but both rounds run inside the same context with the same commitments — a second agreement from the same biased reviewer is not additional scrutiny, just additional cost and latency."
+    ],
+    "principle": "independent review instances, not self-review steps, catch generator blind spots",
+    "relatedConcept": "Session context isolation in CI: the session that wrote the change is the wrong session to review it.",
+    "overallExplanation": "Route the diff to an independent instance without the implementing session's context. Self-review — however instructed, repeated, or role-played — inherits the reasoning that produced the defects."
+  },
+  {
+    "id": 435,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design multi-instance and multi-pass review architectures",
+    "type": "multi",
+    "question": "A platform team uses Claude to generate framework-migration pull requests touching 30+ files each, then needs automated review before humans look. Early attempts — asking the generating session to double-check itself, and reviewing all 30 files in one pass — missed cross-file breakages and produced contradictory per-file verdicts. Which two architectural choices fix this? (Choose two.)",
+    "options": [
+      "Review with an independent Claude instance that has no access to the generating session's reasoning context",
+      "Split the review into per-file passes for local issues plus a separate integration pass for cross-file data flow",
+      "Keep the review in the generating session but enable extended thinking so it deliberates longer over each file",
+      "Run the single whole-PR pass three times and post only the findings that appear in a majority of the runs"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The generating session retains the reasoning that produced the migration and will not challenge its own decisions; an independent instance without that context evaluates the changes on their merits — the fix for self-review consistently blessing its own output.",
+      "Correct. Thirty files in one pass dilutes attention, producing exactly the observed symptoms: contradictory verdicts on the same pattern and missed cross-file breakage. Per-file passes give each file consistent depth, and a dedicated integration pass examines the data flow between them.",
+      "Tempting because longer deliberation sounds like deeper review, but extended thinking extends reasoning that begins inside the generator's own context — more careful thought within the same blind spot, which independent instances are specifically noted to outperform.",
+      "Tempting because majority voting filters unstable output, but each run suffers the same attention dilution over 30 files, and agreement measures repeatability rather than correctness — intermittently caught real defects are voted out while stable misjudgments survive."
+    ],
+    "principle": "isolate the reviewer and split the pass: independence plus multi-pass",
+    "relatedConcept": "Large generated changesets need both context isolation (separate instance) and attention management (per-file + integration passes).",
+    "overallExplanation": "Combine an independent review instance with per-file passes plus a cross-file integration pass. Extended thinking and majority voting leave both root causes — generator context and attention dilution — untouched."
+  },
+  {
+    "id": 436,
+    "domain": "Prompt Engineering & Structured Output",
+    "objective": "Design multi-instance and multi-pass review architectures",
+    "type": "single",
+    "question": "An automated reviewer analyzes each file of a pull request in its own focused pass, and per-file feedback quality is consistently strong. Last week it approved a PR in which one file changed a date field's serialization format while a consumer in another file still parsed the old format — a production incident followed. What should be added to the architecture?",
+    "options": [
+      "A separate integration pass that examines cross-file data flow across the full changeset after the per-file passes complete",
+      "An expansion of each per-file pass's input to include the full contents of every other changed file for reference",
+      "A rule that per-file passes flag any change to serialization logic for mandatory human review before merge",
+      "A second round of per-file passes with a different prompt emphasis, so each file is examined twice before approval"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Per-file passes are scoped to local issues by design — a producer-consumer mismatch is invisible when each file is judged alone. The multi-pass architecture pairs them with a cross-file integration pass that analyzes data flow across the changeset, which is exactly what this defect required.",
+      "Tempting because full visibility would technically expose the mismatch, but loading every other file into every per-file pass recreates the attention-diluted single-pass review the per-file design exists to avoid — analysis quality degrades across the board.",
+      "Tempting because it would have caught this incident, but it is a patch for one defect signature: the next cross-file breakage will involve an enum, a route, or a config key, not serialization. The architectural gap is the missing integration pass, not a missing keyword rule.",
+      "Tempting because a second emphasis catches more local issues, but both rounds still judge each file in isolation — no number of per-file passes, under any prompt, can see a contract broken between two files that are never examined together."
+    ],
+    "principle": "per-file passes catch local issues; only an integration pass sees cross-file contracts",
+    "relatedConcept": "Multi-pass review = focused per-file analysis plus a dedicated cross-file data-flow pass; each covers what the other cannot.",
+    "overallExplanation": "Add a cross-file integration pass after the per-file passes. Producer-consumer mismatches live between files, where isolated per-file review — however thorough or repeated — cannot look."
   }
 ]
