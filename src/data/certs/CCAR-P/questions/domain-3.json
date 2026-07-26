@@ -872,5 +872,373 @@
     "principle": "decide by the ratio of catalog size to per-task usage",
     "relatedConcept": "Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer.",
     "overallExplanation": "Decide by the ratio of catalog size to per-task usage. Progressive discovery versus monolithic context is a trade-off with regimes, not a doctrine with a universally right answer."
+  },
+  {
+    "id": 339,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "An enterprise is connecting Claude to twelve internal systems, including CRM, ticketing, HR, and inventory, each owned and maintained by a different team. Tools are added and retired frequently as those systems evolve, and several other AI applications across the company will need to reuse the same connections rather than reimplementing them. Which integration approach best fits these requirements?",
+    "options": [
+      "Hard-code each system's REST API directly into every application's own tool definitions",
+      "Build one custom middleware service that wraps all twelve systems behind a single endpoint",
+      "Expose each system through an MCP server that any authorized application can connect to",
+      "Grant Claude direct database access to each system to avoid maintaining API integrations"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because each integration can be built and tested independently, but hard-coding twelve APIs into every application multiplies maintenance work by the number of consuming applications and duplicates effort every time a team-owned system changes.",
+      "Tempting because a single endpoint feels simpler to reason about, but funneling twelve independently owned systems through one custom middleware service creates a bottleneck team and a single point of failure that every application now depends on.",
+      "Correct. This is exactly the shape MCP fits: many systems owned by different teams, frequent tool churn, and many consuming applications. Each team maintains its own server once, and every application reuses it instead of rebuilding the integration.",
+      "Tempting because it skips API development entirely, but direct database access bypasses the business logic, validation, and access control each system's API is built to enforce, and it multiplies that risk across all twelve systems at once."
+    ],
+    "principle": "match the integration mechanism to the number of owners and consumers, not to convenience",
+    "relatedConcept": "MCP standardizes many-to-many tool access so each system is integrated once and reused by every consuming application.",
+    "overallExplanation": "Match the integration mechanism to the number of owners and consumers, not to convenience. MCP standardizes many-to-many tool access so each system is integrated once and reused by every consuming application."
+  },
+  {
+    "id": 340,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "single",
+    "question": "An agent has grown to 45 registered tools spanning six different business domains. Tool-selection accuracy has declined and per-request latency has increased as the catalog expanded, and a usage analysis shows that roughly a third of the registered tools have never been invoked in production. What should the architect do first?",
+    "options": [
+      "Write longer, more detailed descriptions for all 45 tools so the model can distinguish between them more reliably",
+      "Upgrade to a more capable model tier that can handle a larger tool catalog without losing selection accuracy",
+      "Require the model to list all 45 tools and justify its choice in writing before every tool invocation",
+      "Audit and remove unused or overlapping tools, and consider progressive discovery so only relevant tools are presented per request"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because clearer descriptions do help the model choose correctly, but lengthening all 45 descriptions adds tokens to every request while leaving the oversized catalog — including the third nobody ever invokes — exactly as crowded as before.",
+      "Tempting because a stronger model does reason better over a crowded catalog, but this treats the symptom at higher cost while the underlying capability bloat, including tools nobody uses, remains untouched and keeps degrading selection.",
+      "Tempting because a justification step sounds like it would catch mistakes, but it adds latency and tokens to every single invocation instead of shrinking the tool surface, and it does nothing about the unused third of the catalog.",
+      "Correct. This is capability bloat: a third of the catalog is confirmed dead weight, and an audit surfaces any redundant or overlapping tools alongside it. Removing them directly restores selection accuracy, and progressive discovery keeps the per-request tool surface small."
+    ],
+    "principle": "remove unused and overlapping tools before adding more model or prompt complexity",
+    "relatedConcept": "Capability bloat degrades selection accuracy in proportion to catalog size, so curating the catalog is the first lever, not the last.",
+    "overallExplanation": "Remove unused and overlapping tools before adding more model or prompt complexity. Capability bloat degrades selection accuracy in proportion to catalog size, so curating the catalog is the first lever, not the last."
+  },
+  {
+    "id": 341,
+    "domain": "Integration",
+    "objective": "Analyze authentication and authorization requirements to identify security gaps",
+    "type": "single",
+    "question": "A Claude-based assistant answers employee questions by querying an HR system on their behalf. It authenticates to the HR system using a single service account that has organization-wide read access, and the system prompt instructs the model to return only the data belonging to the employee who is asking. A security review flags this design. What is the core problem?",
+    "options": [
+      "Authorization is being enforced through prompt instructions rather than through the access-control layer, so a prompt failure or injection could expose any employee's data",
+      "Service accounts cannot legally be used to connect AI systems to HR data under most compliance frameworks",
+      "The service account should be granted write access as well so that the resulting audit log is complete",
+      "The model should authenticate to the HR system directly using each employee's own password instead of a service account"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Prompt instructions are not a security boundary; a model can be misled, misgeneration can occur, or a prompt injection can override the instruction. Because the service account itself can already read every employee's record, any such failure exposes the entire HR system.",
+      "Tempting because it sounds like a compliance rule, but there is no general prohibition on service accounts connecting AI systems to HR data; the actual problem is the scope of that account's access, not its existence as a service account.",
+      "Tempting because more logging sounds like better security, but adding write access to an already over-scoped account expands the blast radius of any failure instead of narrowing access that should never have been organization-wide read in the first place.",
+      "Tempting because per-employee credentials sound like tighter scoping, but having the model handle each employee's password is a serious credential-handling anti-pattern and does not by itself fix the underlying authorization gap."
+    ],
+    "principle": "enforce authorization at the access-control layer, never rely on prompt instructions to scope data access",
+    "relatedConcept": "A model that can technically read everything is one prompt failure away from exposing everything, regardless of what the instructions say.",
+    "overallExplanation": "Enforce authorization at the access-control layer, never rely on prompt instructions to scope data access. A model that can technically read everything is one prompt failure away from exposing everything, regardless of what the instructions say."
+  },
+  {
+    "id": 342,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "single",
+    "question": "A RAG system built over a library of commercial contracts splits every document into fixed 300-token chunks before indexing. Retrieval frequently returns clause fragments whose meaning depends on defined terms and cross-references that live elsewhere in the same document, and answer quality suffers as a result. Which change most directly addresses this problem?",
+    "options": [
+      "Reduce the chunk size from 300 tokens to 100 tokens so that retrieval becomes more precise",
+      "Adopt structure-aware chunking aligned to clauses and sections, with metadata linking definitions and cross-references",
+      "Increase the number of retrieved chunks per query from 5 to 50 so the missing context is more likely to be included",
+      "Replace semantic retrieval with a keyword index built only over clause headings"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because smaller chunks sound more precise, but shrinking a fixed-size chunk further fragments clauses into even smaller pieces and makes the definitions and cross-references the answer depends on even less likely to appear together.",
+      "Correct. The failure is structural, not a sizing problem: clauses depend on definitions and cross-references elsewhere in the document. Chunking aligned to the document's own structure, with metadata linking those dependencies, preserves the interpretive context retrieval needs.",
+      "Tempting because retrieving more chunks raises the odds of including the missing context, but it floods the model's context window hoping to get lucky rather than fixing the chunking strategy, and it multiplies token cost on every query.",
+      "Tempting because headings are structural, but restricting retrieval to a keyword index over headings discards the semantic retrieval that already works well for the rest of the contract library and narrows what can be found."
+    ],
+    "principle": "chunk along document structure so retrieved fragments keep the context they depend on",
+    "relatedConcept": "Fixed-size chunking ignores where meaning actually lives in a document, while structure-aware chunking with linkage metadata preserves it.",
+    "overallExplanation": "Chunk along document structure so retrieved fragments keep the context they depend on. Fixed-size chunking ignores where meaning actually lives in a document, while structure-aware chunking with linkage metadata preserves it."
+  },
+  {
+    "id": 343,
+    "domain": "Integration",
+    "objective": "Apply retrieval strategies matched to data shape and query pattern",
+    "type": "single",
+    "question": "A parts-lookup assistant retrieves information using pure semantic vector search. Users who search using exact part numbers, such as \"KX-2481-B\", often receive results for similar but incorrect parts, while users who describe what they need in natural language get accurate results. Which retrieval strategy best resolves this problem?",
+    "options": [
+      "Replace semantic retrieval entirely with pure keyword search across the whole parts catalog",
+      "Switch to a larger embedding model so that part numbers embed more distinctly from one another",
+      "Instruct users to describe the part they need in natural language instead of typing part numbers",
+      "Use hybrid retrieval that combines keyword or exact matching with semantic search, weighted by query type"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because keyword search would fix the part-number problem, but replacing semantic retrieval entirely breaks the natural-language queries that already work well and that a large share of users rely on.",
+      "Tempting because a larger model might separate embeddings slightly better, but exact identifiers like part numbers are a fundamentally lexical matching problem, and a bigger embedding model only marginally improves what is essentially the wrong tool for that query shape.",
+      "Tempting because it avoids any engineering work, but pushing users to change how they search shifts the system's own retrieval failure onto the people using it and ignores that part numbers are a normal, reasonable way to search a catalog.",
+      "Correct. Exact identifiers are exactly where lexical or keyword matching outperforms embeddings, which tend to blur distinct codes together, while natural-language queries are where semantic search wins. Hybrid retrieval, weighted by query type, matches the strategy to the shape of the query."
+    ],
+    "principle": "match retrieval strategy to query shape rather than committing to one method for every query",
+    "relatedConcept": "Exact identifiers favor lexical matching while descriptive queries favor semantic search, so hybrid retrieval routes each query to its strength.",
+    "overallExplanation": "Match retrieval strategy to query shape rather than committing to one method for every query. Exact identifiers favor lexical matching while descriptive queries favor semantic search, so hybrid retrieval routes each query to its strength."
+  },
+  {
+    "id": 344,
+    "domain": "Integration",
+    "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+    "type": "single",
+    "question": "Adding a re-ranking stage to a support assistant's retrieval pipeline improves answer accuracy from 86% to 93%, but it adds roughly 500 milliseconds of latency to every request. The assistant's contractual SLA is a 3-second response time, and its current p95 latency is 1.6 seconds. How should the architect reason about this trade-off?",
+    "options": [
+      "Adopt re-ranking: the accuracy gain is material and the added latency still leaves comfortable headroom within the SLA",
+      "Reject re-ranking: latency increases should never be accepted in a customer-facing system regardless of the accuracy gain",
+      "Adopt re-ranking, but only for the small subset of queries where the 3-second SLA does not technically apply",
+      "Defer the decision until the SLA is renegotiated to explicitly allow for slower responses"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Quantifying both sides against the actual SLA is what this decision requires: a 7-point accuracy gain for 500 milliseconds moves p95 latency to roughly 2.1 seconds, which still leaves clear headroom under the 3-second contractual limit.",
+      "Tempting because it sounds cautious, but treating every latency increase as unacceptable is dogma rather than analysis, and it would reject a change that keeps the system comfortably within its own SLA while meaningfully improving accuracy.",
+      "Tempting because it seems to limit exposure, but carving out a subset of queries where the SLA does not apply fragments the assistant's behavior arbitrarily and creates two different accuracy experiences without a principled reason.",
+      "Tempting because it avoids making a call now, but the SLA already permits this change with headroom to spare; deferring simply delays a decision the existing data already supports making today."
+    ],
+    "principle": "weigh accuracy gains against latency cost in the units the SLA is actually measured in",
+    "relatedConcept": "A latency increase is only a problem relative to the budget available, not in the abstract.",
+    "overallExplanation": "Weigh accuracy gains against latency cost in the units the SLA is actually measured in. A latency increase is only a problem relative to the budget available, not in the abstract."
+  },
+  {
+    "id": 345,
+    "domain": "Integration",
+    "objective": "Analyze observability challenges and select monitoring strategies at scale",
+    "type": "single",
+    "question": "A platform runs tens of thousands of agent sessions every day. Engineers currently log the full prompt, response, and every tool payload for each session, which has become expensive to store and search, and failures are still hard to locate within the volume of raw logs. Which observability strategy is more appropriate at this scale?",
+    "options": [
+      "Disable logging in production entirely and reproduce any reported failure in a staging environment instead",
+      "Log only the final response of each session and discard all intermediate reasoning and tool-call steps",
+      "Use structured traces with correlation IDs and key metrics on every session, and sample or trigger full payload capture on error conditions",
+      "Rely on user complaints as the primary mechanism for detecting failures in production"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because it eliminates logging cost immediately, but it also loses the exact production context, including the real inputs and system state, that caused the failure, and many failures cannot be reproduced from a description alone.",
+      "Tempting because it cuts logging volume sharply, but agents most often fail in their intermediate steps, such as a wrong tool call or a misread retrieval result, and discarding those steps removes the evidence needed to diagnose exactly those failures.",
+      "Correct. At this scale, observability means structured traces, correlation IDs, and key metrics captured on every session cheaply, with the expensive full-payload capture reserved for sampled sessions or triggered specifically by error conditions.",
+      "Tempting because it costs nothing to build, but waiting for users to complain is a lagging indicator that catches only a fraction of failures, damages trust with every affected user, and provides far less diagnostic detail than structured traces."
+    ],
+    "principle": "capture structured traces and metrics on everything, and reserve expensive full capture for errors",
+    "relatedConcept": "Observability at scale is a sampling and structuring problem, not a binary choice between logging everything and logging nothing.",
+    "overallExplanation": "Capture structured traces and metrics on everything, and reserve expensive full capture for errors. Observability at scale is a sampling and structuring problem, not a binary choice between logging everything and logging nothing."
+  },
+  {
+    "id": 346,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A procurement agent operated by one company needs to negotiate delivery schedules with a scheduling agent operated independently by a supplier. Neither organization is willing to expose its internal tools or systems directly to the other. Which connection approach best fits this requirement?",
+    "options": [
+      "Register the supplier's internal scheduling tools directly in the procurement agent's own tool catalog",
+      "Use agent-to-agent communication across an agreed protocol boundary, with each agent mediating access to its own organization's systems",
+      "Give each agent direct read access to the other organization's internal scheduling database",
+      "Replace both agents with a single shared agent operated by a neutral third party"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it would let the procurement agent call scheduling functions directly, but registering the supplier's internal tools in another company's catalog exposes exactly what neither organization agreed to expose.",
+      "Correct. Coordinating across an organizational boundary without exposing either side's internal systems is the defining use case for agent-to-agent communication, where each agent stays in control of, and mediates access to, its own systems.",
+      "Tempting because direct access seems efficient, but granting either agent read access into the other organization's internal database exposes internal systems across the trust boundary that neither company is willing to cross.",
+      "Tempting because a single agent removes coordination overhead, but replacing both agents with a third-party-operated one requires an operating model, and a level of shared trust and control, that neither company asked for or agreed to."
+    ],
+    "principle": "use agent-to-agent protocols when autonomous agents must coordinate across an organizational trust boundary",
+    "relatedConcept": "Agent-to-agent communication lets each side mediate its own systems instead of exposing internals across a boundary neither organization controls.",
+    "overallExplanation": "Use agent-to-agent protocols when autonomous agents must coordinate across an organizational trust boundary. Agent-to-agent communication lets each side mediate its own systems instead of exposing internals across a boundary neither organization controls."
+  },
+  {
+    "id": 347,
+    "domain": "Integration",
+    "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+    "type": "multi",
+    "question": "A RAG assistant's knowledge base goes through a nightly documentation refresh, but the assistant intermittently answers questions using superseded content that the refresh was supposed to replace. Which TWO measures most directly address this problem? (Choose two.)",
+    "options": [
+      "Increase the context window so more documents can be retrieved for each query",
+      "Run a weekly manual spot-check of ten randomly selected answers",
+      "Add an automated re-indexing pipeline that validates completeness and embedding consistency after every content refresh",
+      "Add document versioning metadata to the index, and have retrieval filter out superseded versions"
+    ],
+    "correct": [2, 3],
+    "optionExplanations": [
+      "Tempting because retrieving more documents sounds like it would surface the current version somewhere in the results, but a larger context window just retrieves more of the same index, including the stale content, without fixing what made it stale in the first place.",
+      "Tempting because manual review does catch some errors, but a weekly check on ten answers is far too slow and sparse to catch an issue introduced by a nightly refresh, and it does nothing to prevent stale content from being served in between checks.",
+      "Correct. An automated re-indexing pipeline that validates completeness and embedding consistency after every refresh catches indexing failures at the source, right when the nightly update happens, rather than relying on someone noticing a wrong answer later.",
+      "Correct. Versioning metadata combined with retrieval-time filtering ensures that even if older embeddings linger in the index during a transition, the assistant only ever serves the current version of a document to the user."
+    ],
+    "principle": "validate the index at refresh time and filter by version at retrieval time",
+    "relatedConcept": "Staleness in RAG systems is usually an indexing-pipeline and metadata problem, not a retrieval-volume problem.",
+    "overallExplanation": "Validate the index at refresh time and filter by version at retrieval time. Staleness in RAG systems is usually an indexing-pipeline and metadata problem, not a retrieval-volume problem."
+  },
+  {
+    "id": 348,
+    "domain": "Integration",
+    "objective": "Evaluate tool/agent configuration for capability bloat",
+    "type": "multi",
+    "question": "An agent frequently invokes the wrong tool when several of its registered tools have closely related purposes, such as multiple tools that can each update customer records in slightly different ways. Which TWO changes most directly reduce these tool-selection errors? (Choose two.)",
+    "options": [
+      "Rewrite the tool descriptions so each tool's purpose, inputs, and boundaries are explicit and non-overlapping",
+      "Add more granular tools so that every edge case has its own dedicated tool to call",
+      "Instruct the model to always prefer the first tool listed in the catalog whenever it is uncertain",
+      "Consolidate or remove tools with overlapping functionality"
+    ],
+    "correct": [0, 3],
+    "optionExplanations": [
+      "Correct. When tools have related purposes, explicit and non-overlapping descriptions of what each tool does, what it takes as input, and where its boundaries stop give the model the distinguishing information it needs to select correctly.",
+      "Tempting because dedicated tools sound more precise individually, but adding more granular tools for every edge case increases the total number of related, similar-looking options and expands exactly the confusion surface that is causing the selection errors.",
+      "Tempting because a fallback rule sounds like it would at least be predictable, but always preferring the first listed tool under uncertainty institutionalizes wrong choices rather than helping the model select the actually correct tool.",
+      "Correct. Consolidating or removing tools whose functionality overlaps removes the ambiguity directly, since there are fewer plausible-looking options competing for the same request, which is the root cause of selecting the wrong one."
+    ],
+    "principle": "make each tool's purpose distinct instead of adding more overlapping tools or blanket fallback rules",
+    "relatedConcept": "Selection errors among related tools are usually solved by clarifying or consolidating the catalog, not by expanding it.",
+    "overallExplanation": "Make each tool's purpose distinct instead of adding more overlapping tools or blanket fallback rules. Selection errors among related tools are usually solved by clarifying or consolidating the catalog, not by expanding it."
+  },
+  {
+    "id": 349,
+    "domain": "Integration",
+    "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+    "type": "multi",
+    "question": "An architect is weighing progressive discovery, where tools and reference material are loaded on demand, against a monolithic strategy, where everything is placed in context upfront. Which TWO situations most strongly favor progressive discovery over the monolithic approach? (Choose two.)",
+    "options": [
+      "The solution uses only three tools, and all three are needed on every single request",
+      "The solution has a large catalog of tools and reference material, of which only a small subset is relevant to any single request",
+      "The context budget is constrained, and stuffing everything into context upfront degrades response quality",
+      "The reference material never changes and fits comfortably within the context window"
+    ],
+    "correct": [1, 2],
+    "optionExplanations": [
+      "Tempting because it describes a real design situation, but when a small, stable set of tools is needed on every request, loading everything upfront is simpler and progressive discovery's round-trips would only add latency without saving anything.",
+      "Correct. When only a small slice of a large catalog is relevant to any given request, discovery avoids paying the token and attention cost of the entire catalog on every request, loading just the slice that the task actually needs.",
+      "Correct. When the context budget is tight and loading everything upfront measurably degrades response quality, progressive discovery directly relieves that pressure by keeping the per-request context small and relevant.",
+      "Tempting because it describes a real scenario, but reference material that never changes and already fits comfortably in context is exactly the case where monolithic loading is simplest and discovery's round-trip cost buys nothing."
+    ],
+    "principle": "favor progressive discovery when the catalog is large relative to what each task actually uses",
+    "relatedConcept": "Monolithic context stays the simpler choice when the material is small, stable, and needed on nearly every request.",
+    "overallExplanation": "Favor progressive discovery when the catalog is large relative to what each task actually uses. Monolithic context stays the simpler choice when the material is small, stable, and needed on nearly every request."
+  },
+  {
+    "id": 350,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "An internal ticketing system needs to be accessible to multiple AI applications across the company, each of which should be able to discover and use its capabilities without a bespoke integration built separately for every application. Which integration mechanism best fits this need?",
+    "options": [
+      "MCP server",
+      "Direct API integration",
+      "Agent-to-agent protocol",
+      "Direct database access, bypassing any API or protocol layer"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Standardized, reusable, and discoverable access for many current and future consumers is exactly what an MCP server provides: the ticketing team maintains one server, and every application that needs it connects to that same server instead of integrating separately.",
+      "Tempting because the ticketing system likely already has an API, but wiring that API directly into each application's own tool definitions means every application repeats the same integration work and re-implements discovery on its own.",
+      "Tempting because it involves connecting systems, but agent-to-agent protocols exist for coordination between autonomous agents across separate organizations, not for one internal system serving multiple internal applications.",
+      "Tempting because it seems to remove an integration layer, but bypassing the ticketing system's API skips whatever validation, permissions, and business logic that API is built to enforce, and every consuming application would have to reimplement that logic itself."
+    ],
+    "principle": "match the integration mechanism to how many current and future consumers need access",
+    "relatedConcept": "MCP is the mechanism built for broad discoverability and reuse across many independent consumers of one system.",
+    "overallExplanation": "Match the integration mechanism to how many current and future consumers need access. MCP is the mechanism built for broad discoverability and reuse across many independent consumers of one system."
+  },
+  {
+    "id": 351,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A deterministic nightly batch job needs to push a fixed set of records into a data warehouse as part of an existing, tightly owned data pipeline, with no language model involved in the transfer itself. Which integration mechanism best fits this need?",
+    "options": [
+      "MCP server",
+      "Direct API integration",
+      "Agent-to-agent protocol",
+      "Direct database access, bypassing any API or protocol layer"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because MCP is a general integration mechanism, but this job has no model deciding what to call or when; MCP's discovery and tool-selection value goes unused here, adding a layer this deterministic transfer does not need.",
+      "Correct. This is a tightly scoped, deterministic call inside a pipeline the team already owns and operates, with no need for runtime discovery by a model or another agent; a direct API integration is the simplest mechanism that fits.",
+      "Tempting because it sounds like coordination between systems, but there is no autonomous agent on either side of this transfer and no organizational trust boundary being crossed, so agent-to-agent protocols solve a problem this job does not have.",
+      "Tempting because writing straight into the warehouse tables can look simpler, but bypassing the pipeline's own integration layer gives up the schema validation and audit trail the team's owned pipeline depends on, and it couples the job to physical table structure that will shift underneath it."
+    ],
+    "principle": "keep tightly scoped, deterministic pipeline calls on a direct API integration",
+    "relatedConcept": "MCP's discovery and agent-to-agent's cross-boundary negotiation solve problems a single owned pipeline does not have.",
+    "overallExplanation": "Keep tightly scoped, deterministic pipeline calls on a direct API integration. MCP's discovery and agent-to-agent's cross-boundary negotiation solve problems a single owned pipeline does not have."
+  },
+  {
+    "id": 352,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "Two autonomous agents, each owned and operated by a different company, need to coordinate logistics scheduling with each other, and neither company is willing to expose its internal systems to the other. Which integration mechanism best fits this need?",
+    "options": [
+      "MCP server",
+      "Direct API integration",
+      "Agent-to-agent protocol",
+      "Direct database access, bypassing any API or protocol layer"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because MCP does standardize access, but MCP servers are built for a single organization to expose its own systems to consuming applications, not for two independent, autonomous agents from different companies to coordinate directly with each other.",
+      "Tempting because APIs are a common way to connect two systems, but a plain API integration would require one company to expose an endpoint into its internal logistics systems directly to the other company's software, which neither side is willing to do.",
+      "Correct. Coordinating between autonomous agents across an organizational trust boundary, without either side exposing its internal systems, is precisely what agent-to-agent protocols are designed for; each agent mediates access to its own company's systems.",
+      "Tempting because it would give each side full visibility into the other's schedule, but granting database access across two independent companies exposes far more than logistics data and eliminates any access control or audit trail either company could otherwise enforce."
+    ],
+    "principle": "use agent-to-agent protocols specifically when autonomous agents across different organizations must coordinate",
+    "relatedConcept": "Neither MCP nor a direct API integration is built for two independently owned autonomous agents negotiating with each other.",
+    "overallExplanation": "Use agent-to-agent protocols specifically when autonomous agents across different organizations must coordinate. Neither MCP nor a direct API integration is built for two independently owned autonomous agents negotiating with each other."
+  },
+  {
+    "id": 353,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "A company is launching a new internal knowledge base and wants it to be discoverable and usable by any current agent in the organization, as well as by agents that have not been built yet. Which integration mechanism best fits this need?",
+    "options": [
+      "MCP server",
+      "Direct API integration",
+      "Agent-to-agent protocol",
+      "Direct database access, bypassing any API or protocol layer"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Discoverability by any present or future consumer, without a bespoke integration built for each one, is the core value MCP provides; any agent that speaks the protocol can find and use the knowledge base without custom work.",
+      "Tempting because a knowledge base likely has a query API already, but wiring that API directly into each agent's tool definitions means every future agent needs its own custom integration work, which is exactly what the company is trying to avoid.",
+      "Tempting because it involves multiple agents, but agent-to-agent protocols coordinate autonomous agents across a trust boundary; a shared internal knowledge base is not another autonomous agent and does not need that kind of negotiation layer.",
+      "Tempting because it seems like the most direct route to the underlying content, but bypassing the knowledge base's own retrieval and access layer skips whatever permissions and relevance logic it enforces, and every future agent would have to reimplement that logic itself."
+    ],
+    "principle": "choose MCP when a resource must be discoverable by any current or future agent",
+    "relatedConcept": "Direct integrations require rebuilding the connection for every new consumer, which defeats the goal of broad future discoverability.",
+    "overallExplanation": "Choose MCP when a resource must be discoverable by any current or future agent. Direct integrations require rebuilding the connection for every new consumer, which defeats the goal of broad future discoverability."
+  },
+  {
+    "id": 354,
+    "domain": "Integration",
+    "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+    "type": "single",
+    "question": "An existing microservice, already part of a tightly controlled internal pipeline, needs to call a Claude model a single time to classify an incoming document before the document moves on to the next stage. Which integration mechanism best fits this need?",
+    "options": [
+      "MCP server",
+      "Direct API integration",
+      "Agent-to-agent protocol",
+      "Direct database access, bypassing any API or protocol layer"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because MCP is a general-purpose connection mechanism, but this microservice already owns its pipeline and needs exactly one classification call, not the tool discovery and reuse across many consumers that an MCP server is built to provide.",
+      "Correct. A single, tightly scoped call inside a pipeline the microservice already owns and controls is a direct API integration: no discovery layer, no cross-organization mediation, and no additional infrastructure is needed for one classification request.",
+      "Tempting because it involves the model performing a task, but there is no second autonomous agent here and no organizational trust boundary being crossed; this is one internal service calling a model, not two agents coordinating.",
+      "Tempting only as a way to skip integration work entirely, but classification is a model call, not a database operation — there is no table to read or write that would produce a class label, so this option does not accomplish the task at all."
+    ],
+    "principle": "use a direct API integration for a single tightly scoped call inside an already-owned pipeline",
+    "relatedConcept": "Discovery layers and cross-organization protocols add overhead that a one-call, single-owner integration does not need.",
+    "overallExplanation": "Use a direct API integration for a single tightly scoped call inside an already-owned pipeline. Discovery layers and cross-organization protocols add overhead that a one-call, single-owner integration does not need."
   }
 ]

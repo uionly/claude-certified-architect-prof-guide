@@ -320,5 +320,97 @@
     "principle": "headless invocation with scoped, least-privilege permissions for unattended automation",
     "relatedConcept": "Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact.",
     "overallExplanation": "Headless invocation with scoped, least-privilege permissions for unattended automation. Runbook automation with headless agents extends developer tooling into operational workflows while keeping guardrails intact."
+  },
+  {
+    "id": 715,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "single",
+    "question": "An engineering lead is rolling out AI-assisted coding tools across a 30-person team. Early adopters have each configured the tooling differently, and the team is now seeing inconsistent code style and duplicated effort across projects. What is the most effective enablement step for the lead to take next?",
+    "options": [
+      "Let each developer continue refining their own personal configuration, since productivity tooling is inherently an individual preference",
+      "Establish a shared, version-controlled project configuration and standards that every team member's tooling inherits, reserving personal configuration for individual preferences",
+      "Restrict the use of AI-assisted tooling to only the two most senior engineers on the team",
+      "Mandate that all AI-generated code be rewritten by hand before it is committed"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it respects developer autonomy, but per-developer configuration is exactly the current problem, not a fix — it guarantees the inconsistent style and duplicated effort continue to compound as the team grows.",
+      "Correct. Team-scale productivity comes from shared, version-controlled configuration and standards that every member's tooling inherits automatically, with personal preference layered on top only where it doesn't affect shared conventions.",
+      "Tempting because it limits inconsistency by limiting who uses the tool, but it also eliminates the productivity gains across the other twenty-eight engineers that the rollout exists to create.",
+      "Tempting because manual rewriting feels like a safety net, but it discards the productivity gain the tooling was adopted for and does nothing to fix the underlying lack of shared configuration."
+    ],
+    "principle": "establish shared, version-controlled configuration that every member's tooling inherits",
+    "relatedConcept": "Team-scale productivity from AI-assisted tooling depends on shared standards rather than per-developer configuration.",
+    "overallExplanation": "Establish shared, version-controlled configuration that every member's tooling inherits. Team-scale productivity from AI-assisted tooling depends on shared standards rather than per-developer configuration."
+  },
+  {
+    "id": 716,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Improve developer workflows using AI-assisted tooling",
+    "type": "single",
+    "question": "A team uses an AI assistant to both write and review code. Reviews of AI-authored changes rarely raise any issues, yet defects from those same changes are still reaching production at a steady rate. Which adjustment most directly improves the quality of the review?",
+    "options": [
+      "Skip review entirely for AI-authored code, since it has already been machine-checked once during authoring",
+      "Have the same session that wrote the code review it a second time, this time instructing it to be more careful",
+      "Limit AI authoring to test files only, so that defects in authored code cannot reach production",
+      "Perform review independently of the authoring session or agent, using a fresh context not anchored to the reasoning that produced the code, with humans retaining merge authority"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because the code was already machine-checked once, but defects are reaching production while review is already being performed, so less review cannot be the fix — skipping it removes the very step where genuine independence could be introduced.",
+      "Tempting because it adds a second look, but the same session already committed to its original reasoning, so asking it to look again mostly repeats the anchoring rather than escaping it, catching little that a fresh perspective would.",
+      "Tempting because it shrinks the surface AI can affect, but confining AI authoring to test files doesn't touch the actual problem, which is that review quality itself is anchored, not that the wrong files are being authored.",
+      "Correct. A reviewer anchored to the reasoning that produced the code inherits its blind spots; running review in a fresh, independent context — with humans holding merge authority — is what actually surfaces defects that self-review misses."
+    ],
+    "principle": "review code independently of the session or agent that authored it",
+    "relatedConcept": "A reviewer anchored to the same reasoning that produced the code inherits its blind spots, so independent review with human merge authority catches more defects.",
+    "overallExplanation": "Review code independently of the session or agent that authored it. A reviewer anchored to the same reasoning that produced the code inherits its blind spots, so independent review with human merge authority catches more defects."
+  },
+  {
+    "id": 717,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Support debugging and operational issue resolution",
+    "type": "single",
+    "question": "A production agent has begun taking unexpected actions on a subset of incoming requests, and the on-call engineer's first instinct is to immediately rewrite the system prompt from scratch. What should happen before any change is made to the agent's configuration?",
+    "options": [
+      "Inspect the traces of the affected sessions — inputs, retrieved context, tool calls, and outputs — to identify the actual failure mode before changing anything",
+      "Rewrite the system prompt from scratch immediately, since prompt issues are the most common cause of unexpected agent behavior",
+      "Roll back the underlying model to a version from six months ago as a precaution",
+      "Disable the agent permanently and route the affected workload back to fully manual processing"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Diagnosing a failure means looking at the evidence — the actual inputs, retrieved context, tool calls, and outputs of the affected sessions — before touching anything, so any fix targets the real failure mode rather than a guess.",
+      "Tempting because prompt issues are a common cause of unexpected behavior, but rewriting from scratch before inspecting any traces is a guess about the cause, and a guess made without evidence can just as easily introduce a new failure mode.",
+      "Tempting because rolling back removes a variable, but this is a large intervention taken with no evidence it targets the actual cause of the subset failure, and it discards months of legitimate model improvements along the way.",
+      "Tempting because it stops the unexpected actions immediately, but permanently disabling the agent abandons a system that is failing only on a subset of requests, trading a diagnosable problem for a full loss of the capability."
+    ],
+    "principle": "diagnose before treating: inspect traces to find the actual failure mode first",
+    "relatedConcept": "Effective operational response to agent misbehavior starts with evidence from affected sessions, not an immediate change to configuration.",
+    "overallExplanation": "Diagnose before treating: inspect traces to find the actual failure mode first. Effective operational response to agent misbehavior starts with evidence from affected sessions, not an immediate change to configuration."
+  },
+  {
+    "id": 718,
+    "domain": "Developer Productivity & Operational Enablement",
+    "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+    "type": "multi",
+    "question": "A platform team wants to scale AI-assisted development across the organization without introducing new operational risk. Which two practices best support that goal? (Choose two.)",
+    "options": [
+      "Give all AI-assisted tooling unrestricted credentials across every environment to remove approval friction",
+      "Prohibit developers from inspecting or editing any code that AI tooling generates",
+      "Maintain shared configuration, prompt standards, and reusable workflows in version control so every team inherits proven practice",
+      "Constrain what automated tooling is permitted to execute — for example, allowed commands, protected branches, and approval gates for destructive actions"
+    ],
+    "correct": [2, 3],
+    "optionExplanations": [
+      "Tempting because unrestricted credentials do remove friction, but they maximize the blast radius of any mistake or compromise, which is the opposite of scaling without introducing operational risk.",
+      "Tempting because it sounds like it enforces standardization, but removing the ability to inspect or edit AI-generated code removes human oversight entirely, trading one risk for a larger, unmonitored one.",
+      "Correct. Shared configuration, prompt standards, and reusable workflows kept in version control let every team inherit proven practice automatically instead of each team re-deriving its own, which is how productivity gains scale without fragmenting.",
+      "Correct. Constraining what automated tooling can execute — allowed commands, protected branches, approval gates for destructive actions — bounds the blast radius of unattended or semi-attended runs, which is what makes scaling the tooling safe."
+    ],
+    "principle": "pair shared, version-controlled configuration with constraints on what automated tooling can execute",
+    "relatedConcept": "Scaling AI-assisted development safely requires both proven shared practice and explicit limits on tooling's operational reach.",
+    "overallExplanation": "Pair shared, version-controlled configuration with constraints on what automated tooling can execute. Scaling AI-assisted development safely requires both proven shared practice and explicit limits on tooling's operational reach."
   }
 ]

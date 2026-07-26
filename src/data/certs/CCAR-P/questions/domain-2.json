@@ -441,7 +441,7 @@
     "domain": "Claude Models, Prompting & Context Engineering",
     "objective": "Optimize context windows and manage token usage",
     "type": "single",
-    "question": "A public records agency runs an agentic workflow in which Claude issues repeated search-tool calls, and each raw result of 5–10K tokens of mostly irrelevant records is appended to the conversation. After 15–20 calls, answer quality drops sharply and the agent re-searches for records it already retrieved. What is the most effective remedy?",
+    "question": "A public records agency runs an agentic workflow in which Claude issues repeated search-tool calls, and each raw result of 5\u201310K tokens of mostly irrelevant records is appended to the conversation. After 15\u201320 calls, answer quality drops sharply and the agent re-searches for records it already retrieved. What is the most effective remedy?",
     "options": [
       "Move to a model tier with stronger long-context recall so the accumulated results stop dragging down answer quality",
       "Instruct the agent to stop after ten tool calls, since the observed degradation correlates with call count",
@@ -596,5 +596,189 @@
     "principle": "cache TTL slides with each use, so sequential batches keep shared prefixes warm",
     "relatedConcept": "Judging where caching pays requires reasoning about repetition patterns and TTL refresh behavior, not just raw gaps between runs.",
     "overallExplanation": "Cache TTL slides with each use, so sequential batches keep shared prefixes warm. Judging where caching pays requires reasoning about repetition patterns and TTL refresh behavior, not just raw gaps between runs."
+  },
+  {
+    "id": 227,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Select appropriate Claude models based on trade-offs",
+    "type": "single",
+    "question": "A ticket-routing system classifies 400,000 short messages per day into eight categories. On a labelled test set, accuracy is comparable across the entire model family, and the business is sensitive to both latency and cost. Which model strategy is most defensible?",
+    "options": [
+      "Use the most capable model in the family, since classification errors are always more expensive than the extra compute",
+      "Use the mid-tier model as a compromise between capability and cost, which avoids the need for further evaluation",
+      "Use the smallest model that meets the accuracy target on the test set, and validate the choice with ongoing evaluation in production",
+      "Alternate randomly between models on each request so that no single model's weaknesses dominate the results"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because classification mistakes feel costly, but this substitutes an assumption for measurement: at 400,000 requests a day, paying for capability the test set shows isn't needed is a real and recurring cost.",
+      "Tempting as a middle-ground compromise, but it sidesteps the evaluation that should actually drive the decision, and a compromise is not a substitute for measuring the smallest model that clears the bar.",
+      "Correct. When accuracy is comparable across the model family, the disciplined choice at this volume is the smallest model that meets the target, with ongoing evaluation confirming it continues to hold in production.",
+      "Tempting as a way to hedge against any one model's blind spots, but alternating models at random makes behaviour unpredictable, undebuggable, and impossible to reason about when something goes wrong."
+    ],
+    "principle": "at comparable accuracy and high volume, pick the smallest model that clears the bar and keep evaluating it",
+    "relatedConcept": "Model selection should be driven by measured accuracy against a target, not by assumptions about which model feels safest.",
+    "overallExplanation": "At comparable accuracy and high volume, pick the smallest model that clears the bar and keep evaluating it. Model selection should be driven by measured accuracy against a target, not by assumptions about which model feels safest."
+  },
+  {
+    "id": 228,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
+    "type": "single",
+    "question": "An application prepends the current timestamp and a request ID to the top of its system prompt, followed by 9,000 tokens of static policy content, and then the user's message. Prompt caching is enabled but the cache hit rate is near zero. What is the most likely cause?",
+    "options": [
+      "The dynamic values at the very start of the prompt change the prefix on every request, so no cached prefix can ever match",
+      "The 9,000 tokens of policy content are too long to be eligible for prompt caching",
+      "Prompt caching only applies to user messages, and does not apply to system prompts at all",
+      "The cache is being evicted because the application sends requests too frequently for the cache to keep up"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Caching matches on the prompt prefix, and a timestamp or request ID placed at position zero makes that prefix unique on every call. Moving the dynamic values after the static block restores a stable, cacheable prefix.",
+      "Tempting because 9,000 tokens sounds substantial, but there is no such length restriction that would zero out the hit rate; long static blocks are exactly what caching is designed to make cheap to reuse.",
+      "Tempting because it sounds like a plausible scope limitation, but it misstates how caching works; system prompts are cacheable, and in fact are the most common place to apply it.",
+      "Tempting because frequent requests can strain some systems, but frequent sequential use actually keeps a cache entry's TTL refreshed; it would not drive the hit rate to zero on its own."
+    ],
+    "principle": "dynamic content placed before the static block breaks the cacheable prefix on every request",
+    "relatedConcept": "Prompt caching depends on a stable prefix, so volatile values like timestamps belong after the reusable content, not before it.",
+    "overallExplanation": "Dynamic content placed before the static block breaks the cacheable prefix on every request. Prompt caching depends on a stable prefix, so volatile values like timestamps belong after the reusable content, not before it."
+  },
+  {
+    "id": 229,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
+    "type": "single",
+    "question": "A team applies chain-of-thought prompting uniformly across their platform. It has clearly improved a complex contract-analysis feature, but a simple field-extraction endpoint is now slower and more expensive with no measurable gain in accuracy. What should the architect conclude?",
+    "options": [
+      "Chain-of-thought should be removed platform-wide, since it doubles token usage without justifying the cost",
+      "The extraction endpoint needs an even longer chain-of-thought prompt before the benefit will show up",
+      "Chain-of-thought only produces benefits when used with the largest model in the family",
+      "Chain-of-thought adds value on multi-step reasoning tasks but adds cost and latency without benefit on simple extraction, so it should be applied selectively"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it fixes the extraction endpoint's problem, but it also throws away a proven gain on the contract-analysis feature, which is the wrong fix for a technique that helps in one place and not another.",
+      "Tempting because more reasoning sounds like it should help eventually, but simple field extraction has no multi-step reasoning to unlock, so a longer chain only adds more cost without a corresponding benefit.",
+      "Tempting as an explanation for the mismatch, but it is false; the pattern here has nothing to do with model size and everything to do with whether the task actually requires multi-step reasoning.",
+      "Correct. Chain-of-thought pays off on tasks that require working through multiple steps, but on simple extraction there is no such reasoning to expose, so it should be reserved for tasks where it demonstrably helps."
+    ],
+    "principle": "match chain-of-thought to task complexity rather than applying it uniformly across a platform",
+    "relatedConcept": "A technique that improves one feature can add pure overhead to another, so prompting strategies should be evaluated per task, not applied blanket-wide.",
+    "overallExplanation": "Match chain-of-thought to task complexity rather than applying it uniformly across a platform. A technique that improves one feature can add pure overhead to another, so prompting strategies should be evaluated per task, not applied blanket-wide."
+  },
+  {
+    "id": 230,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Design system prompts, templates, and guardrails",
+    "type": "single",
+    "question": "A system prompt contains a critical rule, never quote internal pricing, buried in the middle of 12,000 tokens of product context. The rule is followed inconsistently, and rewording the rule itself has not improved adherence. Which change is most likely to help?",
+    "options": [
+      "Repeat the rule verbatim after every paragraph of product context throughout the prompt",
+      "Move the critical rule to the beginning or end of the prompt, and separate rules from reference content with clear structure",
+      "Reduce the temperature setting to zero so the model behaves fully deterministically",
+      "Write the rule in upper case so the model treats it as a higher-priority instruction"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because repetition sounds like reinforcement, but scattering the same rule after every paragraph bloats the prompt and dilutes its salience further rather than fixing the underlying positional problem.",
+      "Correct. Critical rules buried in the middle of long context suffer from positional attention effects; placing them at the start or end, and structurally separating rules from reference material, is the highest-leverage fix.",
+      "Tempting because determinism sounds related to consistency, but temperature governs sampling randomness in wording, not which instructions the model attends to or prioritizes, so it would not fix this.",
+      "Tempting as a quick trick, but case alone is not a reliable priority mechanism, and more to the point it leaves the rule buried mid-context — it does not touch the positional cause that the stem has already shown rewording cannot fix."
+    ],
+    "principle": "place critical rules at the start or end of a prompt and structurally separate them from reference content",
+    "relatedConcept": "Instructions buried in the middle of long context are more likely to be missed, so structure and position matter as much as wording.",
+    "overallExplanation": "Place critical rules at the start or end of a prompt and structurally separate them from reference content. Instructions buried in the middle of long context are more likely to be missed, so structure and position matter as much as wording."
+  },
+  {
+    "id": 231,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
+    "type": "single",
+    "question": "A report-generation feature must return output in a precise house style: a fixed section order, defined heading names, and tables in a specific layout. Written instructions describing the format produce output that is close but inconsistent from run to run. What is the most effective next refinement?",
+    "options": [
+      "Add one or two few-shot examples showing complete, correctly formatted example outputs",
+      "Increase the max output tokens setting so the model has more room to follow the format",
+      "Raise the temperature so the model has more flexibility in interpreting the requested style",
+      "Split the report into separate requests, one per section, and concatenate the results afterward"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. For precise format compliance, showing beats telling: complete exemplars give the model a concrete target to match that written prose describing the format cannot convey as precisely.",
+      "Tempting because truncation can look like a formatting failure, but the described problem is inconsistency in structure, not running out of room, so more tokens would not address the actual cause.",
+      "Tempting because flexibility sounds helpful, but raising temperature increases variation in wording and structure, which is the opposite of what a precise, consistent house style requires.",
+      "Tempting as a way to isolate the problem per section, but it adds real engineering overhead without fixing the underlying per-section formatting inconsistency, and complicates recombining the output."
+    ],
+    "principle": "for precise format compliance, few-shot examples outperform written format instructions",
+    "relatedConcept": "Concrete exemplars communicate exact structural expectations more reliably than a written description of the desired format.",
+    "overallExplanation": "For precise format compliance, few-shot examples outperform written format instructions. Concrete exemplars communicate exact structural expectations more reliably than a written description of the desired format."
+  },
+  {
+    "id": 232,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Optimize context windows and manage token usage",
+    "type": "single",
+    "question": "An assistant answers questions over a 150,000-token collection of engineering standards by placing the entire collection into the context window on every request. Answers that cite content from the middle of the collection are noticeably less reliable, and the cost per request is high. Which strategy best addresses both problems?",
+    "options": [
+      "Move the user's question to the top of the prompt, above the full collection",
+      "Ask the model to read through the entire collection twice before answering",
+      "Retrieve only the sections relevant to each question and include those, rather than the full collection",
+      "Compress the collection by stripping out all headings and whitespace before sending it"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because reordering is a low-effort change, but putting the question above a 150,000-token collection is the weaker arrangement for long context, and it does nothing to reduce the tokens sent, so cost stays exactly the same.",
+      "Tempting as a way to reinforce content the model might miss, but the collection is sent and billed once either way, so this buys nothing on cost while adding latency, and re-reading does not repair unreliable mid-document recall.",
+      "Correct. Retrieving only the relevant sections sidesteps the mid-context recall degradation entirely and cuts the tokens sent on every request, directly addressing both reliability and cost.",
+      "Tempting because trimming sounds like it reduces size, but removing headings and whitespace saves a trivial number of tokens relative to 150,000 while destroying the structure that helps the model navigate it."
+    ],
+    "principle": "retrieve only the relevant sections instead of loading an entire large collection on every request",
+    "relatedConcept": "Both recall reliability and cost improve when context is scoped to what a question actually needs rather than including everything available.",
+    "overallExplanation": "Retrieve only the relevant sections instead of loading an entire large collection on every request. Both recall reliability and cost improve when context is scoped to what a question actually needs rather than including everything available."
+  },
+  {
+    "id": 233,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
+    "type": "multi",
+    "question": "A high-volume application has a large, mostly static prompt, and its per-request costs have been rising steadily as traffic grows. Which two techniques most directly reduce per-request cost while preserving the application's existing capability? (Choose two.)",
+    "options": [
+      "Structure the prompt so its static content forms a stable prefix, and enable prompt caching on it",
+      "Increase the max output tokens setting so fewer follow-up requests are needed",
+      "Add more few-shot examples to the prompt so the model succeeds on the first attempt",
+      "Load specialised instructions on demand, such as through modular prompts or Skills, instead of including every instruction in every request"
+    ],
+    "correct": [0, 3],
+    "optionExplanations": [
+      "Correct. A stable, cacheable prefix means the static content is charged at a steep discount on repeat use instead of full price on every request, directly cutting per-request cost at high volume.",
+      "Tempting because fewer follow-ups sounds cheaper, but max output tokens is only a ceiling on response length, not a saving; raising it does nothing about the large static prompt that is resent and billed on every request.",
+      "Tempting because first-attempt success sounds efficient, but every additional few-shot example is sent and billed on every single request, increasing rather than decreasing per-request cost.",
+      "Correct. Loading specialised instructions only when needed means each request pays only for the instructions relevant to it, instead of the full cost of every instruction the application could ever need."
+    ],
+    "principle": "cacheable static prefixes and on-demand modular instructions both cut per-request cost at scale",
+    "relatedConcept": "Reducing cost at high volume comes from paying for shared content once and for specialised content only when needed, not from adding more content per request.",
+    "overallExplanation": "Cacheable static prefixes and on-demand modular instructions both cut per-request cost at scale. Reducing cost at high volume comes from paying for shared content once and for specialised content only when needed, not from adding more content per request."
+  },
+  {
+    "id": 234,
+    "domain": "Claude Models, Prompting & Context Engineering",
+    "objective": "Design system prompts, templates, and guardrails",
+    "type": "multi",
+    "question": "An architect is reviewing a system prompt that produces inconsistent behaviour across otherwise similar requests. Which two practices are most likely to improve the model's adherence to the prompt's instructions? (Choose two.)",
+    "options": [
+      "Organise the prompt into clearly delimited sections, with an explicit priority order for when rules conflict",
+      "Place the most critical rules in the middle of the prompt, where the model spends most of its attention",
+      "Remove all structure so the prompt reads as natural, flowing prose rather than discrete sections",
+      "Include concrete examples showing correct handling of the specific cases the model tends to get wrong"
+    ],
+    "correct": [0, 3],
+    "optionExplanations": [
+      "Correct. Clear delimiters and an explicit conflict-resolution order remove ambiguity about which rule wins in edge cases, which is a common source of inconsistent behaviour.",
+      "Tempting because it sounds like the position of maximum focus, but mid-prompt placement is actually where attention tends to be weakest, so this places critical rules at their least reliable position.",
+      "Tempting because flowing prose can read more naturally, but removing structure strips away the delimiters and organization that help the model distinguish rules from reference content, worsening adherence.",
+      "Correct. Concrete examples of the specific failure cases give the model a precise target to match, which is often more effective at closing adherence gaps than restating the rule in different words."
+    ],
+    "principle": "clear structure with explicit priorities and targeted examples improve instruction adherence",
+    "relatedConcept": "Inconsistent behaviour often stems from ambiguous rule conflicts and missing concrete guidance, not from the wording of the rules themselves.",
+    "overallExplanation": "Clear structure with explicit priorities and targeted examples improve instruction adherence. Inconsistent behaviour often stems from ambiguous rule conflicts and missing concrete guidance, not from the wording of the rules themselves."
   }
 ]

@@ -780,5 +780,350 @@
     "principle": "hit cost targets by matching model tier and context size to each request's actual needs",
     "relatedConcept": "Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope.",
     "overallExplanation": "Hit cost targets by matching model tier and context size to each request's actual needs. Cost-pillar alignment turns a unit-economics target into specific architectural levers: tiering, routing, and retrieval scope."
+  },
+  {
+    "id": 135,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A logistics company wants Claude to process inbound freight quotes. Every request follows the same steps: extract shipment details from an email, validate them against a rate card, and generate a quote document. The requirements are stable and the steps never vary from request to request. Which architectural pattern is most appropriate?",
+    "options": [
+      "A multi-agent system with a supervisor agent delegating each step to specialist agents",
+      "A fixed workflow where each step — extraction, validation, and document generation — is a discrete, sequenced LLM call",
+      "An autonomous agent with tool access that plans its own approach to each incoming request",
+      "A single monolithic prompt containing all instructions and the full rate card, producing the quote in one pass"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because specialist delegation sounds thorough, but the three steps are fixed and never vary, so there is nothing for a supervisor to dynamically decide — multi-agent coordination only adds latency, token cost, and hand-off failure modes to a task that needs none of it.",
+      "Correct. The task is stable, repeatable, and fully known in advance, which is exactly the profile a fixed workflow serves best: each step runs as a discrete, sequenced call with predictable behavior, per-step auditability, and straightforward debugging when a quote comes out wrong.",
+      "Tempting because agents handle variability well, but this process has no variability to handle — every request follows the identical three steps, so autonomous planning is pure overhead that adds nondeterminism where the business wants consistent, explainable output.",
+      "Tempting because one prompt is simple to build, but folding extraction, rate-card validation, and document generation into a single pass sacrifices step-level control: a validation mistake buried inside one large output is far harder to catch than an error in a discrete validation step."
+    ],
+    "principle": "use a fixed workflow when a task's steps are stable, repeatable, and fully known in advance",
+    "relatedConcept": "Pattern selection starts by checking whether a process's steps can be enumerated ahead of time before reaching for agentic complexity.",
+    "overallExplanation": "Use a fixed workflow when a task's steps are stable, repeatable, and fully known in advance. Pattern selection starts by checking whether a process's steps can be enumerated ahead of time before reaching for agentic complexity."
+  },
+  {
+    "id": 136,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A consultancy is building a research assistant that investigates open-ended client questions. The steps required vary enormously between requests: some need only a couple of web searches, while others require document analysis, calculations, and follow-up queries whose necessity only becomes clear partway through the investigation. Which pattern best fits this situation?",
+    "options": [
+      "A fixed workflow with a generous number of pre-defined steps designed to cover most anticipated cases",
+      "A router that classifies each incoming request into one of five pre-built pipelines",
+      "A batch process that runs every possible analysis on each request and discards whatever output turns out to be unused",
+      "An autonomous agent that plans an action, observes the result, and decides its next step in a repeating loop"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because more predefined steps feels like it buys more coverage, but the stem says necessity only becomes clear mid-investigation — no fixed list, however generous, can anticipate a path that depends on what earlier steps reveal.",
+      "Tempting because routing reduces some open-endedness, but classifying into one of five fixed pipelines still requires the correct path to be knowable at the moment of classification, which the stem explicitly rules out for many requests.",
+      "Running every analysis regardless of relevance sidesteps the planning problem by brute force, but it wastes cost on irrelevant work, cannot ask a targeted follow-up query when an early finding demands one, and still produces a static result unresponsive to what's discovered.",
+      "Correct. When the useful next step only emerges from what was just observed, a plan-act-observe loop is the pattern purpose-built for it: the agent forms a hypothesis, acts, examines the result, and adapts its plan accordingly, request by request."
+    ],
+    "principle": "use an autonomous agent when the solution path only emerges during execution",
+    "relatedConcept": "Open-ended investigations where each finding reshapes the next action are the canonical justification for agentic loops over predefined pipelines.",
+    "overallExplanation": "Use an autonomous agent when the solution path only emerges during execution. Open-ended investigations where each finding reshapes the next action are the canonical justification for agentic loops over predefined pipelines."
+  },
+  {
+    "id": 137,
+    "domain": "Solution Design & Architecture",
+    "objective": "Apply decomposition techniques for complex problem solving",
+    "type": "single",
+    "question": "A single prompt asks Claude to read a 60-page RFP, assess compliance against 40 internal policies, score the opportunity, and draft a go/no-go recommendation in one pass. Output quality is inconsistent: some policies are skipped entirely and the scoring rationale is shallow. The team has already refined the prompt's wording twice with no improvement. What is the most effective next step?",
+    "options": [
+      "Move the workload to the largest available model and increase the maximum output token limit",
+      "Add more few-shot examples of well-written go/no-go recommendations to the existing prompt",
+      "Decompose the task into sequenced subtasks — extract, assess per policy group, score, then synthesize — passing structured output between steps",
+      "Lower the sampling temperature so the model follows the instructions more deterministically"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because bigger models and larger output budgets do raise ceiling capability, but the failure signature — skipped policies, shallow rationale on a long multi-part task — points to a structural gap, not a capacity shortfall the largest model would fix on its own.",
+      "Tempting because examples often improve output style, but the team's problem is coverage and depth across 40 distinct policies inside one pass, which is a structural limitation few-shot guidance cannot compensate for; examples show what good output looks like, not how to keep from skipping items.",
+      "Correct. Skipped items and shallow reasoning on a long, multi-part task is the classic decomposition problem: breaking the work into sequenced subtasks lets each step focus on a bounded piece of context, produce checkable intermediate output, and pass structured results forward instead of trying to do everything at once.",
+      "Tempting because determinism sounds like it would produce more consistent coverage, but temperature governs randomness in word choice, not whether the model systematically works through every one of 40 policies — it would not add the missing structure."
+    ],
+    "principle": "decompose a task into sequenced subtasks when a single pass shows skipped coverage and shallow reasoning",
+    "relatedConcept": "Prompt wording changes cannot fix a structural coverage gap that only decomposition into bounded subtasks addresses.",
+    "overallExplanation": "Decompose a task into sequenced subtasks when a single pass shows skipped coverage and shallow reasoning. Prompt wording changes cannot fix a structural coverage gap that only decomposition into bounded subtasks addresses."
+  },
+  {
+    "id": 138,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A claims-processing solution uses four specialist agents — intake, fraud screening, policy validation, and payout calculation. The business requires a complete, ordered audit trail of every decision, and later agents must never run once an earlier agent has flagged an exception. Which orchestration strategy best satisfies both requirements?",
+    "options": [
+      "A supervisor/orchestrator that invokes each specialist in sequence, records each outcome, and halts the chain the moment an exception is flagged",
+      "Peer-to-peer handoffs in which each agent decides for itself which agent to invoke next",
+      "Running all four agents in parallel and merging their outputs once every agent has finished",
+      "A shared message board that all four agents monitor and respond to opportunistically as they see fit"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. A central supervisor delivers both requirements by design rather than by luck: a single point where every decision is logged in order, and explicit control to halt the chain the instant an exception is flagged, with deterministic sequencing as the means to both.",
+      "Tempting because peer handoffs feel more flexible, but letting each agent decide the next invocation makes ordering and halting emergent rather than guaranteed — there is no single place enforcing that a flagged exception actually stops downstream agents from running.",
+      "Tempting because parallel execution is faster, but running all four agents simultaneously directly violates the requirement that later stages not run after an earlier one flags an exception — by the time fraud screening's flag is known, the other three have already executed.",
+      "Tempting because a shared board looks collaborative, but agents monitoring it opportunistically means sequencing and exception halting are left to chance rather than enforced, and reconstructing an ordered audit trail from opportunistic reads and writes is unreliable."
+    ],
+    "principle": "use a central supervisor when the business requires guaranteed sequencing, an ordered audit trail, and hard halting on exceptions",
+    "relatedConcept": "Orchestration strategy should be chosen from the control and traceability requirements a process must satisfy, not from what feels most collaborative.",
+    "overallExplanation": "Use a central supervisor when the business requires guaranteed sequencing, an ordered audit trail, and hard halting on exceptions. Orchestration strategy should be chosen from the control and traceability requirements a process must satisfy, not from what feels most collaborative."
+  },
+  {
+    "id": 139,
+    "domain": "Solution Design & Architecture",
+    "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+    "type": "single",
+    "question": "An executive sponsor wants to 'put AI across the whole business' and asks the architect to propose the very first project. Twelve candidate use cases have been suggested by different departments, each with its own champion and its own pitch for why it should go first. What should most strongly drive the selection of the initial use case?",
+    "options": [
+      "Choosing the use case that showcases the most advanced agentic capabilities to impress the board",
+      "Selecting the department with the most enthusiastic stakeholders, to guarantee smooth internal adoption",
+      "Measurable business value — such as cost, efficiency, or an SLA improvement — combined with feasible data access and manageable risk",
+      "Whichever use case can go live fastest, regardless of impact, in order to build early momentum"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because a flashy first project draws attention, but optimizing for spectacle over measurable outcome risks delivering something impressive that moves no business metric, which undermines the case for further AI investment rather than building it.",
+      "Tempting because stakeholder enthusiasm eases rollout friction, but selecting on politics rather than value means the first project may succeed at adoption while proving nothing about actual business impact, which is what sustained funding depends on.",
+      "Correct. First projects should be selected on measurable value pillars — cost, efficiency, or SLA gains — weighed against whether the data is actually accessible and the risk is containable; that combination is what produces a credible result and builds durable organizational support for what follows.",
+      "Tempting because speed builds visible momentum, but shipping fastest while ignoring impact optimizes for a metric — time to launch — that says nothing about whether the business is better off, and a fast but low-value launch does not earn the credibility a first AI project needs."
+    ],
+    "principle": "select an initial AI use case on measurable value weighed against feasibility and risk",
+    "relatedConcept": "Executive enthusiasm for breadth should be translated into a disciplined first project chosen on value, not on spectacle, politics, or speed alone.",
+    "overallExplanation": "Select an initial AI use case on measurable value weighed against feasibility and risk. Executive enthusiasm for breadth should be translated into a disciplined first project chosen on value, not on spectacle, politics, or speed alone."
+  },
+  {
+    "id": 140,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A document-triage solution has been running in production for three months. The team has dashboards for latency and token cost, but no way of knowing whether the model's classifications are actually correct once they reach production. Which architectural addition most directly closes this gap?",
+    "options": [
+      "A larger model, since classification accuracy generally improves as model capability increases",
+      "An alert that fires whenever daily token consumption deviates from its historical norm",
+      "A weekly review of the system prompt to confirm the instructions are still current",
+      "A feedback loop that captures downstream corrections and user signals, and routes a sample of production outputs into a labelled evaluation set"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because model capability correlates with accuracy in general, but swapping models changes behavior without measuring anything — the team still would have no way of knowing whether the new model's classifications are actually correct in production.",
+      "Tempting because cost monitoring is a legitimate architectural concern, but a token-consumption alert measures spend, not correctness; classifications could be systematically wrong while token usage stays perfectly within its historical norm.",
+      "Tempting because stale instructions are a real failure mode, but reviewing whether the prompt still reads sensibly is a check on configuration, not on whether the outputs it produces are correct — it would not surface a systematic classification error.",
+      "Correct. The missing piece is the feedback stage of the input-processing-output-feedback loop: capturing downstream corrections and user signals, and routing sampled production outputs into a labelled evaluation set, is what turns 'we have no idea if this is right' into a measurable, trackable accuracy signal."
+    ],
+    "principle": "add a feedback loop that captures production corrections into a labelled evaluation set to know whether outputs are actually correct",
+    "relatedConcept": "Latency and cost dashboards do not measure correctness; only a designed feedback stage that captures real-world signal can close that gap.",
+    "overallExplanation": "Add a feedback loop that captures production corrections into a labelled evaluation set to know whether outputs are actually correct. Latency and cost dashboards do not measure correctness; only a designed feedback stage that captures real-world signal can close that gap."
+  },
+  {
+    "id": 141,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+    "type": "single",
+    "question": "A retailer's product catalog, pricing, and promotions change daily, and the team wants Claude to answer customer questions using this information. They are debating how the model should get access to this constantly changing data. Which approach is most appropriate?",
+    "options": [
+      "Fine-tune a model on the current catalog snapshot and repeat the fine-tuning process every quarter",
+      "Augment the model with retrieval over the live catalog so its answers reflect current data",
+      "Paste the full catalog, including pricing and promotions, into the context window of every request",
+      "Rely on the base model's general knowledge and add a disclaimer that prices and availability may vary"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because fine-tuning does bake in knowledge, but a catalog that changes daily is stale within days of a quarterly fine-tune, and each retraining cycle is slow and costly relative to how fast the underlying data moves.",
+      "Correct. Daily-changing factual data like a live catalog is the canonical case for retrieval augmentation: the model queries current records at answer time, so responses reflect today's prices and promotions without ever needing to be retrained.",
+      "Tempting because it does give the model current data, but pasting the entire catalog into every request's context is costly at scale, will not fit as the catalog grows, and pays full context cost on requests that only need a handful of relevant items.",
+      "Tempting because a disclaimer is cheap to add, but it simply accepts that answers may be wrong about prices and availability rather than solving the problem — customers asking about current promotions deserve accurate data, not a caveat."
+    ],
+    "principle": "use retrieval augmentation when the model must answer from data that changes faster than any retraining cycle",
+    "relatedConcept": "Live, frequently-changing business data belongs behind retrieval, not inside a fine-tuned model or a disclaimer.",
+    "overallExplanation": "Use retrieval augmentation when the model must answer from data that changes faster than any retraining cycle. Live, frequently-changing business data belongs behind retrieval, not inside a fine-tuned model or a disclaimer."
+  },
+  {
+    "id": 142,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "single",
+    "question": "A single 'operations agent' handles HR queries, IT tickets, and finance requests. It carries 35 tools and a 6,000-token system prompt spanning all three domains, and its tool-selection accuracy has been declining as capabilities were added over time. Stakeholders now want to add a fourth domain, procurement. What is the strongest architectural recommendation?",
+    "options": [
+      "Split the agent into domain-specific agents behind a router or supervisor, each with a focused toolset and a focused system prompt",
+      "Add the procurement tools to the existing agent now, and plan a system-prompt rewrite for next quarter",
+      "Keep a single agent, but double the length of the system prompt so every domain is covered in more detail",
+      "Force the model to invoke a tool on every request so it stops answering from general knowledge alone"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Declining tool-selection accuracy as breadth grows is the classic signal that one agent is overloaded with too many tools and too broad a prompt; splitting into domain-specific agents behind a router restores a focused toolset and prompt per domain, and makes adding procurement an isolated addition instead of a further burden on the same overloaded agent.",
+      "Tempting because it satisfies the immediate ask quickly, but adding a fourth domain's tools to an agent whose accuracy is already declining compounds the exact problem described, and deferring the fix to next quarter means the agent operates degraded in the meantime.",
+      "Tempting because more detail sounds like it clarifies things, but a longer prompt covering four domains makes the instructions harder to follow, not easier, and does nothing to reduce the tool-selection confusion caused by having 35-plus tools available at once.",
+      "Tempting because forced tool use sounds like it would sharpen behavior, but the stated problem is that the agent is choosing the wrong tool among too many options, not that it is skipping tools altogether — this misdiagnoses the actual failure."
+    ],
+    "principle": "split an overloaded single agent into domain-specific agents behind a router when tool-selection accuracy declines with added breadth",
+    "relatedConcept": "Growing scope one domain at a time is a warning sign to decompose an agent by domain rather than keep adding to it.",
+    "overallExplanation": "Split an overloaded single agent into domain-specific agents behind a router when tool-selection accuracy declines with added breadth. Growing scope one domain at a time is a warning sign to decompose an agent by domain rather than keep adding to it."
+  },
+  {
+    "id": 143,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "multi",
+    "question": "An architect is deciding between a fixed workflow and an autonomous agent for a new Claude-based process, and wants to apply the general selection criteria correctly rather than defaulting to whichever pattern feels more modern. Which two characteristics of a problem most strongly favor choosing a fixed workflow over an autonomous agent? (Choose two.)",
+    "options": [
+      "Inputs arrive in unpredictable formats that require dynamic, case-by-case handling",
+      "The processing steps are known in advance and are the same for every request",
+      "The task benefits from creative exploration of multiple possible solution paths",
+      "The business requires that each step be individually auditable and reproducible"
+    ],
+    "correct": [1, 3],
+    "optionExplanations": [
+      "Tempting because unpredictability sounds relevant, but unpredictable inputs requiring dynamic handling is actually a condition that favors agentic autonomy, not a fixed workflow — it is the opposite signal from what the question asks for.",
+      "Correct. When the processing steps are known in advance and identical across requests, there is nothing for a model to decide dynamically; a fixed workflow captures that stability directly and runs each known step under code control.",
+      "Tempting because exploration sounds valuable in general, but a task that rewards creative exploration of multiple paths is precisely the kind of task that benefits from dynamic planning, which argues for an agent's flexibility rather than a workflow's fixed sequencing.",
+      "Correct. A requirement that each step be individually auditable and reproducible is satisfied naturally by a fixed workflow, where every step is a discrete, inspectable call; an agent's self-directed path can vary between otherwise identical requests, undermining reproducibility."
+    ],
+    "principle": "favor a fixed workflow when steps are known in advance and each step must be individually auditable and reproducible",
+    "relatedConcept": "The same two signals — predictability of steps and the need for reproducible auditability — repeatedly distinguish workflow-appropriate tasks from agent-appropriate ones.",
+    "overallExplanation": "Favor a fixed workflow when steps are known in advance and each step must be individually auditable and reproducible. The same two signals — predictability of steps and the need for reproducible auditability — repeatedly distinguish workflow-appropriate tasks from agent-appropriate ones."
+  },
+  {
+    "id": 144,
+    "domain": "Solution Design & Architecture",
+    "objective": "Design multi-agent systems and orchestration strategies",
+    "type": "multi",
+    "question": "A consultancy is scoping a complex due-diligence engagement and must decide whether a single augmented agent is sufficient or whether a multi-agent design is actually warranted for the work. Which two characteristics of the task most strongly indicate that a multi-agent design is warranted rather than a single agent? (Choose two.)",
+    "options": [
+      "The overall request volume across the engagement is expected to be very high",
+      "The project budget is large enough to comfortably afford running multiple agents",
+      "Distinct sub-tasks require different specializations, tools, and context that would overload a single agent",
+      "Several sub-tasks are independent of each other and can run in parallel to reduce end-to-end time"
+    ],
+    "correct": [2, 3],
+    "optionExplanations": [
+      "Tempting because high volume sounds like a scaling argument for more agents, but request volume is a throughput concern that can be handled within any pattern — including a single agent processing a queue — and does not by itself argue for splitting into multiple agents.",
+      "Tempting because affordability removes a constraint, but a large budget is a fact about resources, not an architectural driver; it does not tell you whether the task's structure actually needs multiple agents rather than one well-equipped agent.",
+      "Correct. When distinct sub-tasks each need different specializations, tools, and context — enough that combining them would overload a single agent's prompt and toolset — that is a structural reason to split the work across specialized agents rather than a resourcing preference.",
+      "Correct. Independent sub-tasks that can run in parallel are exactly what a multi-agent design exploits to reduce end-to-end time; running them as isolated parallel workers is the multi-agent advantage a single sequential agent cannot capture."
+    ],
+    "principle": "choose a multi-agent design when sub-tasks need distinct specializations or can run independently in parallel",
+    "relatedConcept": "Multi-agent architecture earns its coordination cost through task structure — specialization needs and parallelism — not through volume or budget alone.",
+    "overallExplanation": "Choose a multi-agent design when sub-tasks need distinct specializations or can run independently in parallel. Multi-agent architecture earns its coordination cost through task structure — specialization needs and parallelism — not through volume or budget alone."
+  },
+  {
+    "id": 145,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A company wants to summarize each inbound support email into a concise CRM note, retrieving the customer's account record to give the model relevant context before it writes the summary. Which architectural pattern best fits this task?",
+    "options": [
+      "A single augmented LLM call",
+      "A fixed workflow",
+      "An autonomous agent",
+      "A multi-agent system"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is one transformation — read an email plus a retrieved account record, produce a summary note — with no repeating multi-step sequence, no need for the model to plan its own path, and no separate specialists to coordinate; a single call augmented with retrieved context is the simplest pattern that fully covers it.",
+      "Tempting because retrieval feels like a 'step,' but there is no sequence of distinct model-driven steps here beyond one generation call informed by context — wrapping a single augmented call in workflow machinery adds structure the task does not need.",
+      "Tempting because agents can also use retrieved context, but nothing about this task requires the model to plan multiple actions or decide what to do next — it is a one-shot summarization from known, already-retrieved inputs, which does not justify autonomous looping.",
+      "Tempting because 'retrieve, then summarize' can sound like two roles, but both are trivially handled inside one augmented call; introducing separate agents for retrieval and summarization would add coordination overhead for a task with no real specialization to separate."
+    ],
+    "principle": "use a single augmented LLM call for one-shot transformations that only need supplied context, not multi-step orchestration",
+    "relatedConcept": "The simplest pattern that fully covers a task should be chosen before reaching for workflow, agentic, or multi-agent machinery.",
+    "overallExplanation": "Use a single augmented LLM call for one-shot transformations that only need supplied context, not multi-step orchestration. The simplest pattern that fully covers a task should be chosen before reaching for workflow, agentic, or multi-agent machinery."
+  },
+  {
+    "id": 146,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A finance team generates a monthly compliance report through the same five steps every time: gather source data, validate it, analyze it, format the report, and distribute it to reviewers. Which architectural pattern best fits this recurring process?",
+    "options": [
+      "A single augmented LLM call",
+      "A fixed workflow",
+      "An autonomous agent",
+      "A multi-agent system"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because a single call is simple, but five distinct steps — gathering, validating, analyzing, formatting, and distributing — each with different logic do not collapse cleanly into one prompt without losing the per-step checks a compliance report needs.",
+      "Correct. The same five steps recur identically every month with no variation in what needs to happen or in what order — that stability and repeatability is exactly what a fixed workflow is designed for, with each step callable, checkable, and auditable on its own.",
+      "Tempting because 'monthly process' sounds like it could benefit from planning, but nothing about this task is unpredictable: the steps and their order never change, so autonomous planning would add nondeterminism to a process that should behave identically every cycle.",
+      "Tempting because five steps might suggest five agents, but the steps are sequential and fixed rather than requiring different specialized reasoning or parallel execution — a multi-agent system would add coordination cost without addressing any actual specialization need."
+    ],
+    "principle": "use a fixed workflow for a recurring process whose steps and order never vary",
+    "relatedConcept": "Recurring, well-specified business processes are the clearest fit for prompt-chained workflows under code control.",
+    "overallExplanation": "Use a fixed workflow for a recurring process whose steps and order never vary. Recurring, well-specified business processes are the clearest fit for prompt-chained workflows under code control."
+  },
+  {
+    "id": 147,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "An engineer is investigating a production incident where the diagnostic path depends entirely on what each log or configuration query reveals — the next thing to check only becomes clear after seeing the result of the last one. Which architectural pattern best fits this investigation?",
+    "options": [
+      "A single augmented LLM call",
+      "A fixed workflow",
+      "An autonomous agent",
+      "A multi-agent system"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because retrieval-style context could inform an answer, but a single call cannot iteratively query systems and adapt based on what it finds — this task explicitly needs multiple rounds of investigation shaped by evolving evidence, which one call cannot provide.",
+      "Tempting because a workflow can chain steps, but a fixed workflow requires the steps and their order to be known in advance, and the stem states the opposite: what to check next is discovered only after seeing each result, which a predefined sequence cannot capture.",
+      "Correct. The diagnostic path only emerges from what earlier steps reveal — that plan, act, observe, and re-plan loop is precisely what an autonomous agent is built for, letting it form a hypothesis, query a system, and decide the next check based on the actual result.",
+      "Tempting because incident response can involve many kinds of checks, but nothing here calls for distinct specialized agents with different tools and context — one agent iterating through queries covers the described investigation without needing separate coordinated roles."
+    ],
+    "principle": "use an autonomous agent when the next useful action can only be determined after observing the previous result",
+    "relatedConcept": "Investigations with no predictable diagnostic path are the textbook case for a plan-act-observe agent loop rather than a predefined sequence.",
+    "overallExplanation": "Use an autonomous agent when the next useful action can only be determined after observing the previous result. Investigations with no predictable diagnostic path are the textbook case for a plan-act-observe agent loop rather than a predefined sequence."
+  },
+  {
+    "id": 148,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A merger review requires separate legal, financial, and technical assessments, each needing its own specialized tools and context, which then must be coordinated into a single combined recommendation for the deal team. Which architectural pattern best fits this review?",
+    "options": [
+      "A single augmented LLM call",
+      "A fixed workflow",
+      "An autonomous agent",
+      "A multi-agent system"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because a single call is efficient, but legal, financial, and technical assessment each demand different specialized context and tools that would overload one prompt, and combining all three into one call would blur distinct expertise areas together.",
+      "Tempting because a workflow can sequence distinct steps, but the three assessments here are described as needing their own specialized tools and context rather than a fixed, shared sequence — that specialization need points past a simple step chain.",
+      "Tempting because a single agent could try to hold all three domains, but juggling legal, financial, and technical tools and context in one agent recreates the overload problem a multi-agent split is meant to avoid, rather than solving the coordination need described.",
+      "Correct. Distinct sub-tasks each needing their own specialization, tools, and context, then coordinated into one combined output, is the defining case for a multi-agent design: specialist agents handle their domain and a lead agent synthesizes the results into the final recommendation."
+    ],
+    "principle": "use a multi-agent system when distinct sub-tasks each require their own specialization and must be coordinated into one output",
+    "relatedConcept": "Reviews spanning genuinely different domains of expertise are where multi-agent coordination earns its overhead.",
+    "overallExplanation": "Use a multi-agent system when distinct sub-tasks each require their own specialization and must be coordinated into one output. Reviews spanning genuinely different domains of expertise are where multi-agent coordination earns its overhead."
+  },
+  {
+    "id": 149,
+    "domain": "Solution Design & Architecture",
+    "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+    "type": "single",
+    "question": "A localization team needs to translate each incoming document into English, supplying a glossary of approved terminology as context so the translation uses consistent, approved terms. Which architectural pattern best fits this task?",
+    "options": [
+      "A single augmented LLM call",
+      "A fixed workflow",
+      "An autonomous agent",
+      "A multi-agent system"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Translating a document with a glossary supplied as context is a single transformation augmented with reference material — there is no repeating sequence of distinct steps, no need for the model to plan across multiple actions, and no separate specialists to coordinate.",
+      "Tempting because translation-plus-glossary can sound like two steps, but supplying the glossary as context and producing the translation both happen inside one call; wrapping that in workflow sequencing adds structure the single-call task does not need.",
+      "Tempting because agents can also use reference material, but nothing about this task requires the model to decide what to do next based on unpredictable results — it is a one-shot transformation with known inputs, not an open-ended investigation.",
+      "Tempting because 'terminology' and 'translation' could sound like separate specialties, but a single model call handles both together perfectly well; introducing multiple coordinated agents for a single grounded transformation adds cost without addressing any real specialization gap."
+    ],
+    "principle": "use a single augmented LLM call for a grounded transformation task with no repeating steps or planning need",
+    "relatedConcept": "Reference material supplied as context, like a glossary, augments a single call rather than requiring workflow or agentic structure.",
+    "overallExplanation": "Use a single augmented LLM call for a grounded transformation task with no repeating steps or planning need. Reference material supplied as context, like a glossary, augments a single call rather than requiring workflow or agentic structure."
   }
 ]

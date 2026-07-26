@@ -642,5 +642,304 @@
     "principle": "treat model deprecation as the start of a planned, eval-verified migration — not a deadline to approach",
     "relatedConcept": "Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles.",
     "overallExplanation": "Treat model deprecation as the start of a planned, eval-verified migration — not a deadline to approach. Model sunsetting is a recurring lifecycle event in LLM systems, and mature programs absorb it through planned regression evaluation rather than deadline scrambles."
+  },
+  {
+    "id": 629,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "During discovery for a new customer-support AI solution, a client's executive sponsor insists that the system must be \"100% accurate\" before it can go live, and dismisses any lower figure as unacceptable. What is the most effective response for the architect to give in that discovery conversation?",
+    "options": [
+      "Agree to the 100% accuracy requirement and add extended testing phases until that level is reached",
+      "Explain that LLM-based systems are inherently probabilistic, then work with the sponsor to define measurable acceptance criteria and an error-handling strategy aligned to business risk",
+      "Decline the engagement, since a 100% accuracy requirement cannot realistically be met by any AI system",
+      "Propose using a smaller, cheaper model instead, since it would be less costly to iterate toward the same requirement"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Tempting because it seems responsive to the sponsor's demand, but committing to an impossible target simply defers the failure — no amount of testing will make a probabilistic system produce zero errors, and the plan will eventually collide with reality.",
+      "Correct. This reframes an unachievable absolute into a workable agreement: acknowledging the technology's probabilistic nature lets the conversation move to concrete, measurable thresholds and a plan for handling the errors that will occur.",
+      "Tempting because it avoids setting the team up for failure, but walking away treats a communication and expectation-setting problem as if it were unsolvable, when a grounded conversation about acceptance criteria usually resolves it.",
+      "Tempting because a smaller model sounds like a simpler starting point, but changing model size changes the error rate achieved, not the sponsor's stated expectation — the underlying misunderstanding about probabilistic systems remains unaddressed."
+    ],
+    "principle": "convert an unachievable absolute demand into measurable, risk-aligned acceptance criteria",
+    "relatedConcept": "Executive sponsors often express requirements as absolutes, and the architect's job in discovery is to translate those absolutes into terms the system can actually be evaluated against.",
+    "overallExplanation": "Convert an unachievable absolute demand into measurable, risk-aligned acceptance criteria. Executive sponsors often express requirements as absolutes, and the architect's job in discovery is to translate those absolutes into terms the system can actually be evaluated against."
+  },
+  {
+    "id": 630,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "single",
+    "question": "A client opens a new engagement by stating simply, \"we need a chatbot for our intranet,\" without describing the underlying problem, target users, or how success would be measured. What should the architect do first, before proposing any architecture?",
+    "options": [
+      "Prepare a fixed-price quote for a standard intranet chatbot so the client has a concrete number to evaluate",
+      "Begin building a working prototype chatbot immediately so there is something concrete for stakeholders to react to",
+      "Run structured discovery to identify the underlying business problem, the users involved, success measures, the data landscape, and constraints, since a chatbot may or may not turn out to be the right solution",
+      "Ask which chatbot product the client has seen at a competitor and plan to replicate its feature set"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because a quick quote feels efficient, but pricing a solution before the underlying problem is understood locks in a scope and cost that may not even address what the client actually needs.",
+      "Tempting because a prototype gives stakeholders something tangible, but building first anchors everyone on 'chatbot' as the answer before anyone has confirmed what problem it is meant to solve.",
+      "Correct. \"We need a chatbot\" is a proposed solution, not a problem statement — structured discovery uncovers the business need, users, success measures, data landscape, and constraints that determine whether a chatbot is even the right answer.",
+      "Tempting because competitor examples feel like useful benchmarks, but copying another company's feature set outsources the client's own problem definition to a competitor's unrelated context and constraints."
+    ],
+    "principle": "treat a requested solution as a starting hypothesis, not a confirmed requirement",
+    "relatedConcept": "Clients frequently describe engagements in terms of a technology they have seen elsewhere, and discovery exists to recover the business problem underneath that request.",
+    "overallExplanation": "Treat a requested solution as a starting hypothesis, not a confirmed requirement. Clients frequently describe engagements in terms of a technology they have seen elsewhere, and discovery exists to recover the business problem underneath that request."
+  },
+  {
+    "id": 631,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Communicate architectural decisions and trade-offs",
+    "type": "single",
+    "question": "A CFO instructs the team to use the cheapest available model for a document-analysis solution that feeds regulatory reporting, but internal testing shows that cheaper model has a materially higher error rate on this specific task. What is the architect's most professional course of action?",
+    "options": [
+      "Present the trade-off with evidence — error rates, downstream rework, and regulatory exposure — against the cost saving, and recommend a decision framework, letting the accountable stakeholder decide with full information",
+      "Silently use the more capable, more expensive model anyway and absorb the cost difference elsewhere in the budget without mentioning it",
+      "Comply without comment, since cost decisions belong to the CFO and are outside the architect's remit",
+      "Escalate immediately above the CFO to the board audit committee before raising the concern with the CFO directly"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. This is evidence-based trade-off communication: laying out the measured error rate, its downstream rework cost, and its regulatory exposure alongside the savings gives the accountable stakeholder what they need to make an informed call.",
+      "Tempting because it seems to solve the accuracy problem quietly, but overriding an explicit instruction without telling anyone is a form of deception that undermines trust and hides a real cost from whoever owns the budget.",
+      "Tempting because respecting stakeholder authority sounds appropriately deferential, but silent compliance withholds material information — the error-rate evidence — from the person who is accountable for the outcome of their own decision.",
+      "Tempting because escalation feels decisive, but jumping over the CFO to the board before ever raising the concern directly skips the normal conversation and damages the working relationship unnecessarily."
+    ],
+    "principle": "surface trade-off evidence to the accountable stakeholder before a costly decision is finalized",
+    "relatedConcept": "Communicating architectural trade-offs means making risk and cost visible in business terms, not silently complying with or unilaterally overriding a stakeholder's instruction.",
+    "overallExplanation": "Surface trade-off evidence to the accountable stakeholder before a costly decision is finalized. Communicating architectural trade-offs means making risk and cost visible in business terms, not silently complying with or unilaterally overriding a stakeholder's instruction."
+  },
+  {
+    "id": 632,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "A stakeholder demands sub-second, complete responses from an assistant that performs multi-step retrieval and reasoning before answering, but engineering analysis shows the pipeline cannot realistically complete in under three seconds. Which approach best manages this expectation?",
+    "options": [
+      "Accept the sub-second requirement as stated and hope that later optimization work closes the gap before launch",
+      "Remove the retrieval and reasoning steps from the pipeline so the sub-second target can technically be met",
+      "Commit to sub-second responses for stakeholder demonstrations only, and plan to address the real latency later",
+      "Present the latency breakdown, negotiate a service-level agreement that reflects the pipeline's realistic envelope, and propose experience improvements such as streaming and progress indicators"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Tempting because it avoids an uncomfortable conversation now, but accepting a target the engineering analysis already shows is unreachable simply schedules the difficult conversation for after the requirement is missed.",
+      "Tempting because it would technically satisfy the timing number, but stripping out retrieval and reasoning removes the exact capability that gives the assistant its value, trading the requirement for the point of building it.",
+      "Tempting because it protects the demo, but a system that behaves differently in front of stakeholders than in production guarantees the gap surfaces later, at a worse time and with less trust to draw on.",
+      "Correct. This uses the latency breakdown as evidence to negotiate an SLA grounded in what the pipeline can actually do, while streaming and progress indicators improve perceived responsiveness within that real envelope."
+    ],
+    "principle": "negotiate SLAs from measured system behavior, and manage perceived latency where the real latency cannot move",
+    "relatedConcept": "Stakeholder feedback loops work best when latency and other expectations are anchored to engineering evidence rather than to a number stated before analysis existed.",
+    "overallExplanation": "Negotiate SLAs from measured system behavior, and manage perceived latency where the real latency cannot move. Stakeholder feedback loops work best when latency and other expectations are anchored to engineering evidence rather than to a number stated before analysis existed."
+  },
+  {
+    "id": 633,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Document architectures and provide implementation guidance",
+    "type": "single",
+    "question": "A consultancy is handing off a completed AI solution to the client's internal engineering team, who will own and operate it going forward after the consultancy's engagement ends. Beyond the code itself, which artifact set is most critical to a successful handoff?",
+    "options": [
+      "A recording of the final stakeholder demonstration that was used to close out the engagement",
+      "The complete history of prompt drafts that were explored and discarded during development",
+      "Architecture documentation with decision records explaining key trade-offs, operational runbooks, and evaluation baselines the team can re-run",
+      "A list of features that were considered during the engagement but ultimately not built"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Tempting because the demo shows the system working, but a recording is an artifact of the sales and sign-off journey — it gives the receiving team nothing they can use to operate or troubleshoot the system.",
+      "Tempting because the drafts show how the current prompt was reached, but a history of discarded attempts is development trivia rather than operational knowledge the receiving team needs to run the system day to day.",
+      "Correct. The receiving team must operate and evolve the system: decision records explain why it is built the way it is, runbooks tell them what to do when something goes wrong, and re-runnable evaluation baselines let them verify changes.",
+      "Tempting because it shows the thinking behind scope decisions, but a list of features that were never built documents what does not exist rather than what the team must run, monitor, or maintain."
+    ],
+    "principle": "hand off operational knowledge, not just working code",
+    "relatedConcept": "A successful handoff equips the receiving team to run, troubleshoot, and evolve the system independently, which requires decision records, runbooks, and re-runnable evaluations rather than artifacts of the build process itself.",
+    "overallExplanation": "Hand off operational knowledge, not just working code. A successful handoff equips the receiving team to run, troubleshoot, and evolve the system independently, which requires decision records, runbooks, and re-runnable evaluations rather than artifacts of the build process itself."
+  },
+  {
+    "id": 634,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "single",
+    "question": "Two months after launch, sponsor enthusiasm for an AI solution is fading, even though the system performs well, because the fortnightly status report shows only technical metrics such as token spend, latency, and uptime. What change would most improve stakeholder alignment?",
+    "options": [
+      "Report progress against the business success criteria agreed during discovery, such as hours saved, resolution rate, or error reduction, with technical metrics included as supporting detail",
+      "Increase the reporting frequency from fortnightly to daily so the sponsor receives more frequent updates",
+      "Remove the formal report entirely and rely on ad-hoc conversations with the sponsor when questions arise",
+      "Add even more technical metrics to the report so it appears more comprehensive and rigorous"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Sponsors fund a business outcome, not a set of technical metrics — reporting against the success criteria agreed at discovery reconnects the update to what the sponsor actually cares about, with technical detail supporting rather than replacing it.",
+      "Tempting because more frequent contact sounds like more engagement, but sending the same wrong content more often does nothing to close the gap between what is reported and what the sponsor is trying to see.",
+      "Tempting because ad-hoc conversations feel more personal, but removing the structured loop entirely leaves the sponsor without any regular visibility at all, which is a worse version of the same underlying problem.",
+      "Tempting because more data can look like more rigor, but adding further technical detail deepens the mismatch between what is measured and what the sponsor was promised the engagement would achieve."
+    ],
+    "principle": "anchor recurring stakeholder reporting to the business success criteria the sponsor actually funded",
+    "relatedConcept": "Feedback loops lose their value when they report only what is easy to measure technically instead of what was agreed as the definition of success at discovery.",
+    "overallExplanation": "Anchor recurring stakeholder reporting to the business success criteria the sponsor actually funded. Feedback loops lose their value when they report only what is easy to measure technically instead of what was agreed as the definition of success at discovery."
+  },
+  {
+    "id": 635,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Conduct structured discovery and requirement gathering",
+    "type": "multi",
+    "question": "An architect is concluding the discovery phase for a new AI engagement and preparing to move into design. Which TWO outputs are most important to have clearly documented before design begins? (Choose two.)",
+    "options": [
+      "Agreed, measurable success criteria and acceptance thresholds tied to the underlying business problem",
+      "The final production system prompt that the design team will implement",
+      "An assessment of data availability, quality, access constraints, and relevant compliance obligations",
+      "The specific model version that will be pinned for the production deployment"
+    ],
+    "correct": [0, 2],
+    "optionExplanations": [
+      "Correct. Design decisions cannot be evaluated without a target — measurable success criteria and acceptance thresholds, agreed with the business, give design and every later phase something concrete to be judged against.",
+      "Tempting because a system prompt looks like tangible progress, but writing production prompt language is a design and build activity; producing it during discovery skips straight to a solution before the requirements are settled.",
+      "Correct. Design choices about retrieval, storage, and workflow all depend on what data actually exists, its quality, who can access it, and what compliance obligations apply — discovery is where that assessment belongs.",
+      "Tempting because naming a model version feels like a concrete decision, but committing to a specific model before design is complete is premature and constrains architectural choices that discovery has not yet informed."
+    ],
+    "principle": "close discovery with agreed success criteria and a data/compliance assessment, not with design artifacts",
+    "relatedConcept": "Discovery outputs should describe the problem and its constraints precisely enough for design to begin, without pre-committing to the specific mechanisms design is meant to choose.",
+    "overallExplanation": "Close discovery with agreed success criteria and a data/compliance assessment, not with design artifacts. Discovery outputs should describe the problem and its constraints precisely enough for design to begin, without pre-committing to the specific mechanisms design is meant to choose."
+  },
+  {
+    "id": 636,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+    "type": "multi",
+    "question": "Midway through a build, stakeholders keep requesting additions to an AI solution — new data sources, extra user groups, additional output formats — beyond what was originally scoped. Which TWO practices best manage this pattern while preserving the stakeholder relationship? (Choose two.)",
+    "options": [
+      "Assess each request against the agreed success criteria and scope baseline, making its impact on timeline and cost visible before deciding whether to accept it",
+      "Refuse all change requests outright until the originally scoped work has fully shipped",
+      "Implement the requested additions but quietly reduce the testing effort elsewhere to protect the original schedule",
+      "Re-baseline the timeline, cost, and risk with sponsor sign-off whenever accepted changes materially alter the original plan"
+    ],
+    "correct": [0, 3],
+    "optionExplanations": [
+      "Correct. Evaluating each request against the agreed baseline, and making the resulting impact visible before it is accepted, keeps scope decisions deliberate rather than accumulating silently.",
+      "Tempting because a hard line protects the schedule, but refusing every request regardless of merit signals inflexibility and erodes the relationship with stakeholders who may have legitimate new information.",
+      "Tempting because it seems to satisfy everyone without disrupting the plan, but quietly cutting testing trades quality for schedule in a way stakeholders never agreed to and cannot see.",
+      "Correct. When accepted changes materially change scope, re-baselining timeline, cost, and risk with sponsor sign-off keeps expectations honest and prevents the original commitments from being judged against a plan that no longer reflects reality."
+    ],
+    "principle": "evaluate scope changes against the baseline openly, then re-baseline with sign-off when they materially change the plan",
+    "relatedConcept": "Feedback loops during a build should make the cost of new requests visible rather than absorbing them silently or refusing them reflexively, preserving trust in both directions.",
+    "overallExplanation": "Evaluate scope changes against the baseline openly, then re-baseline with sign-off when they materially change the plan. Feedback loops during a build should make the cost of new requests visible rather than absorbing them silently or refusing them reflexively, preserving trust in both directions."
+  },
+  {
+    "id": 637,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "An architect spends a week interviewing frontline staff to understand how insurance quotes are produced today, where manual effort is concentrated, and where time is lost in the current process, before any solution has been proposed. Which lifecycle phase does this activity belong to?",
+    "options": [
+      "Discovery",
+      "Design",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Interviewing frontline staff about today's process, and mapping where time and effort are lost, is discovery — it establishes the baseline problem before any solution or architecture has been chosen.",
+      "Design begins from an agreed problem and produces concrete architectural mechanisms; interviewing staff about today's process precedes that agreement and has not yet produced anything to design against.",
+      "Handoff transfers an already-built system's operation to the team that will run it; mapping today's manual quoting process has nothing to hand off yet, since no system exists.",
+      "Monitoring and iteration examines a live system's performance to prioritize improvements; interviewing staff about the current manual process happens before any AI system is running to monitor."
+    ],
+    "principle": "map today's process and its pain points before any solution is proposed",
+    "relatedConcept": "Discovery is anchored in understanding the current-state process and where it costs the business time or money, independent of what technology might later address it.",
+    "overallExplanation": "Map today's process and its pain points before any solution is proposed. Discovery is anchored in understanding the current-state process and where it costs the business time or money, independent of what technology might later address it."
+  },
+  {
+    "id": 638,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "For an already-agreed customer-support use case, an architect is now selecting the retrieval strategy and defining the guardrail architecture that the build team will implement. Which lifecycle phase does this activity belong to?",
+    "options": [
+      "Discovery",
+      "Design",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "correct": [1],
+    "optionExplanations": [
+      "Discovery is where the use case and its success criteria get agreed in the first place; this activity starts from an already-agreed use case and chooses concrete mechanisms, which is past discovery's scope.",
+      "Correct. Choosing a retrieval strategy and defining guardrails against an already-agreed use case is design — translating an agreed problem into concrete architectural mechanisms the build team will implement.",
+      "Handoff transfers a completed system's operation to the receiving team; selecting the retrieval and guardrail approach happens before there is a built system to hand off.",
+      "Monitoring and iteration responds to a live system's observed behavior; choosing the initial retrieval and guardrail architecture happens before the system exists to be monitored."
+    ],
+    "principle": "choose concrete architectural mechanisms against an already-agreed use case",
+    "relatedConcept": "Design takes the problem and success criteria settled in discovery and turns them into specific mechanisms such as retrieval strategy and guardrail architecture.",
+    "overallExplanation": "Choose concrete architectural mechanisms against an already-agreed use case. Design takes the problem and success criteria settled in discovery and turns them into specific mechanisms such as retrieval strategy and guardrail architecture."
+  },
+  {
+    "id": 639,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "At the end of a build, an architect walks the client's engineering team through the operational runbooks for a completed AI solution and formally transfers day-to-day ownership of the system to them. Which lifecycle phase does this activity belong to?",
+    "options": [
+      "Discovery",
+      "Design",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "correct": [2],
+    "optionExplanations": [
+      "Discovery happens before any solution is built, establishing the problem and requirements; transferring ownership of a completed system to its new operators is a much later activity.",
+      "Design produces the architectural mechanisms a system will use; walking a team through runbooks and transferring ownership happens after the system is already built, not while it is being designed.",
+      "Correct. Walking the receiving team through runbooks and formally transferring operational ownership is handoff — the point where responsibility for running the system moves to the team that will own it.",
+      "Monitoring and iteration is an ongoing activity performed by whoever owns the system after handoff; the act of transferring that ownership itself is the handoff step that precedes it."
+    ],
+    "principle": "transfer runbooks and operational ownership to the team that will run the system",
+    "relatedConcept": "Handoff is the specific point in the lifecycle where responsibility for operating a completed system moves from the build team to the team that will own it going forward.",
+    "overallExplanation": "Transfer runbooks and operational ownership to the team that will run the system. Handoff is the specific point in the lifecycle where responsibility for operating a completed system moves from the build team to the team that will own it going forward."
+  },
+  {
+    "id": 640,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "Several months into production, an architect reviews evaluation trends gathered from live usage of an AI solution and uses them to prioritize the next round of prompt improvements. Which lifecycle phase does this activity belong to?",
+    "options": [
+      "Discovery",
+      "Design",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "correct": [3],
+    "optionExplanations": [
+      "Discovery establishes the problem before a system exists; reviewing live evaluation trends requires a production system already generating data, which discovery precedes.",
+      "Design chooses a system's initial architectural mechanisms before launch; prioritizing the next improvement cycle from live evaluation trends happens well after design's initial choices are already running in production.",
+      "Handoff is the one-time transfer of operational ownership to the receiving team; reviewing evaluation trends to prioritize improvements is an ongoing activity that happens after handoff is already complete.",
+      "Correct. Using live evaluation trends to decide what to improve next is monitoring and iteration — the ongoing cycle of observing a production system's behavior and refining it accordingly."
+    ],
+    "principle": "use live evaluation trends to prioritize the next improvement cycle",
+    "relatedConcept": "Monitoring and iteration is the recurring lifecycle phase where a production system's observed behavior is reviewed and fed back into targeted improvements.",
+    "overallExplanation": "Use live evaluation trends to prioritize the next improvement cycle. Monitoring and iteration is the recurring lifecycle phase where a production system's observed behavior is reviewed and fed back into targeted improvements."
+  },
+  {
+    "id": 641,
+    "domain": "Stakeholder Communication & Lifecycle Management",
+    "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+    "type": "single",
+    "question": "Before any architectural choices have been made, an architect facilitates a workshop with stakeholders to agree what \"success\" will mean for a proposed AI solution and how that success will be measured. Which lifecycle phase does this activity belong to?",
+    "options": [
+      "Discovery",
+      "Design",
+      "Handoff",
+      "Monitoring and iteration"
+    ],
+    "correct": [0],
+    "optionExplanations": [
+      "Correct. Agreeing what success means and how it will be measured, before any design choice has been made, is discovery — it establishes the criteria every later phase will be judged against.",
+      "Design translates an already-agreed definition of success into concrete architectural mechanisms; a workshop to establish that definition in the first place happens before design has anything to work from.",
+      "Handoff transfers an already-built system's operation to its new owners; agreeing on success measures for a solution that does not exist yet happens long before there is anything to hand off.",
+      "Monitoring and iteration measures a live system against criteria that were already agreed; facilitating the workshop that establishes those criteria in the first place precedes any system to monitor."
+    ],
+    "principle": "agree what success means and how it will be measured before any design choice is made",
+    "relatedConcept": "Discovery is where stakeholders align on the definition and measurement of success, setting the target that design, handoff, and monitoring will all be evaluated against.",
+    "overallExplanation": "Agree what success means and how it will be measured before any design choice is made. Discovery is where stakeholders align on the definition and measurement of success, setting the target that design, handoff, and monitoring will all be evaluated against."
   }
 ]
