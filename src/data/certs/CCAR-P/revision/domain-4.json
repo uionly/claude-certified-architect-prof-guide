@@ -1,0 +1,144 @@
+{
+  "domain": 4,
+  "title": "Evaluation, Testing & Optimization",
+  "objectives": [
+    {
+      "objective": "Define evaluation metrics (accuracy, latency, cost, safety, security)",
+      "keyPoints": [
+        "Five dimensions defined before you build, derived from the business requirement: accuracy, latency, cost, safety, security.",
+        "Latency SLAs live on percentiles (p95, p99) and time-to-first-token — averages hide the tail where users complain and churn.",
+        "Cost is only meaningful per successful task outcome, including retries and human correction — not per token.",
+        "Safety and security need leading, adversarial metrics (harmful-output rate, injection success rate against the deployed system), not lagging incident counts.",
+        "High-stakes generation needs a dedicated faithfulness or grounding metric — a holistic quality score can be high while output contains fabrications."
+      ],
+      "watchFor": "Setting quality bars after seeing performance calibrates the target to whatever shipped; \"we'll know it when we see it\" reliably drifts toward acceptance.",
+      "question": {
+        "type": "single",
+        "stem": "A clinical summarization tool scores 9.1/10 on a holistic quality rubric, yet reviewers keep finding invented medication details. What metric is missing?",
+        "options": [
+          "A faithfulness or grounding metric measuring whether every claim traces to the source record",
+          "A higher-resolution quality rubric with more scoring dimensions",
+          "An inter-rater reliability measure for the human reviewers",
+          "A post-launch incident count for fabrication reports"
+        ],
+        "correct": [0],
+        "answerWhy": "A single aggregate quality score can be high while specific claims are ungrounded, so the failure mode that matters needs its own metric measuring traceability to the source. Expanding the rubric's resolution still averages fabrication away, reviewer reliability measures the graders rather than the system, and incident counts only move after patients have been affected."
+      }
+    },
+    {
+      "objective": "Design evaluation datasets and test frameworks using mixed methodologies",
+      "keyPoints": [
+        "The golden set's core comes from real (anonymized) production or pilot traffic — real users produce phrasings and ambiguities no team imagines.",
+        "Augment deliberately with rare-but-costly edge cases and adversarial cases (injections, jailbreaks, out-of-scope requests) that traffic under-samples.",
+        "Match grading to output type: exact-match or code-graded checks for deterministic outputs; a rubric-constrained LLM judge for open-ended ones.",
+        "Validate the judge against human labels before trusting its scores, and revalidate periodically for drift.",
+        "Keep a held-out set that iteration never touches, and refresh the golden set from current traffic on a cadence."
+      ],
+      "watchFor": "A 15-case suite passing 100% mostly measures the suite — coverage must be stratified across intents so whole categories cannot go untested.",
+      "question": {
+        "type": "single",
+        "stem": "A team builds its golden set from queries written by product managers, and the assistant then fails on real user phrasings and typos. What is the fix?",
+        "options": [
+          "Expand the PM-authored set with many more variations of each query",
+          "Anchor the set in real anonymized production traffic, augmented with edge and adversarial cases",
+          "Have a stronger model generate synthetic paraphrases of each PM query",
+          "Add an LLM judge so grading captures the intent behind each query"
+        ],
+        "correct": [1],
+        "answerWhy": "An eval set is a claim about production traffic, and imagined usage inherits the team's blind spots — real traffic is the anchor, with synthetic data supplementing edge and adversarial coverage. More PM-authored variants and model-generated paraphrases both expand within the same blind spot, and a judge changes how outputs are graded rather than which inputs are tested."
+      }
+    },
+    {
+      "objective": "Conduct A/B testing and iterative improvements",
+      "keyPoints": [
+        "Isolate variables — change prompt, model version, or retrieval depth one at a time and evaluate independently before combining validated changes.",
+        "Sequence offline before online: cheap risk-free golden-set evals filter bad candidates before any user sees them.",
+        "Grow blast radius with evidence — canary on a small slice with guardrail metrics (error rate, latency, cost, safety) watched for degradation, then widen.",
+        "Pre-define significance and sample size; small samples produce large random swings.",
+        "Where no unvalidated output may reach users, shadow deployment runs the variant on real inputs while logging rather than serving."
+      ],
+      "watchFor": "Running a confounded bundle longer just measures the confound more precisely — and watching only the primary metric hides the trade you didn't mean to make.",
+      "question": {
+        "type": "single",
+        "stem": "A release changed the prompt, upgraded the model, and doubled retrieval depth together. Task success rose 3% but latency regressed. What should the team do?",
+        "options": [
+          "Run the same experiment longer to reach statistical significance",
+          "Revert and test the three changes independently against the golden set, then combine only the validated ones",
+          "Keep the change and reduce retrieval depth until latency recovers",
+          "Roll out to more traffic to see whether the latency regression persists at scale"
+        ],
+        "correct": [1],
+        "answerWhy": "With three variables moved at once neither the gain nor the regression has an owner, so the effects must be separated before anything can be attributed. More runtime or more traffic measures the confounded bundle more precisely without resolving it, and tuning one dial inside the bundle leaves the attribution problem intact."
+      }
+    },
+    {
+      "objective": "Diagnose system issues (prompt failure, hallucinations, model mismatch)",
+      "keyPoints": [
+        "Prompt failure: unclear, conflicting, or accreted instructions — signature is inconsistency no model tier fixes.",
+        "Hallucination in a RAG system is usually a grounding gap — traces show retrieval returned nothing relevant and the model filled the void fluently.",
+        "Model mismatch: a plateau below target after competent prompt iteration, while a stronger model passes the same eval — route up and stop prompting.",
+        "Context problems are their own category: instructions honored in short sessions but ignored as context grows means truncation or lost-in-the-middle — a placement problem, not a wording problem.",
+        "Method: reproduce, read end-to-end traces to localize the broken step, then change one variable and verify against the reproduced cases."
+      ],
+      "watchFor": "Temperature 0 is not a groundedness fix — determinism makes the model fabricate the same answer every time. Randomness and grounding are different axes.",
+      "question": {
+        "type": "single",
+        "stem": "A RAG assistant confidently states policy details that do not exist. Traces show retrieval returned no relevant chunks for those queries. What is the correct fix?",
+        "options": [
+          "Add a strong instruction never to state anything not present in the provided context",
+          "Fix retrieval for these query types and give generation an explicit abstention path when context is insufficient",
+          "Set temperature to 0 so responses become deterministic",
+          "Upgrade to a more capable model tier that hallucinates less"
+        ],
+        "correct": [1],
+        "answerWhy": "This is a retrieval failure wearing a generation costume: the model had no source material, so the durable fix is retrieving the right content plus a sanctioned way to say \"insufficient information\". An instruction cannot conjure absent context, temperature 0 makes the fabrication repeatable, and a stronger model faced with empty context still has nothing to ground on."
+      }
+    },
+    {
+      "objective": "Optimize token usage, latency, and cost-performance trade-offs",
+      "keyPoints": [
+        "Profile first — attribute latency and cost across retrieval, queueing, tool calls, and generation, because intuition about the bottleneck is routinely wrong.",
+        "Risk-rank the levers: prompt caching of a large stable prefix, then context trimming, then output-length control — all with little or no behavioral risk.",
+        "Output tokens cost more and drive generation time, so shorter outputs are cheaper and faster; streaming changes perceived latency, not total.",
+        "Structural levers: route by difficulty so top-tier capability is paid for only where needed; batch pricing for anything nobody waits on.",
+        "Gate every optimization change on a golden-set pass — trimming, routing, and tier changes alter behavior."
+      ],
+      "watchFor": "Downgrading the model tier as the first cost move spends behavioral risk before the risk-free levers are exhausted — and savings judged per token can mask a rise in cost per successful task.",
+      "question": {
+        "type": "single",
+        "stem": "Costs are over budget on a workload that resends a 40,000-token system prompt and tool catalog on every call. Which lever should the architect try first?",
+        "options": [
+          "Downgrade to a cheaper model tier",
+          "Enable prompt caching on the stable prefix, which cuts input cost and latency with no effect on outputs",
+          "Reduce max output tokens across all requests",
+          "Move the workload to the Batches API for asynchronous pricing"
+        ],
+        "correct": [1],
+        "answerWhy": "A large prefix identical on every call is cache material, and caching is the highest-value lever that carries zero behavioral risk. A tier downgrade spends quality risk before the free savings are collected, output limits address a smaller term here, and batch pricing only applies if nothing waits on the responses."
+      }
+    },
+    {
+      "objective": "Monitor system performance using logging and observability tools",
+      "keyPoints": [
+        "Content-level structured logging — prompts, completions, tool calls — correlated by request ID, with PII redaction and retention policies.",
+        "For multi-step agents the unit of observability is the step: every model call and tool invocation traced with inputs and outputs under one trace ID.",
+        "Dashboards and alerts cover operational metrics: token usage, cost, latency percentiles, error rates.",
+        "Alert on sustained rate thresholds tied to SLOs, not individual failures — a page nobody reads protects nothing.",
+        "Quality needs its own layer: automated scoring of sampled production outputs for coverage plus sampled human review for ground truth and judge calibration."
+      ],
+      "watchFor": "Green operational dashboards are blind to answer quality — without a monitored quality signal, customers become the detection mechanism, and periodic manual audits let slow drift accumulate between reviews.",
+      "question": {
+        "type": "single",
+        "stem": "Cost, latency, and error dashboards have been green for two months, but an enterprise customer escalates that answer quality has degraded. What was missing?",
+        "options": [
+          "Tighter alert thresholds on the existing operational metrics",
+          "A quality monitoring layer — automated scoring of sampled production outputs plus periodic human review against the eval baseline",
+          "Longer log retention so the degradation could be traced",
+          "Per-tenant cost attribution so this customer's traffic was visible"
+        ],
+        "correct": [1],
+        "answerWhy": "Operational metrics cannot see whether answers are correct, so quality degradation needs its own continuously monitored signal scored against the eval baseline. Tightening thresholds on blind metrics changes nothing, longer retention helps investigate after the fact, and cost attribution answers a different question entirely."
+      }
+    }
+  ]
+}

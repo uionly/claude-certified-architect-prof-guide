@@ -1,0 +1,144 @@
+{
+  "domain": 4,
+  "title": "Prompt Engineering & Structured Output",
+  "objectives": [
+    {
+      "objective": "Design prompts with explicit criteria to improve precision and reduce false positives",
+      "keyPoints": [
+        "Precision comes from applicable decision rules, not from asking for care: \"flag only when the claimed behaviour contradicts actual code behaviour\" beats \"check that comments are accurate\".",
+        "\"Be conservative\" and \"only high-confidence findings\" define nothing the model can apply.",
+        "Model self-reported confidence is poorly calibrated — it is often most confident in its false positives.",
+        "Make criteria categorical: name the issue types to report (bugs, security flaws) and the ones to skip (style preferences, established local patterns).",
+        "Anchor each severity level with explicit criteria plus concrete code examples so classification is matching, not mood."
+      ],
+      "watchFor": "False positives spend developer trust faster than true positives earn it — disable a noisy category while you fix its criteria rather than letting it discredit the accurate ones.",
+      "question": {
+        "type": "single",
+        "stem": "A CI review agent flags style nits alongside real bugs, and developers have started ignoring all of its comments. What is the most effective change?",
+        "options": [
+          "Instruct the agent to be conservative and report only high-confidence findings",
+          "Define explicit categories to flag (bugs, security flaws) and to skip (style preferences, established local patterns), with severity criteria anchored by code examples",
+          "Filter findings by the agent's self-reported confidence score",
+          "Reduce the number of findings reported per pull request to the top three"
+        ],
+        "correct": [1],
+        "answerWhy": "Precision comes from categorical rules the model can apply identically on every run, including severity criteria anchored to concrete examples. \"Be conservative\" defines nothing, confidence filtering relies on a poorly calibrated signal that is often highest on false positives, and capping the count discards real findings without improving what qualifies as one."
+      }
+    },
+    {
+      "objective": "Apply few-shot prompting to improve output consistency and quality",
+      "keyPoints": [
+        "Few-shot is the strongest lever when detailed instructions still produce inconsistent output — it fixes both format (location, issue, severity, suggested fix) and judgment.",
+        "Target 2–4 examples at the ambiguous scenarios, each showing why one action beat a plausible alternative, so the reasoning generalizes.",
+        "For false-positive reduction, pair examples: an acceptable pattern beside a genuine issue, with the rationale for each.",
+        "For extraction, demonstrate varied document structures (inline citations vs bibliographies, narrative prose vs structured schedules) to fix format-driven misses.",
+        "Examples teach conventions for approximate or unusual source language."
+      ],
+      "watchFor": "Enumerating dozens of examples turns few-shot into lookup — and only choosing obvious examples wastes the mechanism, since the value is in the ambiguous cases.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction pipeline returns null for a publication-date field on documents where the date appears in a bibliography rather than a header, even though it is present. What fixes it best?",
+        "options": [
+          "Mark the field required so the model must populate it",
+          "Add a few targeted examples demonstrating correct extraction from the structural variants that are failing, including bibliography-style sources",
+          "Add a stricter instruction stating that the date is always present somewhere in the document",
+          "Retry the extraction until a non-null value is returned"
+        ],
+        "correct": [1],
+        "answerWhy": "The misses are driven by unfamiliar document structure, and a handful of examples covering those variants teaches the model where to look in each layout. Making the field required or insisting the value exists pressures the model into fabricating a date, and retrying reproduces the same structural blind spot."
+      }
+    },
+    {
+      "objective": "Enforce structured output using tool use and JSON schemas",
+      "keyPoints": [
+        "Define an extraction tool whose input parameters are your target schema and read data from the tool_use response — this makes structure structural, not probabilistic.",
+        "It eliminates syntax errors only; semantically wrong values (line items that don't sum, swapped fields) are still schema-valid.",
+        "tool_choice: \"auto\" allows plain text (the source of intermittent parser breakage); \"any\" guarantees a tool call while the model picks the schema; forced selection pins one specific tool.",
+        "Use \"any\" when several extraction schemas exist and the document type is unknown; force a tool when a specific step must run first.",
+        "Make fields optional/nullable when sources may lack them, and give enums honest exits — \"unclear\" for ambiguity, \"other\" plus detail for novelty."
+      ],
+      "watchFor": "Forcing a specific tool when the document type is unknown corrupts every document that does not match the forced schema.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction pipeline handles invoices, contracts, and reports, each with its own schema, and the document type is unknown at request time. Occasional plain-text responses break the parser. What tool_choice setting fits?",
+        "options": [
+          "\"auto\", with a prompt instruction to always call a tool",
+          "\"any\", so a tool call is guaranteed while the model selects the matching schema",
+          "Forced selection of the invoice extraction tool as the most common case",
+          "\"auto\", with a validation step that reprompts when plain text is returned"
+        ],
+        "correct": [1],
+        "answerWhy": "\"any\" is exactly the middle rung needed here: conversational text becomes impossible while the model retains the choice of which schema applies. \"auto\" leaves the plain-text path open regardless of prompt wording or a reprompt patch, and forcing one tool misapplies the invoice schema to every contract and report."
+      }
+    },
+    {
+      "objective": "Implement validation, retry, and feedback loops for extraction quality",
+      "keyPoints": [
+        "Validate semantics — schema validation plus business rules — because tool use eliminates only syntax errors.",
+        "Retry with error feedback: send the original document, the failed extraction, and the specific validation errors; blind identical retries mostly reproduce the failure.",
+        "Know when retries cannot succeed: information absent from the source is not a format error — fix it upstream or make the field nullable.",
+        "Extract both stated and calculated values and flag disagreement; surface internal inconsistencies with a conflict flag rather than resolving them silently.",
+        "Instrument findings with the triggering construct (a detected_pattern field) so dismissals and false positives are analyzable."
+      ],
+      "watchFor": "Pushing harder on retries for absent information wastes budget at best and teaches the model to fabricate plausible values at worst.",
+      "question": {
+        "type": "single",
+        "stem": "An invoice extraction fails validation because the line items do not sum to the stated total. What is the correct handling?",
+        "options": [
+          "Retry the identical request until an extraction that reconciles is returned",
+          "Retry with the original document, the failed extraction, and the specific validation error — and extract both stated and calculated totals, flagging the disagreement",
+          "Silently replace the stated total with the calculated sum before storing the record",
+          "Mark the total field optional so the validation no longer fails"
+        ],
+        "correct": [1],
+        "answerWhy": "Feedback-carrying retries let the model see what was wrong and correct misplaced or misread values, and capturing both the stated and calculated totals surfaces a genuine source conflict instead of hiding it. Blind retries reproduce the same failure, silently overwriting the stated total destroys evidence of a real discrepancy, and loosening the schema suppresses the signal entirely."
+      }
+    },
+    {
+      "objective": "Design efficient batch processing strategies",
+      "keyPoints": [
+        "The Batches API trades latency for cost: ~50% savings, a processing window of up to 24 hours, and no latency SLA.",
+        "Fits non-blocking latency-tolerant work (overnight reports, weekly audits, nightly test generation); disqualifies blocking workflows like pre-merge checks.",
+        "Batch requests do not support multi-turn tool calling — agentic loops must run synchronously or be restructured as single-turn requests with pre-collected context.",
+        "Every request carries a custom_id: on partial failure, resubmit only the failed items, modified to fix the cause (e.g. chunking oversized documents).",
+        "SLA arithmetic: submission cadence plus the 24-hour window sets worst-case delivery — submitting every 4 hours bounds completion at 28 hours."
+      ],
+      "watchFor": "\"Usually fast\" is not an SLA — never build deadlines on observed batch latency, and never submit a corpus with an unvalidated prompt when a sample would have taught the same lesson cheaply.",
+      "question": {
+        "type": "single",
+        "stem": "A team proposes moving their pre-merge review checks to the Message Batches API for the 50% discount. What is the sound assessment?",
+        "options": [
+          "Reject it — pre-merge checks are blocking, and the processing window extends to 24 hours with no latency SLA",
+          "Accept it, since batch turnaround is usually a few minutes in practice",
+          "Accept it, provided failed items are resubmitted by custom_id",
+          "Accept it for large pull requests only, keeping small ones synchronous"
+        ],
+        "correct": [0],
+        "answerWhy": "Batch is for latency-tolerant work, and a developer blocked on a merge cannot wait inside a window that may run to 24 hours with no guarantee. Observed turnaround is not a contract, and neither failure-recovery hygiene nor splitting by pull-request size changes the fact that the workflow is blocking."
+      }
+    },
+    {
+      "objective": "Design multi-instance and multi-pass review architectures",
+      "keyPoints": [
+        "Self-review is structurally limited: a session that generated the code retains its generation reasoning and rationalizes rather than questions.",
+        "The fix is a second independent instance that receives the code without the generator's reasoning context.",
+        "Single-pass review of large changesets suffers attention dilution — detailed early feedback, cursory later notes, and contradictory findings across files.",
+        "Multi-pass architecture: per-file passes for local issues plus a separate integration pass for cross-file data flow.",
+        "Calibrated confidence (measured against outcomes, not self-reported in the moment) can route review attention."
+      ],
+      "watchFor": "Larger context windows change what fits, not how evenly it is analyzed — and cross-run consensus filters suppress intermittently caught real bugs while stable false judgments survive.",
+      "question": {
+        "type": "single",
+        "stem": "A team's review step runs in the same session that generated the code and passes over a 40-file changeset in one go. Findings are shallow and sometimes contradictory. What architecture fixes this?",
+        "options": [
+          "Enable extended thinking and add adversarial framing to the review prompt",
+          "An independent Claude instance that receives the code without generation context, running per-file passes plus a separate cross-file integration pass",
+          "A larger context window so the whole changeset is analyzed at once",
+          "Three review runs, reporting only findings that appear in at least two of them"
+        ],
+        "correct": [1],
+        "answerWhy": "Two separate defects are in play — self-review bias and attention dilution — and they need instance isolation plus a multi-pass split respectively. Extended thinking deliberates longer inside the same blind spot, a bigger window changes capacity rather than evenness of attention, and consensus filtering discards intermittently detected real defects."
+      }
+    }
+  ]
+}

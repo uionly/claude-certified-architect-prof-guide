@@ -1,0 +1,75 @@
+{
+  "domain": 7,
+  "title": "Developer Productivity & Operational Enablement",
+  "objectives": [
+    {
+      "objective": "Configure Claude tools and environments for teams (e.g., Claude Code)",
+      "keyPoints": [
+        "Move knowledge and policy out of developers' heads into version-controlled artifacts the tool reads: CLAUDE.md for conventions, committed project settings.json for shared policy, user settings for personal preferences.",
+        "Deterministic vs probabilistic: memory files and prompts raise likelihood; hooks and permission allow/deny rules execute every time.",
+        "Must-happen behaviours (lint before finishing, never read .env, no destructive commands without approval) belong in hooks and permission rules.",
+        "Keep CLAUDE.md lean — it consumes context every session; stable conventions belong there, live external data behind MCP servers.",
+        "Deny rules for secrets paths belong in shared settings from day one."
+      ],
+      "watchFor": "Documenting standards in a wiki codifies drift rather than eliminating it, because nothing enforces what the wiki says — and per-developer permission settings make security depend on whose laptop is open.",
+      "question": {
+        "type": "single",
+        "stem": "A team requires that the linter run after every file edit, without exception. Where should this be configured?",
+        "options": [
+          "A hook in the committed project settings that runs after edit operations",
+          "An instruction in the project CLAUDE.md telling Claude to lint after editing",
+          "A team wiki page describing the linting standard",
+          "A custom slash command developers invoke when they finish editing"
+        ],
+        "correct": [0],
+        "answerWhy": "A behaviour that must happen every time needs deterministic execution, and a hook in shared committed settings runs regardless of what the model decides. A CLAUDE.md instruction is probabilistic, a wiki enforces nothing, and a slash command depends on someone remembering to invoke it."
+      }
+    },
+    {
+      "objective": "Improve developer workflows using AI-assisted tooling",
+      "keyPoints": [
+        "Workflow-first adoption: start from the delivery constraint — review latency, test debt, slow onboarding, doc rot — and apply tooling where it relieves the bottleneck.",
+        "Theory of constraints applies: accelerating code generation when review is the bottleneck just deepens the review queue.",
+        "High-value applications: AI-assisted first-pass review, test generation against untested code, refactoring support, documentation, and navigating unfamiliar codebases.",
+        "Measure delivery outcomes — cycle time, PR throughput, change-failure rate, developer satisfaction — against a baseline captured before rollout.",
+        "Managed rollout: pilot with a real team on real backlog work, publish guidelines, measure for a defined period, expand on evidence."
+      ],
+      "watchFor": "Adoption percentage, AI-generated lines of code, and acceptance rate are vanity metrics — they can all rise while the organization ships no faster. A named human stays accountable for merged code.",
+      "question": {
+        "type": "single",
+        "stem": "A team's delivery bottleneck is code review latency. Leadership proposes rolling out AI code generation and reporting adoption percentage as the success metric. What should the architect recommend?",
+        "options": [
+          "Proceed as proposed, since faster code generation increases overall throughput",
+          "Target the review bottleneck with AI-assisted first-pass review, and measure cycle time and PR throughput against a pre-rollout baseline",
+          "Roll out generation first and address review capacity in a later phase",
+          "Add reviewers rather than tooling, since the constraint is human capacity"
+        ],
+        "correct": [1],
+        "answerWhy": "Accelerating a non-bottleneck step deepens the queue at the constraint, so the tooling should target review itself, measured by delivery outcomes against a baseline. Adoption percentage measures activity rather than throughput, deferring the constraint to a later phase guarantees the interim gets worse, and hiring alone forgoes the tooling leverage available at the bottleneck."
+      }
+    },
+    {
+      "objective": "Support debugging and operational issue resolution",
+      "keyPoints": [
+        "Split permissions on the observe/act boundary: read-only access to logs, metrics, traces, and code for diagnosis; explicit human approval for any state-changing action.",
+        "Mid-incident is when supervision is least reliable, which is exactly why the write path needs a deterministic gate.",
+        "A coherent explanation is not evidence — reproduce the failure with a test, confirm the patch makes it pass, and run the existing suite.",
+        "Learn the guessing signature: serially revised, authoritative root causes with shifting citations and no confirmed checks.",
+        "When that pattern appears, stop the AI-led thread and escalate to humans, handing over the hypotheses already eliminated."
+      ],
+      "watchFor": "Restricting AI diagnosis to staging discards the live logs and state the investigation needs — read-only production access is the safe alternative, not a staging-only rule.",
+      "question": {
+        "type": "single",
+        "stem": "During an outage, an assistant proposes a root cause and a config change with a clear, convincing explanation. What should happen before it is applied?",
+        "options": [
+          "Apply it immediately — incident duration is the dominant cost",
+          "Reproduce the failure with a test, confirm the patch makes that test pass, and run the existing suite",
+          "Ask the assistant to rate its confidence in the diagnosis and apply it if confidence is high",
+          "Have a second model review the proposed change before applying it"
+        ],
+        "correct": [1],
+        "answerWhy": "Fluency is not evidence, so the fix must be verified against the system's actual behaviour via a reproducing test plus the existing suite. Applying immediately risks turning one outage into two, self-rated confidence structures the guess without adding ground truth, and a second model is another probabilistic opinion rather than a check against reality."
+      }
+    }
+  ]
+}

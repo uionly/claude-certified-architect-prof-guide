@@ -1,0 +1,29 @@
+{
+  "domain": 4,
+  "title": "Eval, Testing, and Debugging",
+  "objectives": [
+    {
+      "objective": "Debugging and Error Handling",
+      "keyPoints": [
+        "First move: decide whether the failure is integration-layer (401, 403, 400, 429, 5xx, 529) or model-output (malformed JSON, ignored instruction, truncation, refusal) — they need different medicine.",
+        "Transient integration errors (429, 5xx, 529) get exponential backoff with jitter; 400-class errors are deterministic client bugs to fix, not retry.",
+        "A 200 response does not mean success end-to-end — check stop_reason for max_tokens truncation and validate the payload.",
+        "Model-output failures need validation, tighter output constraints, few-shot examples, or a corrective reprompt that includes the validation error.",
+        "Debug multi-step workflows from per-step traces (prompts, tool calls, tool results, stop reasons), not from the final answer alone."
+      ],
+      "watchFor": "Blanket remedies — retry everything, use a bigger model, wrap it in try/except — treat symptoms without a diagnosis, and a larger model fixes neither rate limits nor parsing bugs.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction endpoint returns HTTP 200, but roughly one response in twenty is JSON the parser rejects. The team's handler retries the identical request on parse failure. What is the better approach?",
+        "options": [
+          "Keep retrying but add exponential backoff with jitter between attempts",
+          "Validate the response and, on failure, reprompt with the validation error — and constrain output with a typed schema so drift stops occurring",
+          "Upgrade to a more capable model tier to reduce malformed output",
+          "Catch the parse exception, log it, and skip the record"
+        ],
+        "correct": [1],
+        "answerWhy": "This is a model-output failure inside a healthy HTTP response, so the remedy is validation plus a corrective reprompt that tells the model what was wrong, with a typed schema preventing the drift up front. Retrying an identical request tends to reproduce the same failure regardless of backoff, a bigger model leaves the unconstrained output contract in place, and skipping records silently drops data."
+      }
+    }
+  ]
+}

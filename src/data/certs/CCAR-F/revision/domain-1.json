@@ -1,0 +1,167 @@
+{
+  "domain": 1,
+  "title": "Agentic Architecture & Orchestration",
+  "objectives": [
+    {
+      "objective": "Design and implement agentic loops for autonomous task execution",
+      "keyPoints": [
+        "Loop on stop_reason: continue while \"tool_use\", terminate on \"end_turn\" — never parse assistant text for completion phrases.",
+        "Append every tool result to the growing conversation before the next request; a rebuilt request makes the model re-call tools forever.",
+        "Return one result for every tool call requested in the turn.",
+        "The application executes tools; Claude only requests them.",
+        "Iteration caps are alarmed runaway backstops, not the stopping mechanism."
+      ],
+      "watchFor": "Claude emits explanatory prose alongside tool requests, so text-based termination exits loops mid-task — the text is commentary, not a signal.",
+      "question": {
+        "type": "single",
+        "stem": "A support agent's loop exits partway through a refund because the assistant's commentary matched a \"task complete\" phrase. What is the correct control flow?",
+        "options": [
+          "Continue the loop while stop_reason is \"tool_use\" and exit only when it is \"end_turn\"",
+          "Expand the completion-phrase list so mid-task commentary no longer matches",
+          "Set a fixed iteration count that covers the longest expected workflow",
+          "Have the model emit a sentinel token when it is genuinely finished"
+        ],
+        "correct": [0],
+        "answerWhy": "stop_reason is the model's explicit structured signal for whether it wants tools or considers the task done, so the loop should be driven by it and nothing else. Refining phrase lists or sentinel tokens keeps termination dependent on generated text, and a fixed iteration count either truncates long tasks or spins on short ones."
+      }
+    },
+    {
+      "objective": "Orchestrate multi-agent systems with coordinator-subagent patterns",
+      "keyPoints": [
+        "Hub-and-spoke: all inter-subagent communication, error handling, and routing flows through the coordinator — subagents never talk peer-to-peer.",
+        "That buys observability of every handoff, a single owner for failures, and controlled information flow.",
+        "Coordinators select subagents dynamically per query — a simple factual question invokes one search agent, not the full pipeline.",
+        "Close the loop: evaluate the synthesis for gaps, re-delegate, re-synthesize; exit on goal-referenced sufficiency, not iteration counts.",
+        "Partition scope across parallel subagents — identical prompts buy duplicated research."
+      ],
+      "watchFor": "The exam names both coordinator risks: blanket routing through every stage, and decomposing a broad topic into hyper-narrow slivers so the report misses cross-cutting themes.",
+      "question": {
+        "type": "single",
+        "stem": "In a research pipeline, the search subagent passes its results straight to the analysis subagent to save a hop. What is the architectural cost?",
+        "options": [
+          "Latency increases because the coordinator can no longer parallelize the stages",
+          "The system loses observability of the handoff, a single owner for errors, and coordinator control over what each subagent sees",
+          "The analysis subagent inherits the search subagent's context window and exhausts it",
+          "Nothing significant — direct handoff is a valid optimization for sequential stages"
+        ],
+        "correct": [1],
+        "answerWhy": "Hub-and-spoke exists so every handoff is visible in one place, failures surface to one owner, and the coordinator decides exactly what each subagent receives — a peer-to-peer shortcut forfeits all three. Latency is not the issue here, and subagents run with isolated context rather than inheriting one another's windows."
+      }
+    },
+    {
+      "objective": "Configure subagent invocation, context passing, and spawning",
+      "keyPoints": [
+        "Subagents are spawned via the Task tool — without \"Task\" in the coordinator's allowedTools, delegation is impossible no matter how good the prompts are.",
+        "An AgentDefinition covers description, system prompt, and tool restrictions.",
+        "Subagents have isolated context: they inherit no parent history and share no memory between invocations.",
+        "Embed the complete prior findings in the delegation prompt — \"synthesize the findings so far\" hands the subagent nothing.",
+        "Parallelize by emitting multiple Task calls in one response, not by spawning across separate turns."
+      ],
+      "watchFor": "Pass findings as structured content plus metadata (source URLs, document names, page numbers) — undifferentiated prose destroys attribution before synthesis starts.",
+      "question": {
+        "type": "single",
+        "stem": "A synthesis subagent produces plausible but unsourced conclusions. Its delegation prompt reads: \"Synthesize the findings gathered so far into a report.\" What is wrong?",
+        "options": [
+          "The synthesis subagent needs a larger context window to hold the accumulated findings",
+          "Subagents inherit no parent context — the coordinator must embed the actual search and analysis outputs, structured with their source metadata, in the prompt",
+          "The coordinator should let the search subagent hand its results to the synthesis subagent directly",
+          "The prompt should specify the report's section structure and length"
+        ],
+        "correct": [1],
+        "answerWhy": "Subagent context is isolated, so a reference to earlier work conveys nothing and the agent fills the gap with plausible invention; the coordinator has to pass the findings verbatim with content separated from source metadata. A bigger window cannot hold context that was never sent, peer handoff breaks hub-and-spoke, and formatting detail does not supply the missing evidence."
+      }
+    },
+    {
+      "objective": "Implement multi-step workflows with enforcement and handoff patterns",
+      "keyPoints": [
+        "Programmatic enforcement vs prompt guidance: prompts give probabilistic compliance with a non-zero failure rate — fine for style, unacceptable for hard invariants.",
+        "For guaranteed ordering (identity verification before a financial operation), use a prerequisite gate in code that blocks the downstream tool until the prerequisite completed.",
+        "A blocking gate should redirect the agent to the prerequisite rather than dead-ending it.",
+        "Decompose multi-concern messages into distinct items, investigate in parallel with shared context, then synthesize one unified resolution.",
+        "Hand off with a structured summary — customer ID, root cause, amounts, recommended action — not a raw transcript."
+      ],
+      "watchFor": "Adding a second model to review the first is still stacked probabilistic checks — it lowers the failure rate without ever making it a guarantee, and it adds latency and cost.",
+      "question": {
+        "type": "single",
+        "stem": "A support agent must never call process_refund before get_customer has verified the customer's identity. Prompt strengthening reduced but did not eliminate skipped verifications. What is the correct mechanism?",
+        "options": [
+          "Add few-shot examples showing verification preceding every refund",
+          "A programmatic prerequisite gate that blocks process_refund until a verified customer ID exists, redirecting the agent to verification",
+          "A second model that reviews each refund decision before it executes",
+          "Move the verification requirement to the top of the system prompt and repeat it"
+        ],
+        "correct": [1],
+        "answerWhy": "A hard business invariant needs deterministic enforcement, so code blocks the refund until the prerequisite is satisfied and points the agent at what it must do first. Few-shot examples, prompt placement, and a second reviewing model all reduce the failure rate probabilistically, which is not the same as making the violation impossible."
+      }
+    },
+    {
+      "objective": "Apply Agent SDK hooks for tool call interception and data normalization",
+      "keyPoints": [
+        "PostToolUse hooks transform tool results after execution — the canonical use is normalizing heterogeneous formats (Unix timestamps, ISO 8601, numeric status codes) into one shape.",
+        "Pre-execution interception enforces compliance: inspect the outgoing call, block violations, redirect to an alternative workflow.",
+        "Direction is the design decision: gate actions before execution, transform results after it.",
+        "Blocked calls should redirect (e.g. to escalate_to_human), not strand the customer.",
+        "Hooks transform and gate; they do not think for the agent."
+      ],
+      "watchFor": "Letting the model convert formats in-context works most of the time and fails intermittently — which is worse than failing consistently, because it is nearly impossible to reproduce.",
+      "question": {
+        "type": "single",
+        "stem": "Refunds above $500 must always route to a human. Where does this belong?",
+        "options": [
+          "A PostToolUse hook that flags oversized refunds for compliance review after execution",
+          "A hook that inspects each process_refund call before execution, blocks amounts above $500, and redirects to escalate_to_human",
+          "A system prompt rule stating the threshold, with examples of compliant behavior",
+          "A validation step inside the refund tool that logs a warning and proceeds"
+        ],
+        "correct": [1],
+        "answerWhy": "Enforcement requires interception before the tool runs, and pairing the block with a redirect escalates the customer instead of stranding them. A PostToolUse hook produces an audit finding for money already sent, a prompt rule yields probabilistic compliance, and a warning that proceeds enforces nothing at all."
+      }
+    },
+    {
+      "objective": "Design task decomposition strategies for complex workflows",
+      "keyPoints": [
+        "One question decides the strategy: are the subtasks knowable at design time?",
+        "Knowable and enumerable → fixed sequential pipeline (prompt chaining): per-file review passes plus a separate cross-file integration pass.",
+        "Chaining counters attention dilution, where a single oversized pass reviews early files thoroughly and later files superficially.",
+        "Unknowable up front (legacy exploration, unfamiliar systems) → dynamic adaptive decomposition that generates subtasks from what each step discovers.",
+        "Granularity: big enough to carry context, small enough for focus, plus an integration step."
+      ],
+      "watchFor": "Prioritizing by alphabetical or directory order substitutes an arbitrary sequence for mapping the structure and targeting high-impact areas first.",
+      "question": {
+        "type": "single",
+        "stem": "A review agent must assess a 30-file pull request including cross-module data flow. What decomposition is soundest?",
+        "options": [
+          "One comprehensive pass over all 30 files so cross-file relationships stay visible",
+          "Per-file analysis passes chained into a separate cross-file integration pass that sees all per-file findings",
+          "Adaptive decomposition that decides what to review next based on each file's findings",
+          "Parallel independent reviews of each file, concatenating the results"
+        ],
+        "correct": [1],
+        "answerWhy": "The subtasks are enumerable at design time, so a fixed chain gives each file focused attention and then a dedicated integration pass reasons about data flow with every finding in view. A single pass invites attention dilution and contradictory cross-file conclusions, adaptive decomposition trades a completeness guarantee for unneeded flexibility, and concatenated per-file reviews never examine the interactions."
+      }
+    },
+    {
+      "objective": "Manage session state, resumption, and forking",
+      "keyPoints": [
+        "Three moves: resume a named session when prior context is mostly valid, fork to explore divergent branches from a shared baseline, restart with a summary when context is broadly stale.",
+        "On resumption after code changes, tell the agent which specific files changed so it re-analyzes just those.",
+        "Forking pays for the expensive baseline analysis once and lets each branch diverge in isolation without contaminating the other.",
+        "One named session per investigation; `--resume <session-name>` continues it.",
+        "Sessions neither self-refresh nor self-merge — you manage validity."
+      ],
+      "watchFor": "A silently resumed session treats stale tool results as current ground truth and reasons confidently from file contents that were refactored away.",
+      "question": {
+        "type": "single",
+        "stem": "An architect wants to compare two refactoring strategies, both starting from the same expensive multi-day codebase analysis. What is the right session move?",
+        "options": [
+          "Fork the session into independent branches from the shared analysis baseline",
+          "Resume the session and alternate between the two strategies turn by turn",
+          "Start two new sessions and re-run the codebase analysis in each",
+          "Resume the session and ask for a single comparison of both strategies"
+        ],
+        "correct": [0],
+        "answerWhy": "Forking is designed exactly for divergent exploration from a shared baseline: the analysis is paid for once and each branch develops in isolation without contaminating the other's reasoning. Alternating within one session lets the two strategies bleed into each other, re-running the analysis discards days of valid work, and a single blended comparison never develops either option properly."
+      }
+    }
+  ]
+}

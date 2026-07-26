@@ -1,4 +1,4 @@
-// Validates question bank + study guide content against each cert's blueprint.
+// Validates question bank + study guide + revision content against each cert's blueprint.
 // Usage: node scripts/validate-content.mjs [certCode] [domainId]
 //   no args        -> validate every cert under src/data/certs/
 //   certCode        -> validate just that cert
@@ -118,6 +118,50 @@ for (const certCode of certCodes) {
       });
       if (!Array.isArray(s.pitfalls) || s.pitfalls.length < 2) errors.push(`D${domain.id} study[${i}]: need >=2 pitfalls`);
       if (PLACEHOLDER.test(JSON.stringify(s))) errors.push(`D${domain.id} study[${i}]: contains placeholder text`);
+    });
+
+    // ---- revision ----
+    // A domain with questions + a study guide must also have a revision pass:
+    // one recap + exactly one high-yield question per blueprint objective.
+    const rPath = join(certDir, `revision/domain-${domain.id}.json`);
+    if (!existsSync(rPath)) { errors.push(`D${domain.id}: missing ${rPath}`); continue; }
+    let revision;
+    try {
+      revision = JSON.parse(readFileSync(rPath, 'utf8'));
+    } catch (e) { errors.push(`D${domain.id}: invalid JSON in revision file: ${e.message}`); continue; }
+
+    if (revision.domain !== domain.id) errors.push(`D${domain.id}: revision.domain must be ${domain.id}`);
+    if (revision.title !== domain.title) errors.push(`D${domain.id}: revision.title must be "${domain.title}"`);
+    if (!Array.isArray(revision.objectives) || revision.objectives.length !== domain.objectives.length)
+      errors.push(`D${domain.id}: revision must have ${domain.objectives.length} objective entries`);
+    else revision.objectives.forEach((r, i) => {
+      const tag = `D${domain.id} revision[${i}]`;
+      const expected = domain.objectives[i].objective;
+      if (r.objective !== expected) errors.push(`${tag}: objective must be exactly "${expected}"`);
+      if (!Array.isArray(r.keyPoints) || r.keyPoints.length < 3 || r.keyPoints.length > 5)
+        errors.push(`${tag}: need 3-5 keyPoints`);
+      else r.keyPoints.forEach((p, j) => {
+        if (typeof p !== 'string' || p.trim().length < 20) errors.push(`${tag}: keyPoints[${j}] missing or too short (<20 chars)`);
+      });
+      if (typeof r.watchFor !== 'string' || r.watchFor.trim().length < 40) errors.push(`${tag}: watchFor missing or too short (<40 chars)`);
+
+      const q = r.question;
+      if (!q || typeof q !== 'object') { errors.push(`${tag}: missing question`); return; }
+      if (q.type !== 'single' && q.type !== 'multi') errors.push(`${tag}: question.type must be "single"|"multi"`);
+      if (typeof q.stem !== 'string' || q.stem.length < 60) errors.push(`${tag}: question.stem missing or too short (<60 chars)`);
+      if (!Array.isArray(q.options) || q.options.length !== 4) errors.push(`${tag}: question must have exactly 4 options`);
+      else q.options.forEach((opt, j) => {
+        if (typeof opt !== 'string' || !opt.trim()) errors.push(`${tag}: options[${j}] must be a non-empty string`);
+      });
+      if (!Array.isArray(q.correct) || q.correct.length < 1) errors.push(`${tag}: question.correct must be a non-empty array`);
+      else {
+        if (q.type === 'single' && q.correct.length !== 1) errors.push(`${tag}: single type must have exactly 1 correct index`);
+        if (q.type === 'multi' && q.correct.length < 2) errors.push(`${tag}: multi type must have >=2 correct indices`);
+        if (q.type === 'multi' && !/\(Choose two\.\)$/.test(q.stem || '')) errors.push(`${tag}: multi stem must end with "(Choose two.)"`);
+        for (const c of q.correct) if (!Number.isInteger(c) || c < 0 || c > 3) errors.push(`${tag}: correct index ${c} out of range`);
+      }
+      if (typeof q.answerWhy !== 'string' || q.answerWhy.length < 80) errors.push(`${tag}: question.answerWhy missing or too short (<80 chars)`);
+      if (PLACEHOLDER.test(JSON.stringify(r))) errors.push(`${tag}: contains placeholder text`);
     });
   }
 

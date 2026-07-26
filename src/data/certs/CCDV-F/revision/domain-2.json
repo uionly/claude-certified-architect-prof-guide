@@ -1,0 +1,144 @@
+{
+  "domain": 2,
+  "title": "Applications and Integration",
+  "objectives": [
+    {
+      "objective": "Understanding Requirements",
+      "keyPoints": [
+        "Functional = what the system does for users; infrastructure (non-functional) = what the platform must provide (latency, concurrency, availability, residency, compliance).",
+        "Requirements come before technology — model tier, realtime-vs-batch, and hosting are all chosen to satisfy them.",
+        "Vague requirements must become measurable targets; \"fast\" and \"reliable\" cannot drive design or verification.",
+        "Behavior that integrates with backend systems is still functional; concurrency and availability are the infrastructure qualities.",
+        "Conflicting requirements are resolved by stakeholders, not silently by engineers."
+      ],
+      "watchFor": "Compliance and residency constraints ignored until late can eliminate entire designs — they are cheap to honor from the start and expensive to retrofit.",
+      "question": {
+        "type": "single",
+        "stem": "A stakeholder asks for \"a fast AI assistant for billing questions that integrates with our ledger.\" What should the developer do before choosing a model or architecture?",
+        "options": [
+          "Select a low-latency model tier, since \"fast\" is the stated priority",
+          "Turn the request into measurable functional and infrastructure requirements — a latency target, expected concurrency, ledger operations needed, and any residency or compliance constraints",
+          "Prototype against the ledger API to discover what is technically possible",
+          "Classify the ledger integration as an infrastructure requirement and design around it"
+        ],
+        "correct": [1],
+        "answerWhy": "Technology is selected to satisfy requirements, so the first step is converting the goal into testable functional behavior and numeric infrastructure targets. Picking a tier from the word \"fast\" inverts the process, prototyping first discovers capability rather than need, and ledger integration is functional behavior — concurrency and availability are the infrastructure qualities."
+      }
+    },
+    {
+      "objective": "Systems Life Cycle",
+      "keyPoints": [
+        "Deployment is the middle of the life cycle, not the end — operations and maintenance outlast the build and need owners and budget.",
+        "Model versions deprecate on the provider's schedule, so upgrade planning is a standing responsibility.",
+        "Output quality drifts as inputs and prompts change; quality monitoring is an operations task, not a launch checkbox.",
+        "A deliberate implementation phase — test, pilot, ready operations — sits between build and full use.",
+        "Replace systems by parallel running and reversible cutover, retiring the old only after stability is proven."
+      ],
+      "watchFor": "Pre-deployment gates like UAT are not the operate-and-maintain discipline — a passed launch test cannot catch what changes months later.",
+      "question": {
+        "type": "single",
+        "stem": "A team's Claude application passed UAT and launched six months ago with no ongoing plan. What is the most significant gap?",
+        "options": [
+          "There is no operations phase — no owner for model deprecations, no quality-drift monitoring, and no change process for prompts and schemas",
+          "The UAT suite should be re-run on a fixed schedule to confirm nothing has changed",
+          "The application should be rebuilt on the Agent SDK to reduce maintenance",
+          "Nothing significant — a system that passed UAT and launched successfully is in a steady state"
+        ],
+        "correct": [0],
+        "answerWhy": "Claude applications decay by default as models deprecate, inputs shift, and prompts get edited, so the missing piece is an owned operations phase with monitoring and change management. Re-running the launch suite is a fragment of that at best, rebuilding on a different SDK addresses architecture rather than the ownership gap, and treating launch as a steady state is the exact assumption that lets regressions accumulate invisibly."
+      }
+    },
+    {
+      "objective": "Claude API Mechanics",
+      "keyPoints": [
+        "Streaming fixes perceived latency by sending incremental deltas; total generation time is unchanged.",
+        "Prompt caching marks a large stable prefix (system prompt, corpus, tool definitions) so repeat requests reuse it at a fraction of input cost.",
+        "The Message Batches API trades latency for cost — asynchronous processing in an up-to-24-hour window; wrong for anything interactive.",
+        "Vision is native: images go in as content blocks in a user message, no OCR pipeline needed.",
+        "The Messages API is stateless — the client owns and resends conversation history; max_tokens is the output budget, not the context window."
+      ],
+      "watchFor": "Perceived-latency complaints tempt a model downgrade; streaming usually fixes responsiveness with no quality trade-off at all.",
+      "question": {
+        "type": "single",
+        "stem": "An application sends the same 30,000-token policy corpus as a system prefix on every request, with only a short user question changing. Input costs are high. What is the targeted fix?",
+        "options": [
+          "Move the traffic to the Message Batches API for discounted pricing",
+          "Enable prompt caching on the stable corpus prefix so repeat requests reuse it at reduced input cost",
+          "Switch to a cheaper model tier for these requests",
+          "Truncate the corpus and retrieve only the most relevant sections per request"
+        ],
+        "correct": [1],
+        "answerWhy": "A large prefix that is identical across requests is exactly the prompt-caching case: mark it once and pay full price only for what changes. Batch discounts require giving up interactive latency, a cheaper tier changes quality rather than addressing the repeated prefix, and retrieval is a larger redesign than the cost problem requires."
+      }
+    },
+    {
+      "objective": "Software Engineering Foundations",
+      "keyPoints": [
+        "LLM calls are I/O-bound: throughput comes from bounded concurrency, not language rewrites or per-call micro-optimizations. `await` in a loop is still sequential.",
+        "429 means back off — exponential retry with jitter, honor server retry timing, cap concurrency; tight retry loops amplify the overload.",
+        "Classify before retrying: 4xx client errors need fixes, transient errors need backoff; retries plus side effects require idempotency.",
+        "Prompts, tool schemas, and configuration are code — version them, review them, deploy them with history and rollback.",
+        "Refactor in small verified steps; review and testing capacity, not generation capacity, bound safe change size."
+      ],
+      "watchFor": "AI-drafted code still gets full human review — green CI is necessary but not sufficient, and dashboard-edited prompts with no audit trail are how silent multi-day regressions happen.",
+      "question": {
+        "type": "single",
+        "stem": "A batch job processes 5,000 documents by awaiting one Claude call per document inside a for loop, taking hours. What is the right optimization?",
+        "options": [
+          "Rewrite the job in a faster language to reduce per-call overhead",
+          "Overlap the requests with bounded concurrency that respects the rate limit",
+          "Increase max_tokens so each call returns more work per request",
+          "Switch to a faster model tier to cut per-call latency"
+        ],
+        "correct": [1],
+        "answerWhy": "The work is I/O-bound — awaiting each call in sequence means the job spends almost all its time waiting — so throughput comes from overlapping requests up to a concurrency bound that respects rate limits. A language rewrite optimizes compute that is not the bottleneck, max_tokens governs output size, and a faster tier shaves each wait without removing the serialization."
+      }
+    },
+    {
+      "objective": "Claude Application Design",
+      "keyPoints": [
+        "The system prompt is the trusted instruction channel; untrusted input (uploads, retrieved documents, third-party text) enters as clearly delimited data in the user message.",
+        "Scope sessions to tasks — one long session across unrelated tasks or users structurally guarantees context bleed and privacy exposure; \"forget previous context\" deletes nothing.",
+        "Structured output needs a schema contract plus validation — prose requests for JSON drift in keys, types, and wrapping. Encode legal values as enums.",
+        "Render model output as untrusted content: escape and sanitize at the boundary.",
+        "Deterministic computation belongs in code; the model does the language work."
+      ],
+      "watchFor": "Keyword filters bolted on top of a mixed instruction/data channel are an arms race, not a fix — the design flaw is the concatenation itself.",
+      "question": {
+        "type": "single",
+        "stem": "A support app concatenates retrieved knowledge-base articles into the system prompt. A poisoned article instructs Claude to reveal internal notes, and it complies. What is the correct fix?",
+        "options": [
+          "Add a filter that strips instruction-like phrases from retrieved articles before use",
+          "Move the retrieved articles into the user message as clearly delimited data, keeping the system prompt for trusted instructions only",
+          "Add a system-prompt line telling Claude to ignore instructions found in retrieved content",
+          "Restrict retrieval to a smaller set of manually reviewed articles"
+        ],
+        "correct": [1],
+        "answerWhy": "The root cause is channel mixing: untrusted content was placed in the trusted instruction channel, so the structural fix is to pass it as delimited data in the user message. Phrase filters are an arms race against paraphrase, a counter-instruction leaves the two channels merged and relies on probabilistic compliance, and shrinking the corpus reduces exposure without fixing the flaw."
+      }
+    },
+    {
+      "objective": "Configuration Management",
+      "keyPoints": [
+        "Pin specific model versions in production; always-latest aliases change your dependency on the provider's schedule, silently.",
+        "Adopt new model releases deliberately: validate against an eval suite, roll out in a controlled way, then move the pin.",
+        "CLAUDE.md instructs the model (followed probabilistically); settings.json configures the enforcement layer (permissions, hooks) deterministically.",
+        "Version every prompt revision and record which version produced each output.",
+        "Model identifiers are per-environment configuration, not source-code constants; plugins are pinned, declared dependencies."
+      ],
+      "watchFor": "A permission or forbidden-command rule written as prose in CLAUDE.md is a suggestion — enforcement rules belong in settings.json.",
+      "question": {
+        "type": "single",
+        "stem": "A production service calls Claude through an alias that always resolves to the newest release. Downstream parsing broke overnight with no code change. What is the correct remediation?",
+        "options": [
+          "Add defensive parsing so the service tolerates format variation from any model version",
+          "Pin a specific model version per environment and adopt new releases only after they pass the eval suite",
+          "Add a CLAUDE.md note describing the expected output format",
+          "Re-run the failing requests, since the change is likely transient"
+        ],
+        "correct": [1],
+        "answerWhy": "An always-latest alias makes your production dependency change on the provider's schedule, so the fix is pinning the version and gating upgrades behind evals. Defensive parsing is worth having but does not restore control over when behavior changes, a CLAUDE.md note does not affect API requests at all, and the change is a new model version rather than a transient fault."
+      }
+    }
+  ]
+}

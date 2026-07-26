@@ -7,6 +7,8 @@ import CertPicker from './pages/CertPicker.jsx'
 import Home from './pages/Home.jsx'
 import StudyIndex from './pages/StudyIndex.jsx'
 import StudyDomain from './pages/StudyDomain.jsx'
+import RevisionIndex from './pages/RevisionIndex.jsx'
+import RevisionDomain from './pages/RevisionDomain.jsx'
 import PracticeSetup from './pages/PracticeSetup.jsx'
 import Quiz from './pages/Quiz.jsx'
 import Results from './pages/Results.jsx'
@@ -47,6 +49,8 @@ const router = createBrowserRouter([
           { index: true, element: <Home /> },
           { path: 'study', element: <StudyIndex /> },
           { path: 'study/:domainId', element: <StudyDomain /> },
+          { path: 'revision', element: <RevisionIndex /> },
+          { path: 'revision/:domainId', element: <RevisionDomain /> },
           { path: 'practice', element: <PracticeSetup /> },
           { path: 'quiz', element: <Quiz /> },
           { path: 'results/:attemptId', element: <Results /> },
@@ -57,6 +61,11 @@ const router = createBrowserRouter([
       {
         path: 'study/:domainId',
         loader: ({ params }) => redirect(`/${defaultCert()}/study/${params.domainId}`),
+      },
+      { path: 'revision', loader: () => redirect(`/${defaultCert()}/revision`) },
+      {
+        path: 'revision/:domainId',
+        loader: ({ params }) => redirect(`/${defaultCert()}/revision/${params.domainId}`),
       },
       { path: 'practice', loader: () => redirect(`/${defaultCert()}/practice`) },
       { path: 'quiz', loader: () => redirect(`/${defaultCert()}/quiz`) },

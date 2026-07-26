@@ -26,6 +26,9 @@ export default function App() {
               <NavLink to={`/${certCode}/study`} className={navLinkClass}>
                 Study Guide
               </NavLink>
+              <NavLink to={`/${certCode}/revision`} className={navLinkClass}>
+                Revision
+              </NavLink>
               <NavLink to={`/${certCode}/practice`} className={navLinkClass}>
                 Practice
               </NavLink>

@@ -1,0 +1,75 @@
+{
+  "domain": 1,
+  "title": "Agents and Workflows",
+  "objectives": [
+    {
+      "objective": "Agent Architecture",
+      "keyPoints": [
+        "Workflow = developer-written control flow over predefined steps; agent = the model decides which tools to call, in what order, and when it is done.",
+        "Decision criterion is predictability: if you can write the steps down in advance, build a workflow — cheaper, faster, more testable, failures localize.",
+        "Reserve agents for genuinely open-ended paths (research, debugging, coding) where each step depends on the last.",
+        "Supervisor/subagent hierarchies buy context isolation (noisy output burns the subagent's window) and parallelism on independent subtasks.",
+        "Supervisors decompose, delegate, and synthesize — they do not do the workers' reading."
+      ],
+      "watchFor": "Context exhaustion is a structure problem, not a capacity problem — the answer is isolating noisy work in subagents, not a bigger window or duplicate peer agents.",
+      "question": {
+        "type": "single",
+        "stem": "A document pipeline always runs the same three steps: extract fields, classify the document type, then route it. A team proposes rebuilding it as an autonomous agent with tools. What is the sound assessment?",
+        "options": [
+          "Keep it as a workflow — the steps are known in advance, so an agent adds nondeterminism, latency, and cost with no benefit",
+          "Move to an agent, since agents handle edge cases better than fixed pipelines",
+          "Move to an agent so subagents can isolate the extraction context",
+          "Keep it as a workflow but have the model choose the step order at runtime"
+        ],
+        "correct": [0],
+        "answerWhy": "When the control flow is fully predictable, a workflow is the cheaper, faster, more testable abstraction and its failures localize to a single step. Choosing an agent here buys flexibility the task does not need, and letting the model reorder known steps reintroduces the nondeterminism a workflow exists to avoid."
+      }
+    },
+    {
+      "objective": "Agent Construction with Claude",
+      "keyPoints": [
+        "Start from the Claude Agent SDK — it packages the production loop: tool execution, file/shell access, context management, sessions, and hook points.",
+        "Build a custom loop on the raw Messages API only when requirements genuinely exceed what the SDK exposes; you then own dispatch, compaction, and permissioning.",
+        "Hooks are harness code that intercepts actions deterministically — guarantees come from hooks, not from system-prompt instructions.",
+        "Runaway loops are stopped by harness-level iteration and budget limits, not by asking the model to stop.",
+        "Hosting (self-hosted vs Anthropic-hosted managed) changes who operates the runtime, not what the agent can do."
+      ],
+      "watchFor": "Must-hold rules written into the system prompt are probabilistic; a distractor that says \"instruct the model never to do X\" is offering a suggestion where the requirement is a guarantee.",
+      "question": {
+        "type": "single",
+        "stem": "An agent must never execute a database write against production, and the team needs this to hold every time, not usually. Where does the control belong?",
+        "options": [
+          "A strongly worded prohibition in the agent's system prompt",
+          "A hook in the harness that inspects and blocks the action before it executes",
+          "A few-shot example showing the agent declining production writes",
+          "A post-run audit log that flags any production write for review"
+        ],
+        "correct": [1],
+        "answerWhy": "Deterministic enforcement lives in harness code, so a hook that intercepts the action turns \"the model usually complies\" into \"the harness always blocks it\". Prompt prohibitions and few-shot examples steer behavior probabilistically, and an audit log detects the violation after the write has already happened."
+      }
+    },
+    {
+      "objective": "Agent Patterns and Frameworks",
+      "keyPoints": [
+        "The tool-use loop: send messages + tool definitions → model stops with stop_reason \"tool_use\" → client executes the tool → append the assistant turn and a tool_result to the same conversation → call again until \"end_turn\".",
+        "The client executes tools, not the model, and tool results must be appended to the growing conversation to keep loop state.",
+        "Tool failures flow back into the loop as error results the model can react to — not as thrown exceptions or fake successes.",
+        "Long sessions need active context management: prune stale tool output and compact history into summaries of what was learned.",
+        "Cross-session continuity comes from external memory, not from a bigger or longer context window."
+      ],
+      "watchFor": "Frameworks (Strands, LangGraph, PydanticAI) organize orchestration and state — they do not make sampling deterministic or infer your tool definitions. Pick on abstraction fit, not popularity.",
+      "question": {
+        "type": "single",
+        "stem": "A developer's integration receives a response with stop_reason \"tool_use\" and treats it as a failed request, returning an error to the user. What is the correct handling?",
+        "options": [
+          "Retry the same request, since \"tool_use\" indicates a transient interruption",
+          "Execute the requested tool, append the assistant turn and a tool_result to the same conversation, and call the API again",
+          "Return the partial text to the user and start a new conversation with the tool output",
+          "Raise the max_tokens limit so the model can finish without stopping"
+        ],
+        "correct": [1],
+        "answerWhy": "\"tool_use\" means the model is pausing for the client to run a tool, so the loop continues by executing it and appending a tool_result to the same conversation before calling again. Retrying reproduces the same pause, starting a fresh conversation strips the tool result of the context that gives it meaning, and max_tokens is unrelated to tool-use stops."
+      }
+    }
+  ]
+}

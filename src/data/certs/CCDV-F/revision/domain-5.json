@@ -1,0 +1,98 @@
+{
+  "domain": 5,
+  "title": "Model Selection and Optimization",
+  "objectives": [
+    {
+      "objective": "LLM Fundamentals",
+      "keyPoints": [
+        "Generation is next-token sampling, so output is non-deterministic — validate meaning and structure, never exact strings.",
+        "Tokens are subword units (~¾ of a word in English); the context window bounds input plus generated output together.",
+        "Temperature is the diversity lever: low for classification and extraction, higher only where variety helps.",
+        "Zero-/single-/multi-shot counts the worked examples; demonstrations beat prose for locking a format and edge-case handling.",
+        "Models see tokens, not characters — do exact character-level work in deterministic code."
+      ],
+      "watchFor": "Estimating tokens from word counts breaks both cost forecasts and context math, and tokenization efficiency varies by language and script — budget from measured counts.",
+      "question": {
+        "type": "single",
+        "stem": "A classifier prompt describes the required output format in increasing detail, yet responses still vary in wrapping and casing. What is the most reliable fix?",
+        "options": [
+          "Add several worked input→output examples showing the exact label format, and lower the temperature",
+          "Add \"respond with only the label, and double-check your formatting\" to the instructions",
+          "Move to a more capable model tier",
+          "Assert exact string equality in tests so drift is caught before release"
+        ],
+        "correct": [0],
+        "answerWhy": "Demonstrations communicate format far more reliably than description, and a low temperature reduces the sampling variance that produces the remaining drift. More emphatic prose is the exhortation trap, a bigger model does not eliminate sampling variability, and exact-match assertions detect the symptom rather than fixing the cause."
+      }
+    },
+    {
+      "objective": "Technical Fundamentals",
+      "keyPoints": [
+        "The official SDKs are convenience wrappers over the REST API — same endpoints, limits, and token accounting; the client only changes how gracefully you handle them.",
+        "Match transport to traffic: request/response for discrete calls, SSE for one-way token streaming, WebSockets for persistent bidirectional realtime.",
+        "High-volume clients need backoff-with-jitter retries, concurrency caps, and explicit timeouts — one hung request per worker can starve a service.",
+        "Long-running work belongs behind an async job pattern: return an ID immediately, process in the background, poll or push status.",
+        "Long generations should stream so continuous data flow avoids idle-connection timeouts."
+      ],
+      "watchFor": "Switching from the SDK to hand-rolled HTTP (or the reverse) to escape rate limits — limits are enforced server-side and no client choice bypasses them.",
+      "question": {
+        "type": "single",
+        "stem": "A team hitting 429s proposes replacing the official SDK with direct HTTP calls, believing the SDK is throttling them. What is the correct assessment?",
+        "options": [
+          "Correct — SDK default retry behavior is the source of the throttling",
+          "Rate limits are enforced server-side and identical either way; the fix is exponential backoff with jitter and a cap on in-flight requests",
+          "Correct — raw HTTP allows higher concurrency than the SDK permits",
+          "Switch to WebSockets so the connection is not re-established per request"
+        ],
+        "correct": [1],
+        "answerWhy": "The SDK is a wrapper over the same REST endpoints, so the 429s reflect server-side limits the client cannot negotiate away; the remedy is disciplined backoff and bounded concurrency. Blaming the SDK or expecting raw HTTP to unlock more throughput misreads where limits live, and WebSockets change the transport without changing the quota."
+      }
+    },
+    {
+      "objective": "Model Selection and Tradeoffs",
+      "keyPoints": [
+        "Opus: deepest reasoning for the hardest multi-step and agentic work, highest cost and latency. Sonnet: balanced default for interactive products and most production workloads. Haiku: fastest and cheapest for high-volume classification, routing, extraction, simple Q&A.",
+        "Selection is a quality/latency/cost decision per workload, not per organization — weigh task difficulty, volume, latency demand, and the cost of a wrong answer.",
+        "Tier routing is the common production pattern: a fast model handles the easy majority and escalates hard cases.",
+        "Right-size after prototyping — evaluate cheaper tiers against an explicit quality bar and ship the smallest one that passes.",
+        "Pin model versions and gate upgrades behind eval runs."
+      ],
+      "watchFor": "Prompt engineering improves any tier but cannot manufacture reasoning depth — and selecting on latency alone just ships snappy wrong answers.",
+      "question": {
+        "type": "single",
+        "stem": "A support product classifies millions of tickets a month; roughly 5% are genuinely ambiguous and need careful reasoning. What is the most cost-effective design?",
+        "options": [
+          "Route all traffic to the top tier so no ambiguous ticket is mishandled",
+          "Route all traffic to the fastest tier and improve the prompt with examples",
+          "Classify with the fast tier and escalate the low-confidence minority to a stronger tier",
+          "Alternate tiers by request volume to balance cost against quality"
+        ],
+        "correct": [2],
+        "answerWhy": "Tier routing pays for capability only where it earns its cost: the fast tier absorbs the easy 95% and the hard minority gets escalated. Sending everything to the top tier multiplies spend across millions of simple requests, prompt work alone cannot supply reasoning depth the fast tier lacks, and volume-based alternation has no relationship to task difficulty."
+      }
+    },
+    {
+      "objective": "Cost and Token Management",
+      "keyPoints": [
+        "Cost is token math — input plus output priced per million, output higher — and every response returns exact usage counts.",
+        "Instrument per-request token usage tagged by feature or customer before optimizing; find the dominant term first.",
+        "Prompt caching wins when a large stable prefix repeats with a small dynamic tail: order prompts stable-first and keep volatile values out of the cached region.",
+        "Cache hits require a byte-identical prefix — a timestamp or reordered tool definitions turn discounted reads back into full-price writes.",
+        "High-volume latency-tolerant jobs belong on the Batches API; detect truncation via stop_reason and size max_tokens from measured output lengths."
+      ],
+      "watchFor": "Attacking the small term of the bill — trimming output when input dominates, or vice versa — barely moves the total, and word-count estimates hide the skew that drives real spend.",
+      "question": {
+        "type": "single",
+        "stem": "Leadership asks why the Claude bill tripled. The team has no per-request usage logging and proposes shortening system prompts across all features. What should they do first?",
+        "options": [
+          "Shorten the prompts, since input tokens are usually the largest cost term",
+          "Log the usage data returned with each response, attribute it by feature, and identify which term and which feature dominates",
+          "Move all traffic to the Batches API for the discount",
+          "Downgrade every feature to a cheaper model tier until the bill falls"
+        ],
+        "correct": [1],
+        "answerWhy": "Measurement precedes optimization: the API returns exact input, output, and cache token counts per request, and attributing them by feature shows which lever actually matters. Trimming prompts, batching everything, or blanket downgrades are guesses that may target the small term of the bill while degrading quality or breaking interactive latency."
+      }
+    }
+  ]
+}

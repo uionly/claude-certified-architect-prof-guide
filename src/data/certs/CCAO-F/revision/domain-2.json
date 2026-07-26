@@ -1,0 +1,143 @@
+{
+  "domain": 2,
+  "title": "Output Evaluation and Validation",
+  "objectives": [
+    {
+      "objective": "Evaluate Claude-generated outputs for accuracy and completeness",
+      "keyPoints": [
+        "Two separate axes: accuracy (are the claims true to the source?) and completeness (does it cover everything the task required?). An output can pass one and fail the other.",
+        "Fluency, confidence, and clean organization are not evidence — models write smoothly whether or not they captured the source.",
+        "\"It had the document\" is not verification; models still misread, mis-aggregate, and merge separate discussions.",
+        "One confirmed error re-opens the whole output — the remaining figures are unverified until spot-checked.",
+        "Asking Claude \"did you miss anything?\" fails as a completeness check because its blind spots apply to its self-review."
+      ],
+      "watchFor": "Wrong answers lean on the model's own reassurance or on the fact that source material was attached; real evaluation compares the output back to the source and back to the original ask.",
+      "question": {
+        "type": "single",
+        "stem": "An associate uploads a 40-page contract and gets a summary. Every sentence checks out against the document, but the termination clause is not mentioned. What does this show?",
+        "options": [
+          "The summary is accurate but incomplete, so completeness must be checked against the original task requirements",
+          "The summary is unreliable and should be regenerated with a more capable model",
+          "Nothing is wrong — a summary is expected to omit clauses to stay concise",
+          "The model hallucinated by omission, so all remaining sentences are likely fabricated"
+        ],
+        "correct": [0],
+        "answerWhy": "Accuracy and completeness are independent: this output is true in everything it says while missing what mattered most, which is exactly why completeness is checked against the ask rather than the prose. Treating omission as hallucination confuses the failure modes, and accepting the gap as normal concision ignores that the reviewer defined what the summary had to cover."
+      }
+    },
+    {
+      "objective": "Identify hallucinations, inconsistencies, and biases in responses",
+      "keyPoints": [
+        "Hallucinations look precise — plausible titles, document numbers, statistics, quotes — so specificity is not evidence of authenticity.",
+        "An unfindable source is presumed fabricated until the actual document is located; a URL or restated confirmation from the same model is not corroboration.",
+        "Internal contradictions (a figure that changes, a recommendation conflicting with its analysis) signal the output was not tracking the material — scrutinize the rest.",
+        "Bias shows as systematic skew in tone or framing that the source material does not justify; audit against the source rather than forcing identical language."
+      ],
+      "watchFor": "The classic trap is asking Claude to confirm its own questionable claim — the system that fabricated a detail can fabricate its supporting evidence just as fluently.",
+      "question": {
+        "type": "single",
+        "stem": "A report cites \"Industry Benchmark Report 2024, Section 4.2, p. 118\" for a key statistic, but the associate cannot find the publication anywhere. What is the correct response?",
+        "options": [
+          "Accept the citation, since the section and page detail indicate a real source was consulted",
+          "Ask Claude to confirm the citation and provide a link, then cite it if a URL is returned",
+          "Treat the citation as fabricated until the actual document is located, and remove or replace the claim",
+          "Keep the statistic but drop the citation so the report does not point to an unverifiable source"
+        ],
+        "correct": [2],
+        "answerWhy": "Precise-looking bibliographic detail is the signature of a hallucination, not proof of one, so an unlocatable source is presumed fabricated until the document itself is found. Asking the model to confirm or supply a URL uses the same system that may have invented the citation, and keeping the statistic without attribution leaves an unverified claim in the report with its provenance hidden."
+      }
+    },
+    {
+      "objective": "Apply fact-checking and validation techniques",
+      "keyPoints": [
+        "Genuine validation is independent of the model — self-checks, confidence ratings, and agreement between two chatbots measure plausibility, not truth.",
+        "Match the technique to where the ground truth lives: public claims go to authoritative primary sources, claims about your materials go to those internal documents.",
+        "Citations validate by locating the cited document — and a real citation can still misrepresent what the source says.",
+        "Triangulate only across genuinely independent sources; outlets recycling one press release are not independent.",
+        "Prioritize checking effort on the figures, dates, and commitments people will act on rather than spreading it evenly."
+      ],
+      "watchFor": "Adding a disclaimer instead of verifying is not diligence — it transfers the checking burden to readers who have less access to the sources than you do.",
+      "question": {
+        "type": "single",
+        "stem": "Claude's draft states that Q3 support ticket volume rose 22%, based on the team's internal dashboard export the associate provided. How should this be validated?",
+        "options": [
+          "Search the web for industry support-volume trends to see whether 22% is plausible",
+          "Recompute the figure directly from the dashboard export the model was given",
+          "Ask Claude to double-check the calculation and state its confidence level",
+          "Run the same prompt through a second AI assistant and compare the results"
+        ],
+        "correct": [1],
+        "answerWhy": "The ground truth for an internal metric lives in the internal data, so validation means recomputing from the export rather than seeking outside corroboration. A web search cannot confirm what happened in your ticket queue, and a model self-check or a second chatbot's agreement measures plausibility — both systems can share the same mis-aggregation."
+      }
+    },
+    {
+      "objective": "Determine when human review or additional verification is required",
+      "keyPoints": [
+        "Review intensity scales with the cost of an error, not with draft quality or with how much AI was involved.",
+        "Automatic expert review: legal/contractual language, regulatory and compliance content, medical or safety guidance, and significant financial material.",
+        "Accuracy to the source you supplied is not the bar — the source itself may omit a required disclosure that only an accountable expert would catch.",
+        "\"Review this as a lawyer\" is still the model reviewing itself, with no professional accountability behind it.",
+        "Uniform gates on everything bury reviewers in trivia and stall adoption without reducing real risk."
+      ],
+      "watchFor": "Polish is the seductive wrong signal: a well-written, source-faithful document can still create regulatory or legal exposure, and a colleague's proofread is review at the wrong level.",
+      "question": {
+        "type": "single",
+        "stem": "Claude drafts a customer notification about a billing policy change. It matches the internal memo exactly and reads well. What is required before it goes out?",
+        "options": [
+          "Nothing further — it is accurate to the source memo and clearly written",
+          "A colleague's proofread for typos and tone consistency",
+          "Review by legal or compliance, who are accountable for what the notice must disclose",
+          "A second Claude pass in a compliance-reviewer persona to check for regulatory issues"
+        ],
+        "correct": [2],
+        "answerWhy": "Customer-facing billing policy notices carry regulatory and contractual weight, so the gate is review by the people professionally accountable for that risk — and they may catch a required disclosure the internal memo itself omitted. Fidelity to the memo and a typo pass operate below the level of the risk, and a persona-based self-review is still the model checking its own work."
+      }
+    },
+    {
+      "objective": "Edit, adapt, refine, and compare outputs for the intended audience",
+      "keyPoints": [
+        "Accurate but mismatched to its readers still counts as failed — fitness for the audience is part of quality.",
+        "Adapt by constrained regeneration: name the reader, reading level, tone, and the facts that must survive — deleting technical sections leaves a document still organized for experts.",
+        "Re-verify facts after every transformation; rewriting can quietly shift a number or soften a qualifier.",
+        "Compare drafts against criteria derived from the audience, not by length or by merging both wholesale.",
+        "The final pick stays human — only you hold the brand, history, and relationship context."
+      ],
+      "watchFor": "\"Condense proportionally\" and \"cut the technical parts\" both sound efficient, but adaptation means re-expressing content by decision-relevance for the new reader.",
+      "question": {
+        "type": "single",
+        "stem": "An engineer-facing incident report must be turned into a customer notice. What is the best approach?",
+        "options": [
+          "Delete the technical sections and send what remains",
+          "Ask Claude to rewrite it for customers at a specified reading level and tone, listing the facts that must be retained, then verify those facts survived",
+          "Send the original report since it is the most accurate and complete version available",
+          "Rewrite it manually from scratch to guarantee the customer tone is right"
+        ],
+        "correct": [1],
+        "answerWhy": "Audience adaptation is re-expression under explicit constraints — reader, reading level, tone, and mandatory facts — followed by verification that those facts came through intact. Deleting sections leaves an expert-structured document with holes, sending the original ignores that fit is part of quality, and a full manual rewrite discards the leverage while leaving the human doing production instead of review."
+      }
+    },
+    {
+      "objective": "Organize and curate information and select appropriate output formats (artifacts, inline, structured data)",
+      "keyPoints": [
+        "Match the container to the content's lifecycle: read-once, evolving, or machine-bound.",
+        "Inline chat suits short conversational answers acted on once; wrapping them in artifacts adds friction without value.",
+        "Artifacts suit substantial, self-contained content that will be revised or shared — one authoritative copy that updates in place.",
+        "Structured data (consistent tables, CSV-style output) suits anything a spreadsheet, tracker, or downstream system must parse.",
+        "Curate rather than dump: order content around the audience's decisions and keep the sources for re-verification."
+      ],
+      "watchFor": "Regenerating a long evolving document as inline chat text each session is the common failure — versions fragment across scroll-back with no single authoritative copy.",
+      "question": {
+        "type": "single",
+        "stem": "An associate is building a vendor comparison across six vendors and five evaluation criteria, to be imported into the team's procurement tracker. Which output format fits?",
+        "options": [
+          "A structured table with one row per vendor and consistent columns for each criterion",
+          "An artifact containing a narrative assessment of each vendor in turn",
+          "Inline prose paragraphs summarizing the strengths and weaknesses of each vendor",
+          "A bulleted list grouped by criterion with commentary under each bullet"
+        ],
+        "correct": [0],
+        "answerWhy": "Content headed into another tool needs a predictable machine-readable shape, and a consistent-column table maps directly onto tracker fields. Narrative or bulleted prose — whether inline or in an artifact — reads fine for a person but forces someone to hand-reformat every value before import."
+      }
+    }
+  ]
+}

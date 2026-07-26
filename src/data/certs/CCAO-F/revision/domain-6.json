@@ -1,0 +1,98 @@
+{
+  "domain": 6,
+  "title": "Governance, Risk, and Responsible Use",
+  "objectives": [
+    {
+      "objective": "Identify appropriate and inappropriate use cases",
+      "keyPoints": [
+        "Two tests: what are the stakes of the output, and does a qualified human review and own the result?",
+        "Appropriate: drafting, summarizing, brainstorming, organizing, first-pass analysis — errors contained, human checks before it matters.",
+        "Inappropriate: consequential decisions about people (hiring, discipline, credit), unreviewed output to patients/clients/regulators, AI interpretations adopted as official positions.",
+        "Workload pressure never converts an inappropriate delegation into an appropriate one.",
+        "Avoid overcorrecting into blanket bans that block low-risk assistance along with the real problem."
+      ],
+      "watchFor": "The instruction-as-safeguard fallacy: \"we told it to be objective and unbiased\" does not make a model a fair or accountable decision-maker.",
+      "question": {
+        "type": "single",
+        "stem": "Facing a large applicant backlog, a hiring coordinator proposes having Claude auto-reject candidates below a scored threshold, with a prompt instructing it to evaluate objectively. How should this be assessed?",
+        "options": [
+          "Acceptable, because the instruction to evaluate objectively controls the bias risk",
+          "Acceptable given the backlog, provided a sample of rejections is reviewed afterward",
+          "Inappropriate — consequential decisions about people stay human-owned, though Claude may summarize applications to support reviewers",
+          "Inappropriate, and Claude should not be used anywhere in the hiring process"
+        ],
+        "correct": [2],
+        "answerWhy": "Rejection is a consequential decision about a person, so it cannot be delegated regardless of workload, and a prompt instruction is not a fairness safeguard. Post-hoc sampling arrives after candidates are already rejected; the correct line keeps the decision human while still allowing Claude to assist the surrounding work, which a blanket ban needlessly forfeits."
+      }
+    },
+    {
+      "objective": "Apply data sensitivity, regulatory, and privacy considerations",
+      "keyPoints": [
+        "The safeguard comes before the prompt — decide what data is about to leave controlled systems and under what terms.",
+        "Classification governs the data, not your intent: \"it's only for internal analysis\" does not lift a sharing restriction.",
+        "Anonymize first — mask names, IDs, and account numbers; most pattern and trend analysis survives anonymization intact.",
+        "Use the organization's approved environment; a personal account bypasses every protection the enterprise agreement provides.",
+        "Share the minimum the task requires, and report data incidents rather than burying them."
+      ],
+      "watchFor": "\"Claude, keep this confidential\" and splitting a sensitive file into small pastes are not controls — exposure, not volume or phrasing, is what matters.",
+      "question": {
+        "type": "single",
+        "stem": "An analyst wants Claude to find repayment patterns in a spreadsheet of customer loan records containing names and account numbers. What is the correct approach?",
+        "options": [
+          "Upload it as-is to the approved workspace, since the analysis is internal",
+          "Remove or mask the names and account numbers, then run the pattern analysis on the anonymized data in the approved workspace",
+          "Paste the data in small batches so no single upload contains the full record set",
+          "Drop the analysis, since customer financial records cannot be used with AI tools"
+        ],
+        "correct": [1],
+        "answerWhy": "Anonymization lets the analysis proceed on the structure of the data without exposing whom it describes, which is why redact-first beats both uploading as-is and abandoning the task. Internal purpose does not lift a classification restriction, and splitting the upload into batches reduces nothing — the same protected identifiers still leave controlled systems."
+      }
+    },
+    {
+      "objective": "Follow organizational AI policies and governance standards",
+      "keyPoints": [
+        "Sequence: check the policy against your specific use case before building, not after the workflow is embedded.",
+        "Route use cases involving sensitive data or customer impact through governance review — it usually surfaces requirements the builder would miss.",
+        "Shadow AI (personal accounts, unapproved tools) compounds a data violation with a process violation and hides workflows from the people accountable for them.",
+        "Output review addresses quality risk; governance also covers input-side risks — data handling, tool approval, regulatory exposure.",
+        "Policy updates apply to existing workflows, not just new ones."
+      ],
+      "watchFor": "Reading policy silence on sensitive material as default permission — the correct move is to ask the policy owner, not to assume.",
+      "question": {
+        "type": "single",
+        "stem": "A manager says governance review is unnecessary for their new Claude workflow because \"my team reads every output before it goes anywhere.\" What is the flaw in this reasoning?",
+        "options": [
+          "Output review handles quality risk but not the input-side risks governance covers — data handling, tool approval, and regulatory exposure",
+          "Output review is unreliable because reviewers miss errors when volume is high",
+          "There is no flaw; human review of all outputs satisfies governance requirements",
+          "Governance review is only needed for workflows that touch customers directly"
+        ],
+        "correct": [0],
+        "answerWhy": "Reading outputs cannot detect what data was sent, whether the tool and workspace are approved, or which regulations the workflow touches — those are input-side questions only governance review addresses. Reviewer fallibility is a secondary point, and narrowing governance to customer-facing workflows leaves sensitive internal data handling unexamined."
+      }
+    },
+    {
+      "objective": "Understand the ethical implications of AI usage",
+      "keyPoints": [
+        "Accountability: a named human reviews, owns, and answers for every consequential output — \"the AI wrote it\" is never an answer.",
+        "Honesty: follow considered disclosure standards; reviewed, human-owned AI assistance is defensible, but concealment and false provenance claims are not.",
+        "Fairness: outputs can carry and amplify bias, sharpest when they influence decisions about people or whose voices get weight.",
+        "Check outputs for representational bias yourself — a model's self-certification of objectivity means nothing.",
+        "Include hard-to-process voices (other languages, low-volume groups) rather than excluding them from analysis."
+      ],
+      "watchFor": "Overreliance erodes accountability quietly: if nobody can say who owns an AI-assisted output that shaped a real decision, the ethical failure has already happened.",
+      "question": {
+        "type": "single",
+        "stem": "An associate is summarizing 3,000 public consultation comments to inform a policy decision. Roughly 200 are in other languages and several communities submitted only a handful each. What is the responsible approach?",
+        "options": [
+          "Summarize the English-language majority and note that other submissions were received",
+          "Include all submissions, translate the non-English comments, and review whether low-volume and minority positions survived the summarization",
+          "Ask Claude to confirm that its summary is unbiased and representative before submitting it",
+          "Weight all comments equally by volume so the summary reflects the actual distribution of responses"
+        ],
+        "correct": [1],
+        "answerWhy": "Excluding hard-to-process submissions silences exactly the voices most at risk of underrepresentation, so the responsible path includes them and then checks the summary for representational loss. The model's self-assessment of its own objectivity is worthless as a bias check, and pure volume weighting can bury a small community's position entirely even when it is the most affected."
+      }
+    }
+  ]
+}

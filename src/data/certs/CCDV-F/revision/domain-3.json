@@ -1,0 +1,29 @@
+{
+  "domain": 3,
+  "title": "Claude Code",
+  "objectives": [
+    {
+      "objective": "Claude Code Operation",
+      "keyPoints": [
+        "CLAUDE.md holds persistent natural-language instructions, read at session start, layered enterprise → user → project root → nested subdirectory (narrowest scope that should always apply wins).",
+        "settings.json configures the deterministic side — tool permissions, allow/deny lists, hooks, env vars, model selection; settings.local.json holds personal uncommitted overrides.",
+        "Components divide up: Rules are persistent constraints, Skills are packaged instructions loaded on matching tasks, Commands are on-demand slash prompts, Agents are delegated workers with their own context, Agent Memory persists knowledge across sessions.",
+        "Headless mode is the mechanism for non-interactive, scripted, and CI-driven runs; `/init` bootstraps a project CLAUDE.md from the codebase.",
+        "Interrupted work is recovered through session resumption, not by rebuilding context by hand."
+      ],
+      "watchFor": "CLAUDE.md is loaded into context every session, so letting it grow into a dumping ground wastes tokens and dilutes the instructions that matter.",
+      "question": {
+        "type": "single",
+        "stem": "A team wants Claude Code to run their release checklist unattended each night from CI. Which mechanism fits?",
+        "options": [
+          "A custom slash command invoked at the start of each session",
+          "Headless mode invoked by the CI scheduler",
+          "A CLAUDE.md instruction describing the nightly checklist",
+          "An auto-approval mode left running in an interactive session"
+        ],
+        "correct": [1],
+        "answerWhy": "Unattended, scheduled execution is precisely what headless mode provides, driven by an external scheduler or CI pipeline. Slash commands are on-demand shortcuts inside a session, CLAUDE.md supplies guidance rather than triggering runs, and leaving an interactive session in auto-approval mode is neither scheduled nor safely bounded."
+      }
+    }
+  ]
+}

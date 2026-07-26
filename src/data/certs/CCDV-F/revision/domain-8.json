@@ -1,0 +1,75 @@
+{
+  "domain": 8,
+  "title": "Tools and MCPs",
+  "objectives": [
+    {
+      "objective": "Tool Implementation",
+      "keyPoints": [
+        "The contract: you send definitions (name, description, JSON schema), the model emits a tool-use request, your code executes it and returns a tool_result — the model never executes anything.",
+        "Descriptions and schemas are the model's only documentation — write them like API docs, including when to use a sibling tool instead.",
+        "Model-constructed arguments are untrusted input: validate existence, format, range, and authorization server-side before any state change.",
+        "Return structured, actionable error results so failures flow back into the loop; false success compounds, honest failure is recoverable.",
+        "Gate proportionally to risk — auto-run reversible reads, require approval for payments, deletions, and external communications."
+      ],
+      "watchFor": "Tool sprawl degrades selection: shape tools around agent tasks rather than mirroring backend endpoints one-to-one, and answer every tool_use block with a matching tool_result id.",
+      "question": {
+        "type": "single",
+        "stem": "An agent frequently calls the wrong one of two similar lookup tools and sometimes passes malformed date arguments. What is the highest-leverage fix?",
+        "options": [
+          "Rewrite both tool descriptions to state what each does, when to prefer the other, and each parameter's meaning and format with examples — and encode the date format in the schema",
+          "Add a system-prompt paragraph explaining which tool to use in which situation",
+          "Consolidate both tools into a single tool with a mode parameter",
+          "Switch to a more capable model tier for better tool selection"
+        ],
+        "correct": [0],
+        "answerWhy": "The model selects tools and constructs arguments purely from names, descriptions, and schemas, so wrong-tool and malformed-argument failures are documentation failures fixable at that layer. Tool guidance in the system prompt is not where the model reads when choosing, consolidation may help but hides the real defect, and a stronger model still has only the ambiguous definitions to work from."
+      }
+    },
+    {
+      "objective": "MCP Server Development",
+      "keyPoints": [
+        "MCP standardizes connections: expose a capability once as a server and any MCP client (Claude Desktop, Claude Code, your app) can connect.",
+        "Three capability types: tools (model-invoked operations), resources (data the client reads into context), prompts (reusable parameterized templates).",
+        "Transport follows topology — stdio for a client-launched local subprocess with no network surface; streamable HTTP for a standing shared service.",
+        "The moment you leave stdio, authentication, authorization, and access control become the server's responsibility.",
+        "Capabilities are transport-independent; transport is a property of the connection, not of individual tools."
+      ],
+      "watchFor": "On a stdio server, stdout is the protocol channel — printing logs there corrupts the protocol; route diagnostics to stderr or a file.",
+      "question": {
+        "type": "single",
+        "stem": "A platform team wants one integration with the internal inventory system, usable by several Claude applications across the company, owned and versioned by them. Which deployment fits?",
+        "options": [
+          "An MCP server on stdio, launched locally by each client application",
+          "An MCP server over a network transport with authentication and access control",
+          "A custom tool implemented separately in each consuming application",
+          "A Skill packaging the inventory API documentation and example calls"
+        ],
+        "correct": [1],
+        "answerWhy": "A shared, independently owned capability reached by many clients is the network-transport case, and leaving stdio makes auth and access control the server's responsibility. Stdio suits a single local user's subprocess, per-app custom tools produce parallel implementations that drift, and a documentation Skill leaves every consumer improvising authenticated calls."
+      }
+    },
+    {
+      "objective": "Agentic Customization",
+      "keyPoints": [
+        "Four mechanisms: built-in tools (zero build, fixed scope), custom tools (lightest path, private to one app), Skills (packaged procedural knowledge), MCP servers (independently owned shared services).",
+        "First question: does Claude need to know something or reach something? Procedure and conventions → Skill; live system access → tool or MCP.",
+        "Second question, for executable capability: what is the scope of reuse and ownership? One app, one team → custom tool; many apps or independent versioning → MCP.",
+        "Check built-in tools first — when a platform capability covers the need, custom infrastructure is pure overhead.",
+        "Requirements for exact repeatable results are requirements for code: put computation in a tool and let the model orchestrate, not calculate."
+      ],
+      "watchFor": "An MCP server whose tools just return static procedure text is overhead pretending to be integration — and a Skill full of curl examples leaves every consumer improvising unauthenticated calls.",
+      "question": {
+        "type": "single",
+        "stem": "A team wants Claude to produce quarterly business reviews following the company's specific structure, section order, and review checklist. No system access is needed. Which mechanism fits?",
+        "options": [
+          "An MCP server whose tools return the report template and checklist",
+          "A Skill packaging the report structure, conventions, and checklist",
+          "A custom tool that returns the template as a string",
+          "A built-in file tool pointed at the template document"
+        ],
+        "correct": [1],
+        "answerWhy": "This is procedural knowledge — how to do a task the company way — which is exactly what a Skill packages, loaded when a matching task arises. Wrapping static instruction text in an MCP server or a custom tool adds transport, deployment, and maintenance overhead with no integration benefit, and a file tool provides access to a document without conveying the conventions."
+      }
+    }
+  ]
+}

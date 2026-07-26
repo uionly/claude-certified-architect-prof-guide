@@ -1,0 +1,121 @@
+{
+  "domain": 4,
+  "title": "Workflow Integration and Solution Design",
+  "objectives": [
+    {
+      "objective": "Apply Claude to analyze requirements and use cases",
+      "keyPoints": [
+        "Sequence matters: analyze requirements before designing the solution.",
+        "Feed Claude the raw material (interview notes, process docs, tickets) and ask for recurring themes, requirements, edge cases, conflicts, and clarifying questions.",
+        "Take Claude's clarifying questions back to stakeholders — its synthesis is a draft, not validated truth.",
+        "Map the documented process, then interview to find the real one, including exception handling.",
+        "Check that the required inputs actually exist before committing to a use case."
+      ],
+      "watchFor": "Asking Claude for cost savings, volumes, or error rates it has no data to compute produces confident fabricated numbers that then get quoted in a business case.",
+      "question": {
+        "type": "single",
+        "stem": "An associate is asked to explore using Claude in the claims intake process. They have interview notes from four staff members. What should they do first?",
+        "options": [
+          "Ask Claude to produce an automation plan with projected annual cost savings",
+          "Ask Claude to synthesize the notes into recurring themes, requirements, and conflicts, plus clarifying questions to take back to staff",
+          "Ask Claude to draft the new intake workflow so stakeholders have something concrete to react to",
+          "Begin a pilot and let the requirements emerge from real usage"
+        ],
+        "correct": [1],
+        "answerWhy": "Requirements analysis precedes solution design, and Claude's leverage here is synthesizing the input you have and exposing the gaps you still need to close with stakeholders. Asking for a plan or savings estimate first produces plausible invented figures — Claude has no access to your real volumes or exception rates — and letting requirements emerge from a pilot builds for a process nobody has validated."
+      }
+    },
+    {
+      "objective": "Leverage Claude for research, planning, and process optimization",
+      "keyPoints": [
+        "Currency-sensitive research (recent regulations, fast-moving markets) needs research mode with sources; plain chat draws on training data with a cutoff.",
+        "Research output is a sourced draft — verify the claims that will drive the decision against the cited sources before briefing anyone.",
+        "For planning, supply the goal, timeline, resources, and known risks and treat the returned plan as a reviewable starting point.",
+        "Describe the real process, exceptions included, so Claude finds the real bottlenecks rather than the documented ones.",
+        "Validate optimization suggestions against operational and compliance constraints before adopting them."
+      ],
+      "watchFor": "Writing the conclusion first and asking Claude to find supporting sources inverts research into advocacy — the citations will support a position you never tested.",
+      "question": {
+        "type": "single",
+        "stem": "An associate must brief leadership on data-residency rules that changed in the last few months. What is the sound approach?",
+        "options": [
+          "Ask Claude in plain chat, since it has broad knowledge of regulatory frameworks",
+          "Use research mode for current sources, then verify the decision-driving claims against those sources before the briefing",
+          "Ask Claude for the rules and add a disclaimer that details may be out of date",
+          "State the expected conclusion and ask Claude to find sources that support it"
+        ],
+        "correct": [1],
+        "answerWhy": "Recent regulatory change is currency-sensitive, so it needs a mode that retrieves and cites current sources, and the claims leadership will act on get checked against those sources first. Plain chat can return confidently stale rules, a disclaimer pushes verification onto the audience, and sourcing a predetermined conclusion is advocacy rather than research."
+      }
+    },
+    {
+      "objective": "Use Claude to support solution design, development, and iteration",
+      "keyPoints": [
+        "Design is a loop: generate, review against the real requirement, give specific feedback, refine. The first output is a draft by design.",
+        "Artifacts make the loop concrete for tangible deliverables — each version visible and reshaped by the next request.",
+        "Iterate with named defects, not \"make it better\" and not by generating many one-shot versions and picking a favorite.",
+        "Build the smallest valuable slice, test it against real cases, and grow it on feedback.",
+        "Deliver what built-in features support and escalate custom integration work to Developers or Architects."
+      ],
+      "watchFor": "Abandoning an otherwise viable design because one component exceeds built-in features wastes the rest — ship what works and escalate that single piece.",
+      "question": {
+        "type": "single",
+        "stem": "An associate designs a shared client-onboarding checklist with Claude. Four of five components work with built-in features; the fifth needs a live CRM connection. What should they do?",
+        "options": [
+          "Deliver the four supported components now and escalate the CRM integration to a developer",
+          "Pause the whole design until the CRM integration can be built",
+          "Attempt the CRM connection themselves so the solution ships complete",
+          "Redesign the checklist to avoid needing any CRM data"
+        ],
+        "correct": [0],
+        "answerWhy": "The right move is to deliver the value that built-in features already support and route the one technical component to the role accountable for integrations. Pausing everything forfeits four working components, improvising the integration exceeds Associate scope and creates reliability and security risk, and redesigning to avoid CRM data silently drops a real requirement."
+      }
+    },
+    {
+      "objective": "Integrate Claude into existing workflows to augment or redesign them",
+      "keyPoints": [
+        "Start incrementally: insert Claude at one high-friction step — drafting, summarizing, first-pass analysis — and leave existing review and approval steps intact.",
+        "For customer-facing or high-stakes output, draft-plus-review is the default; accountability stays with the team.",
+        "Capture the baseline metrics before the workflow changes, or you cannot show what the change achieved.",
+        "Standardize what repeats: shared Project holding the task instructions, templates, tone rules, and reference documents.",
+        "Integration includes enablement — training and shared prompts, not just configuration."
+      ],
+      "watchFor": "Removing human review at the same moment Claude is introduced maximizes risk exactly when the team's understanding of its failure modes is lowest.",
+      "question": {
+        "type": "single",
+        "stem": "A support team wants Claude to help with customer response emails. Which integration approach is soundest for a first rollout?",
+        "options": [
+          "Have Claude send routine replies automatically and sample a percentage afterward for quality",
+          "Have Claude draft replies for agents to review and personalize before sending, using a shared Project for tone and templates",
+          "Let each agent decide how and when to use Claude in their own workflow",
+          "Replace the current reply process entirely and keep review only for escalated tickets"
+        ],
+        "correct": [1],
+        "answerWhy": "Draft-plus-review inserts Claude at the high-friction step while the existing safeguard stays intact, and the shared Project makes output consistent across agents instead of dependent on individual prompting. Automated sends with after-the-fact sampling exposes customers to unvetted output, and per-agent improvisation is individual usage rather than integration."
+      }
+    },
+    {
+      "objective": "Communicate Claude's value and limitations to stakeholders",
+      "keyPoints": [
+        "Report value and limitations together, both grounded in measured data from the pilot.",
+        "To enthusiasts, calibrate: Claude drafts and accelerates but can produce confident plausible errors, so review stays for consequential output.",
+        "To skeptics, bring evidence: pilot numbers, concrete examples, and the safeguards that contain the known risks.",
+        "Never credit Claude for quality the human review step produced — that invites stakeholders to cut the safeguard the results depended on.",
+        "Answer overreach by reframing to the appropriate human-accountable use, not with a blanket prohibition."
+      ],
+      "watchFor": "Promising that errors are eliminated buys short-term enthusiasm and collapses credibility the moment the first visible mistake lands.",
+      "question": {
+        "type": "single",
+        "stem": "After a pilot, drafting time for customer letters fell 40%, and reviewers still make about one material correction per ten letters. How should the associate report this to the executive sponsor?",
+        "options": [
+          "Report the 40% time saving and note that quality has been consistently high",
+          "Report the 40% time saving alongside the one-in-ten correction rate, and state that review must remain part of the workflow",
+          "Report the time saving and propose removing review now that the process is proven",
+          "Hold the report until the correction rate approaches zero"
+        ],
+        "correct": [1],
+        "answerWhy": "Pairing the measured gain with the measured limitation gives the sponsor what they need to decide, and it makes explicit that the review step is what produced the quality. Reporting only the saving — or proposing to drop review — invites cutting the safeguard the results depended on, and withholding the result until errors vanish sets an unreachable bar."
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "domain": 5,
+  "title": "Governance, Safety & Risk Management",
+  "objectives": [
+    {
+      "objective": "Implement guardrails and safety controls",
+      "keyPoints": [
+        "Layered defense: system-prompt instructions, input filters, output validation, tool permission scoping, rate limits — no single layer is reliable alone.",
+        "The key distinction: probabilistic controls (anything enforced by asking the model) lower the violation rate; deterministic controls (enforced outside the model) cannot be talked past.",
+        "Hard requirements — regulatory rules, financial limits, destructive-action bans — must rest on deterministic layers. Instructions are hygiene, not enforcement.",
+        "Design assuming bypass: scope tool permissions so a successful injection has bounded blast radius.",
+        "Fail closed on public, hard-to-recall outputs; flag-and-review only where harm is recoverable."
+      ],
+      "watchFor": "A human confirmation click is not a control when the confirmer cannot evaluate what they're approving — analysts approving SQL they cannot read is theater.",
+      "question": {
+        "type": "single",
+        "stem": "A payments agent must never issue a refund above $10,000. The team hardened the system prompt and added examples, and violations dropped to a fraction of a percent. What should the architect require?",
+        "options": [
+          "Further prompt hardening plus an output classifier that scores refund amounts",
+          "A deterministic limit enforced in the refund API, with an approval gate for amounts above the threshold",
+          "Daily log review to catch and reverse any over-limit refunds",
+          "A second model that reviews each refund decision before it executes"
+        ],
+        "correct": [1],
+        "answerWhy": "A hard financial limit is a deterministic requirement, so it belongs in the API the agent calls where the model cannot argue past it, with an approval gate above the line. Prompt hardening and model-based review keep the control probabilistic on a rule that must hold every time, and daily review is incident response after money has moved."
+      }
+    },
+    {
+      "objective": "Identify risks, limitations, and failure modes of LLM systems",
+      "keyPoints": [
+        "Hallucination: fluency is never evidence — models express no less confidence when fabricating, so verification must live outside the model.",
+        "Prompt injection is direct (the user attacks) and indirect (instructions hidden in retrieved documents, web pages, emails, tool results) — every content source the agent reads is an attack channel.",
+        "Data leakage often travels secondary paths: full-prompt logging copies sensitive data into observability systems with weaker controls and longer retention.",
+        "Automation bias: a mostly-right system erodes reviewer vigilance — watch for rising approval rates, falling review times, and errors surviving review.",
+        "Cascading failure: per-step accuracies multiply (three 95% steps ≈ 86% end to end), and downstream steps build confidently on corrupted upstream output."
+      ],
+      "watchFor": "Swapping model versions on benchmark strength alone is a behavior change — behavior tuned against one version does not transfer, so migrations need your own regression suite and a staged rollout.",
+      "question": {
+        "type": "single",
+        "stem": "An agent summarizes incoming supplier emails and can call an internal transfer tool. What is the most significant risk introduced by this combination?",
+        "options": [
+          "Hallucinated summary details misleading the finance team",
+          "Indirect prompt injection: instructions embedded in supplier email content driving real transfers through the agent's tool access",
+          "The email content exhausting the agent's context window",
+          "Users directly jailbreaking the agent through their own messages"
+        ],
+        "correct": [1],
+        "answerWhy": "Third-party email content is an input channel an attacker can write to, and tool access converts injected text into real-world actions — that is the defining agent attack surface. Hallucinated details and context exhaustion are real but far less consequential here, and direct jailbreaking overlooks that the untrusted content arrives from outside the user entirely."
+      }
+    },
+    {
+      "objective": "Apply human-in-the-loop validation strategies",
+      "keyPoints": [
+        "Human attention is scarce — allocate it by impact and reversibility.",
+        "High-impact irreversible actions (transfers, account freezes, benefit denials, medical escalations) get mandatory pre-action approval gates.",
+        "Recoverable outputs get review woven into the natural workflow, or sampled review sized to detect systemic regressions rather than inspect every unit.",
+        "Route to humans on measured uncertainty and stakes — low model confidence, high account value, distress signals, repeated resolution failure — not on user initiative.",
+        "Instrument the review layer itself: catch rate and disagreement rate, or rubber-stamping stays invisible until an incident."
+      ],
+      "watchFor": "Escalation must never depend on the affected person diagnosing the failure — the people most harmed by model error are often least able to recognize it.",
+      "question": {
+        "type": "single",
+        "stem": "A mandated human review step approves 99.7% of items at about 20 seconds each. What should the architect conclude?",
+        "options": [
+          "The model is performing well, so review can be reduced to sampling",
+          "The control is likely unverified rubber-stamping — measure catch and disagreement rates, and reallocate review toward high-impact irreversible items",
+          "Reviewers need a faster interface so throughput matches the volume",
+          "The approval threshold should be raised so fewer items reach reviewers"
+        ],
+        "correct": [1],
+        "answerWhy": "Those numbers are the signature of automation bias hollowing out an oversight layer, and the only way to know is to instrument whether review actually catches errors. Treating the approval rate as evidence of model quality assumes the very thing in doubt, and faster tooling or a higher threshold optimizes throughput on a control that may not be functioning."
+      }
+    },
+    {
+      "objective": "Ensure compliance with regulations (e.g., GDPR, HIPAA, FedRAMP)",
+      "keyPoints": [
+        "Compliance is a property of the deployment architecture, not the model — the same model is compliant or not depending on data, environment, contracts, and retention.",
+        "Each regime demands its instrument: a BAA for PHI, a DPA and disclosed processor chain for GDPR, an authorized deployment environment for US federal work.",
+        "Data minimization is architectural — send only the fields the purpose requires; maximal context \"for better answers\" is over-processing by design.",
+        "Erasure reaches every copy: prompts persisted in logs, analytics warehouses, and caches are all in scope, so deletion propagation must be designed in.",
+        "Pseudonymized data is still personal data if the organization can re-link tokens to people."
+      ],
+      "watchFor": "Encryption, SOC 2, and ISO certifications are security evidence, not the legal instruments each regime requires — and no privately negotiated terms substitute for federal authorization.",
+      "question": {
+        "type": "single",
+        "stem": "A hospital wants to send patient records to a Claude-based summarizer. The vendor offers TLS, encryption at rest, and SOC 2 Type II. What is still required?",
+        "options": [
+          "Nothing further — the security controls satisfy HIPAA for PHI processing",
+          "A Business Associate Agreement plus a PHI-aware architecture covering minimization, retention, and log handling",
+          "Pseudonymization of patient identifiers before transmission",
+          "An independent penetration test of the summarization service"
+        ],
+        "correct": [1],
+        "answerWhy": "PHI reaching a vendor requires the contractual instrument HIPAA specifies — a BAA — alongside an architecture that governs what data flows, how long copies persist, and where prompts are logged. Strong security controls are evidence, not the legal basis; pseudonymized clinical data typically remains identifiable in practice, and a penetration test assesses security rather than establishing the required relationship."
+      }
+    },
+    {
+      "objective": "Address ethical AI considerations (bias, fairness, transparency)",
+      "keyPoints": [
+        "Bias is invisible in aggregate — a system can match human judgments 94% overall while systematically disadvantaging one group.",
+        "Measure disparate impact: compare score distributions and selection rates across groups on representative data, before launch and continuously after.",
+        "Blinding inputs does not achieve fairness — proxy features (zip codes, school names, career gaps, writing style) carry the same signal, and blinding makes disparity harder to measure.",
+        "Fairness findings are perishable: population shift, prompt revisions, and model upgrades each reset the assessment clock.",
+        "Transparency plus contestability: affected people learn AI participated and the principal factors, and get a human appeal with authority to change the outcome."
+      ],
+      "watchFor": "Validating a consequential-decision system by agreement with historical human decisions measures faithful reproduction of whatever bias that history contained.",
+      "question": {
+        "type": "single",
+        "stem": "A hiring screener removes names, gender, and age from applications and reports 94% agreement with past recruiter decisions. What is the flaw?",
+        "options": [
+          "Blinding leaves proxy features intact while making disparity harder to measure, and concordance with historical decisions reproduces whatever bias they contained",
+          "The agreement rate is too low for a consequential decision and should exceed 98%",
+          "The model should be shown demographic data so it can correct for imbalance",
+          "The screener needs a model card documenting its training data and limitations"
+        ],
+        "correct": [0],
+        "answerWhy": "Two errors compound: proxies like zip code and school name carry the removed signal while blinding removes the ability to measure disparate impact, and benchmarking against past human decisions rewards faithful reproduction of historical bias. A higher concordance target deepens the second problem, feeding demographics to the model is not the intervention fairness testing calls for, and a model card documents without measuring or enabling appeal."
+      }
+    }
+  ]
+}

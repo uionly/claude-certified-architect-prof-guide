@@ -1,0 +1,144 @@
+{
+  "domain": 1,
+  "title": "Solution Design & Architecture",
+  "objectives": [
+    {
+      "objective": "Translate business problems into Claude-based AI solutions",
+      "keyPoints": [
+        "Decompose the process and sort subtasks: language understanding and ambiguity tolerance → Claude; rules, arithmetic, lookups, fixed transformations → deterministic code.",
+        "The requirement is the outcome, not the stakeholder's solution language (\"build us an agent\").",
+        "Establish measurable success criteria and a baseline (current cost per document, handle time, error rate) before any architecture debate.",
+        "Scope the MVP by volume, measurability, and contained blast radius — not by what demos best.",
+        "Add model involvement, and especially agency, only where the task actually requires it."
+      ],
+      "watchFor": "Deterministic logic in a prompt is strictly worse than the same logic in code on accuracy, cost, and auditability — a uniform stack is not a reason to run thresholds through the model.",
+      "question": {
+        "type": "single",
+        "stem": "A claims process has three steps: read adjuster notes and summarize the incident, apply the policy's deductible and coverage-limit rules, and draft the customer letter. How should the work be allocated?",
+        "options": [
+          "Claude for the summary and the letter; deterministic code for the deductible and coverage-limit calculation",
+          "Claude for all three steps, with the policy rules supplied in the system prompt",
+          "Deterministic code for all three, with Claude reviewing the output",
+          "Claude for all three, with a second model call validating the calculation"
+        ],
+        "correct": [0],
+        "answerWhy": "Summarizing notes and drafting a letter are language problems, while deductible and limit arithmetic is exact rule evaluation that code performs faster, cheaper, and auditably. Putting the rules in a prompt trades certainty for probability, code cannot write the letter, and a second model validating arithmetic is a probabilistic check where a deterministic one is available."
+      }
+    },
+    {
+      "objective": "Design end-to-end architectures (input → processing → output → feedback loops)",
+      "keyPoints": [
+        "Four stages, each catching failures the others cannot: input validation and normalization, processing, output validation, feedback capture.",
+        "Garbage in, garbage out — no model tier reconstructs information lost in capture or preprocessing, so gate quality before the model stage.",
+        "Validate output deterministically wherever a ground truth exists (code lists, schemas, recomputed fields); use targeted human review only where no mechanical oracle exists.",
+        "Place human gates at high-impact, irreversible actions in proportion to risk — not uniformly, and not only at intake.",
+        "Capture human corrections as labeled data driving prompt updates and regression evals."
+      ],
+      "watchFor": "Structured output is not correct output — a schema constrains shape, not truth, so structural checks never replace content validation.",
+      "question": {
+        "type": "single",
+        "stem": "Extraction accuracy is poor because scanned invoices arrive with degraded OCR text. The team proposes upgrading to a more capable model. What is the sound assessment?",
+        "options": [
+          "The upgrade is appropriate — a stronger model infers correct values from degraded text",
+          "Fix it at the input stage with OCR quality gates that reject or re-capture unusable scans before the model sees them",
+          "Add a second model pass to cross-check the extracted values",
+          "Add human review of every extraction until accuracy improves"
+        ],
+        "correct": [1],
+        "answerWhy": "Information destroyed upstream cannot be reconstructed downstream, so the defect belongs to the input stage where quality gates can reject or re-capture the scan. A stronger model or a second pass produces more confident guesses over the same missing characters, and blanket human review pays for the upstream defect forever instead of fixing it."
+      }
+    },
+    {
+      "objective": "Select appropriate architectural patterns (workflow, agentic, augmented LLM)",
+      "keyPoints": [
+        "Escalation ladder — use the simplest pattern that meets the requirement. Rung one: the augmented LLM (one call plus retrieval, tools, memory) covers a surprising share of production tasks.",
+        "Workflows are code-orchestrated predefined calls: prompt chaining for fixed ordered checkable steps with gates between them; routing for distinct input categories.",
+        "Parallelization has two forms — sectioning (split a large input) and voting (repeat the same task and aggregate for confidence).",
+        "Orchestrator-workers when a model must decide which subtasks each input needs; evaluator-optimizer when criteria are articulable and iteration demonstrably improves output.",
+        "Reserve agents for paths that cannot be predicted and must emerge from observations."
+      ],
+      "watchFor": "A hard p95 latency SLA rules out unbounded agent loops regardless of output quality — patterns with unpredictable call structure cannot be engineered to a fixed latency.",
+      "question": {
+        "type": "single",
+        "stem": "A single support-triage prompt handles billing, technical, and account requests. Tuning it for billing accuracy consistently degrades technical handling. Which pattern fits?",
+        "options": [
+          "An agent that decides how to handle each request dynamically",
+          "Routing — a cheap classifier dispatches each category to its own specialized prompt",
+          "Parallelization, running all three specialized prompts on every request and aggregating",
+          "Evaluator-optimizer, with a critic scoring each triage decision"
+        ],
+        "correct": [1],
+        "answerWhy": "Improving one category at another's expense is routing's signature symptom: the categories are distinct and each needs its own prompt, dispatched by a cheap classifier. An agent adds nondeterminism to a predictable dispatch, running every prompt on every request triples cost to avoid building the classifier, and evaluator-optimizer critiques output rather than separating the conflicting categories."
+      }
+    },
+    {
+      "objective": "Design multi-agent systems and orchestration strategies",
+      "keyPoints": [
+        "First decide whether to be multi-agent at all — a single agent with well-designed tools wins whenever each request needs a bounded, predictable slice of capability.",
+        "Multi-agent earns its cost when breadth and parallelism are the bottleneck: work exceeding one context window, many independent subtasks against a deadline, or subtask sets that vary per input.",
+        "Orchestrator-workers is the dominant shape: a lead decomposes, dispatches, and owns synthesis; fixed dispatch for static subtasks, model-driven when they emerge per input.",
+        "Coordinate through explicit interfaces with isolated contexts — never a shared mutable conversation.",
+        "Control cost by tiering models per role; contain worker failures at the orchestrator and degrade to partial results with explicit gaps."
+      ],
+      "watchFor": "Decomposing along org-chart or data-source lines (\"one agent per system\") is the classic over-engineering pattern — those boundaries are usually just tool boundaries for one agent.",
+      "question": {
+        "type": "single",
+        "stem": "An architect proposes one agent per backend system — CRM, billing, inventory — for a support assistant whose requests each touch a bounded, predictable set of those systems. What is the sound assessment?",
+        "options": [
+          "Reasonable — per-system agents keep credentials and failure domains separate",
+          "A single agent with well-designed tools for each system is cheaper and more debuggable for bounded workloads",
+          "Reasonable, provided the agents share one conversation so each knows what the others found",
+          "Add an orchestrator above the three agents so failures are contained"
+        ],
+        "correct": [1],
+        "answerWhy": "Data-source boundaries are tool boundaries, not agent boundaries: one agent with three good tools avoids coordination overhead, context duplication, and three systems to evaluate. A shared conversation makes it worse through stale-plan collisions and multiplied token spend, and adding an orchestrator layers cost onto a decomposition that was unnecessary."
+      }
+    },
+    {
+      "objective": "Apply decomposition techniques for complex problem solving",
+      "keyPoints": [
+        "Cut along natural boundaries — document sections and clauses, process stages — so each unit stays semantically whole.",
+        "Sequential dependency → chaining with a programmatic gate between stages so defects stop propagating.",
+        "Independent parts of a large input → sectioning with an aggregation step, which also attacks latency.",
+        "Unreliable judgment → voting: repeat the task and aggregate by a rule matched to the cost asymmetry (union when misses are expensive, majority when false positives are).",
+        "Split perception from judgment — a structured record of the facts, then reasoning over it — so each error class is attributable and the intermediate is validatable."
+      ],
+      "watchFor": "Every boundary costs latency and failure surface, so steps that do not move a quality metric should be merged away — and fixed-size chunking severs the clauses and cross-references that section-aligned cuts preserve.",
+      "question": {
+        "type": "single",
+        "stem": "A compliance review of contracts must not miss prohibited clauses, and single passes catch different subsets each run. What decomposition fits?",
+        "options": [
+          "Section the contract into fixed-size chunks and process them in parallel",
+          "Run the review multiple times independently and take the union of findings",
+          "Run the review multiple times and report only clauses found by a majority of runs",
+          "Chain the review into per-clause-type passes executed in sequence"
+        ],
+        "correct": [1],
+        "answerWhy": "Inconsistent single passes on a hard judgment call for voting, and because a missed prohibited clause is the expensive error the aggregation rule should be union rather than majority. Fixed-size chunking severs clauses and does not address run-to-run inconsistency, and majority voting discards exactly the intermittently-caught findings this review cannot afford to lose."
+      }
+    },
+    {
+      "objective": "Align solutions to business value pillars (efficiency, transformation, productivity, cost, performance SLAs)",
+      "keyPoints": [
+        "Efficiency: the same defined work done cheaper or faster — unit cost and cycle time. Productivity: people accomplishing more or higher-value output.",
+        "Transformation: a genuinely new capability, offering, or revenue stream the prior operating model could not produce — measured in new revenue, not cost per unit.",
+        "Cost means an explicit spend target; performance means meeting defined SLAs.",
+        "Pillars are design inputs: a contracted p95 latency bound constrains model and pattern choice from the start.",
+        "No architecture without a named value pillar, metric, and owner."
+      ],
+      "watchFor": "Calling a cheaper-faster version of unchanged work \"transformation\" puts the wrong metrics in front of executives and funds the initiative from the wrong case.",
+      "question": {
+        "type": "single",
+        "stem": "An insurer automates first-draft claim summaries. The workflow, outputs, and volumes are unchanged; handle time falls 40%. Which value pillar does this serve?",
+        "options": [
+          "Transformation — AI capability is new to the organization",
+          "Efficiency — the same defined work is done faster and cheaper, measured in cycle time and unit cost",
+          "Productivity — adjusters have more time available",
+          "Performance — the process now meets its service commitments"
+        ],
+        "correct": [1],
+        "answerWhy": "Same work, same outputs, same volumes, lower cycle time is the definition of efficiency, and the metrics that prove it are unit cost and handle time. Nothing new is being offered so transformation is inflated, productivity would require redirected higher-value output rather than a faster identical task, and no SLA is described."
+      }
+    }
+  ]
+}

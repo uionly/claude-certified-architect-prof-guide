@@ -1,0 +1,75 @@
+{
+  "domain": 7,
+  "title": "Troubleshooting and Optimization",
+  "objectives": [
+    {
+      "objective": "Identify, diagnose, and resolve issues with underperforming prompts or poor outputs",
+      "keyPoints": [
+        "Read the symptom: generic output = underspecified prompt (no goal, audience, or criteria).",
+        "Wrong or fabricated specifics = knowledge gap — supply source material or use a feature that reaches real sources.",
+        "Confused output mixing topics or contradicting earlier turns = crowded conversation; restart with a concise relevant summary.",
+        "Diagnose before fixing, and try the cheap likely causes first — most underperformance is the prompt or the conversation, not the model.",
+        "When style descriptions keep failing, provide an example to match instead of more adjectives."
+      ],
+      "watchFor": "Regenerating the same underspecified prompt, escalating to technical teams, or declaring the tool defective are all substitutes for the two-minute diagnosis that would locate the real gap.",
+      "question": {
+        "type": "single",
+        "stem": "An associate's competitor analysis comes back generic — observations that could describe any company in the sector. What is the most likely cause and the right fix?",
+        "options": [
+          "The model tier is too low; rerun the request on a more capable model",
+          "The prompt lacks the decision it supports, the audience, and what counts as important — specify those and supply the competitor material",
+          "The conversation is too long; start a fresh chat with the same prompt",
+          "The request needs more creative latitude; ask for a bolder, more opinionated analysis"
+        ],
+        "correct": [1],
+        "answerWhy": "Generic output is the signature of an underspecified prompt, so the fix is stating the goal, the reader, the criteria for importance, and the source material to ground it. A higher tier still cannot know which decision the analysis serves, a fresh chat with the same prompt reproduces the same gap, and asking for boldness changes tone rather than substance."
+      }
+    },
+    {
+      "objective": "Adjust approach based on feedback and results",
+      "keyPoints": [
+        "A recurring reviewer flag is one configuration problem, not a stream of separate draft problems — encode it in the standing instructions with examples of the rejected phrasing.",
+        "Manually fixing the same flag each cycle treats the safety net as the fix and leaves the waste in place.",
+        "Change one element at a time and evaluate against the same test cases so results are attributable.",
+        "Define what \"good\" means before judging which version is better.",
+        "On a regression, revert to known-good, treat the failure as information, and iterate in smaller steps."
+      ],
+      "watchFor": "Pressuring reviewers to relax the standard adjusts the wrong side of the loop — the drafts, not the reviewers, are what should change.",
+      "question": {
+        "type": "single",
+        "stem": "For eight straight weeks, reviewers have removed the same overpromising phrases from Claude's client update drafts. What is the right adjustment?",
+        "options": [
+          "Continue editing the phrases out during review, since the process is catching them reliably",
+          "Add a rule to the project instructions prohibiting those commitment phrases, with examples of the rejected wording and acceptable alternatives",
+          "Ask reviewers to accept the phrasing since clients have not complained",
+          "Rewrite the whole prompt from scratch with tighter constraints on tone, length, and structure"
+        ],
+        "correct": [1],
+        "answerWhy": "A flag that recurs every week is a configuration gap, and encoding it with concrete examples means every future draft inherits the correction instead of paying for it in rework. Continuing to edit manually leaves the waste permanent, relaxing the reviewers' standard fixes the wrong side of the loop, and rewriting everything at once changes many variables so nothing learned is attributable."
+      }
+    },
+    {
+      "objective": "Optimize workflows for efficiency and effectiveness",
+      "keyPoints": [
+        "Anything you repeat or correct every cycle belongs upstream in configuration.",
+        "Repeated setup — re-explaining the task, re-pasting standards — is eliminated by a shared Project.",
+        "Post-generation rework is eliminated by specifying the exact output structure in the standing instructions.",
+        "An overloaded single pass caps quality — decompose into stages with checkpoints so errors are caught where they occur.",
+        "Optimize the bottleneck the measurements point to, and never optimize away needed review or scope."
+      ],
+      "watchFor": "Brute force (rerun and pick the best) and instruction bloat both dodge the real problem when a prompt is simply doing too much in one pass.",
+      "question": {
+        "type": "single",
+        "stem": "One prompt asks Claude to research a market, draft a report, adapt it for two audiences, and produce a slide outline. Results are uneven and errors show up in every downstream deliverable. What is the best optimization?",
+        "options": [
+          "Split it into sequential stages — research, then draft and review, then adapt per audience — so each stage is checked before the next uses it",
+          "Run the prompt several times and assemble the best pieces from each result",
+          "Add detailed corrective rules to the prompt for each of the four outputs",
+          "Move the prompt into a Project so the setup does not have to be retyped"
+        ],
+        "correct": [0],
+        "answerWhy": "The prompt is doing too much in one pass, so an early error propagates into every downstream artifact with no place to catch it; decomposing into stages inserts those checkpoints. Rerunning and cherry-picking multiplies reading effort without fixing the structure, more rules bloat an already overloaded prompt, and a Project solves repeated setup rather than this quality problem."
+      }
+    }
+  ]
+}

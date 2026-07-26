@@ -1,0 +1,121 @@
+{
+  "domain": 2,
+  "title": "Tool Design & MCP Integration",
+  "objectives": [
+    {
+      "objective": "Design effective tool interfaces with clear descriptions and boundaries",
+      "keyPoints": [
+        "Descriptions are the tool-selection mechanism — a production description states input formats, example queries, edge cases, and when to use this tool versus its neighbours.",
+        "Eliminate functional overlap by renaming: analyze_content becomes extract_web_results with a web-specific description, so name and description carve out distinct territory.",
+        "Split multiplexed generic tools (analyze_document with a free-text instructions parameter) into purpose-specific contracts: extract_data_points, summarize_content, verify_claim_against_source.",
+        "Audit system prompts for keyword-sensitive instructions that can override even excellent descriptions and create unintended tool associations.",
+        "Fix selection at the interface, not with few-shot patches or a pre-model routing layer."
+      ],
+      "watchFor": "Misrouted tool calls get misdiagnosed as model weakness; the actual defect is usually two ambiguous description strings sitting next to each other in the catalog.",
+      "question": {
+        "type": "single",
+        "stem": "A research pipeline has analyze_content (\"Retrieves and analyzes content\") and analyze_document (\"Analyzes document content\"). Traffic is misrouted between them. What is the correct fix?",
+        "options": [
+          "Add few-shot examples showing which tool to use for each input type",
+          "Rename and re-describe the tools so their territories do not overlap, stating input formats, edge cases, and when to prefer the other",
+          "Insert a routing layer that picks the tool before the model sees the request",
+          "Merge them into a single tool with a parameter selecting the analysis mode"
+        ],
+        "correct": [1],
+        "answerWhy": "The model selects from names and descriptions alone, so overlapping definitions guarantee misrouting until the interface itself distinguishes them. Few-shot examples and an external router paper over the ambiguity, and merging into one mode-switched tool recreates the multiplexed generic tool that makes selection and downstream contracts worse."
+      }
+    },
+    {
+      "objective": "Implement structured error responses for MCP tools",
+      "keyPoints": [
+        "Report failures in-band with the isError flag — what accompanies it decides whether the agent can recover.",
+        "Taxonomy: transient (timeouts, unavailability — retry), validation (invalid input — retrying is futile), business (understood but disallowed), permission (caller lacks rights).",
+        "Return errorCategory, an isRetryable boolean, and a human-readable description so the agent stops guessing recovery semantics from prose.",
+        "Business rule violations get retriable: false plus a customer-friendly explanation, so the agent communicates a denial rather than apologizing for a technical fault.",
+        "Validation errors should name the offending parameter and mark themselves non-retryable."
+      ],
+      "watchFor": "Returning an empty result for an access failure makes outages invisible and successful-but-empty queries indistinguishable — encode the difference, and never report an error as an empty success.",
+      "question": {
+        "type": "single",
+        "stem": "An MCP tool returns \"Operation failed\" for every error. The agent retries invalid-ID lookups repeatedly and gives up immediately on backend timeouts. What is the fix?",
+        "options": [
+          "Add a retry policy in the agent loop with exponential backoff on all tool failures",
+          "Return structured errors with an errorCategory, an isRetryable flag, and a description naming what went wrong",
+          "Instruct the agent in the system prompt to retry timeouts but not validation errors",
+          "Have the tool retry internally and return only the final outcome"
+        ],
+        "correct": [1],
+        "answerWhy": "The agent's behaviour is backwards because the error response erased the distinctions it needed, so the fix is explicit category and retryability metadata at the tool boundary. A blanket backoff policy still retries hopeless validation errors, prompt guidance cannot classify errors the response does not distinguish, and internal-only retries hide the failure semantics the agent needs for anything beyond transients."
+      }
+    },
+    {
+      "objective": "Distribute tools appropriately across agents and configure tool choice",
+      "keyPoints": [
+        "More tools make an agent worse: 18 tools instead of 4–5 degrades selection reliability, and out-of-role tools invite misuse (a synthesis agent that starts web searching).",
+        "Scope tool access to role; for high-frequency cross-role needs give a constrained scoped tool (verify_fact) and route complex cases through the coordinator.",
+        "Replace generic tools with constrained validating alternatives — fetch_url becomes load_document with URL validation.",
+        "tool_choice \"auto\" lets the model decide including plain text; \"any\" guarantees a tool call but not which one; forced {\"type\": \"tool\", \"name\": …} guarantees a specific tool.",
+        "Match mechanism strength to requirement: preference → prompt, \"a tool must be called\" → any, \"this tool must be called\" → forced selection."
+      ],
+      "watchFor": "Forced selection is per-request — force the first step, then release to \"auto\" on follow-up turns so the model regains its freedom.",
+      "question": {
+        "type": "single",
+        "stem": "An enrichment workflow requires extract_metadata to run before any other tool on each document. Prompt instructions occasionally get skipped. What configuration guarantees it?",
+        "options": [
+          "Set tool_choice to \"any\" so the model must call a tool on the first request",
+          "Force tool_choice to the named extract_metadata tool on the first request, then release to \"auto\" for the follow-up turns",
+          "Remove the other tools from the catalog until extract_metadata has returned",
+          "Repeat the ordering requirement at the top and bottom of the system prompt"
+        ],
+        "correct": [1],
+        "answerWhy": "\"This specific tool must be called\" maps to forced selection by name, and because forcing is per-request the follow-up turns can return to \"auto\" for the remaining steps. \"any\" guarantees only that some tool is called, dynamically swapping the catalog is awkward and fragile, and prompt repetition leaves a probabilistic gap in a hard requirement."
+      }
+    },
+    {
+      "objective": "Integrate MCP servers into Claude Code and agent workflows",
+      "keyPoints": [
+        "Project-level .mcp.json is for shared team tooling — committed with the repo so every clone gets the same servers; user-level ~/.claude.json is for personal and experimental servers.",
+        "Credentials never live in the committed file: use environment variable expansion, ${GITHUB_TOKEN}, so each developer authenticates with their own token.",
+        "Tools from all configured servers across both scopes are discovered at connection time and available simultaneously.",
+        "Adopt community servers for standard integrations (Jira); reserve custom development for genuinely team-specific workflows.",
+        "Expose content catalogs as MCP resources rather than making agents discover data through exploratory tool calls."
+      ],
+      "watchFor": "A thin MCP tool description makes the agent default to a built-in like Grep over the more capable MCP alternative it cannot evaluate.",
+      "question": {
+        "type": "single",
+        "stem": "A team's shared MCP server is configured in each developer's ~/.claude.json with the API token written inline. What should change?",
+        "options": [
+          "Move the server definition to a committed .mcp.json and supply the token via ${ENV_VAR} expansion",
+          "Keep the user-scoped configuration but encrypt the token in place",
+          "Move the definition to .mcp.json including the token so the whole team shares one credential",
+          "Keep both the configuration and the token per-developer, and document the setup steps in the README"
+        ],
+        "correct": [0],
+        "answerWhy": "Shared tooling belongs in project scope so it is versioned with the code every developer clones, while credentials stay out of the file through environment variable expansion. Encrypting in place or documenting manual setup leaves the configuration fragmenting per developer, and committing a shared token is the security incident this pattern exists to prevent."
+      }
+    },
+    {
+      "objective": "Select and apply built-in tools (Read, Write, Edit, Bash, Grep, Glob) effectively",
+      "keyPoints": [
+        "Grep searches file contents — function definitions, callers, error messages, imports. Glob matches file path patterns like **/*.test.tsx.",
+        "Read and Write are whole-file operations; Edit makes targeted changes by matching unique anchor text.",
+        "When no practical anchor is unique (repetitive files), fall back to Read + Write rather than hunting for uniqueness that may not exist.",
+        "Explore incrementally: Grep to locate entry points, then Read those files — don't read whole directories for \"complete understanding\".",
+        "To trace aliased usage in wrapper-heavy codebases, enumerate all exported names first, then search for each."
+      ],
+      "watchFor": "Bash text processing bypasses purpose-built tools — a global sed changes every match rather than the one you intended, and cat dumps burn context.",
+      "question": {
+        "type": "single",
+        "stem": "An agent must modify one occurrence of a repeated configuration block in a file where no surrounding text is unique. Edit keeps rejecting the change. What should it do?",
+        "options": [
+          "Retry Edit with progressively longer anchor text until a unique match is found",
+          "Read the complete file, apply the modification with full positional context, and Write the corrected file",
+          "Use Bash sed to substitute the pattern in place",
+          "Use Grep to count occurrences, then Edit the nth match by index"
+        ],
+        "correct": [1],
+        "answerWhy": "Edit requires a uniquely identifying anchor, and in structurally repetitive files that uniqueness may not exist at any length — Read + Write is the documented fallback because full positional context resolves the ambiguity. Longer anchors keep chasing something that isn't there, sed changes every match, and Edit does not select matches by index."
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "domain": 6,
+  "title": "Stakeholder Communication & Lifecycle Management",
+  "objectives": [
+    {
+      "objective": "Conduct structured discovery and requirement gathering",
+      "keyPoints": [
+        "Start from the business problem and its metric, not the requested technology — a request for \"a chatbot\" is a hypothesis to test.",
+        "Three lines of inquiry: the target metric and what movement counts as success; the real workflow including exceptions; and whether the data exists in usable form.",
+        "Verify data claims firsthand — \"we have all the data\" is the assumption most often wrong in RAG engagements.",
+        "Map and engage the full stakeholder set — sponsor, users, IT, security, compliance — before requirements freeze, or missing groups reappear as blockers.",
+        "Agree measurable success criteria and explicit non-goals with the sponsor before design starts."
+      ],
+      "watchFor": "Building a prototype as a discovery tool for executives anchors expectations to the wrong thing, convincingly, before the problem is even understood.",
+      "question": {
+        "type": "single",
+        "stem": "A VP of Operations opens an engagement with \"we need an AI agent for our claims team.\" What should the architect do first?",
+        "options": [
+          "Draft an agent architecture so the VP has something concrete to react to",
+          "Elicit the business problem and the metric a solution must move, then examine the current workflow and verify the data it would depend on",
+          "Survey the claims team about which features they would want in an agent",
+          "Build a scoped prototype on sample claims to demonstrate feasibility"
+        ],
+        "correct": [1],
+        "answerWhy": "The requested technology is a hypothesis about a solution, so discovery has to establish the underlying problem, the measurable target, the real workflow with its exceptions, and whether usable data exists. Designing or prototyping first anchors everyone to an unvalidated solution, and a feature survey collects wants without ever locating the problem or the metric."
+      }
+    },
+    {
+      "objective": "Communicate architectural decisions and trade-offs",
+      "keyPoints": [
+        "Same substance, audience-specific framing: value/cost/risk for executives, technical rationale for engineers, traceability and evidence for auditors.",
+        "Quantify trade-offs with eval evidence — accuracy, cost, and latency deltas — rather than \"faster but pricier\".",
+        "Record decisions with options considered, rejection rationale, and the conditions that would reopen them.",
+        "Never promise zero errors; communicate measured ranges plus the safeguards managing residual risk.",
+        "Convert stakeholder conflicts into priced trade-offs the business can own, instead of refereeing by personal preference."
+      ],
+      "watchFor": "Unquantified trade-offs mean the decision silently defaults to whoever argues loudest — and undocumented rationale guarantees the choice is relitigated from scratch.",
+      "question": {
+        "type": "single",
+        "stem": "A CFO wants the cheapest model tier; a product VP wants the most capable. How should the architect resolve it?",
+        "options": [
+          "Recommend the balanced middle tier as a reasonable compromise",
+          "Run an eval producing accuracy, cost, and latency deltas across tiers, then facilitate a joint decision on that priced curve",
+          "Defer to the CFO, since cost constraints are typically binding",
+          "Defer to the product VP, since quality drives customer retention"
+        ],
+        "correct": [1],
+        "answerWhy": "The architect's job is to price the quality-cost curve with measured evidence so the business can own the choice on its own terms. A middle-tier compromise resolves the argument without informing it, and deferring to either executive substitutes authority for evidence on a decision neither can evaluate without the numbers."
+      }
+    },
+    {
+      "objective": "Manage stakeholder feedback loops and expectation alignment (including SLAs)",
+      "keyPoints": [
+        "Expectations drift toward the last demo — re-anchor to measured baselines on representative data, expressed as ranges with the conditions producing the low end named.",
+        "Faced with a demand for a guarantee no LLM can honestly give, redirect: present the measured range and design the workflow (confidence routing, human verification) to meet the standard.",
+        "Derive SLAs from measured performance, using metrics that fit how the system behaves — time-to-first-token with streaming where whole-response latency is inherently long.",
+        "Build feedback capture into the workflow, case-linked, reviewed on a fixed cadence with a defined cohort.",
+        "Route every scope addition through explicit change control against the agreed success criteria."
+      ],
+      "watchFor": "Overexcitement needs managing as much as disappointment — early wins prompt demands to remove safeguards, and only pre-agreed evidence gates convert that into a plan.",
+      "question": {
+        "type": "single",
+        "stem": "A sponsor insists the contract state 100% accuracy for an AI-assisted claims decision system. How should the architect respond?",
+        "options": [
+          "Accept the number and add a footnote listing the conditions under which it may not hold",
+          "Present the measured accuracy range and design the end-to-end workflow — confidence routing plus human verification — so the process meets the sponsor's standard",
+          "Decline, explaining that no LLM system can guarantee perfect accuracy",
+          "Commit to the number and plan to renegotiate once production data is available"
+        ],
+        "correct": [1],
+        "answerWhy": "The productive move is neither capitulation nor refusal: show the evidenced range for the model and design the workflow so the overall process delivers what the sponsor actually needs. A footnoted guarantee is still a guarantee, a flat refusal leaves the sponsor's requirement unaddressed, and committing to renegotiate later signs an unmeetable term today."
+      }
+    },
+    {
+      "objective": "Document architectures and provide implementation guidance",
+      "keyPoints": [
+        "The test: can people who were not in the room act correctly without the architect present?",
+        "A handoff package covers architecture and data-flow diagrams, prompt and configuration specifications, decision rationale, and known risks with mitigations.",
+        "Rationale is the most-skipped and most expensive piece — without it, successors cannot tell load-bearing choices from incidental ones.",
+        "Match the artifact to the audience: value-and-risk summaries for executives, component designs for engineers, data flows and trust boundaries for security, runbooks for operations.",
+        "Runbooks map observable symptoms to diagnostic steps, safe interim actions, and escalation criteria — written before handoff, because incidents don't wait."
+      ],
+      "watchFor": "Documentation stays true only when updating it is a required step of every change; \"just ask me\" is not a handoff package, and prompts outside version control have no history, review, or rollback.",
+      "question": {
+        "type": "single",
+        "stem": "An architect is handing off to an operations team that did not build the system. What artifact matters most for their on-call readiness?",
+        "options": [
+          "Architecture and data-flow diagrams covering every component",
+          "A runbook mapping observable symptoms to diagnostic steps, safe interim actions, and escalation criteria",
+          "Complete API reference documentation for every service and tool",
+          "A standing commitment from the architect to join incident calls for six months"
+        ],
+        "correct": [1],
+        "answerWhy": "Reference material describes the system, but only symptom-to-action procedures let an unfamiliar team respond correctly at 2 a.m. Diagrams and API references support diagnosis without prescribing it, and depending on the architect's availability leaves the tacit knowledge untransferred and ownership unclaimed."
+      }
+    },
+    {
+      "objective": "Support lifecycle phases (discovery, design, handoff, monitoring, iteration)",
+      "keyPoints": [
+        "Phases chain: design quality is bounded by requirement quality, pilot evidence depends on discovery's success criteria, iteration depends on monitoring being reviewed.",
+        "Under pressure phases compress but their outputs cannot be skipped — a timeboxed one-week discovery that verifies metric, workflow, and data is legitimate.",
+        "Handoff is a supported transition: an overlap period where the receiving team operates the system, a defined support window, and a deliberate end so ownership transfers.",
+        "Monitoring is an operating rhythm — a review cadence, a named owner, and a route from findings into an iteration backlog.",
+        "Treat model deprecation as the start of a planned, eval-verified migration, not a deadline to approach."
+      ],
+      "watchFor": "Recurring fixes that decay as the workload shifts are a redesign signal, not a tuning backlog — the system has moved outside its design assumptions.",
+      "question": {
+        "type": "single",
+        "stem": "A team's dashboards show cost, latency, and accuracy metrics, but a two-month quality decline surfaced only when users complained. What was missing from the monitoring practice?",
+        "options": [
+          "More granular metrics and additional dashboard panels",
+          "A scheduled review cadence, a named owner, and a defined path from findings into the iteration backlog",
+          "Longer retention so the decline could be traced back further",
+          "Alerts on every metric so degradation triggers a page"
+        ],
+        "correct": [1],
+        "answerWhy": "Measurement without a rhythm produces exactly the failure it was built to prevent: nobody was accountable for looking, and nothing routed findings into work. More panels and longer retention add data without adding attention, and blanket alerting on every metric produces fatigue rather than the periodic human review a slow decline requires."
+      }
+    }
+  ]
+}

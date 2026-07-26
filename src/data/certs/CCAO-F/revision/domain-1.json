@@ -1,0 +1,95 @@
+{
+  "domain": 1,
+  "title": "Prompting and Task Execution",
+  "objectives": [
+    {
+      "objective": "Create effective prompts for business and technical tasks",
+      "keyPoints": [
+        "A complete prompt supplies four things the model cannot guess: context/role, source material, the task with its scope, and output requirements (format, length, tone, reading level).",
+        "Weak output from a vague prompt is a specification problem, not a model problem — add the missing facts rather than retrying or upgrading tiers.",
+        "Attach source documents so Claude grounds output in your content instead of inventing plausible details; pasted material still needs explicit task instructions.",
+        "State exclusions and internal vocabulary explicitly — what to leave out and what your organization's terms mean are things only you know."
+      ],
+      "watchFor": "Distractors offer regenerating, adding \"be more creative\", lengthening the prompt, or switching to a larger model — none of which supply the missing context that actually caused the weak draft.",
+      "question": {
+        "type": "single",
+        "stem": "A marketing associate prompts \"Write an email about our spring promotion\" and gets generic copy with no products, dates, or brand voice. What is the most effective next step?",
+        "options": [
+          "Regenerate the response two or three times and pick the strongest version",
+          "Rewrite the prompt with the audience, the promoted products and dates, the required tone, and the email length",
+          "Switch to a more capable model tier and send the same request",
+          "Add \"be more creative and engaging\" to the end of the existing prompt"
+        ],
+        "correct": [1],
+        "answerWhy": "The output is generic because the prompt is generic: no model can know your products, dates, audience, or brand voice unless the prompt supplies them. Regenerating resamples the same underspecified request, so it varies wording rather than relevance, and a bigger model or a style instruction cannot substitute for facts the prompt never provided."
+      }
+    },
+    {
+      "objective": "Apply task decomposition techniques to structure complex requests",
+      "keyPoints": [
+        "Large deliverables fail as single prompts — attention spreads thin, producing shallow, uneven output that is hard to correct after the fact.",
+        "Structure-first: get an outline, review and adjust it, then request detailed content section by section so structural misunderstandings are caught early.",
+        "Sequential chaining: order subtasks so each output feeds the next (stakeholders → timeline → budget), which surfaces errors at the step that caused them.",
+        "Decomposition means fewer requirements per request, not one longer request; unrelated deliverables get separate prompts."
+      ],
+      "watchFor": "A tempting wrong answer packs every requirement into one exhaustive prompt or generates several complete versions to choose from — both keep the single-shot depth problem instead of breaking the work into reviewable stages.",
+      "question": {
+        "type": "single",
+        "stem": "An operations lead needs a 25-page process improvement report. Which approach best applies task decomposition?",
+        "options": [
+          "Write one detailed prompt listing every section, requirement, and formatting rule for the full report",
+          "Request an outline, approve or adjust it, then draft each section in sequence with the approved structure as context",
+          "Generate three complete drafts of the report and combine the strongest sections from each",
+          "Ask for the report and then iterate on the finished draft section by section"
+        ],
+        "correct": [1],
+        "answerWhy": "Decomposition splits the deliverable into stages with review checkpoints, so the structure is agreed before drafting effort multiplies across 25 pages. Packing everything into one exhaustive prompt is the opposite of decomposing, and generating multiple full drafts triples the reading burden while every draft still suffers the same single-shot shallowness."
+      }
+    },
+    {
+      "objective": "Iterate prompts to improve output quality",
+      "keyPoints": [
+        "Targeted feedback beats regeneration: stay in the conversation, name exactly what is wrong, and describe what good looks like so each round converges.",
+        "Regenerating carries no information about the failure, so the same problems reappear by chance rather than being fixed.",
+        "For recurring tasks, fold repeated corrections into the reusable prompt and include a known-good example so first drafts start where past sessions ended.",
+        "If patches start oscillating, consolidate the requirements and restart rather than layering more fixes.",
+        "Stop iterating when the real problem is upstream — missing source material or a task that needs decomposition."
+      ],
+      "watchFor": "Options that start a fresh chat with the same prompt look like a clean slate but throw away both the conversation context and the diagnostic value of the failed draft.",
+      "question": {
+        "type": "single",
+        "stem": "Every week an analyst has to correct the same two flaws in Claude's recurring status summary: the tone is too formal and the recommendation is buried at the end. What is the best long-term fix?",
+        "options": [
+          "Keep giving the same two corrections each week in the conversation",
+          "Update the reusable prompt to require a conversational tone and a lead recommendation, and attach a past summary that came out right",
+          "Start each week in a fresh conversation so earlier formal drafts do not influence the new one",
+          "Regenerate the summary until a version arrives with the right tone and ordering"
+        ],
+        "correct": [1],
+        "answerWhy": "When the same correction recurs across sessions, the lesson belongs in the reusable prompt, not in each conversation — with an example of a good past output, future first drafts start at the quality previous sessions ended at. Repeating the corrections weekly works but never compounds, and regenerating carries no information about what was wrong."
+      }
+    },
+    {
+      "objective": "Adapt prompting strategies based on task type (analysis, research, drafting, brainstorming)",
+      "keyPoints": [
+        "Analysis: supply the source, ask specific questions, request the reasoning, and constrain output format so findings are scannable.",
+        "Research: allow a fuller exploratory answer, ask for sources, and require uncertain or unverifiable claims to be flagged.",
+        "Drafting: converge — state the audience, tone, length, and required facts, produce one draft, then refine it.",
+        "Brainstorming: diverge before you converge — ask for many diverse ideas, invite unconventional options, and defer evaluation to a follow-up step."
+      ],
+      "watchFor": "Adding constraints or asking for \"the single best idea\" to make a brainstorm more useful collapses exactly the breadth a divergent task exists to produce.",
+      "question": {
+        "type": "single",
+        "stem": "A product manager needs fresh ideas for a stalled onboarding flow and prompts Claude for \"the best onboarding improvement, with sources and a business case.\" The single suggestion is safe and obvious. What should change?",
+        "options": [
+          "Ask for a wide, varied set of options including unconventional ones, then evaluate the shortlist in a follow-up prompt",
+          "Add tighter constraints on budget, timeline, and platform so the suggestion is more actionable",
+          "Ask for more citations so the recommendation is better grounded",
+          "Provide the current onboarding metrics and ask for a structured analysis of the drop-off points"
+        ],
+        "correct": [0],
+        "answerWhy": "This is a divergent task, so the prompt should maximize breadth first and defer judgment to a separate evaluation step. Requesting one best idea with a business case applies convergent, analysis-style prompting to a brainstorm; adding constraints or citations narrows it further, and pivoting to metric analysis answers a different question than the one asked."
+      }
+    }
+  ]
+}

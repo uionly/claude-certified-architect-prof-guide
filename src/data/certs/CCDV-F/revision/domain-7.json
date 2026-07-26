@@ -1,0 +1,98 @@
+{
+  "domain": 7,
+  "title": "Security and Safety",
+  "objectives": [
+    {
+      "objective": "AI Application Security",
+      "keyPoints": [
+        "The root vulnerability: instructions and data share one channel. Prompt injection hides adversarial instructions in ingested content; jailbreaks are the direct-user variant.",
+        "Mitigation is structural — delimit external content, declare it data-only, sanitize it, and enforce least privilege so a landed injection has nothing dangerous to trigger.",
+        "Never make the model the authorization boundary; entitlement checks belong in application code before data enters context.",
+        "Assume anything in context can surface in output — send only the fields the task needs and scope retrieval to what the requesting user may see.",
+        "Treat PII specially: minimize, redact or mask before model calls where feasible, and honor retention and residency in logs and caches too."
+      ],
+      "watchFor": "A more capable model is not a more injection-resistant one — better instruction-following can mean better compliance with a well-crafted injection.",
+      "question": {
+        "type": "single",
+        "stem": "An agent with an email tool processes supplier documents. One document contains hidden instructions to forward internal data to an external address. Which control most reliably limits the damage?",
+        "options": [
+          "A system-prompt rule instructing the model to ignore instructions found in documents",
+          "An allowlist of permitted recipients enforced in the email tool, plus delimiting documents as data-only",
+          "Upgrading to a more capable model that follows the system prompt more closely",
+          "Scanning documents for suspicious phrases before ingestion"
+        ],
+        "correct": [1],
+        "answerWhy": "Because no prompt-level measure is guaranteed, the reliable control is least privilege at the action layer: a recipient allowlist means a successful injection has no sensitive action available. A polite system-prompt rule is precisely what injections are engineered to override, a stronger model may comply more faithfully with a well-crafted injection, and phrase scanning is an arms race against paraphrase."
+      }
+    },
+    {
+      "objective": "Guardrails and Safe Deployment",
+      "keyPoints": [
+        "Assume any single control can fail — layer input screening, model-level safety, output validation, and action-level limits.",
+        "Layers must be genuinely independent: three rules in the same system prompt are one control written three times.",
+        "Hard controls (code that blocks) back the soft ones (instructions that ask); a never-show policy needs a fail-closed output gate outside the model.",
+        "Least privilege from the start — broad permissions granted \"to tighten later\" harden in place.",
+        "Adversarial testing (injections, jailbreaks, out-of-scope probes) belongs in the release gate, with production monitoring for what testing missed."
+      ],
+      "watchFor": "The model's built-in safety training is a baseline layer, not the enforcement point for your application-specific policy.",
+      "question": {
+        "type": "single",
+        "stem": "A public assistant must never disclose internal pricing formulas. The team adds three separate system-prompt rules forbidding it. Why is this insufficient?",
+        "options": [
+          "All three rules live in one bypassable layer — a never-disclose requirement needs a fail-closed output gate enforced outside the model",
+          "Three rules exceed the effective instruction budget and dilute each other",
+          "The rules should be in a CLAUDE.md file rather than the system prompt",
+          "The model's built-in safety training already covers this, making the rules redundant"
+        ],
+        "correct": [0],
+        "answerWhy": "Multiple rules in the same prompt are a single soft control in costume, so an absolute requirement needs an independent output gate in code that fails closed. Instruction-budget concerns are secondary, CLAUDE.md is not part of an API application's request at all, and built-in safety training does not know your pricing policy."
+      }
+    },
+    {
+      "objective": "Claude Hooks",
+      "keyPoints": [
+        "Hooks are user-defined code the harness executes at lifecycle points (PreToolUse, PostToolUse, session events) — they bind regardless of what the model reasoned.",
+        "Instructions shape probability; hooks determine possibility.",
+        "Prevention must run pre-execution: a PreToolUse hook can block, require confirmation, or rewrite context before the call happens.",
+        "PostToolUse is for audit trails and detection — valuable, but the destructive command has already run.",
+        "Use PreToolUse to selectively escalate matched risky commands to human approval while routine calls run; return a clear reason when blocking so the agent can adjust."
+      ],
+      "watchFor": "A brittle or incomplete denylist gives false confidence — test hooks against command variants and pair them with least-privilege permissions.",
+      "question": {
+        "type": "single",
+        "stem": "An agent must be prevented from running recursive force-deletes. The team currently documents the prohibition in CLAUDE.md and logs all executed commands. What should change?",
+        "options": [
+          "Strengthen the CLAUDE.md wording and add examples of forbidden commands",
+          "Add a PreToolUse hook that inspects the pending command and blocks matching patterns before execution",
+          "Add a PostToolUse hook that alerts the team when a recursive delete has run",
+          "Restrict the agent to a read-only filesystem for the entire session"
+        ],
+        "correct": [1],
+        "answerWhy": "Prevention requires deterministic interception before the command executes, which is exactly what a PreToolUse hook provides. CLAUDE.md wording remains guidance the model interprets, a PostToolUse alert documents a loss that already happened, and a fully read-only filesystem blocks the legitimate writes the agent needs to do its job."
+      }
+    },
+    {
+      "objective": "Identity, Secrets, and Key Management",
+      "keyPoints": [
+        "API keys are bearer credentials — whoever holds one is you, with your limits, bill, and data access.",
+        "Secrets never live in source control; a committed key is compromised by its presence in history, and making the repo private later does not un-expose it.",
+        "Keys belong in runtime environment variables or a secrets manager with access control, audit logging, and rotation.",
+        "On exposure, revoke and reissue first, investigate second — the anomaly you are studying may be the abuse in progress.",
+        "Separate keys per environment and service for least privilege and attribution; monitor per-key usage against baselines."
+      ],
+      "watchFor": "API keys must never ship to the client — proxy model calls through an authenticated backend, and treat any credential that reached a browser bundle as burned.",
+      "question": {
+        "type": "single",
+        "stem": "A developer discovers a production API key was committed to a repository three weeks ago. What is the correct first action?",
+        "options": [
+          "Remove the key from the current files and make the repository private",
+          "Revoke the key and issue a replacement immediately, then investigate usage for signs of abuse",
+          "Rewrite the git history to purge the key from all commits",
+          "Add per-key usage monitoring and watch for anomalies before deciding"
+        ],
+        "correct": [1],
+        "answerWhy": "An exposed bearer credential may already be in use, so revocation and reissue come first and the investigation follows. Deleting the key from current files leaves it in history, privacy or history rewrites cannot recall clones and CI caches, and adding monitoring while the live key stays valid leaves the window open."
+      }
+    }
+  ]
+}

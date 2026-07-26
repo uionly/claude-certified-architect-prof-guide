@@ -1,0 +1,144 @@
+{
+  "domain": 5,
+  "title": "Context Management & Reliability",
+  "objectives": [
+    {
+      "objective": "Manage conversation context to preserve critical information across long interactions",
+      "keyPoints": [
+        "Progressive summarization vagues away exactly the facts that matter — \"$83.40 by March 3\" becomes \"around $80 soon\".",
+        "Layer the design: extract transactional facts (amounts, dates, order numbers, statuses) into a persistent case-facts block included each prompt, outside the summarized history.",
+        "Multi-issue sessions get a structured fact layer per issue.",
+        "Trim verbose tool results to the relevant fields before they accumulate — a lookup returning 40+ fields when 5 matter is pure context tax.",
+        "Lost-in-the-middle: put key-findings summaries at the beginning of aggregated inputs and organize detail under explicit section headers."
+      ],
+      "watchFor": "Subagents returning verbose prose and reasoning chains to context-tight downstream agents is a budget problem best fixed upstream — return structured facts, citations, and relevance scores instead.",
+      "question": {
+        "type": "single",
+        "stem": "A support agent quoted a customer \"$83.40 refunded by March 3\", but forty turns later it says \"around $80 soon\". What design change prevents this?",
+        "options": [
+          "Increase the summarization threshold so compression happens less often",
+          "Extract the amount, date, and commitment into a persistent case-facts block included in every prompt, outside the summarized history",
+          "Instruct the model to preserve exact figures when summarizing",
+          "Move to a model with a larger context window so summarization is unnecessary"
+        ],
+        "correct": [1],
+        "answerWhy": "Compression predictably vagues numerical values, so exact transactional facts must live in a layer that summarization never touches. Raising the threshold and asking the model to preserve figures both leave the facts inside the lossy layer, and a bigger window postpones compression without protecting the values when it eventually happens."
+      }
+    },
+    {
+      "objective": "Design effective escalation and ambiguity resolution patterns",
+      "keyPoints": [
+        "Explicit triggers: the customer asks for a human, policy is silent or has a gap on this situation, or the agent cannot make meaningful progress.",
+        "Sentiment does not correlate with case complexity, and self-reported confidence is poorly calibrated — the agent is often most confident on the hard cases it is getting wrong.",
+        "An explicit request for a human is escalated immediately, without a resolution attempt first.",
+        "Frustration without a request is different: acknowledge it, resolve within capability, and escalate if the customer reiterates the preference.",
+        "Resolve multi-match lookups by asking for additional identifiers, never by heuristics like most-recent activity."
+      ],
+      "watchFor": "Policy silence is an escalation trigger, not a license to extrapolate — improvising through a gap (competitor price matching when policy covers only own-site adjustments) is where compliance exposure starts.",
+      "question": {
+        "type": "single",
+        "stem": "A customer writes: \"Stop wasting my time, put me through to a person.\" The agent could likely resolve the underlying issue. What is correct?",
+        "options": [
+          "Attempt resolution first, and escalate only if the fix fails",
+          "Escalate immediately with a structured summary of the case",
+          "Acknowledge the frustration, offer to resolve it, and escalate if the customer insists again",
+          "Check a sentiment score and escalate if it falls below the threshold"
+        ],
+        "correct": [1],
+        "answerWhy": "An explicit request for a human is a trigger, not a negotiation — overriding a stated preference to chase resolution metrics generates complaints even when the fix works. The acknowledge-and-offer pattern belongs to frustration without a request, and sentiment scoring is an unreliable proxy that is irrelevant once the customer has asked outright."
+      }
+    },
+    {
+      "objective": "Implement error propagation strategies across multi-agent systems",
+      "keyPoints": [
+        "What the coordinator can do next depends entirely on what the failure report contains — include failure type, the attempted query, partial results, and possible alternative approaches.",
+        "Generic statuses like \"search unavailable\" tell the coordinator something broke but not what to do about it.",
+        "Never silently suppress: empty results marked as success guarantee reports with invisible coverage holes.",
+        "Never terminate the whole workflow on one subagent failure — proceed with partial results and annotate the gap.",
+        "Division of labour: subagents recover transient failures locally and propagate only what they cannot resolve."
+      ],
+      "watchFor": "Conflating an access failure with a valid empty result makes the coordinator re-run no-match queries and trust output produced during an outage.",
+      "question": {
+        "type": "single",
+        "stem": "A search subagent's backend times out. Which failure report best enables coordinator recovery?",
+        "options": [
+          "An empty result set marked successful, so the pipeline continues without interruption",
+          "A structured error giving the failure type, the attempted query, any partial results, and suggested alternative approaches",
+          "A generic \"search unavailable\" status so the coordinator knows the stage failed",
+          "An exception that terminates the workflow so nothing incomplete is reported"
+        ],
+        "correct": [1],
+        "answerWhy": "Recovery intelligence is bounded by error visibility, so the report must carry enough structure for the coordinator to retry with a modified query, switch approach, or continue with an annotated gap. An empty success creates an invisible coverage hole, a generic status hides everything actionable, and terminating discards everything the rest of the system learned."
+      }
+    },
+    {
+      "objective": "Manage context effectively in large codebase exploration",
+      "keyPoints": [
+        "Degradation has a signature: inconsistent answers and \"typical patterns\" replacing the specific classes discovered hours earlier.",
+        "Persist findings to scratchpad files as exploration proceeds and reference them for later questions — do not trust a long session's memory.",
+        "Delegate specific verbose investigations to subagents so raw output lives in their contexts while the main agent coordinates.",
+        "`/compact` condenses a saturated session mid-work; `/clear` discards state and re-reading raw transcripts reloads the noise.",
+        "Summarize each phase's findings before spawning the next phase's subagents and inject the summary into their initial context."
+      ],
+      "watchFor": "Without structured state exports or a manifest, a crash costs the entire accumulated understanding rather than one session.",
+      "question": {
+        "type": "single",
+        "stem": "Late in a day-long exploration, an agent starts describing \"typical repository patterns\" instead of the specific classes it identified that morning. What is the right countermeasure?",
+        "options": [
+          "Persist key findings to a scratchpad file as exploration proceeds and reference it for later questions",
+          "Re-read the session transcript so the discovered specifics return to context",
+          "Run /clear and restate the original exploration goal",
+          "Ask the model to be specific and avoid generalizations"
+        ],
+        "correct": [0],
+        "answerWhy": "This is context degradation, and the fix is externalizing discoveries so late-session answers stay anchored to what was actually found rather than to plausible generalities. Re-reading the transcript reloads exactly the noise that saturated the window, /clear discards the accumulated understanding, and an instruction to be specific cannot restore facts no longer in context."
+      }
+    },
+    {
+      "objective": "Design human review workflows and confidence calibration",
+      "keyPoints": [
+        "Aggregate accuracy hides segment failure — 97% overall can mean strong on standard applications and weak on rare self-employment income documents.",
+        "Analyze accuracy by document type and by field before reducing human review anywhere.",
+        "Have the model emit field-level confidence, then calibrate thresholds against labeled validation sets so a score maps to a measured error rate.",
+        "Keep stratified sampling on whatever you automate, so novel error patterns stay detectable.",
+        "Prioritize scarce reviewer capacity on low-confidence extractions and on ambiguous or contradictory source documents."
+      ],
+      "watchFor": "Removing review is a one-way door if nothing keeps measuring — by the time downstream systems surface a systematic error, months of extractions may need re-processing.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction pipeline reports 97% overall accuracy, and the team proposes removing human review for high-confidence results. What must happen first?",
+        "options": [
+          "Raise the confidence threshold until the automated segment reaches 99% aggregate accuracy",
+          "Break accuracy down by document type and field, calibrate confidence thresholds on labeled data, and keep stratified sampling on whatever is automated",
+          "Route only the lowest-confidence 3% of extractions to reviewers to match the error rate",
+          "Have a second model review high-confidence extractions instead of humans"
+        ],
+        "correct": [1],
+        "answerWhy": "An aggregate number can conceal systematic failure on a rare document type, so segmented validation plus calibrated thresholds is what makes the automation decision defensible — and ongoing sampling is what keeps it defensible. Tuning to a higher aggregate or matching a percentage to the error rate both still trust the average, and a second model is an uncalibrated substitute for measurement."
+      }
+    },
+    {
+      "objective": "Preserve information provenance and handle uncertainty in multi-source synthesis",
+      "keyPoints": [
+        "Provenance is lost at summarization steps — require subagents to emit claim-source mappings (URLs, document names, excerpts) and the synthesis agent to preserve and merge them.",
+        "Traceability is claim-level; an appended bibliography is not provenance.",
+        "Conflicting statistics from credible sources are information: include both values with source attribution and let the coordinator reconcile.",
+        "Require publication or data-collection dates in structured outputs so temporal differences (a 2021 trial vs a 2024 trial) aren't misread as contradictions.",
+        "Structure reports with explicit sections separating well-established from contested findings, preserving each source's characterization and methodological context."
+      ],
+      "watchFor": "Flattening everything into one uniform format loses meaning — financial data belongs in tables, news in prose, technical findings in structured lists.",
+      "question": {
+        "type": "single",
+        "stem": "Two credible sources report different figures for the same market size. What should the analysis subagent do?",
+        "options": [
+          "Report the figure from the more authoritative source and note the other in a footnote",
+          "Include both values with source attribution and collection dates, annotated as a conflict, and let the coordinator reconcile before synthesis",
+          "Average the two figures and report the result with a range",
+          "Omit the statistic, since conflicting sources make it unreliable"
+        ],
+        "correct": [1],
+        "answerWhy": "A conflict between credible sources is information the synthesis layer needs, so both values travel forward annotated with attribution and dates — which often reveals the difference is temporal rather than contradictory. Silently picking one, averaging, or dropping the statistic all make a reconciliation decision at the wrong layer and destroy the evidence behind it."
+      }
+    }
+  ]
+}

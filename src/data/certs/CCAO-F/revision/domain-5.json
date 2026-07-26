@@ -1,0 +1,98 @@
+{
+  "domain": 5,
+  "title": "Configuration and Knowledge Management",
+  "objectives": [
+    {
+      "objective": "Configure Claude Projects with instructions and knowledge sources",
+      "keyPoints": [
+        "Two mechanisms, two jobs: instructions carry standing behavioral directives; knowledge carries reference material Claude draws content from.",
+        "Behavioral rules (tone, structure, boundaries) go in instructions, stated concisely; bulk documents (past proposals, catalogs, manuals) go in knowledge.",
+        "Every chat started in the Project begins grounded in both — that is what makes team output consistent.",
+        "Scope each Project to one workflow, and curate knowledge to current, authoritative documents.",
+        "Team workflows need a shared Project; a personal one improves in one account only."
+      ],
+      "watchFor": "Pasting reference documents into instructions dilutes the directives, and leaving behavioral rules as a knowledge file makes them compete with every other document instead of steering responses.",
+      "question": {
+        "type": "single",
+        "stem": "A proposals team wants consistent output. They have a tone-and-structure standard, a boundary rule about never committing to delivery dates, and twelve past winning proposals. How should the Project be configured?",
+        "options": [
+          "Put all of it in project instructions so Claude always has everything available",
+          "Put the tone, structure, and delivery-date rule in instructions; upload the twelve past proposals as knowledge",
+          "Upload all of it as knowledge files so Claude can reference each one as needed",
+          "Put the past proposals in instructions as examples and the rules in a knowledge file"
+        ],
+        "correct": [1],
+        "answerWhy": "Standing behavioral rules belong in instructions where they steer every response, and reference content belongs in knowledge where Claude can draw from it. Pasting twelve proposals into instructions buries the directives, and demoting the rules to just another knowledge file leaves them competing with every other document instead of consistently shaping output."
+      }
+    },
+    {
+      "objective": "Manage uploaded knowledge and connectors (e.g., Google Drive, Gmail)",
+      "keyPoints": [
+        "Match the mechanism to the change rate: stable finalized documents suit static uploads; frequently revised sources belong behind a connector.",
+        "A stale upload produces confident wrong answers about current prices and policies with no visible warning.",
+        "Scope connector access to the specific folders the use case needs — broad access exposes sensitive content and muddies provenance.",
+        "Connector-grounded answers are not pre-verified; answers that matter still get reviewed.",
+        "Remove superseded documents rather than adding instructions that rule around them."
+      ],
+      "watchFor": "Granting the whole organizational drive \"to be safe\" inverts the risk — it turns a productivity setup into a data-governance problem and makes wrong-document answers hard to trace.",
+      "question": {
+        "type": "single",
+        "stem": "A team's Project contains a static upload of the price list, which the finance team revises monthly. Claude keeps quoting last quarter's prices. What is the right fix?",
+        "options": [
+          "Add a project instruction telling Claude that prices may be outdated and to note this in every answer",
+          "Connect the live source where the price list is maintained, so Claude references the current version",
+          "Re-upload the price list whenever someone notices an answer looks wrong",
+          "Ask users to confirm prices with finance before using any Claude output"
+        ],
+        "correct": [1],
+        "answerWhy": "A source that changes monthly should be reached through a connector rather than frozen at upload time, which removes the staleness rather than warning about it. A caveat instruction and a manual re-upload habit both leave wrong numbers in circulation, and pushing verification onto every user converts a fixable configuration problem into permanent overhead."
+      }
+    },
+    {
+      "objective": "Create effective system-level instructions",
+      "keyPoints": [
+        "Specific and followable beats virtue words: \"eighth-grade reading level, lead with the resolution, under 150 words\" versus \"be helpful and professional\".",
+        "Positively framed — describe the output you want, and anchor it with a short example of a good one.",
+        "Concise and prioritized: a handful of rules that matter, not forty accumulated prohibitions.",
+        "Instructions are for behavior, not bulk content — distil the operative rules and move the manual to knowledge.",
+        "Reconcile conflicting rules deliberately; instructions must be internally consistent to be followable."
+      ],
+      "watchFor": "Instructions cannot legislate factual accuracy — \"always be accurate\" or \"never hallucinate\" is not a verification control, and inconsistency caused by vague instructions is not fixed by switching models.",
+      "question": {
+        "type": "single",
+        "stem": "A team's project instructions read \"Be helpful, professional, and high-quality in all responses,\" and output still varies between team members. What is the best improvement?",
+        "options": [
+          "Replace them with concrete directives naming the audience, reading level, structure, and length, plus one example of an on-standard response",
+          "Add a rule that Claude must always be accurate and never invent information",
+          "Paste the full company style guide into the instructions",
+          "Switch the team to a more capable model tier"
+        ],
+        "correct": [0],
+        "answerWhy": "Virtue words give Claude nothing to follow, so the fix is specific, followable directives anchored by a concrete example of the target. An accuracy rule cannot enforce factual correctness, pasting the whole style guide buries the operative rules that belong in instructions, and a bigger model still has no definition of what this team means by \"professional\"."
+      }
+    },
+    {
+      "objective": "Inform, maintain, and update Claude configurations, knowledge sources, and instructions",
+      "keyPoints": [
+        "Configurations decay — when the organization changes, replace the affected knowledge and sweep instructions for references to the old state.",
+        "Updating the document while instructions still describe the old rules leaves the configuration fighting itself.",
+        "Durable maintenance needs a named owner, a review cadence matched to the content's change rate, and a change log.",
+        "Treat user reports of wrong answers as maintenance signals, not one-off complaints.",
+        "Test an updated configuration on representative tasks before rolling it out."
+      ],
+      "watchFor": "In-chat corrections do not update the Project — every new conversation still starts from the stale knowledge file.",
+      "question": {
+        "type": "single",
+        "stem": "Users discover a Project is answering from a policy that was superseded six months ago, and several people have been correcting it inside their chats. What is the most complete response?",
+        "options": [
+          "Tell users to keep correcting it in-chat until the next configuration cycle",
+          "Delete the Project so nobody relies on outdated guidance",
+          "Replace the knowledge file with the current policy, update instructions that reference the old rules, assign an owner and review cadence, and tell users what changed",
+          "Add an instruction warning that policy details may be out of date"
+        ],
+        "correct": [2],
+        "answerWhy": "Staleness is a process failure, so the fix covers the content, the instructions that reference it, the ownership gap that let it drift, and the communication users need to recalibrate. In-chat corrections never reach new conversations, deleting the Project discards the value instead of maintaining it, and a warning label leaves the wrong policy in place."
+      }
+    }
+  ]
+}

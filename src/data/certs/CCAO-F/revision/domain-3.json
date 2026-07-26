@@ -1,0 +1,98 @@
+{
+  "domain": 3,
+  "title": "Product and Model Selection",
+  "objectives": [
+    {
+      "objective": "Select appropriate Claude product features (Projects, research mode, chat, artifacts)",
+      "keyPoints": [
+        "Plain chat: quick one-off tasks, no setup — wrong for anything that recurs.",
+        "Projects: knowledge files and custom instructions configured once, applied to every chat inside. Re-uploading the same documents is the signal you need one.",
+        "Research mode: deep multi-source investigation of new information with sources; it does not store your private context.",
+        "Artifacts: substantial deliverables revised across sessions and eventually shared, kept as one coherent editable piece.",
+        "One Project per distinct context — don't merge unrelated workstreams into a single knowledge base."
+      ],
+      "watchFor": "Using one endless chat as a stand-in for a Project is the trap — context degrades and unrelated threads pile up, whereas Projects persist setup cleanly across fresh chats.",
+      "question": {
+        "type": "single",
+        "stem": "A consultant re-uploads the same style guide and pastes the same tone instructions at the start of every client-report conversation, several times a week. What should they do?",
+        "options": [
+          "Keep one long-running conversation so the style guide stays in context",
+          "Create a Project holding the style guide and the standing instructions, and start each report in a chat inside it",
+          "Use research mode so Claude can recall the style guide when needed",
+          "Save the instructions as an artifact and reference it in each new chat"
+        ],
+        "correct": [1],
+        "answerWhy": "Recurring context is exactly what Projects exist for: configure the knowledge files and instructions once and every chat in the Project inherits them. A single endless chat degrades as it accumulates unrelated threads, research mode investigates new external information rather than persisting your documents, and artifacts hold deliverables, not setup."
+      }
+    },
+    {
+      "objective": "Differentiate between Claude model types (Haiku, Sonnet, Opus)",
+      "keyPoints": [
+        "Haiku: fastest and most economical — simple, well-defined, high-volume work like tagging, extraction, and short formulaic drafts.",
+        "Sonnet: the balanced tier and the sensible everyday default — drafting, summarizing, moderate analysis at interactive speed.",
+        "Opus: the most capable tier for genuinely complex reasoning and high-stakes deliverables, at higher cost and latency.",
+        "The tiers differ in reasoning depth, not only speed — a light model on a hard task returns shallower work, not just faster work.",
+        "Recency and tier are separate dimensions; a newer light model still targets speed and economy."
+      ],
+      "watchFor": "\"Most capable is always best\" misroutes work at scale — most business tasks never use Opus-level depth, and the premium is paid on every single request.",
+      "question": {
+        "type": "single",
+        "stem": "A team lead tells new hires that Haiku, Sonnet, and Opus \"are the same model at different speeds, so just pick by how fast you need an answer.\" Why is this briefing wrong?",
+        "options": [
+          "The tiers also differ in reasoning depth, so a complex task on a light tier returns shallower analysis, not merely a faster one",
+          "The tiers differ only in context window size, so the guidance should be based on document length",
+          "Speed is identical across tiers, so the choice should be based on cost alone",
+          "Only the newest model in the family should be used, regardless of tier"
+        ],
+        "correct": [0],
+        "answerWhy": "Capability, not just latency, moves along the ladder, so routing hard reasoning to a speed tier degrades the quality of the answer itself. Framing the difference as context length, cost, or release recency all misdescribe the trade-off and lead teams to send genuinely complex work to a tier that cannot do it well."
+      }
+    },
+    {
+      "objective": "Align model selection with task requirements (cost, speed, quality)",
+      "keyPoints": [
+        "Rule: pick the cheapest, fastest tier whose quality clears the task's bar — and establish that bar with evidence.",
+        "Spot-check candidate tiers on representative tasks; this turns model choice from taste into a defensible decision.",
+        "Stakes rhetoric misleads both ways — \"it affects revenue\" does not override spot checks showing tier-equivalent output.",
+        "Route by segment: send the few hard cases upward rather than upgrading an entire high-volume stream.",
+        "Weigh all three requirements; cost is one input, not the automatic tiebreaker."
+      ],
+      "watchFor": "Arbitrary routing rules — alternating tiers, choosing by day of the week, or a blanket \"always use the top model\" default — replace requirement-based alignment with habit.",
+      "question": {
+        "type": "single",
+        "stem": "Spot checks show a light tier and the top tier produce equivalent results on a team's high-volume ticket-tagging task, but the manager insists on the top tier because \"tickets affect revenue.\" What is the sound recommendation?",
+        "options": [
+          "Use the top tier, since revenue-affecting work justifies maximum capability",
+          "Use the light tier for the bulk stream and route only the genuinely ambiguous tickets to a higher tier",
+          "Alternate between the two tiers to balance cost against quality",
+          "Use the balanced tier as a compromise between the two candidates"
+        ],
+        "correct": [1],
+        "answerWhy": "When measured quality is equivalent, the premium buys nothing, so the evidence supports the cheaper tier for the bulk of volume with targeted escalation for the hard minority. Stakes language is not evidence, and alternating tiers or splitting the difference introduces variation with no connection to what the task actually requires."
+      }
+    },
+    {
+      "objective": "Understand and manage context limitations and memory considerations (when to restart, summarize, or persist)",
+      "keyPoints": [
+        "Symptoms of a degraded context: drift from early decisions, contradicting settled choices, and re-explaining things the chat already covered.",
+        "Summarize the settled decisions, constraints, and current state — Claude can help write the summary.",
+        "Restart a fresh chat seeded with that summary so the model works from a clean, focused context.",
+        "Persist durable material — reference documents, standing instructions, canonical decisions — in Project knowledge so it survives every restart.",
+        "Carry forward only the slice the next task needs, not the whole history."
+      ],
+      "watchFor": "Treating context drift as a capability problem and switching the same bloated conversation to a bigger model just inherits all the clutter.",
+      "question": {
+        "type": "single",
+        "stem": "Six weeks into a project, a very long chat starts contradicting decisions made in week two and the associate keeps re-explaining settled constraints. What is the best response?",
+        "options": [
+          "Switch this conversation to a more capable model tier",
+          "Re-paste the key decisions at the top of every new message",
+          "Summarize the settled decisions and current state, start a fresh chat from that summary, and move durable reference material into Project knowledge",
+          "Ask Claude to re-read the conversation from the beginning before each response"
+        ],
+        "correct": [2],
+        "answerWhy": "These are textbook context-degradation symptoms, and the fix is the summarize-restart-persist pattern: distill what is settled, restart clean from it, and put long-lived material where it survives future restarts. Upgrading the tier carries the same clutter forward, and re-pasting decisions or re-reading the history each turn adds to the overload that caused the drift."
+      }
+    }
+  ]
+}

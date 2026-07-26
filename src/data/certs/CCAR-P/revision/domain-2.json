@@ -1,0 +1,121 @@
+{
+  "domain": 2,
+  "title": "Claude Models, Prompting & Context Engineering",
+  "objectives": [
+    {
+      "objective": "Select appropriate Claude models based on trade-offs",
+      "keyPoints": [
+        "Opus: highest capability, highest cost and latency. Sonnet: balanced default for most production workloads. Haiku: fastest and cheapest for high-volume well-defined work (classification, routing, extraction, short summarization).",
+        "Choose the cheapest tier whose measured quality meets the bar — measured, via a pilot on representative data, because intuition errs in both directions.",
+        "If a blinded evaluation shows tier equivalence, the cheaper tier wins regardless of how high-stakes the domain feels.",
+        "Low-volume, high-error-cost workloads can justify Opus outright: a handful of premium requests cost less than one expensive mistake.",
+        "Mixed traffic usually beats any single tier with a routing layer — audit each workload separately."
+      ],
+      "watchFor": "Extended thinking is a paid per-request dial for multi-step reasoning failures with latency slack — not a default setting, and not a fix for formatting problems.",
+      "question": {
+        "type": "single",
+        "stem": "A blinded evaluation on representative medical-billing records shows Sonnet and Opus performing equivalently on a high-volume coding task. The team argues Opus is safer because the domain is regulated. What should the architect recommend?",
+        "options": [
+          "Opus, because regulated domains warrant maximum capability",
+          "Sonnet, since measured quality is equivalent and the premium buys nothing on this workload",
+          "Opus with extended thinking enabled to further reduce risk",
+          "Alternate between tiers and compare production error rates over time"
+        ],
+        "correct": [1],
+        "answerWhy": "Tier choice is an economic decision constrained by measured quality, so demonstrated equivalence means the premium is unfunded — domain stakes are not evidence. Adding extended thinking compounds cost and latency for a reasoning failure the evaluation did not find, and alternating tiers in production introduces variance where a controlled evaluation already answered the question."
+      }
+    },
+    {
+      "objective": "Design system prompts, templates, and guardrails",
+      "keyPoints": [
+        "Separate what never changes from what changes per request: one versioned system prompt for stable instructions, template variables for per-request data in the user turn.",
+        "Delimit sections with XML tags; wrap untrusted input in labeled tags and instruct the model to treat tagged content as data to analyze, never as instructions.",
+        "Ordering: long documents first, instructions and question last, so the task sits adjacent to where generation happens.",
+        "Guardrails need deterministic validation outside the model — instructions inside it shift probabilities, they do not guarantee.",
+        "Resolve contradictory instructions at the source through ownership and review, not with a precedence meta-rule."
+      ],
+      "watchFor": "Interleaving per-request data with stable instructions in one generated blob makes prompts unreviewable, drift-prone, and uncacheable all at once.",
+      "question": {
+        "type": "single",
+        "stem": "Three teams have added rules to a shared system prompt, and two of them now contradict each other. What should the architect do?",
+        "options": [
+          "Add a precedence meta-rule stating which team's rules take priority",
+          "Assign ownership and resolve the conflict at the source by deleting or scoping the losing rule",
+          "Move the conflicting rules to the end of the prompt where the model attends most closely",
+          "Split the prompt so each team's rules are applied in a separate model call"
+        ],
+        "correct": [1],
+        "answerWhy": "Model behaviour under contradiction is undefined, so the only reliable fix is removing the contradiction — which requires an owner and a review path. A precedence rule papers over the conflict, repositioning it only shifts probabilities, and splitting into separate calls multiplies cost while leaving both rules in force somewhere."
+      }
+    },
+    {
+      "objective": "Apply prompt engineering techniques (zero-shot, few-shot, chain-of-thought)",
+      "keyPoints": [
+        "An escalation ladder — stop at the lowest rung meeting the quality bar, because each rung taxes every request in tokens and latency.",
+        "Zero-shot with clear instructions is the starting point; capable models handle most well-specified tasks without demonstrations.",
+        "Few-shot (typically 3–5 examples) pins down rigid output formats and edge-case handling better than prose descriptions.",
+        "Example quality and diversity beat quantity — the set defines the expected input distribution, so include the messy production cases.",
+        "Chain-of-thought targets multi-step reasoning failures where latency has slack, and the reasoning must precede the answer."
+      ],
+      "watchFor": "Each technique targets a different failure mode — chain-of-thought does not fix formatting and few-shot does not fix reasoning depth. Large homogeneous example sets inflate cost and overfit to incidental quirks.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction prompt uses 22 examples, all clean single-item invoices. It handles those perfectly but fails on multi-item records and missing fields. What is the best revision?",
+        "options": [
+          "Add another dozen examples covering more invoice variations",
+          "Cut to a small diverse set that includes multi-item records and missing fields, and add chain-of-thought reasoning",
+          "Replace the example set with 3–5 examples that span the edge cases, including multi-item and missing-field records",
+          "Keep the examples and add an instruction to handle multi-item and incomplete invoices carefully"
+        ],
+        "correct": [2],
+        "answerWhy": "The example set defines the input distribution the model expects, so the fix is diversity over volume: a handful of examples that demonstrate the failing edge cases. Adding more happy-path examples inflates cost while overfitting further, chain-of-thought targets reasoning rather than unseen formats, and an instruction cannot demonstrate what the examples never showed."
+      }
+    },
+    {
+      "objective": "Optimize context windows and manage token usage",
+      "keyPoints": [
+        "Capacity is not a reason to fill it — accuracy degrades as context fills with irrelevant content through attention dilution and similar-but-wrong passages.",
+        "Retrieving the few relevant sections at request time beats dumping an entire corpus, even when the corpus fits.",
+        "Long interactions need structured summarization — distil goals, decisions, and open items and carry that forward with recent turns; naive truncation discards the durable facts coherence depends on.",
+        "Agentic workflows need context hygiene: filter each tool result to what is relevant before it enters the conversation, and compact older exchanges.",
+        "Profile the token budget and attack the dominant term — usually machine-generated input data, not the instructions."
+      ],
+      "watchFor": "Leaving max output tokens at defaults silently truncates exactly the largest, most complex responses — size the limit from measured worst-case output.",
+      "question": {
+        "type": "single",
+        "stem": "A long-running assistant starts contradicting decisions from earlier in the session. The team currently truncates the conversation to the most recent turns. What should replace this?",
+        "options": [
+          "Periodic structured summarization capturing goals, decisions, and open items, carried forward with recent turns",
+          "Resending the full transcript each turn now that the context window is large",
+          "Truncating to a larger number of recent turns",
+          "Moving to a model with a larger context window"
+        ],
+        "correct": [0],
+        "answerWhy": "Truncation discards precisely the durable state — goals and prior decisions — that coherence depends on, which is why structured summarization carried alongside recent turns is the standard remedy. Resending the whole transcript becomes impractical and dilutes attention, and both a longer truncation window and a bigger context window postpone the failure without preserving the decisions."
+      }
+    },
+    {
+      "objective": "Implement prompt reuse strategies (caching, modular prompts, Skills)",
+      "keyPoints": [
+        "Caching is strict prefix matching — the cache hits only when the prompt's beginning is byte-for-byte identical, so any change anywhere in the prefix invalidates it.",
+        "Design stable-first, variable-last, with the breakpoint at the boundary so only stable content forms the cached prefix.",
+        "The short TTL (about five minutes) refreshes on each use, so steady traffic and sequential batches keep prefixes warm; content seen once should never be cached.",
+        "Share rules as a single versioned module composed into each assistant's prompt at build time — copy-paste duplication guarantees drift and eventual policy contradictions.",
+        "Package occasional-use procedures as Skills loaded on demand instead of keeping them resident in every prompt."
+      ],
+      "watchFor": "A misplaced timestamp or session ID ahead of the stable content silently zeroes every cache read while the billing looks superficially normal.",
+      "question": {
+        "type": "single",
+        "stem": "A team enabled prompt caching on a large stable policy corpus but sees no cost reduction. Each prompt begins with a generated request timestamp. What is happening?",
+        "options": [
+          "The five-minute TTL expires between requests, so entries never get reused",
+          "The timestamp sits ahead of the stable content, so the prefix never matches and every request pays a cache write",
+          "The corpus exceeds the maximum cacheable prefix size",
+          "Caching only reduces output token cost, which this workload barely uses"
+        ],
+        "correct": [1],
+        "answerWhy": "Caching matches on an exact prefix, so a value that changes every request placed before the stable corpus guarantees a miss and repeated write premiums. The TTL refreshes on use so steady traffic stays warm, and neither a size limit nor an output-cost misconception explains a prefix that is different on every call."
+      }
+    }
+  ]
+}

@@ -1,11 +1,13 @@
-// Every certification lives under ./certs/<CODE>/{blueprint.json, questions/domain-N.json, study/domain-N.json}.
+// Every certification lives under ./certs/<CODE>/{blueprint.json, questions/domain-N.json,
+// study/domain-N.json, revision/domain-N.json}.
 // Add a new cert directory and it is picked up here automatically — no manual registration needed.
 const blueprintModules = import.meta.glob('./certs/*/blueprint.json', { eager: true })
 
-// Question/study content is loaded lazily (one dynamic-import chunk per cert)
+// Question/study/revision content is loaded lazily (one dynamic-import chunk per cert)
 // so switching certs only downloads that cert's data.
 const questionModules = import.meta.glob('./certs/*/questions/domain-*.json')
 const studyModules = import.meta.glob('./certs/*/study/domain-*.json')
+const revisionModules = import.meta.glob('./certs/*/revision/domain-*.json')
 
 function codeFromPath(path) {
   return path.match(/^\.\/certs\/([^/]+)\//)[1]
@@ -31,10 +33,12 @@ export async function getCertData(certCode) {
 
   const qLoaders = Object.entries(questionModules).filter(([path]) => codeFromPath(path) === certCode)
   const sLoaders = Object.entries(studyModules).filter(([path]) => codeFromPath(path) === certCode)
+  const rLoaders = Object.entries(revisionModules).filter(([path]) => codeFromPath(path) === certCode)
 
-  const [questionFiles, studyFiles] = await Promise.all([
+  const [questionFiles, studyFiles, revisionFiles] = await Promise.all([
     Promise.all(qLoaders.map(([, load]) => load())),
     Promise.all(sLoaders.map(([, load]) => load())),
+    Promise.all(rLoaders.map(([, load]) => load())),
   ])
 
   const allQuestions = questionFiles.flatMap((m) => m.default).sort((a, b) => a.id - b.id)
@@ -47,6 +51,9 @@ export async function getCertData(certCode) {
   const studyByDomain = {}
   for (const m of studyFiles) studyByDomain[m.default.domain] = m.default
 
+  const revisionByDomain = {}
+  for (const m of revisionFiles) revisionByDomain[m.default.domain] = m.default
+
   const data = {
     cert: blueprint.cert,
     domains,
@@ -56,6 +63,7 @@ export async function getCertData(certCode) {
     domainById,
     domainIdForQuestion: (q) => titleToId[q.domain],
     studyByDomain,
+    revisionByDomain,
   }
   certDataCache.set(certCode, data)
   return data

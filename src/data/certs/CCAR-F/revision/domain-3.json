@@ -1,0 +1,144 @@
+{
+  "domain": 3,
+  "title": "Claude Code Configuration & Workflows",
+  "objectives": [
+    {
+      "objective": "Configure CLAUDE.md files with appropriate hierarchy, scoping, and modular organization",
+      "keyPoints": [
+        "Hierarchy: user-level (~/.claude/CLAUDE.md), project-level (.claude/CLAUDE.md or root CLAUDE.md), and directory-level files in subdirectories.",
+        "User-level instructions are never shared via version control — team conventions there silently miss teammates and new hires.",
+        "`/memory` shows exactly which memory files loaded; it is the first diagnostic when behaviour differs across sessions or machines.",
+        "Keep configuration modular: @import external standards files, and organize topic-specific rules in .claude/rules/ rather than one monolith.",
+        "Directory-level CLAUDE.md scopes conventions to a subtree; personal always-on preferences belong at user level."
+      ],
+      "watchFor": "A monolithic CLAUDE.md makes every session pay the token cost of standards that do not apply, and unrelated conventions bleed into the current task.",
+      "question": {
+        "type": "single",
+        "stem": "One developer's Claude Code sessions follow the team's conventions; a new hire's do not, on the same repo. What is the most likely cause?",
+        "options": [
+          "The new hire's Claude Code version predates the conventions file",
+          "The conventions live in the first developer's ~/.claude/CLAUDE.md, which is not shared through version control",
+          "The project CLAUDE.md exceeds the context budget and is being truncated",
+          "The new hire needs to run /memory to load the project conventions"
+        ],
+        "correct": [1],
+        "answerWhy": "User-level memory is personal and never travels with the repository, which is the classic cause of conventions that work on one laptop only — moving them to a version-controlled project file fixes it. A version mismatch or truncation would not correlate with the individual developer, and /memory is the diagnostic that reveals the loaded files rather than a command that loads missing ones."
+      }
+    },
+    {
+      "objective": "Create and configure custom slash commands and skills",
+      "keyPoints": [
+        ".claude/commands/ in the repo is shared with the team; ~/.claude/commands/ is personal and never leaves the machine.",
+        "Skills live in .claude/skills/ as directories containing SKILL.md, whose frontmatter is the control surface.",
+        "context: fork runs the skill in an isolated sub-agent context so verbose or exploratory output does not pollute the main conversation — only the result returns.",
+        "allowed-tools restricts what the skill may do; argument-hint prompts for required parameters at invocation.",
+        "Personal variants of a shared skill go in ~/.claude/skills/ under a different name."
+      ],
+      "watchFor": "Universal coding standards must not be a skill — on-demand invocation means they silently don't apply in every session where nobody invokes it. Always-on standards belong in CLAUDE.md.",
+      "question": {
+        "type": "single",
+        "stem": "A codebase-analysis skill produces thousands of lines of intermediate output, exhausting the main conversation's context. Which frontmatter setting addresses it?",
+        "options": [
+          "allowed-tools, restricting the skill to read-only operations",
+          "context: fork, so the skill runs in an isolated sub-agent context and returns only its result",
+          "argument-hint, so the developer narrows the analysis scope at invocation",
+          "Moving the skill from .claude/skills/ to ~/.claude/skills/"
+        ],
+        "correct": [1],
+        "answerWhy": "context: fork exists precisely for verbose or exploratory skills: the work happens in an isolated context and only the distilled result comes back to the main conversation. allowed-tools bounds capability rather than context, argument-hint collects inputs, and changing the skill's scope affects who can run it, not how much context it consumes."
+      }
+    },
+    {
+      "objective": "Apply path-specific rules for conditional convention loading",
+      "keyPoints": [
+        "Rule files in .claude/rules/ take YAML frontmatter with a paths field of glob patterns; the rule loads only when matching files are edited.",
+        "Two benefits: no irrelevant context in sessions that never touch matching files, and deterministic path-driven loading rather than the model inferring which section applies.",
+        "Globs follow file type across the tree (**/*.test.tsx for co-located tests); directory-level CLAUDE.md follows location.",
+        "One rule file can scope to multiple trees via a list of globs; use recursive globs (dir/**/*) for whole subtrees.",
+        "Universal standards stay in CLAUDE.md — rules are for genuinely scoped conventions."
+      ],
+      "watchFor": "A glob written for a layout the codebase does not have (scoping tests to src/tests/** when tests are co-located) silently never loads, and leaving the text in root CLAUDE.md after migrating it double-loads content that then drifts.",
+      "question": {
+        "type": "single",
+        "stem": "Test files named Button.test.tsx are co-located beside their components throughout the codebase, and testing conventions should apply whenever one is edited. What is the best mechanism?",
+        "options": [
+          "A rule file in .claude/rules/ with paths: [\"**/*.test.tsx\"]",
+          "A directory-level CLAUDE.md in each directory containing tests",
+          "The testing conventions in the root CLAUDE.md so they always apply",
+          "A skill that developers invoke before working on tests"
+        ],
+        "correct": [0],
+        "answerWhy": "The convention follows file type rather than location, so one glob-scoped rule matches those files wherever they live and loads deterministically only when relevant. Directory-level files would mean duplicating and synchronizing the same text everywhere a test lives, root CLAUDE.md pays the token cost in every session, and a skill applies only when someone remembers to invoke it."
+      }
+    },
+    {
+      "objective": "Determine when to use plan mode vs direct execution",
+      "keyPoints": [
+        "Plan mode: large-scale changes, multiple valid approaches, architectural decisions, multi-file modifications — explore safely and produce a design before committing changes.",
+        "Direct execution: single-file, well-understood changes with clear diagnostics, where planning overhead buys nothing.",
+        "Signals for plan mode: microservice restructuring, a migration touching 45+ files, competing integration approaches with different infrastructure requirements.",
+        "The modes combine — plan the investigation-heavy phase, then execute the committed plan directly.",
+        "Isolate verbose discovery in the Explore subagent and keep only summaries in the main context."
+      ],
+      "watchFor": "Reflexive plan mode on trivial fixes adds ceremony that erodes the team's willingness to plan when it actually matters — and direct execution on unmade architectural decisions produces half-migrated code.",
+      "question": {
+        "type": "single",
+        "stem": "A team must integrate a payment provider, and two viable approaches differ in their infrastructure requirements. How should the work start?",
+        "options": [
+          "Direct execution on the approach the team prefers, adjusting as issues surface",
+          "Plan mode to explore the codebase and select an approach, then direct execution to implement the committed plan",
+          "Plan mode throughout, including the implementation of each file change",
+          "Direct execution on both approaches in parallel branches, then compare"
+        ],
+        "correct": [1],
+        "answerWhy": "Unmade architectural decisions with differing infrastructure implications are the canonical plan-mode signal, and once the approach is committed direct execution implements it efficiently. Starting with direct execution lets a mid-implementation discovery invalidate completed work, plan mode does not modify code so it cannot carry the implementation, and building both approaches fully doubles the cost of a decision planning can settle."
+      }
+    },
+    {
+      "objective": "Apply iterative refinement techniques for progressive improvement",
+      "keyPoints": [
+        "Inconsistent interpretation of a transformation → give 2–3 concrete input/output examples; a real pair settles ambiguity no stricter prose resolves.",
+        "Edge cases like null handling are fixed fastest with specific test cases: example input, expected output.",
+        "Test-driven iteration: write the suite first covering behaviour, edge cases, and performance, then iterate by sharing failures.",
+        "Unfamiliar domain where you cannot yet specify expected behaviour → interview pattern: have Claude ask you questions before implementing.",
+        "Interacting issues go in one detailed message; independent issues iterate better sequentially."
+      ],
+      "watchFor": "Responding to every miss with longer, sterner prose loops indefinitely on the same misinterpretation — examples are what disambiguate.",
+      "question": {
+        "type": "single",
+        "stem": "A data-migration script keeps splitting a composite field differently on each attempt, despite increasingly detailed prose instructions. What is the most effective next step?",
+        "options": [
+          "Provide two or three concrete input records with their exact expected output",
+          "Rewrite the instruction with stricter, more precise wording",
+          "Write the full test suite first and iterate on failures",
+          "Ask Claude to interview you about the migration requirements"
+        ],
+        "correct": [0],
+        "answerWhy": "Concrete input/output pairs resolve exactly the ambiguity that prose keeps failing to pin down, because the expected result is shown rather than described. A stricter rewrite repeats the approach that already failed, a full test suite is heavier than needed here, and the interview pattern is for domains where you cannot yet state the expected behaviour — which is not the case."
+      }
+    },
+    {
+      "objective": "Integrate Claude Code into CI/CD pipelines",
+      "keyPoints": [
+        "-p (--print) makes Claude Code process the prompt, write to stdout, and exit — without it the CI job hangs waiting for interactive input.",
+        "For machine-consumable output use --output-format json with --json-schema; a prompt-level \"respond in JSON\" instruction is probabilistic.",
+        "CLAUDE.md carries project context — testing standards, fixture conventions, review criteria — into CI-invoked runs, raising output value.",
+        "Provide existing test files so generation doesn't duplicate coverage the suite already has.",
+        "On re-runs, include the prior review's findings and ask only for new or still-unaddressed issues."
+      ],
+      "watchFor": "Letting the session that generated the code review its own changes wastes the benefit of context isolation — an independent instance reviews more effectively.",
+      "question": {
+        "type": "single",
+        "stem": "A CI review job hangs until timeout, and when it did run its free-form output broke the script that posts inline PR comments. What fixes both problems?",
+        "options": [
+          "Add a timeout to the CI step and a regex parser for the output",
+          "Invoke with -p for non-interactive execution and use --output-format json with --json-schema for parseable findings",
+          "Add a system prompt instruction to respond only in JSON and exit when finished",
+          "Run the job in a container with stdin closed so the session terminates"
+        ],
+        "correct": [1],
+        "answerWhy": "-p is what makes Claude Code run non-interactively and exit, and CLI-level JSON output with a schema gives the consuming script a contract instead of prose to scrape. A timeout plus regex treats both symptoms, prompt-level formatting promises eventually break automation, and closing stdin is an indirect hack that leaves the output shape unspecified."
+      }
+    }
+  ]
+}

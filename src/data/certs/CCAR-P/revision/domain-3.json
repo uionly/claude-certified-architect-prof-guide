@@ -1,0 +1,190 @@
+{
+  "domain": 3,
+  "title": "Integration",
+  "objectives": [
+    {
+      "objective": "Evaluate tool/agent configuration for capability bloat",
+      "keyPoints": [
+        "Tool definitions are part of the prompt — every name, description, and schema consumes context and competes for attention on every request.",
+        "Selection accuracy degrades as the catalog grows, especially with overlapping tools; consolidate overlaps to one canonical capability.",
+        "Every tool is attack surface — a prompt injection or model error can only misuse capabilities the agent actually holds.",
+        "Scope to what the agent's job requires, not what it might someday need; unused capability has zero present value.",
+        "Tool descriptions are prompt engineering — vague descriptions cause wrong calls even in a small catalog."
+      ],
+      "watchFor": "Splitting tools into many narrow variants to \"help\" the model increases selection ambiguity — the goal is fewer, clearer choices, not more precise ones.",
+      "question": {
+        "type": "single",
+        "stem": "An agent with four overlapping database tools frequently picks the wrong one. The team proposes upgrading to a more capable model. What is the better fix?",
+        "options": [
+          "Upgrade the model, since stronger models select tools more accurately",
+          "Consolidate the overlapping tools into one canonical capability with a clear description",
+          "Add system prompt rules specifying which tool to use in which situation",
+          "Split each tool into narrower variants so each has an unambiguous purpose"
+        ],
+        "correct": [1],
+        "answerWhy": "Selection accuracy degrades with catalog size and overlap for any model, so removing the ambiguity deterministically is the fix rather than paying more for a better guess. Prompt rules add tokens and remain probabilistic, and splitting into narrower variants multiplies near-duplicate options and makes selection harder."
+      }
+    },
+    {
+      "objective": "Analyze authentication and authorization requirements to identify security gaps",
+      "keyPoints": [
+        "The model is never the authorization boundary — prompt instructions can be bypassed by injection, jailbreak, or plain error.",
+        "Enforce authorization deterministically in the systems the agent calls: if the credential can read everything, everything is in the blast radius.",
+        "The classic gap is a shared service account with broad access serving all users, with the user's identity only mentioned in the prompt — it breaks both enforcement and attribution.",
+        "Fix by exchanging the authenticated session for a per-user scoped token propagated on every downstream call; for remote MCP servers, OAuth per user is the standard.",
+        "Authentication ≠ authorization: MFA and mTLS strengthen identity and channel without narrowing what a session can reach."
+      ],
+      "watchFor": "Detective controls (logs, weekly access reviews) and credential rotation don't substitute for scope — a well-rotated admin key still reaches everything, and logs find breaches after the data left.",
+      "question": {
+        "type": "single",
+        "stem": "A customer-facing agent queries the CRM through one service account with read access to all accounts, and the system prompt says to discuss only the current customer's data. What is the primary gap?",
+        "options": [
+          "The system prompt should be strengthened and repeated to make the restriction more reliable",
+          "Authorization is enforced only by the model — per-user scoped credentials propagated to the CRM are needed so the API enforces the boundary",
+          "The service account credential should be rotated more frequently and stored in a secrets manager",
+          "Access logs should be reviewed weekly to detect any cross-customer queries"
+        ],
+        "correct": [1],
+        "answerWhy": "A non-deterministic component cannot be the access-control boundary, so the CRM must receive a credential scoped to the requesting user's entitlements. Prompt strengthening remains bypassable, rotation changes a credential's lifetime rather than its scope, and log review discovers exposure only after the data has already been returned."
+      }
+    },
+    {
+      "objective": "Evaluate accuracy-latency trade-offs and justify configuration decisions",
+      "keyPoints": [
+        "The dials: model tier, extended thinking budget, retrieval depth (top-k), reranking stages, and how much enters context — each trades accuracy against latency and cost.",
+        "Justify each setting against the use case's SLA and the cost of being wrong; loose deadlines should convert latency headroom into accuracy.",
+        "Perceived vs total latency: streaming and parallelizing independent tool calls often deliver the responsiveness win teams mistakenly buy with a model downgrade.",
+        "Bimodal workloads want routing by difficulty, not one uniform configuration that overpays on easy requests or underserves hard ones.",
+        "Justify configuration changes with measured quality curves on an eval set, not spot checks."
+      ],
+      "watchFor": "More retrieval is not always better — beyond a workload-specific depth, extra chunks add latency and noise without recall gains, and that curve must be measured.",
+      "question": {
+        "type": "single",
+        "stem": "Users complain a chat assistant \"feels slow\", and the team plans to drop from Sonnet to Haiku. What should the architect evaluate first?",
+        "options": [
+          "Whether streaming and parallelized retrieval and tool calls fix time-to-first-token without sacrificing accuracy",
+          "Whether reducing retrieval depth shortens total generation time",
+          "Whether the complaint threshold justifies renegotiating the latency SLA",
+          "Whether Haiku's measured quality is acceptable across all request types"
+        ],
+        "correct": [0],
+        "answerWhy": "What users feel in a chat interface is time-to-first-token, and streaming plus parallelizing independent calls usually addresses that with no accuracy cost at all. Cutting retrieval depth or downgrading the tier trades quality for a metric the user may not be perceiving, and renegotiating the SLA treats a fixable engineering problem as a contractual one."
+      }
+    },
+    {
+      "objective": "Analyze observability challenges and select monitoring strategies at scale",
+      "keyPoints": [
+        "Three layers: operational metrics (latency percentiles, error rates, tokens, cost) tagged by feature and tenant across 100% of traffic; content-level telemetry; and trace-level visibility.",
+        "Content telemetry scales through sampling: full traces on a random slice plus guaranteed capture of errors, negative feedback, and guardrail triggers.",
+        "Multi-step agents are distributed transactions — diagnosis needs one correlated trace under a workflow ID, not siloed per-service logs.",
+        "Operational dashboards cannot measure quality; production eval signals are a separate requirement.",
+        "Cost accountability starts with per-tenant token and cost attribution."
+      ],
+      "watchFor": "Logs are not less sensitive than production data — prompts and completions replicate PII into a store that is often more widely accessible than the source systems.",
+      "question": {
+        "type": "single",
+        "stem": "An eight-step agent returns a wrong answer. Engineers have per-service logs for each component but spend two days reconstructing what happened. What is missing?",
+        "options": [
+          "Higher log verbosity in each individual service",
+          "Correlated end-to-end traces linking every step of the run under one workflow ID",
+          "Full retention of every prompt and completion indefinitely",
+          "An alert on the agent's error rate so failures are noticed sooner"
+        ],
+        "correct": [1],
+        "answerWhy": "An agent run is a distributed transaction, so step-level diagnosis requires the plan, tool calls, intermediate outputs, and synthesis correlated under one trace ID. More verbose siloed logs deepen the manual stitching problem, indefinite full retention is expensive and sensitive without solving correlation, and an error-rate alert would not have fired on a plausible wrong answer."
+      }
+    },
+    {
+      "objective": "Design a RAG pipeline with appropriate chunking and indexing strategies",
+      "keyPoints": [
+        "Chunk along semantic and structural boundaries (sections, clauses, headings) with overlap where units cross-reference — no fixed size fixes split semantic units.",
+        "Small chunks embed precisely but lose context; large chunks carry context but dilute embeddings. Small-to-big decouples the matching unit from the reading unit.",
+        "Contextual retrieval: prepend each chunk's document and section context (product, version, topic) before embedding, so an isolated chunk isn't ambiguous.",
+        "Attach structured metadata (type, department, version, effective date) so query-time filters enforce category and freshness, which similarity cannot.",
+        "Hybrid lexical + vector recall, then rerank for precision — identifiers and codes are lexical-match problems."
+      ],
+      "watchFor": "Fixing chunking or enrichment means re-processing and re-indexing the whole corpus, which is why these decisions are far cheaper to get right before launch.",
+      "question": {
+        "type": "single",
+        "stem": "A contract assistant retrieves chunks that end mid-clause, so answers miss conditions stated in the second half. The team is experimenting with chunk sizes. What should they change?",
+        "options": [
+          "Increase the chunk size until whole clauses fit",
+          "Chunk along the contract's structural boundaries — sections and clauses — with overlap where units cross-reference",
+          "Reduce the chunk size so each embedding is more precise",
+          "Add a reranking stage so better-matching chunks surface first"
+        ],
+        "correct": [1],
+        "answerWhy": "The failure is caused by boundaries, not size, and no fixed token count stops arbitrary cuts from severing semantic units in documents that have real structure. Larger or smaller chunks shift where the cuts land without aligning them, and reranking reorders candidates that are still individually truncated."
+      }
+    },
+    {
+      "objective": "Apply retrieval strategies matched to data shape and query pattern",
+      "keyPoints": [
+        "Vector search is one mechanism, not the default — the data's shape and the query pattern choose it.",
+        "Structured records want deterministic query interfaces (SQL, APIs): totals, counts, and joins demand exact answers, not probabilistic recall.",
+        "Small stable corpora often need no retrieval — include everything in a cached prompt and there is no retrieval miss to debug.",
+        "Identifier queries (part numbers, error codes, SKUs) favour lexical or exact matching; paraphrase and symptom queries favour embeddings; real workloads mix both.",
+        "Segment by volatility — live state belongs in live systems, and fast-changing exact-match corpora favour agentic search over pre-built indexes."
+      ],
+      "watchFor": "Query-log analysis is the only way to find the actual split between identifier and paraphrase queries — it determines lexical, semantic, or hybrid, and cannot be assumed.",
+      "question": {
+        "type": "single",
+        "stem": "An analytics assistant must answer \"what was total refund value in Q3 by region\" from a transactions table. The team plans to export the rows as prose and embed them. What is the sound recommendation?",
+        "options": [
+          "Embed the rows but add metadata filters for quarter and region",
+          "Query the table deterministically via SQL or an API, since aggregates require exact computation",
+          "Embed the rows and increase retrieval depth so no transaction is missed",
+          "Pre-compute monthly summaries and embed those instead"
+        ],
+        "correct": [1],
+        "answerWhy": "Aggregation over structured records is an exact-computation problem, and similarity retrieval returns a probabilistic subset — which is unacceptable when the answer is a total. Metadata filters and larger top-k still sample rather than compute, and pre-computed summaries only answer the questions someone anticipated."
+      }
+    },
+    {
+      "objective": "Evaluate connection protocols and select the integration mechanism (MCP, API/CLI, agent-to-agent)",
+      "keyPoints": [
+        "MCP standardizes discovery and invocation — implement once and any MCP-compatible client uses it without per-client integration code.",
+        "Its second advantage is dynamic discovery: clients enumerate tools at connection time, so new capabilities reach every assistant without a client release.",
+        "Choose MCP when multiple clients need the same capabilities, or the catalog grows independently of client deployments.",
+        "Direct API or CLI integration is right when code orchestrates a fixed workflow with a single consumer.",
+        "Delegate to the agent that owns the expertise rather than transplanting its tools — tools without their prompts and guardrails are capability without competence."
+      ],
+      "watchFor": "Routing a simple tool call through an orchestrator agent adds latency, cost, and nondeterminism — delegate tasks, not lookups. \"Architectural consistency\" is not a requirement.",
+      "question": {
+        "type": "single",
+        "stem": "A nightly batch pipeline calls Claude to classify documents. It is the only consumer and the workflow is fixed. The platform team wants it wrapped in an MCP server for consistency. What should the architect advise?",
+        "options": [
+          "Wrap it in MCP so the organization has one integration standard",
+          "Call the API directly — MCP's surface earns its cost through multi-client reuse and dynamic discovery, neither of which applies here",
+          "Wrap it in MCP so future consumers can adopt it without changes",
+          "Route the classification through an existing orchestrator agent instead"
+        ],
+        "correct": [1],
+        "answerWhy": "MCP pays for itself through reuse across clients and runtime capability discovery, and a single code-orchestrated consumer has neither — so the server is surface to build, secure, and operate for no benefit. Consistency and speculative future consumers are not requirements, and an orchestrator hop adds latency and nondeterminism to a deterministic step."
+      }
+    },
+    {
+      "objective": "Evaluate progressive discovery vs. monolithic context strategy",
+      "keyPoints": [
+        "Monolithic loads everything upfront — full visibility, no extra round-trips, but token cost and attention dilution on every request.",
+        "Progressive discovery starts lean and loads on demand (core toolset plus fetch, or an index with full content pulled as needed) at the cost of round-trip latency and machinery.",
+        "Decide by the ratio of catalog size to per-task usage: sparse use of a large catalog favours discovery; a small heavily used set favours upfront loading.",
+        "Provide an index upfront (titles, parties, dates) and load full content on demand for large document corpora.",
+        "Re-evaluate the regime as an agent's catalog grows."
+      ],
+      "watchFor": "Prompt caching does not fix monolithic bloat — cached content still occupies the window and still dilutes attention. And compressing tool descriptions trades the bloat problem for a selection-accuracy problem.",
+      "question": {
+        "type": "single",
+        "stem": "An IT-ops agent holds 300 tool definitions, but a typical conversation touches one or two systems. Selection accuracy and cost are both degrading. What is the right strategy?",
+        "options": [
+          "Enable prompt caching on the tool definitions so their token cost is amortized",
+          "Load a small core toolset with on-demand retrieval of the definitions a task actually needs",
+          "Compress each tool description so more fit in the same context budget",
+          "Split the agent into one agent per system so each has a small catalog"
+        ],
+        "correct": [1],
+        "answerWhy": "Sparse use of a large catalog is exactly the regime where discovery's occasional round-trips buy large token and attention savings on every request. Caching amortizes cost while the definitions still occupy the window and dilute attention, compression degrades the descriptions that drive correct selection, and per-system agents push routing onto users who don't know which system a task touches."
+      }
+    }
+  ]
+}

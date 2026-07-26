@@ -1,0 +1,75 @@
+{
+  "domain": 6,
+  "title": "Prompt and Context Engineering",
+  "objectives": [
+    {
+      "objective": "Context Engineering",
+      "keyPoints": [
+        "Two failure modes with one root cause (uncurated context): bloat (raw tool dumps, stale results, long histories) and drift (the model loses its grip on the original task).",
+        "Prune tool output at the tool boundary — if the agent needs three fields from a 5,000-token payload, three fields is what enters context.",
+        "Compaction condenses older history into a running summary preserving decisions, key facts, and open questions.",
+        "Isolate context-hungry subtasks in subagents that return only distilled results; chain workflow steps with fresh contexts and distilled artifacts.",
+        "Track context size per turn and compact on a threshold, not on visible symptoms."
+      ],
+      "watchFor": "A bigger context window only fits more noise — attention dilution is cured by curation. Compacting too aggressively trades bloat for amnesia, so summaries must keep load-bearing state.",
+      "question": {
+        "type": "single",
+        "stem": "A long-running research agent slows down, repeats work, and starts ignoring its original instructions after many tool calls that each returned full API payloads. What is the right fix?",
+        "options": [
+          "Move to a model with a larger context window",
+          "Prune tool results to task-relevant fields at the tool boundary and compact older history into a summary that preserves decisions and open questions",
+          "Reset the session whenever quality visibly degrades",
+          "Repeat the original instructions in every turn so they stay salient"
+        ],
+        "correct": [1],
+        "answerWhy": "These are bloat-and-drift symptoms from uncurated context, so the fix works at the source: trim payloads before they enter context and compact history while retaining load-bearing state. A larger window fits more noise without restoring attention, a hard reset discards the decisions the session established, and re-injecting instructions adds to the volume that caused the dilution."
+      }
+    },
+    {
+      "objective": "Prompt Engineering",
+      "keyPoints": [
+        "Durable behavior (role, tone, policy, scope) belongs in the system prompt; variable per-request content belongs in user turns — this also keeps the prefix cacheable.",
+        "Delimit multi-part prompts with XML-style tags and reference those tags in the instructions so every span has an explicit role.",
+        "Structured reliability comes from explicit output constraints (schemas, closed enums, null-for-missing conventions) plus few-shot examples — not exhortation.",
+        "Sanitize untrusted input: delimit it, declare it data-only, and screen for boundary-breaking patterns.",
+        "Iterate systematically — representative test set, one change at a time, version every revision."
+      ],
+      "watchFor": "\"Double-check your work\" and \"be careful\" are pleading, not specification; and tool-selection guidance belongs in tool names and descriptions, which is what the model actually reads when choosing.",
+      "question": {
+        "type": "single",
+        "stem": "An extraction prompt sometimes omits required fields and sometimes invents values for absent ones. Which change is most likely to fix it?",
+        "options": [
+          "Specify an explicit schema with required fields and a null-for-missing rule, and add few-shot examples including a case with an absent field",
+          "Add an instruction to be thorough and never guess",
+          "Move the input document into the system prompt so it carries more authority",
+          "Raise the temperature so the model explores more complete answers"
+        ],
+        "correct": [0],
+        "answerWhy": "Explicit output constraints plus a demonstration of the missing-field case give the model an unambiguous contract for both structure and edge behavior. Exhortation does not close a specification gap, moving the document into the system prompt erases the trusted/untrusted boundary and breaks caching, and a higher temperature increases variance rather than completeness."
+      }
+    },
+    {
+      "objective": "Output Handling",
+      "keyPoints": [
+        "Treat model output as untrusted input: parse defensively (responses may arrive wrapped in fences or prose), then validate.",
+        "Syntax is not safety — a response can parse cleanly while carrying a bad enum, an impossible quantity, or a hallucinated identifier.",
+        "Validate structure (required fields, types) and values (ranges, closed lists, referential existence) before anything downstream consumes it.",
+        "Every validation needs a defined failure path: corrective reprompt with the error, fallback, or human review — never silent pass-through.",
+        "Constrain structure at generation time with a schema or prefill so output is machine-consumable by construction."
+      ],
+      "watchFor": "Confident tone carries no evidentiary weight, and using a second model call to check syntax a deterministic validator handles perfectly wastes money — save model review for judgments code cannot make.",
+      "question": {
+        "type": "single",
+        "stem": "An order service parses Claude's JSON successfully but occasionally writes a shipment ID that does not exist in the database. What is missing?",
+        "options": [
+          "A retry loop that regenerates the response until parsing succeeds",
+          "Value-level validation — closed lists, ranges, and referential checks such as confirming the shipment ID exists — with a defined failure path",
+          "A more capable model tier to reduce hallucinated identifiers",
+          "A second Claude call to review the JSON for correctness before writing"
+        ],
+        "correct": [1],
+        "answerWhy": "The payload is syntactically valid but semantically wrong, which is exactly the gap value-level validation closes — including a referential check against the system of record before any write. Retrying on parse success never triggers, a stronger model reduces but does not eliminate fabricated IDs, and a model-based reviewer is a probabilistic substitute for a lookup code can perform exactly."
+      }
+    }
+  ]
+}
