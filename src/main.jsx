@@ -4,6 +4,7 @@ import { createBrowserRouter, redirect, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import CertPicker from './pages/CertPicker.jsx'
+import Courses from './pages/Courses.jsx'
 import Home from './pages/Home.jsx'
 import StudyIndex from './pages/StudyIndex.jsx'
 import StudyDomain from './pages/StudyDomain.jsx'
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     children: [
-      { index: true, loader: () => redirect(`/${defaultCert()}`) },
+      { index: true, element: <Courses /> },
       { path: 'certs', element: <CertPicker /> },
       {
         path: ':certCode',

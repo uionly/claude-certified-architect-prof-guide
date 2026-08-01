@@ -18,6 +18,9 @@ export default function App() {
           <NavLink to="/" className="font-serif text-lg font-semibold tracking-tight text-stone-900">
             Claude Cert Prep
           </NavLink>
+          <NavLink to="/" end className={navLinkClass}>
+            Courses
+          </NavLink>
           {certCode && (
             <nav className="flex flex-wrap items-center gap-1">
               <NavLink to={`/${certCode}`} end className={navLinkClass}>
