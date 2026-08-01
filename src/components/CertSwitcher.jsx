@@ -1,13 +1,12 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { certRegistry } from '../data/loader.js'
 
-export default function CertSwitcher() {
-  const { certCode } = useParams()
+export default function CertSwitcher({ activeCertCode }) {
   const navigate = useNavigate()
 
   return (
     <select
-      value={certCode || ''}
+      value={activeCertCode}
       onChange={(e) => {
         localStorage.setItem('selectedCert', e.target.value)
         navigate(`/${e.target.value}`)
