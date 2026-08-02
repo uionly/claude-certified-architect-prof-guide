@@ -36,6 +36,50 @@ for (const certCode of certCodes) {
   const sets = blueprint.cert?.practiceSets ?? 1;
   const errors = [];
 
+  // ---- cert metadata ----
+  const cert = blueprint.cert ?? {};
+  const oneExamQuestions = blueprint.domains.reduce((n, d) => n + d.questionCount, 0);
+  if (typeof cert.name !== 'string' || !cert.name) errors.push('cert.name missing');
+  if (cert.code !== certCode) errors.push(`cert.code "${cert.code}" must match directory name "${certCode}"`);
+  if (typeof cert.level !== 'string' || !cert.level) errors.push('cert.level missing (e.g. "Associate")');
+  if (typeof cert.audience !== 'string' || !cert.audience) errors.push('cert.audience missing');
+  if (!(typeof cert.examMinutesPerQuestion === 'number' && cert.examMinutesPerQuestion > 0))
+    errors.push('cert.examMinutesPerQuestion must be a positive number');
+  // Nullable exam facts: each must be present as a key so it's clear the value
+  // is unknown rather than forgotten. Sourced from the official exam guide.
+  for (const key of [
+    'examQuestions',
+    'examTimeMinutes',
+    'passingScore',
+    'format',
+    'examFee',
+    'validityMonths',
+    'registrationUrl',
+  ]) {
+    if (!(key in cert)) errors.push(`cert.${key} missing — use null if the official value isn't known yet`);
+  }
+  if (cert.registrationUrl != null && !/^https:\/\//.test(cert.registrationUrl))
+    errors.push('cert.registrationUrl must be an https URL or null');
+  // Guard against a percentage creeping in: the passing score is a scaled score
+  // on a 100-1,000 scale, and Anthropic doesn't publish the raw-to-scaled map,
+  // so rendering it as "72%" would be wrong.
+  if (typeof cert.passingScore === 'string' && /^\s*\d{1,2}\s*%\s*$/.test(cert.passingScore))
+    errors.push(`cert.passingScore "${cert.passingScore}" looks like a percentage; the official score is scaled (e.g. "720 / 1000 (scaled)")`);
+  if (cert.examQuestions !== null && cert.examQuestions !== undefined) {
+    if (typeof cert.examQuestions !== 'number')
+      errors.push('cert.examQuestions must be a number or null');
+    // When practiceSets is declared, the per-domain counts describe ONE exam and
+    // the bank is that × practiceSets — so the counts must add up to the official
+    // exam length. This is what stops bank size being mistaken for exam size.
+    // Certs WITHOUT practiceSets (legacy banks like CCAR-P) use per-domain counts
+    // to describe the whole bank, so no such equality holds and examQuestions is
+    // simply the independently-sourced official figure.
+    else if (blueprint.cert.practiceSets && cert.examQuestions !== oneExamQuestions)
+      errors.push(
+        `cert.examQuestions (${cert.examQuestions}) must equal the sum of per-domain questionCount (${oneExamQuestions}), which describes one exam; the bank holds ${oneExamQuestions * sets} (× ${sets} practiceSets)`,
+      );
+  }
+
   for (const domain of blueprint.domains) {
     if (onlyDomain && domain.id !== onlyDomain) continue;
 

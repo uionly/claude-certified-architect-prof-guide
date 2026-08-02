@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, redirect, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
-import CertPicker from './pages/CertPicker.jsx'
 import Courses from './pages/Courses.jsx'
 import Home from './pages/Home.jsx'
 import StudyIndex from './pages/StudyIndex.jsx'
@@ -41,7 +40,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Courses /> },
-      { path: 'certs', element: <CertPicker /> },
+      // The standalone picker was merged into the landing page's cert section.
+      { path: 'certs', loader: () => redirect('/#certifications') },
       {
         path: ':certCode',
         id: 'cert',

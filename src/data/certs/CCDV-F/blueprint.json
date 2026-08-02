@@ -2,8 +2,16 @@
   "cert": {
     "name": "Claude Certified Developer – Foundations",
     "code": "CCDV-F",
-    "totalQuestions": 53,
+    "level": "Developer",
+    "audience": "Backend, full-stack and AI engineers building Claude-powered applications.",
+    "examQuestions": 53,
+    "examTimeMinutes": 120,
     "examMinutesPerQuestion": 2.26,
+    "passingScore": "720 / 1000 (scaled)",
+    "format": "Multiple choice & multiple response · online proctored or test center",
+    "examFee": "$125 USD",
+    "validityMonths": 12,
+    "registrationUrl": "https://anthropic-partners.skilljar.com/claude-certified-developer-foundations-certification",
     "practiceSets": 3
   },
   "domains": [

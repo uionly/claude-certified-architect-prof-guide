@@ -2,8 +2,16 @@
   "cert": {
     "name": "Claude Certified Architect – Foundations",
     "code": "CCAR-F",
-    "totalQuestions": 60,
+    "level": "Architect",
+    "audience": "Developers, technical leads, cloud architects and emerging GenAI architects.",
+    "examQuestions": 60,
+    "examTimeMinutes": 120,
     "examMinutesPerQuestion": 2.0,
+    "passingScore": "720 / 1000 (scaled)",
+    "format": "4 scenarios drawn from a bank of 6 · multiple choice & multiple response · online proctored or test center",
+    "examFee": "$125 USD",
+    "validityMonths": 12,
+    "registrationUrl": "https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification",
     "practiceSets": 3
   },
   "domains": [

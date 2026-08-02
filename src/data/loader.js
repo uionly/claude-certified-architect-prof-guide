@@ -13,9 +13,34 @@ function codeFromPath(path) {
   return path.match(/^\.\/certs\/([^/]+)\//)[1]
 }
 
+// Derived, so the landing page can show sizes without loading any question file.
+// The blueprint's per-domain questionCount describes ONE exam; the bank holds
+// that distribution × practiceSets.
+function bankSize(blueprint) {
+  const sets = blueprint.cert.practiceSets ?? 1
+  return blueprint.domains.reduce((n, d) => n + d.questionCount, 0) * sets
+}
+
+// Real-exam duration. Prefers the official figure from the exam guide; falls
+// back to deriving it from the per-question pace for any cert that doesn't
+// record one yet. Null when neither is available.
+function examMinutes(cert) {
+  if (cert.examTimeMinutes) return cert.examTimeMinutes
+  if (!cert.examQuestions || !cert.examMinutesPerQuestion) return null
+  return Math.round(cert.examQuestions * cert.examMinutesPerQuestion)
+}
+
 export const certRegistry = Object.entries(blueprintModules)
-  .map(([path, m]) => ({ ...m.default.cert, domainCount: m.default.domains.length, _path: path }))
+  .map(([path, m]) => ({
+    ...m.default.cert,
+    domainCount: m.default.domains.length,
+    bankQuestions: bankSize(m.default),
+    examMinutes: examMinutes(m.default.cert),
+    _path: path,
+  }))
   .sort((a, b) => a.code.localeCompare(b.code))
+
+export const certByCode = Object.fromEntries(certRegistry.map((c) => [c.code, c]))
 
 const blueprintByCode = Object.fromEntries(
   Object.entries(blueprintModules).map(([path, m]) => [codeFromPath(path), m.default]),

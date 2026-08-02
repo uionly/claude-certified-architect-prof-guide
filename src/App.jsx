@@ -1,6 +1,5 @@
 import { NavLink, Outlet, ScrollRestoration, useParams } from 'react-router-dom'
 import CertSwitcher from './components/CertSwitcher.jsx'
-import { certRegistry } from './data/loader.js'
 import { useCertData } from './lib/cert.js'
 
 const navLinkClass = ({ isActive }) =>
@@ -8,44 +7,43 @@ const navLinkClass = ({ isActive }) =>
     isActive ? 'bg-stone-200 text-stone-900' : 'text-stone-600 hover:bg-stone-200/60 hover:text-stone-900'
   }`
 
-function activeCertification(routeCertCode) {
-  if (routeCertCode) return routeCertCode
-  const savedCertCode = localStorage.getItem('selectedCert')
-  if (certRegistry.some((cert) => cert.code === savedCertCode)) return savedCertCode
-  return certRegistry.find((cert) => cert.code === 'CCAR-P')?.code ?? certRegistry[0]?.code
-}
-
 export default function App() {
+  // Only a route under ':certCode' has an active certification. On the landing
+  // page we deliberately show no per-cert nav, so nobody lands inside a
+  // certification they never chose.
   const { certCode } = useParams()
-  const activeCertCode = activeCertification(certCode)
   const certData = useCertData()
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-stone-200 bg-stone-50/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          <NavLink to="/" className="font-serif text-lg font-semibold tracking-tight text-stone-900">
+          <NavLink to="/" className="text-lg font-bold tracking-tight text-stone-900">
             Claude Cert Prep
           </NavLink>
-          <NavLink to="/" end className={navLinkClass}>
-            Courses
-          </NavLink>
           <nav className="flex flex-wrap items-center gap-1">
-            <NavLink to={`/${activeCertCode}`} end className={navLinkClass}>
-              Overview
+            <NavLink to="/" end className={navLinkClass}>
+              {certCode ? 'All certifications' : 'Home'}
             </NavLink>
-            <NavLink to={`/${activeCertCode}/study`} className={navLinkClass}>
-              Study Guide
-            </NavLink>
-            <NavLink to={`/${activeCertCode}/revision`} className={navLinkClass}>
-              Revision
-            </NavLink>
-            <NavLink to={`/${activeCertCode}/practice`} className={navLinkClass}>
-              Practice
-            </NavLink>
+            {certCode && (
+              <>
+                <NavLink to={`/${certCode}`} end className={navLinkClass}>
+                  Overview
+                </NavLink>
+                <NavLink to={`/${certCode}/study`} className={navLinkClass}>
+                  Study Guide
+                </NavLink>
+                <NavLink to={`/${certCode}/revision`} className={navLinkClass}>
+                  Revision
+                </NavLink>
+                <NavLink to={`/${certCode}/practice`} className={navLinkClass}>
+                  Practice
+                </NavLink>
+              </>
+            )}
           </nav>
           <div className="ml-auto">
-            <CertSwitcher activeCertCode={activeCertCode} />
+            <CertSwitcher activeCertCode={certCode} />
           </div>
         </div>
       </header>

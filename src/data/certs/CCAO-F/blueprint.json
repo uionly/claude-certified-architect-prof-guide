@@ -2,8 +2,16 @@
   "cert": {
     "name": "Claude Certified Associate – Foundations",
     "code": "CCAO-F",
-    "totalQuestions": 60,
+    "level": "Associate",
+    "audience": "Developers working with product, consulting, customer or enterprise adoption teams.",
+    "examQuestions": 60,
+    "examTimeMinutes": 120,
     "examMinutesPerQuestion": 2.0,
+    "passingScore": "720 / 1000 (scaled)",
+    "format": "Multiple choice & multiple response · online proctored or test center",
+    "examFee": "$99 USD",
+    "validityMonths": 12,
+    "registrationUrl": "https://anthropic-partners.skilljar.com/claude-certified-associate-foundations-certification",
     "practiceSets": 3
   },
   "domains": [

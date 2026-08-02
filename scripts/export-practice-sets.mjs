@@ -1,16 +1,20 @@
 // Exports each cert's question bank as 3 stratified practice-set CSVs for a
 // dependent bulk-upload system, matching PracticeTestBulkQuestionUploadTemplate_v2.csv.
-// Usage: node scripts/export-practice-sets.mjs [certCode]
+// Usage: node scripts/export-practice-sets.mjs [certCode] [--force]
 //   no args  -> export every cert under src/data/certs/ (skipping ones with no content yet)
 //   certCode -> export just that cert
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
+//   --force  -> also rewrite sets for certs whose existing exports this script
+//               can no longer reproduce (see the extra-sets guard below)
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const certsDir = join(root, 'src/data/certs');
 
-const onlyCert = process.argv[2] || null;
+const args = process.argv.slice(2);
+const force = args.includes('--force');
+const onlyCert = args.find((a) => !a.startsWith('--')) || null;
 
 const HEADER = [
   'Question',
@@ -94,6 +98,25 @@ for (const certCode of certCodes) {
   }
 
   const exportsDir = join(root, 'exports', certCode);
+
+  // Guard: if more sets exist on disk than this script produces, they were added
+  // by hand (e.g. a later batch of questions published as an extra practice
+  // test). Rewriting sets 1..n would then pull those questions into the earlier
+  // sets while the extra file still holds them — silently duplicating questions
+  // across published tests. Refuse unless explicitly forced.
+  if (!force && existsSync(exportsDir)) {
+    const existing = readdirSync(exportsDir).filter((f) => /^PracticeSet\d+\.csv$/.test(f));
+    if (existing.length > sets.length) {
+      const extra = existing.filter((f) => Number(f.match(/\d+/)[0]) > sets.length);
+      console.log(
+        `skipping ${certCode}: ${existing.length} set(s) on disk but this script generates ${sets.length}.\n` +
+          `  Hand-added: ${extra.join(', ')}. Rewriting sets 1-${sets.length} would duplicate those questions\n` +
+          `  across sets. Re-run with --force once you've decided how the sets should be partitioned.`,
+      );
+      continue;
+    }
+  }
+
   mkdirSync(exportsDir, { recursive: true });
 
   sets.forEach((questions, i) => {

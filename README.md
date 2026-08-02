@@ -19,7 +19,7 @@ No backend: React + Vite + Tailwind, all state client-side, attempt history pers
 
 Cert codes are the official Anthropic exam codes. The three Foundations blueprints (domains, weights, objective strings) are transcribed from the official exam guides published on the [Anthropic Partner Academy](https://anthropic-partners.skilljar.com/page/partner-certifications) (v1.0, effective July 2026). Each Foundations bank holds **3 distinct, non-overlapping practice sets**, each the size and domain/objective distribution of the real exam (CCAO-F 60, CCDV-F 53, CCAR-F 60 questions per set).
 
-Use the cert switcher in the header (or the `/certs` page) to pick a certification. Certs with no content yet still appear in the switcher/picker with a "coming soon" state.
+The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
 
 ## Setup
 
@@ -50,7 +50,7 @@ Or connect the GitHub repo in the [Vercel dashboard](https://vercel.com/new): no
 - `src/data/certs/<CODE>/questions/domain-N.json` — one array of questions per domain.
 - `src/data/certs/<CODE>/study/domain-N.json` — study guide content per domain.
 - `src/data/certs/<CODE>/revision/domain-N.json` — revision recaps + one high-yield question per objective, per domain.
-- `src/data/loader.js` — `certRegistry` (cheap, eager — every cert's `blueprint.json`, used by the switcher/picker) and `getCertData(certCode)` (async, code-split per cert — merges that cert's blueprint + question files + study files + revision files, discovered via `import.meta.glob`). Add a new cert directory under `src/data/certs/` and it's picked up automatically — no manual registration needed, beyond adding it to the switcher's data (also automatic, since the switcher reads `certRegistry`).
+- `src/data/loader.js` — `certRegistry` / `certByCode` (cheap, eager — every cert's `blueprint.json` plus derived `bankQuestions`, `examMinutes` and `domainCount`, used by the landing page and switcher) and `getCertData(certCode)` (async, code-split per cert — merges that cert's blueprint + question files + study files + revision files, discovered via `import.meta.glob`). Add a new cert directory under `src/data/certs/` and it's picked up automatically — no manual registration needed, beyond adding it to the switcher's data (also automatic, since the switcher reads `certRegistry`).
 - URL scheme: `/<certCode>/...` (e.g. `/CCAR-P/study`, `/CCAR-P/revision/3`, `/CCAR-P/quiz`). `/` redirects to the last-used cert (or CCAR-P by default). Pre-existing un-prefixed bookmarks (`/study`, `/revision`, `/practice`, `/quiz`, `/results/:id`) redirect the same way.
 - Progress storage is cert-scoped (`cert.<CODE>.attempts.v1` / `cert.<CODE>.active.v1` in `localStorage`); a one-time migration preserves history from the original single-cert version of this app (which used unscoped `ccarp.*` keys) into `cert.CCAR-P.*`.
 - `scripts/validate-content.mjs` — checks every cert's content files against its blueprint (counts per objective, schema fields, exact objective strings, explanation lengths, no placeholder text). Run it after any content change.
@@ -74,7 +74,16 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 
 ```json
 {
-  "cert": { "name": "...", "code": "...", "totalQuestions": 200, "examMinutesPerQuestion": 1.9, "practiceSets": 3 },
+  "cert": {
+    "name": "...", "code": "...",
+    "level": "Associate", "audience": "who this exam is for",
+    "examQuestions": 60, "examTimeMinutes": 120, "examMinutesPerQuestion": 2.0,
+    "passingScore": "720 / 1000 (scaled)",
+    "format": "Multiple choice & multiple response · online proctored or test center",
+    "examFee": "$99 USD", "validityMonths": 12,
+    "registrationUrl": "https://anthropic-partners.skilljar.com/...",
+    "practiceSets": 3
+  },
   "domains": [
     {
       "id": 1,
@@ -88,9 +97,27 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 }
 ```
 
-`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to `totalQuestions`; each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to `examQuestions` (when it's known); each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
 
-`totalQuestions`, `questionCount`, and per-objective `questions` always describe **one real exam** (transcribed from the official guide). The optional `practiceSets` (default 1) says how many distinct full exams the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into `practiceSets` non-overlapping CSVs, each matching the official exam's exact size and distribution.
+**Exam facts** (`level`, `audience`, `examQuestions`, `examTimeMinutes`, `passingScore`, `format`, `examFee`, `validityMonths`, `registrationUrl`) drive the "About this exam" panel on the cert overview and the fact rows on the landing page. The nullable ones must be **present as keys** — use `null` when the official value isn't known yet, and the UI omits that fact instead of inventing one.
+
+All four certs' facts are transcribed from Anthropic's official exam guide PDFs (Version 1.0, effective July 2026), linked from <https://anthropic-partners.skilljar.com/page/partner-certifications> and cross-checked against <https://anthropic-partners.skilljar.com/page/faq-certifications>:
+
+| | CCAO-F | CCDV-F | CCAR-F | CCAR-P |
+|---|---|---|---|---|
+| Items | 60 | 53 | 60 | 63 |
+| Time limit | 120 min | 120 min | 120 min | 120 min |
+| Passing score | 720 / 1000 scaled | ← | ← | ← |
+| Fee | $99 | $125 | $125 | $175 |
+| Validity | 12 months | ← | ← | ← |
+
+Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — Anthropic doesn't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
+
+Validation rules: when `practiceSets` is declared, `examQuestions` must equal the sum of per-domain `questionCount` (which describes one exam), so bank size can never be mistaken for exam size. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
+
+`examQuestions`, `questionCount`, and per-objective `questions` always describe **one real exam** (transcribed from the official guide). The optional `practiceSets` (default 1) says how many distinct full exams the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into `practiceSets` non-overlapping CSVs, each matching the official exam's exact size and distribution.
+
+`npm run export:csv [certCode] [--force]`. The exporter **skips any cert that has more `PracticeSet*.csv` files on disk than it generates**, because those extra files were added by hand and rewriting sets 1..n would pull their questions into the earlier sets while the extra file still holds them — silently duplicating questions across published tests. This currently applies to **CCAR-P**: sets 1–3 hold its original 200 questions and a hand-added set 4 holds the 83 added later (verified zero overlap, 283 total). Since 283 is prime it can't be partitioned into equal exam-sized sets, so decide the intended partition before running with `--force`.
 
 ## Question schema
 
@@ -225,4 +252,4 @@ After adding content: `npm run validate` (or `node scripts/validate-content.mjs 
 | 5. Context Management & Reliability | 15% | ✅ 27/27 | ✅ done | ✅ done |
 | **Total** | 100% | **180/180** | **5/5** | **5/5** |
 
-App shell: ✅ scaffold · ✅ multi-cert switcher & picker · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass
+App shell: ✅ scaffold · ✅ purpose-first landing page with exam facts · ✅ multi-cert switcher · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass

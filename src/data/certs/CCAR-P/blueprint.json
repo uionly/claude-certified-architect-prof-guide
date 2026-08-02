@@ -2,8 +2,16 @@
   "cert": {
     "name": "Claude Certified Architect – Professional",
     "code": "CCAR-P",
-    "totalQuestions": 283,
-    "examMinutesPerQuestion": 1.9
+    "level": "Professional",
+    "audience": "Senior engineers, architects and technical leads preparing for advanced Claude work.",
+    "examQuestions": 63,
+    "examTimeMinutes": 120,
+    "examMinutesPerQuestion": 1.9,
+    "passingScore": "720 / 1000 (scaled)",
+    "format": "Multiple choice & multiple response · online proctored or test center",
+    "examFee": "$175 USD",
+    "validityMonths": 12,
+    "registrationUrl": "https://anthropic-partners.skilljar.com/claude-certified-architect-professional-certification"
   },
   "domains": [
     {
