@@ -1,0 +1,909 @@
+[
+  {
+    "id": 301,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "Contoso Health's ingestion API accepts clinical PDFs and hands each one to a Python worker that chunks the document, calls Azure OpenAI for embeddings, and writes vectors to a search index. Uploads burst to 4,000 documents in about three minutes while the worker pool sustains roughly 120 documents per minute, and no document may be lost if every worker instance is recycled mid-batch. Which messaging design fits these requirements?",
+    "options": [
+      "Publish one message per document to an Azure Service Bus queue and have workers receive in peek-lock mode, completing each message only after the vectors are committed",
+      "Publish one event per document to an Azure Event Grid custom topic and register the worker's HTTP endpoint as a webhook subscriber",
+      "Have the ingestion API call the worker's HTTP endpoint directly and retry in-process when the worker returns a 503 during the burst",
+      "Write each document's metadata to a database table and have workers poll that table every second for rows whose status column is still pending"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is a durable back-end command, not a notification: the work must survive a burst that exceeds worker throughput and survive instance recycles. A Service Bus queue absorbs the 4,000-message spike as a backlog the workers drain at their own rate, and peek-lock means a message that was being processed when an instance died is unlocked and redelivered rather than lost.",
+      "Event Grid is a reactive notification service for state changes, not a work buffer you drain at your own pace — it pushes to subscribers and expects a fast acknowledgement. During a 4,000-document burst the worker endpoint would be pushed far past its 120-per-minute capacity, and slow or failed handlers rely on Event Grid retries rather than a backlog you control.",
+      "Direct HTTP calls make the producer's availability depend on the consumer's: there is no buffer, so the burst overwhelms the workers immediately, and in-process retry state is lost the moment the API instance restarts. Coupling a bursty producer to a slower consumer without a broker is the exact failure this queue-based design exists to prevent.",
+      "A polled status table can be made durable, but it reimplements a broker badly: you must hand-roll leasing, visibility timeouts, retry counts, and poison-message handling, and one-second polling across many workers creates contention on the same rows. Service Bus already provides locking, delivery counts, and dead-lettering as managed behavior."
+    ],
+    "principle": "durable back-end commands belong on a queue, not on a notification bus",
+    "relatedConcept": "Choosing between Service Bus and Event Grid starts with asking whether the payload is a command someone must eventually execute or a notification that something happened.",
+    "overallExplanation": "Use a Service Bus queue with peek-lock when work items are durable commands that must survive bursts and instance restarts. Event Grid is for reactive state-change notification; a queue is for buffered, at-least-once execution of back-end operations."
+  },
+  {
+    "id": 302,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A retail platform publishes a ProductUpdated message for every catalog change. Three independent back-end services must each act on every message: an embedding refresher, a price-index rebuilder, and an audit archiver. Today all three read from one Service Bus queue, and each message is processed by whichever service receives it first, so the other two never see it. What is the correct fix?",
+    "options": [
+      "Replace the queue with a Service Bus topic and give each service its own subscription so all three receive an independent copy of every message",
+      "Keep the single queue but have each service peek messages instead of receiving them, so a message stays available to the other two services",
+      "Keep the single queue and enable sessions, assigning each service a distinct session id so each one gets its own stream of messages",
+      "Keep the single queue and have the publisher send three copies of every message, one tagged for each consuming service"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A queue is a competing-consumers construct: one message goes to exactly one receiver. A topic with three subscriptions gives each service a durable, independently tracked copy, with its own delivery count, its own dead-letter queue, and its own backlog — which is precisely the durable publish-subscribe shape this scenario needs.",
+      "Peeking returns messages without locking them, so nothing is ever removed and the same messages are read forever. Peek is a diagnostic and browsing operation, not a delivery mode: it gives you no lock, no completion, and no way to track which service has finished which message.",
+      "Sessions group related messages so they are handled in order by a single consumer; the session id comes from the producer's partitioning intent, not from consumer identity. Assigning a session per service would just split the single stream three ways — each message still lands in only one session and therefore reaches only one service.",
+      "Publisher-side fan-out works only until the fourth consumer appears, and it puts routing knowledge in the producer: adding, removing, or filtering a consumer becomes a code change and a redeploy. Topics move that routing into the broker, where a new subscription is a configuration change with no producer impact."
+    ],
+    "principle": "queues are competing consumers, topics and subscriptions are durable pub/sub",
+    "relatedConcept": "Service Bus topics add a routing layer on top of queue semantics: each subscription behaves like its own queue with its own locks, delivery counts, and dead-letter queue.",
+    "overallExplanation": "When several independent services each need every message, use a Service Bus topic with one subscription per service. A single queue distributes each message to exactly one competing consumer, which is why two of the three services never see it."
+  },
+  {
+    "id": 303,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A conversational-AI back end persists each user turn as a message that a worker applies to a per-conversation summary document. With eight concurrent workers, turns from the same conversation are sometimes applied out of order, producing summaries that mention a reply before the question that prompted it. Throughput across conversations must stay parallel. What should the team change?",
+    "options": [
+      "Enable sessions on the queue and set session_id to the conversation id so all turns for one conversation are processed in order by a single receiver",
+      "Reduce the consumer pool to a single worker instance so that messages are always processed strictly in the order they were enqueued",
+      "Set a longer lock duration on the queue so each worker holds its message long enough for earlier messages to be applied first",
+      "Enable duplicate detection on the queue so that repeated turns from the same conversation are collapsed into a single ordered message"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Session-enabled queues bind all messages sharing a session_id to one receiver at a time and deliver them in order within that session. Using the conversation id as the session id preserves per-conversation ordering while different sessions are still processed concurrently by different workers, so overall throughput is unaffected.",
+      "A single consumer does restore global ordering, but it throws away all cross-conversation parallelism and makes one slow turn block every other user's conversation. The requirement is ordering within a conversation, not ordering across the whole queue, and sessions give exactly that narrower guarantee.",
+      "Lock duration controls how long a receiver may hold a message before it becomes visible again; it says nothing about the relative order in which independent receivers pick messages up. Lengthening it would only delay redelivery of stalled messages while the interleaving that caused the bug continues unchanged.",
+      "Duplicate detection suppresses messages that repeat the same MessageId inside a time window. These turns are distinct messages, not duplicates, so nothing would be filtered and the ordering problem would remain exactly as it is."
+    ],
+    "principle": "sessions give ordered, single-receiver processing per partition key",
+    "relatedConcept": "Service Bus guarantees FIFO only within a session, which is how you get per-entity ordering without giving up parallelism across entities.",
+    "overallExplanation": "Use session-enabled queues with the conversation id as session_id to guarantee in-order processing per conversation while keeping different conversations parallel. Ordering in Service Bus is a per-session guarantee, not a queue-wide one."
+  },
+  {
+    "id": 304,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A summarization worker receives from a Service Bus queue whose lock duration is the maximum five minutes. Long documents take six to nine minutes because of a chained Azure OpenAI call. Telemetry shows those documents being summarized two or three times, and complete_message() then fails with a lock-lost error. The team cannot shorten the model call. What is the correct remedy?",
+    "options": [
+      "Wrap the receiver in an AutoLockRenewer (or call renew_message_lock periodically) so the lock is extended for the duration of the long-running call",
+      "Raise the queue's lock duration to fifteen minutes so it comfortably exceeds the worst-case processing time",
+      "Switch the receiver to receive-and-delete mode so the message is removed immediately and cannot be redelivered",
+      "Increase MaxDeliveryCount so the extra deliveries no longer push the message toward the dead-letter queue"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Five minutes is the hard ceiling for lock duration, so the only supported way to hold a message longer is to renew the lock while you work. AutoLockRenewer renews in the background up to a configured maximum, which keeps the message invisible to other receivers for the whole nine-minute call and lets complete_message() succeed.",
+      "Service Bus caps lock duration at five minutes, so this value cannot be configured — the attempt fails rather than fixing anything. The design assumption is that longer work is covered by lock renewal, not by an ever-larger lock window.",
+      "Receive-and-delete does stop redelivery, but it does so by deleting the message before processing: if the worker crashes during the nine-minute call the document is silently lost with no retry. That trades a duplicate-processing bug for a data-loss bug, which is a worse outcome for an ingestion pipeline.",
+      "Raising MaxDeliveryCount only changes how many redeliveries occur before dead-lettering. The message would still be picked up repeatedly by other receivers and still cost duplicate model calls; the root cause is an expired lock, not an exhausted delivery budget."
+    ],
+    "principle": "renew the lock when work outlives it; never stretch the lock beyond its ceiling",
+    "relatedConcept": "Peek-lock makes a message invisible for the lock duration; if processing can exceed that window, lock renewal is the mechanism that keeps ownership.",
+    "overallExplanation": "Lock duration maxes out at five minutes, so long AI calls must renew the lock — AutoLockRenewer or explicit renew_message_lock. Duplicate processing plus lock-lost errors on completion is the signature of work outliving its lock."
+  },
+  {
+    "id": 305,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "multi",
+    "question": "An overnight enrichment queue has accumulated 812 messages in its dead-letter queue. Sampling shows two causes: about 90 percent were malformed payloads that raise a parse error on every delivery until MaxDeliveryCount was exhausted, and the rest expired while a downstream service was offline. The team needs a supportable dead-letter strategy. Which two actions are appropriate? (Choose two.)",
+    "options": [
+      "Build a triage consumer that receives from the queue's dead-letter sub-queue and reads DeadLetterReason and DeadLetterErrorDescription to classify each message",
+      "Explicitly dead-letter a message with a reason as soon as the payload fails schema validation, instead of letting it burn through ten deliveries first",
+      "Raise MaxDeliveryCount on the queue to 200 so malformed messages have more chances to succeed before being dead-lettered",
+      "Disable dead-lettering on the queue so that failing messages stay in the active queue and are retried indefinitely"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The dead-letter queue is a real sub-queue you read with an ordinary receiver, and Service Bus stamps DeadLetterReason and DeadLetterErrorDescription on each message. A triage consumer that reads those properties can separate poison payloads that need a code or data fix from transient failures that can simply be resubmitted.",
+      "Correct. A payload that cannot be parsed will never succeed, so letting it consume the full delivery budget wastes ten receives, ten model-adjacent code paths, and roughly ten times the latency before it lands where it belongs. Calling dead_letter_message with an explicit reason moves a known-unrecoverable message aside immediately and records why.",
+      "This scales the wrong dimension: a deterministic parse failure fails identically on delivery 200 as on delivery 1, so a higher delivery count only multiplies wasted work and delays discovery. Delivery count exists to absorb transient faults, not to grind against permanently invalid data.",
+      "Turning dead-lettering off removes the quarantine that keeps poison messages from blocking the pipeline: they return to the active queue forever, consuming receiver capacity and hiding the failure signal. The dead-letter queue is the mechanism that makes bad messages visible instead of endlessly recycled."
+    ],
+    "principle": "dead-letter deliberately, then triage on the reason the broker recorded",
+    "relatedConcept": "Dead-lettering is the poison-message boundary: it separates messages that can never succeed from a healthy pipeline, and records why so a human or a repair job can act.",
+    "overallExplanation": "Treat the dead-letter sub-queue as a first-class endpoint — receive from it and classify on DeadLetterReason — and dead-letter known-invalid payloads immediately rather than exhausting MaxDeliveryCount. Raising delivery counts or disabling dead-lettering only hides poison messages."
+  },
+  {
+    "id": 306,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A billing-adjacent worker consumes a Service Bus queue and, for each message, calls Azure OpenAI and appends a usage row. During a deployment that recycled pods mid-processing, several messages were redelivered and the usage table gained duplicate rows for the same source document. The team wants correctness without giving up the queue's durability. What is the right change?",
+    "options": [
+      "Derive an idempotency key from the business payload, carry it on the message, and make the usage write conditional on that key so a replay is a no-op",
+      "Switch the receiver to receive-and-delete so a redelivery can never happen after a pod is recycled",
+      "Enable duplicate detection on the queue, which will prevent the consumer from processing the same message twice",
+      "Reduce MaxDeliveryCount to 1 so a message that fails once is dead-lettered instead of being redelivered"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Service Bus is an at-least-once system: a crash after the side effect but before completion necessarily produces a redelivery. The only place that can be fixed is the consumer, by making the effect idempotent — a stable business key plus a conditional or upsert write means the second application changes nothing.",
+      "Receive-and-delete removes the message before the work runs, so a pod recycled mid-processing loses the document entirely. It eliminates duplicates by introducing silent data loss, which is unacceptable for a pipeline whose output feeds billing.",
+      "Duplicate detection is a producer-side feature: it discards messages whose MessageId repeats within the detection window at send time. It does nothing about redelivery of an already-accepted message caused by an expired lock or a crashed consumer, which is what happened here.",
+      "MaxDeliveryCount of 1 converts every transient blip — a throttled model call, a brief network fault, a pod recycle — into an immediate dead-letter, so the pipeline sheds legitimate work. It also does not eliminate duplicates, because the duplicate here came from the first delivery's partially applied side effect."
+    ],
+    "principle": "at-least-once delivery makes idempotency the consumer's job",
+    "relatedConcept": "Brokers guarantee that a message is delivered at least once, never exactly once, so any consumer with side effects needs a business key that makes reapplication harmless.",
+    "overallExplanation": "At-least-once delivery means redelivery is normal, so the consumer must be idempotent via a business or idempotency key and a conditional write. Duplicate detection is producer-side, and receive-and-delete trades duplicates for data loss."
+  },
+  {
+    "id": 307,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "An ingestion pipeline runs producer to Service Bus queue to worker, where each worker chunks a document, calls an embedding model, then writes to a vector store. Over four hours the queue's active message count climbs from 40 to 61,000 while consumer CPU sits at 22 percent and the vector-store write span averages 2.9 seconds against 180 milliseconds for embedding. What does the backlog tell you?",
+    "options": [
+      "The vector-store write is the slowest stage and is setting end-to-end throughput, so the backlog will keep growing until that stage is made faster or more parallel",
+      "The producers are emitting messages faster than the broker can accept them, so the queue itself is the bottleneck and needs a higher tier",
+      "The workers are CPU-starved, and scaling the consumer pool out will drain the backlog regardless of where time is spent",
+      "The backlog is a normal buffering artifact of an asynchronous pipeline and needs no action as long as no messages are dead-lettered"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A monotonically growing backlog means arrival rate exceeds completion rate, and completion rate is governed by the slowest stage in the consumer path. With writes at 2.9 seconds against 180 milliseconds for embedding, roughly 94 percent of each message's service time is the vector-store write, so that stage is the constraint to widen.",
+      "The queue accepted every message — that is why the backlog exists and keeps growing. A broker that could not keep up would surface throttling or send failures on the producer side, not a cleanly accumulating count of successfully enqueued messages.",
+      "Twenty-two percent CPU is direct evidence the workers are not compute-bound; they are blocked waiting on a downstream dependency. Adding instances that all wait on the same saturated vector store usually increases contention and error rates rather than throughput.",
+      "Buffering is normal, but a backlog that rises steadily for four hours with no plateau is not buffering — it is a throughput deficit, and latency for the newest message grows without bound. Dead-lettering is a separate signal and its absence does not make an unbounded backlog healthy."
+    ],
+    "principle": "a growing queue depth points at the slowest downstream stage",
+    "relatedConcept": "Queue depth is the cheapest throughput telemetry in a message-driven system: it rises exactly when consumption cannot match arrival, and the span breakdown says which stage is responsible.",
+    "overallExplanation": "A steadily growing backlog with idle consumer CPU means the constraint is downstream, and the span breakdown identifies it — here the 2.9-second vector-store write. Fix or parallelize the slowest stage; scaling consumers that are already blocked does not add throughput."
+  },
+  {
+    "id": 308,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A storage account raises Blob Created events for every upload across many containers. A reindexing function should run only for blobs written under the documents/incoming/ prefix and only when the event data's contentType is application/pdf. Today the function receives every blob event and discards about 95 percent of them in code. What is the best change?",
+    "options": [
+      "Configure the event subscription with a subject filter for the documents/incoming/ prefix plus an advanced filter on data.contentType, so Event Grid delivers only matching events",
+      "Keep the broad subscription and move the discard logic to the top of the handler so the function returns earlier on non-matching events",
+      "Create a separate storage account for PDF uploads so that the existing subscription naturally receives only relevant events",
+      "Subscribe to the events with a Service Bus topic in between and write a SQL rule on the subscription that inspects the blob path"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Event Grid filters at the subscription, so non-matching events are never delivered and never billed as handler executions. Subject filtering handles the path prefix and advanced filters evaluate fields inside the event payload such as data.contentType, which together express exactly the 5 percent the function cares about.",
+      "Returning early still pays for delivery, a function invocation, cold-start risk, and log volume for every one of the discarded events. It optimizes the handler's inner loop while leaving the real waste — twenty times more invocations than necessary — completely in place.",
+      "Restructuring storage to encode routing is a heavy, disruptive answer to a filtering problem, and it breaks down the moment a second routing dimension such as content type or tenant appears. Subscription filters express the same intent as configuration, without moving any data.",
+      "Interposing a Service Bus topic adds a hop, a second broker, and a second set of failure modes purely to run a rule that Event Grid can already evaluate itself. It is the right pattern when you also need durable buffering or competing consumers, not when the requirement is simply to stop delivering irrelevant events."
+    ],
+    "principle": "filter at the subscription so irrelevant events are never delivered",
+    "relatedConcept": "Event Grid subscription filters — subject prefix and suffix plus advanced filters over event fields — push routing decisions into the broker instead of the handler.",
+    "overallExplanation": "Express routing as Event Grid subscription filters: subject prefix for the path and an advanced filter on data.contentType. Filtering in handler code still pays the delivery, invocation, and logging cost for every event you throw away."
+  },
+  {
+    "id": 309,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A SaaS team wants other teams to react to its own domain milestones — ModelPromoted, IndexRebuilt, EvaluationCompleted — without the publisher knowing who consumes them. Consumers must be able to subscribe to one event type without receiving the others, and the publisher wants a standards-based envelope. What should the team build?",
+    "options": [
+      "Publish custom events to an Event Grid custom topic using the CloudEvents schema, letting each consumer create a subscription filtered on eventType",
+      "Publish the milestones to a single Service Bus queue and let each consuming team receive from it and ignore the types it does not care about",
+      "Expose a REST endpoint that consumers poll every minute for new milestones, returning any that occurred since the caller's last cursor",
+      "Write the milestones to a shared blob container and let each consuming team enumerate new blobs on a schedule"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A custom topic is exactly the publisher-owned endpoint for domain events, and Event Grid supports the CloudEvents v1.0 schema as a standard envelope. Each consumer then owns its own subscription with an eventType filter, so adding or removing a consumer never touches publisher code — the defining property of reactive, decoupled notification.",
+      "A single queue is competing consumers: the first team to receive a milestone takes it away from the others, so this design silently starves every consumer but one. It also forces each team to filter in code and to coordinate on a shared receiver, which is the coupling the team is trying to eliminate.",
+      "Polling inverts the model the team asked for: consumers must know the publisher's endpoint, manage cursors, and choose a polling interval that trades latency against wasted requests. It also puts read load on the publisher proportional to the number of consumers rather than to the number of events.",
+      "A shared blob container turns an eventing problem into a filesystem-enumeration problem, with no per-consumer filtering, no delivery guarantees, no retries, and no dead-lettering. Consumers would each reimplement change detection and de-duplication over blob listings."
+    ],
+    "principle": "custom topics plus per-consumer subscriptions decouple publishers from subscribers",
+    "relatedConcept": "Event Grid custom topics let an application emit its own domain events in the CloudEvents schema, and subscriptions determine who receives which of them.",
+    "overallExplanation": "Publish domain milestones as custom events to an Event Grid custom topic in the CloudEvents schema, and let each consumer own an eventType-filtered subscription. Queues give competing consumers, and polling reintroduces the coupling events exist to remove."
+  },
+  {
+    "id": 310,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "multi",
+    "question": "An Event Grid subscription delivers to a webhook that was down for a two-hour maintenance window. Afterwards the team finds some events were delivered late, but a portion never arrived at all and no record of them exists anywhere. They need to guarantee that undeliverable events are recoverable in future outages. Which two configuration changes address this? (Choose two.)",
+    "options": [
+      "Configure a dead-letter destination on the event subscription so events that exhaust retries are written to a storage container",
+      "Raise the subscription's event time-to-live so events remain retryable for longer than a planned maintenance window",
+      "Increase the webhook's HTTP timeout so Event Grid waits longer for a response before counting a delivery as failed",
+      "Switch the subscription's delivery schema to CloudEvents so that failed deliveries are automatically preserved by Event Grid"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Without a dead-letter destination, an event that exhausts its retry policy is simply dropped — which is exactly why some events left no trace. Pointing the subscription at a blob container means exhausted events land somewhere durable, with delivery metadata, so they can be inspected and replayed after the outage.",
+      "Correct. Event Grid retries until either the maximum delivery attempts or the event time-to-live is reached, whichever comes first, and the default TTL is 24 hours. Sizing the TTL against the longest outage the team expects to absorb is what keeps events retryable rather than expired during a maintenance window.",
+      "The delivery timeout governs how long Event Grid waits for a single response from a handler that is answering slowly. During this incident the endpoint was down, so requests failed immediately — a longer wait per attempt changes nothing about whether the event survives two hours of unavailability.",
+      "The delivery schema controls the envelope format of the event payload — CloudEvents versus the Event Grid schema — and has no bearing on retention or retry behavior. Preservation of undeliverable events comes from the dead-letter destination, not from the serialization format."
+    ],
+    "principle": "retries need both a time budget and a place for events that exhaust it",
+    "relatedConcept": "Event Grid retry policy is bounded by maximum delivery attempts and event time-to-live; anything that exhausts both is discarded unless a dead-letter destination is configured.",
+    "overallExplanation": "Give the subscription a dead-letter destination so exhausted events land in durable storage, and size the event TTL against realistic outage windows. Delivery timeouts and schema choice do not affect whether an undeliverable event is retained."
+  },
+  {
+    "id": 311,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A worker calls a partner API that returns 503 with a Retry-After of about 90 seconds during the partner's nightly window. Today the worker abandons the message on failure, so Service Bus redelivers it within milliseconds; the message churns through its whole delivery budget in under a second and dead-letters, even though it would have succeeded a couple of minutes later. What is the best fix?",
+    "options": [
+      "On a transient failure, complete the message and re-send a copy with scheduled_enqueue_time_utc set past the retry window, carrying an attempt counter in the application properties",
+      "Keep abandoning the message but raise MaxDeliveryCount to 500 so the churn eventually outlasts the partner's maintenance window",
+      "Have the worker sleep for 90 seconds inside the message handler and retry the partner call in place before completing the message",
+      "Set the queue's lock duration to 90 seconds so an abandoned message cannot be redelivered until the partner has recovered"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Abandon makes a message immediately visible again, which is why the delivery budget evaporates in under a second. Scheduling a fresh copy for a future enqueue time turns redelivery into a real backoff: the message leaves the active queue, stops consuming receiver capacity, and reappears after the partner window, with the attempt counter carrying the retry state.",
+      "A larger delivery budget still gets consumed at the same millisecond cadence, so this mostly converts a fast failure into a burst of hundreds of pointless receives and partner calls. It treats the symptom — dead-lettering — while leaving the actual defect, retry with no delay, untouched.",
+      "Sleeping inside the handler holds the message lock and an entire concurrency slot idle for 90 seconds, so a queue of such messages stalls the whole consumer pool. It also risks exceeding the lock without renewal, which reintroduces duplicate processing on top of the throughput loss.",
+      "Lock duration bounds how long a receiver may hold a message; abandon explicitly releases the lock early, so the lock setting has no effect on how quickly an abandoned message returns. The delay has to be expressed on the message's enqueue time, not on the lock."
+    ],
+    "principle": "backoff must delay the message, not just re-deliver it faster",
+    "relatedConcept": "Scheduled messages let a consumer implement real backoff by pushing a retry into the future instead of spinning through the delivery count immediately.",
+    "overallExplanation": "Abandon returns a message instantly, so it is not backoff. Re-send with scheduled_enqueue_time_utc beyond the retry window and track attempts on the message, which frees consumer capacity and preserves the delivery budget for genuine failures."
+  },
+  {
+    "id": 312,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A team benchmarking a Service Bus consumer sets prefetch_count to 500 and max_wait_time low, and each message triggers a model call averaging 25 seconds. Throughput barely improves and lock-lost errors appear on messages the consumer has not started yet. Lock duration is five minutes. What explains the result?",
+    "options": [
+      "Prefetched messages have their locks started at fetch time, so with 25-second processing a batch of 500 cannot be handled before the later messages' locks expire",
+      "Prefetch is incompatible with peek-lock mode and silently downgrades the receiver to receive-and-delete, which is why locks appear lost",
+      "The lock-lost errors come from prefetch bypassing the broker's delivery count, so messages are dead-lettered before the consumer reaches them",
+      "Prefetch only helps when messages exceed 256 KB, so a small-payload workload cannot benefit from it under any configuration"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Prefetch pulls messages into a client-side buffer and their locks begin ticking the moment they are fetched, not when your code touches them. At 25 seconds each, the consumer is still working on message 12 when message 400's five-minute lock has long expired, so prefetch must be sized to what the consumer can finish inside the lock window.",
+      "Prefetch and peek-lock work together — that is precisely why prefetched messages carry locks that can expire. There is no silent downgrade to receive-and-delete; if there were, messages would be deleted on fetch rather than reported as lock-lost.",
+      "Delivery count is maintained by the broker and is unaffected by client-side prefetching. Messages whose locks expire become visible again and their delivery count increments normally, so they are redelivered rather than skipped straight to dead-letter.",
+      "Prefetch is a latency optimization for high-rate, short-processing workloads and has nothing to do with payload size; the 256 KB figure is the standard-tier message size limit. The relevant variable here is per-message processing time relative to lock duration."
+    ],
+    "principle": "size prefetch to what you can process inside the lock window",
+    "relatedConcept": "Prefetch trades lock safety for latency: it hides broker round trips, but every buffered message is already holding a lock that is counting down.",
+    "overallExplanation": "Prefetched messages start their lock clock at fetch time, so a large prefetch plus slow per-message work guarantees lock expiry on the tail of the batch. Prefetch suits short, high-rate processing; long model calls need a small prefetch and lock renewal."
+  },
+  {
+    "id": 313,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A document pipeline on a Standard-tier Service Bus namespace sends the full extracted text of each document as the message body. Most documents are a few kilobytes, but scanned reports reach 900 KB and the send call fails for those. The team wants the smallest change that keeps every document flowing through the same queue. What should they do?",
+    "options": [
+      "Write the extracted text to Blob Storage and send a message containing the blob URI and a content hash, letting the consumer fetch the body on receipt",
+      "Split the extracted text across several messages of under 256 KB and have the consumer reassemble them before processing",
+      "Compress the extracted text with gzip before sending so that every payload fits within the tier limit",
+      "Move the consumer to receive-and-delete mode, which removes the per-message size restriction on the queue"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is the claim-check pattern: the large payload goes to storage designed for it, and the message carries only a reference plus enough metadata to validate it. It keeps message sizes small and uniform, keeps broker throughput high, and works for a 900 KB scan or a 90 MB one without touching the queue configuration again.",
+      "Manual splitting forces the consumer to buffer partial documents, correlate fragments, handle a missing or out-of-order fragment, and clean up after a partial failure. That is a substantial amount of stateful reassembly logic to avoid one blob write, and it fails outright if a document is large enough to need many fragments.",
+      "Compression buys a variable, workload-dependent margin — a scanned report's text may compress well or badly — so the failure returns as soon as a document is slightly larger or less compressible. It also hides the size problem behind a ratio nobody controls, rather than removing the ceiling.",
+      "Receive mode is a consumer-side concern and has no relationship to the maximum message size the broker will accept on send. The send would fail identically, and the change would additionally introduce data loss on consumer crashes."
+    ],
+    "principle": "put big payloads in storage and send a claim check",
+    "relatedConcept": "Broker message-size ceilings (256 KB on Standard, far larger on Premium) push large payloads toward a reference-plus-blob design rather than inline bodies.",
+    "overallExplanation": "Use the claim-check pattern: store the large payload in Blob Storage and send only a URI plus metadata. Splitting adds stateful reassembly, and compression only postpones the ceiling until a slightly larger document arrives."
+  },
+  {
+    "id": 314,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A publisher that submits reindex commands sometimes retries a send after a network timeout even though the broker actually accepted the original. The team wants Service Bus itself to discard the second copy when the same logical command is submitted twice within a ten-minute window. What must they configure?",
+    "options": [
+      "Create the queue with duplicate detection enabled and have the publisher set a deterministic message_id derived from the command's business key",
+      "Enable sessions on the queue and set session_id to the command's business key so the broker discards repeats within the session",
+      "Enable duplicate detection on the queue and rely on the broker's default message id, which Service Bus assigns per send",
+      "Set the consumer's receive mode to peek-lock and complete each message, which makes the broker reject a later send of the same body"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Duplicate detection compares the MessageId of incoming messages against those seen inside the detection history window, so it only works if the publisher supplies an id that is stable across retries. Deriving message_id from the command's business key makes the retried send an exact repeat that the broker can recognize and drop.",
+      "Sessions provide ordering and single-receiver affinity for a group of related messages; they do not de-duplicate. Two identical commands sharing a session_id would both be delivered, just in order, which is not the behavior the team asked for.",
+      "A broker- or client-generated MessageId is different on every send, so a retried command carries a brand-new id and looks like a new message. Duplicate detection would be enabled and would faithfully find no duplicates — the classic reason this feature appears not to work.",
+      "Peek-lock and completion describe how a consumer takes ownership of a message; they have no influence on what the broker accepts at send time. The broker never compares message bodies, only MessageId within the detection window."
+    ],
+    "principle": "duplicate detection only works with a deterministic message id",
+    "relatedConcept": "Producer-side duplicate detection suppresses repeated sends within a configured history window; consumer-side idempotency handles redelivery of an accepted message.",
+    "overallExplanation": "Enable duplicate detection at queue creation and have the publisher set a deterministic message_id from the business key — the broker matches on MessageId, never on body. Sessions order messages, they do not de-duplicate."
+  },
+  {
+    "id": 315,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "multi",
+    "question": "A Service Bus topic carries messages whose application properties include tenant_tier (\"gold\" or \"standard\") and doc_pages (an integer). A priority subscription must receive only gold-tier messages, and a heavy-batch subscription must receive only messages where doc_pages exceeds 200. A new subscription currently receives everything. Which two statements about configuring these subscriptions are correct? (Choose two.)",
+    "options": [
+      "The priority subscription can use a correlation filter on tenant_tier, which matches on exact property equality and is the cheaper of the two filter kinds to evaluate",
+      "The heavy-batch subscription needs a SQL filter such as doc_pages > 200, because correlation filters cannot express inequality comparisons",
+      "Rules on a subscription are combined with AND, so adding one narrow rule to the new subscription automatically constrains its existing default rule",
+      "Filters on a Service Bus subscription can only inspect system properties such as Label and CorrelationId, so tenant_tier and doc_pages must be moved into the message body"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A correlation filter tests exact equality against system properties and user-defined application properties, and because it is a straight match rather than an expression evaluation it is the more efficient option. Exact equality on tenant_tier is precisely the case correlation filters are optimized for.",
+      "Correct. Correlation filters only express equality, so any comparison such as greater-than, LIKE, or IN requires a SQL filter over the message's properties. doc_pages > 200 is an inequality and therefore belongs in a SQL rule on that subscription.",
+      "Rules on a subscription are evaluated as a union, not an intersection: a message is delivered if any rule matches. That is exactly why the new subscription still receives everything — its default catch-all rule keeps matching independently of any narrow rule you add, so the default rule has to be removed.",
+      "Subscription filters can read user-defined application properties as well as system properties; that is why tenant_tier and doc_pages are usable as written. What filters cannot inspect is the serialized message body, which is the reason routing attributes belong in application properties in the first place."
+    ],
+    "principle": "correlation filters for equality, SQL filters for expressions",
+    "relatedConcept": "Subscription rules are where topic routing is expressed, and they evaluate system and application properties — never the message body.",
+    "overallExplanation": "Use a correlation filter for exact equality on an application property and a SQL filter when you need an expression such as doc_pages > 200. Rules are unioned, so a subscription's default catch-all rule must be removed or it keeps matching everything."
+  },
+  {
+    "id": 316,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A catalog service reacts to Event Grid notifications by re-embedding a product description. During a bulk edit, two events for the same product arrive out of order — the older revision is delivered after the newer one — and the index ends up holding the stale embedding. The handler currently just applies whatever payload it receives. What is the correct fix?",
+    "options": [
+      "Carry a monotonic version or last-modified value in the event data and have the handler ignore an event whose version is not newer than the stored one",
+      "Ask Event Grid to guarantee ordered delivery per subject by enabling ordering on the event subscription",
+      "Add a short delay at the start of the handler so that an older event has time to be overtaken by the newer one before either is applied",
+      "Move the handler behind a Service Bus queue so the queue restores the order in which the events were originally published"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Event Grid delivers at least once and does not guarantee order, so the handler must be able to recognize a stale event. Comparing an event-supplied version or timestamp against what is already stored makes the handler both order-insensitive and idempotent: a late older event is dropped and a redelivered newer event is a no-op.",
+      "Event Grid has no per-subject ordering guarantee to enable; ordering is simply not part of its delivery contract, because retries and parallel delivery paths can reorder events. Designing around a setting that does not exist leaves the bug in place.",
+      "A delay is a race-condition band-aid: it changes the odds without changing the guarantee, and any reordering wider than the delay reintroduces the stale write. It also adds latency to every event to compensate for a small fraction that arrive late.",
+      "A queue preserves the order in which messages reach it, not the order in which the upstream events were originally produced, so out-of-order arrivals at the queue stay out of order. Only sessions with a partition key would give ordering, and that would still not repair events that Event Grid delivered late."
+    ],
+    "principle": "unordered at-least-once delivery means handlers must version their writes",
+    "relatedConcept": "Event Grid guarantees at-least-once delivery but not ordering, so reactive handlers need a version or timestamp to decide whether an event is still relevant.",
+    "overallExplanation": "Include a version or last-modified value in the event and have the handler reject anything not newer than current state. Event Grid does not offer ordered delivery, and queues preserve arrival order rather than production order."
+  },
+  {
+    "id": 317,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A consumer's message handler must deal with three outcomes: a successful enrichment, a 429 from the model endpoint with a Retry-After header, and a payload whose required tenant_id field is missing. A reviewer asks the developer to map each outcome to the right Service Bus settlement call. Which mapping is correct?",
+    "options": [
+      "Complete on success, abandon on the 429 so the message is redelivered and retried, and dead-letter the message with a reason when tenant_id is missing",
+      "Complete on success, dead-letter on the 429 so the throttled message is quarantined, and abandon when tenant_id is missing so a later fix can reprocess it",
+      "Complete on success, defer on the 429, and complete the message when tenant_id is missing so the queue is not blocked by invalid data",
+      "Abandon on success until the downstream write is confirmed, complete on the 429, and dead-letter when tenant_id is missing"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Settlement should follow whether the failure is transient or permanent. A 429 is transient, so abandoning releases the lock and lets the broker redeliver within the delivery budget; a missing required field will fail identically forever, so dead-lettering with a reason quarantines it and records why. Completion on success removes the message exactly once it is safe to do so.",
+      "This inverts the two failure classes. Dead-lettering a throttled message discards work that would have succeeded moments later, while abandoning a permanently invalid payload burns the entire delivery budget on guaranteed failures before it dead-letters anyway.",
+      "Deferring sets a message aside and requires the consumer to remember its sequence number to retrieve it later, which is a poor fit for simple transient throttling. Worse, completing a message with a missing required field silently discards data with no record — the outcome dead-lettering exists to prevent.",
+      "Abandoning on success would make the broker redeliver work that already applied its side effects, producing duplicates on every message, and completing on a 429 throws away a message that was never processed. The success and transient-failure paths are exactly reversed."
+    ],
+    "principle": "abandon transient failures, dead-letter permanent ones, complete only after the effect lands",
+    "relatedConcept": "Settlement calls are the consumer's contract with the broker: they encode whether a message should come back, be quarantined, or disappear.",
+    "overallExplanation": "Map settlement to failure class: complete after the side effect commits, abandon transient failures such as a 429 so redelivery retries them, and dead-letter permanently invalid payloads with an explicit reason."
+  },
+  {
+    "id": 318,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A knowledge-base pipeline must start extracting text within seconds of a file landing in a storage container, and files arrive irregularly — sometimes none for an hour, sometimes 300 at once. The team currently runs a timer job every five minutes that lists the container and diffs it against a manifest, which is both slow to react and expensive on large containers. What should they adopt?",
+    "options": [
+      "Create an Event Grid system topic on the storage account and subscribe to Blob Created events, routing them to a Service Bus queue that the extraction workers drain",
+      "Keep the manifest diff but shorten the timer to every ten seconds so the pipeline reacts closer to real time",
+      "Have the upload client call the extraction service synchronously right after each successful blob upload",
+      "Enable change feed on the storage account and have the timer job read the change feed instead of listing the container"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Blob creation is a state change, which is exactly what an Event Grid system topic emits reactively — no polling, no manifest, and latency in the low seconds. Routing those events into a Service Bus queue then adds the durable buffer the 300-file bursts need, which is the standard pairing of reactive notification with buffered execution.",
+      "Ten-second polling multiplies list operations by thirty while still adding up to ten seconds of latency and still scanning a container that grows without bound. It makes the expensive part more expensive without removing the fundamental inefficiency of asking repeatedly whether anything changed.",
+      "A synchronous call from the uploader couples upload success to extraction availability: a burst of 300 uploads pushes 300 concurrent calls at the extractor, and any extractor error either fails the upload or is silently swallowed. It also misses any blob written by a path that does not go through that client.",
+      "Change feed is a durable ordered log of blob changes and is genuinely better than diffing a manifest, but it is still pull-based: the team keeps a timer, keeps a cursor, and keeps the polling latency. It solves the listing cost without solving the reactivity requirement."
+    ],
+    "principle": "react to state changes with events, then buffer the work on a queue",
+    "relatedConcept": "System topics expose first-party Azure resource state changes such as Blob Created to Event Grid subscriptions, which is how polling loops get replaced by push delivery.",
+    "overallExplanation": "Subscribe to Blob Created events from a storage system topic and route them into a Service Bus queue: Event Grid supplies the reactive trigger and the queue supplies durable buffering for bursts. Shorter polling only makes an inefficient loop run more often."
+  },
+  {
+    "id": 319,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "A nightly job enqueues one message per chunk for about 50,000 chunks. The current loop calls send_messages once per chunk and takes roughly 19 minutes, with traces showing thousands of short outbound spans dominated by round-trip time rather than payload size. The team wants to cut the enqueue time substantially without changing the consumer. What should they do?",
+    "options": [
+      "Build batches with create_message_batch and add_message, sending each batch once it is full so many chunks travel per round trip",
+      "Open 50,000 concurrent senders so every message is dispatched in parallel and the total time collapses to a single round trip",
+      "Increase the namespace tier so that each individual send_messages call completes faster",
+      "Compress each chunk's payload before sending so that fewer bytes travel on every round trip"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The traces say the cost is per-call overhead, not bytes, so the fix is to amortize round trips. A ServiceBusMessageBatch accumulates messages until add_message reports the batch is full, guaranteeing the batch stays within the size limit while collapsing thousands of round trips into a few hundred — and the consumer sees identical individual messages.",
+      "Fifty thousand concurrent senders would exhaust connections and memory, trigger throttling on the namespace, and spend more time on connection setup than on sending. Concurrency helps in moderation, but batching removes the round trips entirely rather than trying to run them all at once.",
+      "A higher tier raises throughput ceilings and can reduce variance, but it cannot eliminate the fixed network round trip that dominates each of the 50,000 calls. Paying more to make an inefficient call pattern slightly faster leaves the real inefficiency in place.",
+      "The traces already rule this out by showing the spans are dominated by round-trip time rather than payload size. Shrinking payloads that were never the constraint changes nothing about the number of network exchanges."
+    ],
+    "principle": "amortize round trips with batching when per-call overhead dominates",
+    "relatedConcept": "Batched sends let a producer fill the broker's size budget per request, which is the difference between chatty and efficient enqueue paths at high volume.",
+    "overallExplanation": "When send spans are short and numerous, per-call overhead is the cost — batch with create_message_batch and add_message so each round trip carries many messages. Higher tiers and compression do not remove round trips."
+  },
+  {
+    "id": 320,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "During a brief regional networking blip, a consumer logs a burst of ServiceBusConnectionError entries and the team's own wrapper immediately re-creates a ServiceBusClient, re-authenticates, and retries in a tight loop. Recovery takes far longer than the blip itself. A reviewer says the SDK already handles this class of failure. What should the team rely on instead?",
+    "options": [
+      "Configure the client's retry options — retry mode, total attempts, and backoff bounds — and let a single long-lived client retry transient AMQP faults internally",
+      "Create a new ServiceBusClient for every receive call so each operation always starts from a freshly authenticated connection",
+      "Catch the connection error and immediately dead-letter the in-flight message so the consumer never blocks on a transient fault",
+      "Disable the SDK's built-in retries so that every transient error surfaces to the application and is handled by the team's own loop"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Service Bus client already implements bounded retry with exponential backoff over transient AMQP and networking faults, and it is configurable through retry options on the client. Keeping one long-lived client and tuning those options gives properly spaced retries instead of a hand-rolled tight loop that hammers a recovering endpoint.",
+      "Re-creating a client per receive pays connection setup and token acquisition on every operation, which is expensive in normal conditions and actively harmful during a blip because it multiplies connection attempts exactly when the network is struggling. Service Bus clients are designed to be long-lived and shared.",
+      "Dead-lettering on a connection error quarantines a perfectly valid message because of an infrastructure hiccup, permanently removing work that would have succeeded seconds later. Dead-lettering is for messages that can never be processed, not for the transport failing briefly.",
+      "Turning off built-in retries hands the hardest part — correct backoff, jitter, and attempt limits — to application code that in this case is already implementing the pathological version. Removing a well-tested retry layer to keep a tight loop is the opposite of the fix."
+    ],
+    "principle": "tune the SDK's bounded retry instead of hand-rolling a tight loop",
+    "relatedConcept": "Azure SDK clients ship configurable retry policies for transient faults; long-lived clients plus tuned retry options beat per-call client construction.",
+    "overallExplanation": "Rely on the Service Bus client's configurable retry options with bounded backoff and keep the client long-lived. Re-creating clients per call and tight application-level retry loops amplify load during exactly the outages they are meant to survive."
+  },
+  {
+    "id": 321,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop event- and message-based AI solutions",
+    "type": "single",
+    "question": "An Event Grid subscription delivers to a custom webhook that synchronously runs a 45-second enrichment before responding. Event Grid reports high delivery-failure rates and the same events arrive several times, each triggering another 45-second run. The endpoint is healthy and returns 200 whenever it finishes. What is the correct design change?",
+    "options": [
+      "Have the webhook enqueue the event and return 200 immediately, moving the 45-second enrichment to a worker that drains that queue",
+      "Increase the subscription's maximum delivery attempts so the repeated deliveries eventually include one that completes in time",
+      "Return 202 instead of 200 from the webhook so that Event Grid treats the delivery as pending rather than failed",
+      "Split the enrichment across three subscriptions to the same topic so each handler does a third of the work within the response window"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Event Grid expects a webhook to acknowledge within its delivery timeout, which is far shorter than 45 seconds, so a synchronous handler is guaranteed to be counted as failed and retried. Acknowledging fast and doing the work asynchronously off a queue makes delivery success independent of processing time and stops the retry storm.",
+      "More attempts means more 45-second runs, not more successes: every attempt hits the same timeout because the handler's duration, not the attempt count, is the problem. This multiplies compute cost while the failure rate stays exactly where it was.",
+      "Event Grid treats 2xx responses as successful delivery; 202 is not a special 'still working' signal that suspends the timeout. The handler would still fail to respond inside the window, so nothing about the retries changes.",
+      "Fanning the same event to three subscriptions gives three handlers the whole event, not a third of the work — there is no partitioning of a single event across subscriptions. Each handler would still need to finish inside the delivery timeout, so the timeout problem is simply replicated three times."
+    ],
+    "principle": "acknowledge event delivery fast and process asynchronously",
+    "relatedConcept": "Event Grid's delivery timeout makes the webhook contract an acknowledgement, not a place to run work; durable execution belongs behind a queue.",
+    "overallExplanation": "Event Grid webhooks must acknowledge within the delivery timeout, so long work must move off the request path — enqueue and return 200, then process asynchronously. Extra retries or a 202 response do not extend the window."
+  },
+  {
+    "id": 322,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A Python function app drains an embedding queue. Today a timer trigger fires every minute, opens a ServiceBusClient, receives up to 50 messages, and settles them by hand. The app sits idle most of the night, spikes at 09:00, and the team keeps finding lock-handling bugs in the hand-written receive loop. What is the idiomatic redesign?",
+    "options": [
+      "Replace the timer with a Service Bus queue trigger so the host manages receive, settlement, and scaling, and the function body only processes one message",
+      "Keep the timer trigger but shorten its schedule to every ten seconds so the backlog is drained closer to real time",
+      "Keep the timer trigger and move the receive loop into a background thread that runs for the whole function invocation",
+      "Replace the timer with an HTTP trigger and have a separate scheduler service call it whenever the queue depth is non-zero"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Service Bus trigger is the binding designed for this: the host owns the receiver, renews and settles locks, dead-letters after the delivery budget, and scales instances against queue depth. The function body reduces to processing a single message, which is where the hand-written lock bugs disappear.",
+      "A faster timer still polls when the queue is empty, still processes at most one batch per tick, and still leaves every lock and settlement bug in place. It makes the idle-night cost worse while doing nothing about the 09:00 spike, because the batch size, not the interval, caps throughput.",
+      "A background thread that outlives the function's own invocation is unsupported: the host may scale the instance in or reclaim it once the invocation returns, so work started on that thread can be cut off mid-message. Long-running work belongs in a trigger the host knows about.",
+      "This invents a scheduler whose only job is to reproduce what the Service Bus trigger already does, and it must itself poll queue depth to know when to call. It adds a component, a credential, and a failure mode without removing the manual receive loop."
+    ],
+    "principle": "let the trigger own receive, settlement, and scale",
+    "relatedConcept": "Triggers and bindings exist so function code expresses business logic while the host handles connection management, settlement, and scaling.",
+    "overallExplanation": "Use the Service Bus queue trigger rather than a timer plus a hand-written receive loop: the host manages locks, settlement, dead-lettering, and queue-depth-driven scaling, leaving the function to process one message."
+  },
+  {
+    "id": 323,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A team is exposing a retrieval API from a Python function app using the v2 programming model. Requests must arrive at /api/v1/collections/{collection}/search, the collection segment must be readable inside the handler, and the endpoint sits behind API Management which supplies its own caller authentication. Which implementation matches these requirements?",
+    "options": [
+      "Decorate the handler with @app.route(route=\"v1/collections/{collection}/search\", methods=[\"POST\"]) and read req.route_params[\"collection\"] inside the function",
+      "Decorate the handler with @app.route(route=\"v1/collections/search\") and have callers pass the collection in a query string parsed with req.params",
+      "Define the function with @app.route(route=\"api/v1/collections/{collection}/search\") so the full path including the api prefix is matched exactly",
+      "Use a Blob trigger bound to a container named after the collection, since HTTP triggers cannot express path parameters"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The route template declares the path segment as {collection}, and the host binds it so req.route_params exposes it by name. The api prefix is supplied by the host's default routing configuration, so the route value itself starts after it — which is why this decorator produces exactly the requested URL.",
+      "A query string works functionally but does not satisfy the stated requirement that the collection appear as a path segment, and it weakens the resource-oriented URL shape that API Management policies and caching often key on. The team specified the path form, and route templates support it directly.",
+      "Including api in the route value double-applies the prefix, so the endpoint resolves under /api/api/v1/... instead of the intended path. The routePrefix is host configuration, not something you repeat in each function's route template.",
+      "The premise is simply false: HTTP triggers support route templates with named parameters, which is what makes them usable for REST-shaped APIs. Substituting a blob trigger would also change the invocation model from a synchronous request-response API to storage-driven processing."
+    ],
+    "principle": "route templates give HTTP-triggered functions REST-shaped paths",
+    "relatedConcept": "Serverless APIs are built from HTTP triggers whose route templates, methods, and authorization level define the contract the host enforces before your code runs.",
+    "overallExplanation": "Declare path parameters in the HTTP trigger's route template and read them from req.route_params. The host's routePrefix already supplies /api, so repeating it in the route value produces a doubled path."
+  },
+  {
+    "id": 324,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "multi",
+    "question": "A function processes a Service Bus message, reads a tenant profile from Cosmos DB by id, and writes one enriched document back to a different Cosmos DB container. A reviewer suggests replacing some hand-written SDK code with declarative bindings. Which two statements about using bindings here are correct? (Choose two.)",
+    "options": [
+      "An input binding can fetch the tenant profile by id before the function body runs, so the handler receives the document rather than constructing a client to read it",
+      "An output binding can write the enriched document by assigning it to the binding's output parameter, so the handler does not manage a client or its connection lifetime",
+      "Bindings are limited to one per function, so a function that both reads and writes Cosmos DB must be split into two functions chained by a queue",
+      "Bindings can replace the SDK for any operation, including multi-item transactional writes and dynamic cross-partition queries built at runtime"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Cosmos DB input bindings resolve a document from a container using values available at invocation time — such as a field from the trigger payload — and hand it to the function as a parameter. That removes client construction, credential handling, and connection reuse concerns from the handler for the common read-by-id case.",
+      "Correct. An output binding lets the function express intent — here is the document to persist — while the host owns the client and the write. It is the natural counterpart to the input binding and keeps the handler free of connection lifetime management.",
+      "There is no one-binding limit: a function has exactly one trigger but may declare multiple input and output bindings, which is precisely how a read-enrich-write function is normally expressed. Splitting into two functions would add a hop and a queue for no benefit.",
+      "Bindings deliberately cover declarative, statically describable operations; anything needing runtime-composed queries, batched transactional writes, or fine-grained control over request options still calls the SDK directly. Treating bindings as a total SDK replacement is what leads teams to contort logic to fit a binding expression."
+    ],
+    "principle": "bindings for declarative I/O, the SDK for dynamic or transactional work",
+    "relatedConcept": "A function has one trigger and any number of input and output bindings; bindings remove connection plumbing for the predictable cases.",
+    "overallExplanation": "Use a Cosmos DB input binding for read-by-id and an output binding for the write, since a function may declare many bindings alongside its single trigger. Keep the SDK for runtime-composed queries and transactional batches that bindings cannot express."
+  },
+  {
+    "id": 325,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A function app on the Consumption plan runs a document-analysis chain that takes 4 to 12 minutes per document. Invocations that exceed roughly ten minutes are terminated by the host, and raising functionTimeout in host.json past that point does not help. The chain cannot be shortened. What should the team do?",
+    "options": [
+      "Split the chain into smaller queue-triggered steps, or move the app to a plan whose maximum functionTimeout accommodates the full run",
+      "Set functionTimeout to null in host.json, which removes the limit on any plan including Consumption",
+      "Keep the Consumption plan and start the chain on a background task, returning from the function immediately so the timeout never applies",
+      "Raise the Service Bus lock duration to fifteen minutes so the host allows the invocation to continue for that long"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The Consumption plan enforces a hard ceiling on invocation duration that host.json cannot exceed, so there are exactly two legitimate paths: make each invocation shorter by decomposing the chain into queue-triggered steps that each finish well inside the limit, or run on a plan whose ceiling is large enough. Both keep execution under the host's supervision.",
+      "An unbounded functionTimeout is only honored on plans that permit it; on Consumption the platform ceiling still applies, so the setting is quietly capped and invocations keep being terminated. Configuration cannot raise a limit the plan itself imposes.",
+      "Returning early while work continues on a detached background task means the host believes the invocation finished and may scale the instance in at any moment, silently truncating the analysis. It converts a visible timeout into an invisible partial-completion bug, which is strictly worse.",
+      "Lock duration is a Service Bus setting governing how long a message stays invisible; it has no influence on how long the Functions host permits an invocation to run. The two timeouts are independent, and the one being hit here is the host's."
+    ],
+    "principle": "decompose long work or pick a plan whose timeout fits it",
+    "relatedConcept": "Hosting plan choice sets the invocation-duration ceiling, so plan selection is part of function design rather than a purely operational decision.",
+    "overallExplanation": "Consumption caps invocation duration and host.json cannot exceed it — either decompose the chain into shorter queue-triggered steps or move to a plan with a higher ceiling. Detached background work just hides the truncation from the host."
+  },
+  {
+    "id": 326,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A Service Bus-triggered function calls a provisioned model deployment that starts returning 429s once the app scales out. Instance count is not the concern — the team wants each instance to process fewer messages at the same time so aggregate concurrency against the deployment stays within its quota. Where is that limit configured?",
+    "options": [
+      "In host.json under extensions.serviceBus, by lowering maxConcurrentCalls (and prefetchCount) for the trigger",
+      "In the function's decorator, by passing a batch size argument to the Service Bus trigger for that single function",
+      "On the Service Bus queue itself, by lowering its maximum concurrent receivers property",
+      "In the app settings, by setting the maximum number of worker instances the app may scale to"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Per-instance trigger concurrency for Service Bus lives in host.json under the serviceBus extension, where maxConcurrentCalls bounds how many messages one instance processes simultaneously; prefetchCount should be lowered alongside it so the client does not buffer more locked messages than it can handle. Aggregate load against the model deployment is instances multiplied by that per-instance concurrency.",
+      "The trigger decorator declares what the function binds to — queue name, connection, session handling — not host-level concurrency tuning. Concurrency for the Service Bus extension is a host.json concern precisely because it governs the shared listener, not one function's signature.",
+      "Service Bus queues expose no maximum-concurrent-receivers property; the broker happily serves as many receivers as connect to it. Concurrency limiting is a client-side responsibility, which is why the Functions host exposes it in configuration.",
+      "Capping instance count limits scale-out, which the team explicitly said is not the dimension they want to constrain, and it caps throughput even when the model deployment has headroom. It also leaves each instance free to run its default concurrency, so a small number of instances can still exceed quota."
+    ],
+    "principle": "per-instance trigger concurrency is host.json configuration",
+    "relatedConcept": "Aggregate load from a function app is instance count multiplied by per-instance concurrency, and each is tuned in a different place.",
+    "overallExplanation": "Lower extensions.serviceBus.maxConcurrentCalls (and prefetchCount) in host.json to bound how many messages each instance handles at once. Instance limits and queue settings address different dimensions of the same aggregate-concurrency problem."
+  },
+  {
+    "id": 327,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A team is removing connection strings from a function app. The Service Bus trigger currently sets connection=\"ServiceBusConnection\", and an app setting of that name holds a SAS connection string. They want the trigger to authenticate with the app's managed identity instead, with no secret stored anywhere. What is the correct configuration?",
+    "options": [
+      "Delete the connection string setting, add ServiceBusConnection__fullyQualifiedNamespace with the namespace host name, and grant the app's managed identity a Service Bus data role",
+      "Change the trigger's connection value to the literal namespace host name so the host resolves it directly without an app setting",
+      "Keep the SAS connection string but move it into Key Vault and reference it from the app setting, which makes the trigger identity-based",
+      "Set connection to an empty string, which makes the host fall back to the app's managed identity for every binding"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An identity-based connection is expressed as a group of settings sharing the binding's connection name as a prefix, with the namespace supplied via the __fullyQualifiedNamespace suffix. The host then acquires a token with the app's identity, which only works once that identity holds a Service Bus data-plane role such as Data Receiver — configuration and role assignment are both required.",
+      "The connection property always names an app setting or setting prefix, never a literal endpoint value, so putting the host name inline leaves the host looking for a setting by that name. This is the single most common reason an identity-based binding fails to resolve.",
+      "A Key Vault reference changes where the secret is stored, not how the binding authenticates: the host still resolves the setting to a SAS connection string and connects with a shared key. It is an improvement over a plaintext setting, but it does not make the connection identity-based, and a secret still exists.",
+      "There is no empty-string convention that switches the host to managed identity; an unresolvable connection name simply fails at listener startup. Identity-based connections are opted into explicitly through the prefixed settings, not inferred from an absent value."
+    ],
+    "principle": "identity-based bindings need prefixed settings plus a data-plane role",
+    "relatedConcept": "A binding's connection property names an app setting or setting prefix, which is what lets the same code run against secrets in one environment and managed identity in another.",
+    "overallExplanation": "Replace the connection string with the prefixed setting ServiceBusConnection__fullyQualifiedNamespace and assign the managed identity a Service Bus data role. The connection property names a setting, never a literal endpoint, and Key Vault references still resolve to a secret."
+  },
+  {
+    "id": 328,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "multi",
+    "question": "A function app deployed by copying files over FTP suffers from partially updated deployments, occasional file-locking errors during release, and inconsistent behaviour between instances after scale-out. The team wants deployments to be atomic and identical on every instance. Which two practices address this? (Choose two.)",
+    "options": [
+      "Deploy as a package — zip deploy with run-from-package — so every instance mounts the same immutable artifact rather than a mutable file tree",
+      "Build the deployment artifact once in the pipeline and promote that same artifact through environments instead of rebuilding per environment",
+      "Deploy over FTP but stop the function app first, so no files are locked while the copy is running",
+      "Deploy each instance separately by targeting its instance identifier, so a failure affects only one instance at a time"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Running from a package makes the app content a single immutable artifact mounted read-only, so a deployment either takes effect wholly or not at all and every instance sees byte-identical content. That directly removes both the partial-update and file-locking failure modes that file-by-file copying creates.",
+      "Correct. Rebuilding per environment means the artifact that reached production was never the artifact you tested, and any dependency resolved at build time can differ between runs. Building once and promoting the same package keeps deployments reproducible and makes instance-to-instance differences impossible to attribute to the build.",
+      "Stopping the app converts a partial-deployment problem into planned downtime and still leaves the copy non-atomic — an interrupted transfer resumes with a half-updated tree. It treats the symptom, file locks, while keeping mutable file-by-file deployment as the mechanism.",
+      "Function app instances are not individually addressable deployment targets; the platform creates and removes them dynamically as the app scales. Attempting per-instance deployment is not a supported operation and would guarantee the version skew the team is trying to eliminate."
+    ],
+    "principle": "deploy an immutable package, built once and promoted",
+    "relatedConcept": "Package-based deployment gives function apps atomic releases and identical content across dynamically created instances.",
+    "overallExplanation": "Use zip deploy with run-from-package so each release is an immutable artifact mounted identically on every instance, and build that artifact once for promotion across environments. File-by-file copying can never be atomic, and instances are not individually addressable."
+  },
+  {
+    "id": 329,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "multi",
+    "question": "A Python function app deployed from a Windows developer laptop starts up with ModuleNotFoundError for a package that is present in requirements.txt and works locally. The app runs on Linux. The developer had zipped the project folder, including the local virtual environment, and uploaded it. Which two corrections should the team make? (Choose two.)",
+    "options": [
+      "Have the deployment perform a remote build on the Linux host so dependencies in requirements.txt are resolved for the target platform",
+      "Exclude the local virtual environment from the deployment artifact and rely on requirements.txt to declare dependencies",
+      "Vendor the Windows virtual environment's site-packages directory into the project so the runtime finds the modules without installing anything",
+      "Pin the function app's Python version to whatever version the developer laptop runs so the uploaded environment matches"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Python packages with compiled components are platform-specific, so wheels resolved on Windows are not loadable on the Linux worker. Letting the platform build remotely from requirements.txt resolves each dependency against the actual runtime, which is what makes the import succeed where the copied environment fails.",
+      "Correct. A local virtual environment is machine-specific state, not deliverable content: shipping it bloats the artifact, can shadow correctly installed packages, and encodes absolute paths from the developer's machine. requirements.txt is the declaration the platform is designed to act on.",
+      "This doubles down on the original mistake by making the platform-mismatched binaries a permanent part of the repository. It also freezes dependency resolution at whatever the developer's laptop happened to have, so security updates and transitive fixes never reach the app.",
+      "Matching the interpreter version does not make Windows-built binary wheels loadable on Linux — the mismatch is the operating system and ABI, not the Python minor version. Version pinning is good practice generally, but it does not address this failure."
+    ],
+    "principle": "declare dependencies and build them on the target platform",
+    "relatedConcept": "Deployment artifacts should contain source plus a dependency manifest; environment-specific binaries belong to the platform that builds them.",
+    "overallExplanation": "Ship source plus requirements.txt and let the platform build remotely on Linux, excluding the local virtual environment. Windows-built wheels cannot load on a Linux worker regardless of how the Python version is pinned."
+  },
+  {
+    "id": 330,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A blob-triggered function processes uploads into a container that already holds several million blobs. New uploads must start processing within a few seconds, but the team observes delays of many minutes between upload and invocation, and the delay grows as the container grows. What change fixes the latency?",
+    "options": [
+      "Configure the blob trigger to use Event Grid as its source so uploads push an event to the function instead of being discovered by scanning",
+      "Increase the function app's instance count so more workers scan the container in parallel",
+      "Move the uploads into date-partitioned virtual folders so each folder holds fewer blobs for the trigger to enumerate",
+      "Switch the function to a timer trigger that lists the container every thirty seconds and processes any blob newer than the last run"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The classic blob trigger discovers new blobs by scanning and tracking receipts, so its latency degrades as the container grows — exactly the symptom described. Using Event Grid as the trigger source replaces discovery with push delivery of Blob Created events, so invocation latency becomes independent of how many blobs already exist.",
+      "Scaling out does not help because the delay is in discovery, not in processing throughput: the workers are idle while waiting to be told a blob exists. Adding instances multiplies the scanning work without shortening the time to notice a new blob.",
+      "Partitioning reduces how much a scan enumerates and can shave some latency, but it keeps the polling-based discovery model and its growth-dependent behaviour. It is a mitigation whose benefit erodes as each partition fills, whereas the Event Grid source removes the scan entirely.",
+      "A timer that lists the container reimplements the polling the team is trying to escape, adds bookkeeping for the last-run watermark, and still pays list costs proportional to container size. It also risks missing or double-processing blobs around the watermark boundary."
+    ],
+    "principle": "push-based triggers keep latency independent of container size",
+    "relatedConcept": "Trigger source choice determines whether a function learns about work by being told or by looking, and only the former scales with data volume.",
+    "overallExplanation": "Point the blob trigger at Event Grid as its source so Blob Created events push invocations, making latency independent of container size. Scaling out or partitioning only mitigates a discovery cost that push delivery eliminates."
+  },
+  {
+    "id": 331,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A nightly job must re-embed documents whose source changed, running once at 02:30 UTC. A developer configures a timer trigger with the schedule \"30 2 * * *\" and it fires far more often than expected. They also worry that once the app scales to several instances the job will run once per instance. Which statement is correct?",
+    "options": [
+      "The Functions CRON format has six fields including seconds, so the schedule must be \"0 30 2 * * *\"; the timer trigger is a singleton, so scale-out does not cause duplicate runs",
+      "The five-field schedule is valid and the extra runs come from scale-out, so the app must be pinned to a single instance to get one run per night",
+      "The schedule is valid, but timer triggers fire once per instance by design, so the job must take a distributed lock before doing work",
+      "The schedule should be \"30 2 * * * *\", and the timer trigger requires a dedicated storage account to avoid duplicate firing across instances"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Timer trigger expressions in Functions carry a leading seconds field, so a five-field expression shifts every position by one and produces a far more frequent schedule than intended. The runtime also enforces singleton behaviour for timer triggers, so exactly one instance fires the timer no matter how far the app has scaled out.",
+      "The five-field expression is the actual defect, and pinning to one instance would be an unnecessary sacrifice of scale for a problem the platform already handles. Timer triggers do not fan out across instances, so scale-out is not the cause of the extra runs.",
+      "This inverts the platform guarantee: timer triggers are singletons precisely so that developers do not have to hand-roll a distributed lock. Adding one would be harmless but pointless, and it would leave the real cause — the misparsed schedule — unaddressed.",
+      "Six asterisks after the 30 gives seven fields, which is not a valid expression in this format. The claim about a dedicated storage account is also wrong: the host uses its existing storage for singleton coordination, and no separate account is required."
+    ],
+    "principle": "Functions CRON has a seconds field, and timer triggers are singletons",
+    "relatedConcept": "Scheduled work in a scaled-out function app relies on host-managed singleton behaviour, so schedule correctness is usually the real bug.",
+    "overallExplanation": "Functions timer schedules use six fields starting with seconds, so \"30 2 * * *\" is misread; use \"0 30 2 * * *\". Timer triggers are singletons across instances, so scale-out never causes duplicate scheduled runs."
+  },
+  {
+    "id": 332,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A function app's HTTP endpoints occasionally return 500 with no useful detail, and the team wants to see the exception, the invocation id, and per-invocation timings without adding logging code to every handler. They also want these signals available alongside the rest of their Azure telemetry. What is the correct configuration?",
+    "options": [
+      "Set the app's Application Insights connection string setting so the host emits invocation, dependency, and exception telemetry automatically",
+      "Increase the logging level in host.json to Trace, which routes host logs to the portal's log stream and preserves them for later analysis",
+      "Add a try-except around every handler that writes the traceback to standard output, since the host only persists what the function prints",
+      "Enable the function app's file-system logs and read the text files over the deployment endpoint after each incident"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Once the Application Insights connection string is configured, the host instruments invocations itself: it records each execution with its invocation id and duration, captures unhandled exceptions with stack traces, and correlates outbound calls as dependencies — all without handler-level code. That also lands the data in the same store as the team's other telemetry, which is what makes cross-service queries possible.",
+      "Raising the log level changes verbosity, not destination or durability; the live log stream is a transient view that shows nothing about an incident that already happened. Without a telemetry destination configured, turning the volume up produces more logs that nobody can query afterwards.",
+      "The host captures unhandled exceptions on its own, so hand-written try-except blocks in every handler duplicate that work and tend to swallow the very exceptions they are meant to reveal. Printing tracebacks also loses the structured invocation id and duration fields the team explicitly asked for.",
+      "File-system logs are meant for short-term debugging, are size-limited and recycled, and offer no querying, correlation, or retention guarantees. Retrieving text files after each incident is exactly the manual workflow that centralized telemetry removes."
+    ],
+    "principle": "configure the telemetry destination and let the host instrument itself",
+    "relatedConcept": "Function apps emit structured invocation, dependency, and exception telemetry automatically once a destination is configured, which is the foundation for later distributed tracing.",
+    "overallExplanation": "Set the Application Insights connection string so the host automatically records invocations, durations, dependencies, and unhandled exceptions. Log verbosity and file-system logs change volume and location, not queryability or retention."
+  },
+  {
+    "id": 333,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "multi",
+    "question": "A function app exposes three HTTP endpoints: a public health probe, a partner-facing search API called from a partner's back end, and an internal admin endpoint used only by the team's own workload identity. Reviewing the authorization design, which two decisions are appropriate? (Choose two.)",
+    "options": [
+      "Give the health probe an anonymous authorization level so external monitoring can call it without distributing any key",
+      "Front the partner-facing API with a gateway that validates the partner's credentials, treating any function key as a coarse shared secret rather than per-caller authentication",
+      "Give every endpoint the admin authorization level, since the master key can be regenerated if it is ever leaked",
+      "Embed the function key in the partner's client-side JavaScript so their front end can call the search API directly without a back-end hop"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A health probe carries no sensitive data and exists to be reachable by monitoring systems, so anonymous access avoids distributing and rotating a key for something whose only output is liveness. Keeping it key-free also prevents a monitoring outage that is really just an expired credential.",
+      "Correct. Function keys are shared secrets scoped to the app or the function, not per-caller identities: they cannot express who called, cannot be revoked for one partner without affecting others, and carry no claims. Putting a gateway in front to validate real partner credentials gives identity, revocation, and per-caller policy, with the key reduced to defence in depth.",
+      "The admin level grants the master key, which authorizes every function in the app plus administrative operations, so handing it to routine callers maximizes blast radius. 'It can be regenerated' is incident response, not access control, and regenerating it breaks every caller at once.",
+      "Anything shipped to a browser is public by definition, so embedding a key there publishes it. It also grants every holder of that page the same access as the partner's back end, with no way to distinguish or revoke an individual caller."
+    ],
+    "principle": "function keys are shared secrets, not caller identity",
+    "relatedConcept": "Authorization level is a coarse gate in front of an HTTP-triggered function; real per-caller identity comes from a token-validating layer.",
+    "overallExplanation": "Use anonymous access for a health probe and validate real partner credentials at a gateway, treating function keys as coarse shared secrets. Master keys and browser-embedded keys both hand broad, unattributable access to anyone who obtains them."
+  },
+  {
+    "id": 334,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A function must split a 900-page document into chunks, embed all chunks in parallel, then write a single aggregate record only after every chunk succeeds — with the ability to resume rather than restart if the app is recycled halfway through. The team wants the coordination handled by the platform rather than by custom state in a database. What should they use?",
+    "options": [
+      "A Durable Functions orchestrator using fan-out/fan-in: schedule an activity per chunk, await them all, then run an aggregation activity",
+      "A single long-running function that uses a thread pool to embed all chunks in parallel and writes the aggregate before returning",
+      "One queue message per chunk plus a custom counter row that each function increments, triggering aggregation when it reaches the chunk count",
+      "A timer-triggered function that re-scans for unembedded chunks every minute and writes the aggregate once none remain"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Fan-out/fan-in is the canonical Durable Functions pattern for exactly this shape: the orchestrator schedules one activity per chunk, awaits the whole set, and then proceeds to aggregation. Because orchestration progress is checkpointed, a host recycle replays the orchestrator to its last known state and completed activities are not re-executed.",
+      "A single invocation with a thread pool has no checkpoints, so a recycle at 80 percent loses everything and the whole document restarts. It also concentrates the entire workload into one invocation that must finish inside the plan's timeout, which a 900-page document may well exceed.",
+      "A hand-rolled counter is the pattern Durable Functions exists to replace, and it is subtly hard to get right: increments race, at-least-once delivery can double-count, and a lost message leaves the counter permanently short so aggregation never fires. It also stores orchestration state the team explicitly wanted the platform to own.",
+      "Periodic re-scanning couples completion detection to a polling interval and to a query that must correctly distinguish 'not started' from 'in flight'. It adds latency, adds load proportional to document size, and still provides no resumable record of which chunks a given run already completed."
+    ],
+    "principle": "use durable orchestration for checkpointed fan-out/fan-in",
+    "relatedConcept": "Durable Functions moves orchestration state into the platform so multi-step, parallel workflows can survive restarts without hand-written coordination tables.",
+    "overallExplanation": "Fan-out/fan-in with a Durable Functions orchestrator schedules an activity per chunk, awaits them all, then aggregates — with checkpointing so a recycle resumes instead of restarting. Counter rows and polling loops reimplement that state management by hand."
+  },
+  {
+    "id": 335,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A Service Bus-triggered function occasionally fails on a transient downstream error. A developer proposes adding a function-level retry policy with exponential backoff to the trigger, arguing it will retry the message in place. What should a reviewer point out about error handling for this trigger?",
+    "options": [
+      "Function-level retry policies are not available for the Service Bus trigger; letting the exception propagate abandons the message so the broker redelivers it until MaxDeliveryCount dead-letters it",
+      "Function-level retry policies apply to every trigger type, so the proposal is correct and no broker-side configuration is needed",
+      "The function should catch the exception and complete the message, then re-publish a copy so the broker's delivery count is never incremented",
+      "The function should catch the exception and sleep with exponential backoff inside the handler until the downstream call succeeds"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Retry policies in Functions are supported for a specific set of triggers, and Service Bus is not among them — because the broker already owns redelivery. Allowing the exception to surface causes the host to abandon the message, the broker increments the delivery count and redelivers, and the message dead-letters once MaxDeliveryCount is exhausted, which is the intended error path.",
+      "Retry policies are not universal across triggers, and assuming they are leads teams to ship a configuration that silently does nothing while they believe retries are protecting them. For Service Bus, redelivery semantics come from the broker's lock and delivery-count model.",
+      "Completing and re-publishing resets the delivery count on every failure, so a permanently failing message loops forever and never reaches the dead-letter queue. It replaces a bounded retry budget with an unbounded one and hides poison messages entirely.",
+      "Sleeping inside the handler holds the message lock and a concurrency slot for the entire backoff, so a batch of failing messages stalls the instance's throughput. It also risks exceeding the lock duration, producing duplicate processing on top of the lost capacity."
+    ],
+    "principle": "let the broker own redelivery for broker-triggered functions",
+    "relatedConcept": "Where a trigger's source already provides delivery guarantees, the host defers to it rather than layering a second retry mechanism on top.",
+    "overallExplanation": "The Service Bus trigger relies on broker redelivery, not function retry policies: let the exception propagate so the message is abandoned, redelivered, and eventually dead-lettered at MaxDeliveryCount. In-handler sleeping and re-publishing both defeat that budget."
+  },
+  {
+    "id": 336,
+    "domain": "Connect to and consume Azure services",
+    "objective": "Develop and implement Azure Functions",
+    "type": "single",
+    "question": "A function app on a Premium plan must be released with no cold-start pause and with an immediate way back if the new build misbehaves. Each environment also has its own Application Insights connection string, and the team wants the staging slot to keep pointing at the staging resource even after a swap. How should the release be configured?",
+    "options": [
+      "Deploy to a staging slot, warm it up, swap it into production, and mark the Application Insights connection string as a deployment slot setting so it stays with its slot",
+      "Deploy to a staging slot and swap, leaving all application settings unmarked so both slots always share one consistent configuration",
+      "Deploy straight to production during a low-traffic window and keep the previous package on hand to redeploy if a problem appears",
+      "Run two separate function apps behind a traffic manager and cut over by changing the routing configuration after each release"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A slot swap warms the staging instances before routing traffic to them, which is what removes the cold-start pause, and swapping back is an immediate rollback because the previous build is still running in the other slot. Marking an environment-specific setting as a deployment slot setting keeps it attached to the slot rather than travelling with the code, so staging keeps writing to staging telemetry.",
+      "Unmarked settings swap along with the code, so after the swap the staging slot would inherit the production connection string and start writing pre-release test telemetry into production data. Sharing one configuration is the right default for settings that are genuinely environment-independent, not for per-environment resources.",
+      "Direct deployment gives no warm-up and no instant rollback: production takes the cold-start hit, and recovering means running another deployment while users are affected. A low-traffic window narrows the blast radius but does not change either property.",
+      "Two apps plus external routing reproduces what slots provide natively while adding a second app to configure, a second identity to manage, and DNS or routing propagation delays on every cutover. It is a heavier answer to a problem the platform already solves in one operation."
+    ],
+    "principle": "swap warmed slots and pin environment-specific settings to the slot",
+    "relatedConcept": "Deployment slots give function apps warm-up and instant rollback, with slot-sticky settings keeping per-environment configuration from travelling with the code.",
+    "overallExplanation": "Deploy to a staging slot, warm it, and swap — the swap avoids cold starts and swapping back is an instant rollback. Mark per-environment values such as the Application Insights connection string as deployment slot settings so they stay with their slot."
+  }
+]

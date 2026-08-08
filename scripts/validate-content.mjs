@@ -43,8 +43,26 @@ for (const certCode of certCodes) {
   if (cert.code !== certCode) errors.push(`cert.code "${cert.code}" must match directory name "${certCode}"`);
   if (typeof cert.level !== 'string' || !cert.level) errors.push('cert.level missing (e.g. "Associate")');
   if (typeof cert.audience !== 'string' || !cert.audience) errors.push('cert.audience missing');
+  // The exam vendor ("Anthropic", "Microsoft", ...). The landing page groups certs by it,
+  // so a cert without one would be dropped from a vendor section.
+  if (typeof cert.vendor !== 'string' || !cert.vendor)
+    errors.push('cert.vendor missing (e.g. "Anthropic", "Microsoft")');
   if (!(typeof cert.examMinutesPerQuestion === 'number' && cert.examMinutesPerQuestion > 0))
     errors.push('cert.examMinutesPerQuestion must be a positive number');
+  // cert.content declares which content trees this cert ships. Absent means all of them;
+  // { study: false } means the cert is practice-only by design, which is how the validator
+  // tells that apart from "the study guide hasn't been written yet".
+  if ('content' in cert) {
+    if (typeof cert.content !== 'object' || cert.content === null || Array.isArray(cert.content))
+      errors.push('cert.content must be an object like { "study": false, "revision": false }');
+    else
+      for (const [key, value] of Object.entries(cert.content)) {
+        if (key !== 'study' && key !== 'revision') errors.push(`cert.content.${key} unknown — only "study" and "revision" are supported`);
+        else if (typeof value !== 'boolean') errors.push(`cert.content.${key} must be a boolean`);
+      }
+  }
+  const wantStudy = cert.content?.study !== false;
+  const wantRevision = cert.content?.revision !== false;
   // Nullable exam facts: each must be present as a key so it's clear the value
   // is unknown rather than forgotten. Sourced from the official exam guide.
   for (const key of [
@@ -61,22 +79,33 @@ for (const certCode of certCodes) {
   if (cert.registrationUrl != null && !/^https:\/\//.test(cert.registrationUrl))
     errors.push('cert.registrationUrl must be an https URL or null');
   // Guard against a percentage creeping in: the passing score is a scaled score
-  // on a 100-1,000 scale, and Anthropic doesn't publish the raw-to-scaled map,
-  // so rendering it as "72%" would be wrong.
+  // on a 100-1,000 scale, and vendors don't publish the raw-to-scaled map, so
+  // rendering it as "72%" would be wrong.
   if (typeof cert.passingScore === 'string' && /^\s*\d{1,2}\s*%\s*$/.test(cert.passingScore))
     errors.push(`cert.passingScore "${cert.passingScore}" looks like a percentage; the official score is scaled (e.g. "720 / 1000 (scaled)")`);
-  if (cert.examQuestions !== null && cert.examQuestions !== undefined) {
-    if (typeof cert.examQuestions !== 'number')
-      errors.push('cert.examQuestions must be a number or null');
-    // When practiceSets is declared, the per-domain counts describe ONE exam and
-    // the bank is that × practiceSets — so the counts must add up to the official
-    // exam length. This is what stops bank size being mistaken for exam size.
-    // Certs WITHOUT practiceSets (legacy banks like CCAR-P) use per-domain counts
-    // to describe the whole bank, so no such equality holds and examQuestions is
-    // simply the independently-sourced official figure.
-    else if (blueprint.cert.practiceSets && cert.examQuestions !== oneExamQuestions)
+  if (cert.examQuestions !== null && cert.examQuestions !== undefined && typeof cert.examQuestions !== 'number')
+    errors.push('cert.examQuestions must be a number or null');
+  if (cert.questionsPerSet !== null && cert.questionsPerSet !== undefined && typeof cert.questionsPerSet !== 'number')
+    errors.push('cert.questionsPerSet must be a number or null');
+  // When practiceSets is declared, the per-domain counts describe ONE set and the
+  // bank is that × practiceSets — so the counts must add up to the declared set
+  // length. This is what stops bank size being mistaken for set size.
+  //
+  // The set length is normally the official exam length (examQuestions). Where the
+  // vendor doesn't publish an item count (Microsoft), examQuestions stays null and
+  // questionsPerSet records the length we chose for our own sets — otherwise nothing
+  // would check that each set really holds that many questions.
+  //
+  // Certs WITHOUT practiceSets (legacy banks like CCAR-P) use per-domain counts to
+  // describe the whole bank, so no such equality holds and examQuestions is simply
+  // the independently-sourced official figure.
+  if (blueprint.cert.practiceSets) {
+    const setSize = cert.examQuestions ?? cert.questionsPerSet;
+    if (setSize == null)
+      errors.push('cert.practiceSets is set, so one of cert.examQuestions / cert.questionsPerSet must give the per-set question count');
+    else if (typeof setSize === 'number' && setSize !== oneExamQuestions)
       errors.push(
-        `cert.examQuestions (${cert.examQuestions}) must equal the sum of per-domain questionCount (${oneExamQuestions}), which describes one exam; the bank holds ${oneExamQuestions * sets} (× ${sets} practiceSets)`,
+        `per-set question count (${setSize}, from cert.${cert.examQuestions != null ? 'examQuestions' : 'questionsPerSet'}) must equal the sum of per-domain questionCount (${oneExamQuestions}); the bank holds ${oneExamQuestions * sets} (× ${sets} practiceSets)`,
       );
   }
 
@@ -139,35 +168,46 @@ for (const certCode of certCodes) {
     }
 
     // ---- study guide ----
+    // Practice-only certs (cert.content.study === false) ship no study guide. The file must
+    // then actually be absent, so a half-written tree can't sit in the repo unvalidated.
     const sPath = join(certDir, `study/domain-${domain.id}.json`);
-    if (!existsSync(sPath)) { errors.push(`D${domain.id}: missing ${sPath}`); continue; }
-    let study;
-    try {
-      study = JSON.parse(readFileSync(sPath, 'utf8'));
-    } catch (e) { errors.push(`D${domain.id}: invalid JSON in study file: ${e.message}`); continue; }
+    if (!wantStudy && existsSync(sPath))
+      errors.push(`D${domain.id}: cert.content.study is false but ${sPath} exists — delete it or turn the flag on`);
+    if (wantStudy) validateStudy();
 
-    if (study.domain !== domain.id) errors.push(`D${domain.id}: study.domain must be ${domain.id}`);
-    if (study.title !== domain.title) errors.push(`D${domain.id}: study.title must be "${domain.title}"`);
-    if (typeof study.intro !== 'string' || study.intro.length < 100) errors.push(`D${domain.id}: study.intro missing or too short`);
-    if (!Array.isArray(study.objectives) || study.objectives.length !== domain.objectives.length)
-      errors.push(`D${domain.id}: study must have ${domain.objectives.length} objective sections`);
-    else study.objectives.forEach((s, i) => {
-      const expected = domain.objectives[i].objective;
-      if (s.objective !== expected) errors.push(`D${domain.id} study[${i}]: objective must be exactly "${expected}"`);
-      if (typeof s.explanation !== 'string' || s.explanation.length < 400) errors.push(`D${domain.id} study[${i}]: explanation too short (<400 chars)`);
-      if (typeof s.whyItMatters !== 'string' || s.whyItMatters.length < 150) errors.push(`D${domain.id} study[${i}]: whyItMatters too short (<150 chars)`);
-      if (!Array.isArray(s.examples) || s.examples.length < 1 || s.examples.length > 2) errors.push(`D${domain.id} study[${i}]: need 1-2 examples`);
-      else s.examples.forEach((ex, j) => {
-        if (!ex.title || typeof ex.body !== 'string' || ex.body.length < 200) errors.push(`D${domain.id} study[${i}] example[${j}]: needs title and body >=200 chars`);
+    function validateStudy() {
+      if (!existsSync(sPath)) { errors.push(`D${domain.id}: missing ${sPath}`); return; }
+      let study;
+      try {
+        study = JSON.parse(readFileSync(sPath, 'utf8'));
+      } catch (e) { errors.push(`D${domain.id}: invalid JSON in study file: ${e.message}`); return; }
+
+      if (study.domain !== domain.id) errors.push(`D${domain.id}: study.domain must be ${domain.id}`);
+      if (study.title !== domain.title) errors.push(`D${domain.id}: study.title must be "${domain.title}"`);
+      if (typeof study.intro !== 'string' || study.intro.length < 100) errors.push(`D${domain.id}: study.intro missing or too short`);
+      if (!Array.isArray(study.objectives) || study.objectives.length !== domain.objectives.length)
+        errors.push(`D${domain.id}: study must have ${domain.objectives.length} objective sections`);
+      else study.objectives.forEach((s, i) => {
+        const expected = domain.objectives[i].objective;
+        if (s.objective !== expected) errors.push(`D${domain.id} study[${i}]: objective must be exactly "${expected}"`);
+        if (typeof s.explanation !== 'string' || s.explanation.length < 400) errors.push(`D${domain.id} study[${i}]: explanation too short (<400 chars)`);
+        if (typeof s.whyItMatters !== 'string' || s.whyItMatters.length < 150) errors.push(`D${domain.id} study[${i}]: whyItMatters too short (<150 chars)`);
+        if (!Array.isArray(s.examples) || s.examples.length < 1 || s.examples.length > 2) errors.push(`D${domain.id} study[${i}]: need 1-2 examples`);
+        else s.examples.forEach((ex, j) => {
+          if (!ex.title || typeof ex.body !== 'string' || ex.body.length < 200) errors.push(`D${domain.id} study[${i}] example[${j}]: needs title and body >=200 chars`);
+        });
+        if (!Array.isArray(s.pitfalls) || s.pitfalls.length < 2) errors.push(`D${domain.id} study[${i}]: need >=2 pitfalls`);
+        if (PLACEHOLDER.test(JSON.stringify(s))) errors.push(`D${domain.id} study[${i}]: contains placeholder text`);
       });
-      if (!Array.isArray(s.pitfalls) || s.pitfalls.length < 2) errors.push(`D${domain.id} study[${i}]: need >=2 pitfalls`);
-      if (PLACEHOLDER.test(JSON.stringify(s))) errors.push(`D${domain.id} study[${i}]: contains placeholder text`);
-    });
+    }
 
     // ---- revision ----
     // A domain with questions + a study guide must also have a revision pass:
     // one recap + exactly one high-yield question per blueprint objective.
     const rPath = join(certDir, `revision/domain-${domain.id}.json`);
+    if (!wantRevision && existsSync(rPath))
+      errors.push(`D${domain.id}: cert.content.revision is false but ${rPath} exists — delete it or turn the flag on`);
+    if (!wantRevision) continue;
     if (!existsSync(rPath)) { errors.push(`D${domain.id}: missing ${rPath}`); continue; }
     let revision;
     try {

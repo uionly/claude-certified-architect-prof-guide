@@ -2,6 +2,7 @@
   "cert": {
     "name": "Claude Certified Associate – Foundations",
     "code": "CCAO-F",
+    "vendor": "Anthropic",
     "level": "Associate",
     "audience": "Developers working with product, consulting, customer or enterprise adoption teams.",
     "examQuestions": 60,

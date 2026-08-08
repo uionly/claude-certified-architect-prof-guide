@@ -2,6 +2,7 @@
   "cert": {
     "name": "Claude Certified Architect – Foundations",
     "code": "CCAR-F",
+    "vendor": "Anthropic",
     "level": "Architect",
     "audience": "Developers, technical leads, cloud architects and emerging GenAI architects.",
     "examQuestions": 60,

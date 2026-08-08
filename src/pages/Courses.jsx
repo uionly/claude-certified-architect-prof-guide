@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { certByCode } from '../data/loader.js'
+import { certRegistry, hasStudy } from '../data/loader.js'
+import { byVendor } from '../lib/vendors.js'
+import Tag from '../components/Tag.jsx'
 
-// Marketing copy + the paid Udemy listing for each cert. Exam facts, level and
-// audience come from the blueprint (see certRegistry) so they can't drift.
-const PATH_ORDER = ['CCAO-F', 'CCDV-F', 'CCAR-F', 'CCAR-P']
-
+// Marketing copy +, where one exists, the paid Udemy listing for each cert. Exam facts,
+// level, vendor and audience come from the blueprint (see certRegistry) so they can't drift.
+// Ordering and vendor grouping live in lib/vendors.js.
 const courseCopy = {
   'CCAO-F': {
     title: 'Claude Associate Foundations',
@@ -30,18 +31,28 @@ const courseCopy = {
       'Realistic scenarios covering architecture trade-offs, failure diagnosis, reliability, security, governance and enterprise AI operations.',
     url: 'https://www.udemy.com/course/claude-certified-architect-professional-practice/?couponCode=716D88928B0C6D1FB137',
   },
+  'AI-103': {
+    title: 'Azure AI Apps and Agents Developer',
+    description:
+      'Foundry solution setup, model selection, RAG, agents and multi-agent orchestration, vision and multimodal, language and speech, document extraction, responsible AI.',
+  },
+  'AI-200': {
+    title: 'Azure AI Cloud Developer',
+    description:
+      'Production engineering for AI back ends: containers and orchestration, Cosmos DB, PostgreSQL with pgvector, Managed Redis, messaging, Key Vault, OpenTelemetry and KQL.',
+  },
 }
 
 const steps = [
   {
     n: 1,
     title: 'Pick your certification',
-    body: 'Four exams, from Associate to Architect Professional. Each one has its own study guide, revision recaps and question bank.',
+    body: 'Claude and Microsoft Azure exams, from Associate to Architect Professional. Each one has its own question bank; the Claude certifications add a study guide and revision recaps.',
   },
   {
     n: 2,
     title: 'Learn the blueprint',
-    body: 'Work through the Study Guide domain by domain, or use Revision for a fast last-mile pass over every objective.',
+    body: 'Where a study guide exists, work through it domain by domain, then use Revision for a fast last-mile pass over every objective.',
   },
   {
     n: 3,
@@ -53,22 +64,22 @@ const steps = [
 const features = [
   {
     label: 'Study Guide',
-    tagline: 'Learn it properly',
+    tagline: 'Claude certifications',
     body: 'One section per exam objective: a plain-language explanation, why it matters in production, worked examples and the common pitfalls.',
   },
   {
     label: 'Revision',
-    tagline: 'The last-mile pass',
+    tagline: 'Claude certifications',
     body: 'A short recap of every objective — key points plus the trap to watch for — with one high-yield question each. Built to be read straight through.',
   },
   {
     label: 'Learn mode',
-    tagline: 'Understand every answer',
+    tagline: 'Every certification',
     body: 'Untimed. After each answer you get the full reasoning — why the right option is right, and the specific error behind each wrong one.',
   },
   {
     label: 'Exam mode',
-    tagline: 'Rehearse the real thing',
+    tagline: 'Every certification',
     body: 'Timed to the real exam pace with feedback withheld until you submit, then a complete per-question review of your reasoning.',
   },
 ]
@@ -103,15 +114,15 @@ export default function Courses() {
     <div className="space-y-14">
       <section className="rounded-lg border border-stone-200 bg-white px-5 py-8 sm:px-8 sm:py-10">
         <p className="text-sm font-semibold uppercase tracking-wide text-indigo-700">
-          Free · No sign-up · 4 certifications
+          Free · No sign-up · {certRegistry.length} certifications
         </p>
         <h1 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-          Prepare for the Claude certification exams.
+          Prepare for the Claude and Azure AI certification exams.
         </h1>
         <p className="mt-4 max-w-3xl leading-relaxed text-stone-700">
-          A study guide and a reasoning-based question bank for each of the four Claude certifications, built around the
-          official exam blueprints. Every question is a realistic scenario with a full explanation of why each option is
-          right or wrong — so you learn the judgement the exam tests, not just the answer key.
+          A reasoning-based question bank for every certification here — plus a full study guide for the Claude
+          exams — built around the official blueprints. Every question is a realistic scenario with a full explanation
+          of why each option is right or wrong, so you learn the judgement the exam tests, not just the answer key.
         </p>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-600">
           Everything runs in your browser. Nothing to install, no account needed, and your progress is saved on this
@@ -136,8 +147,8 @@ export default function Courses() {
       <section id="how-it-works" className="scroll-mt-24">
         <h2 className="text-2xl font-bold tracking-tight text-stone-900">How it works</h2>
         <p className="mt-2 max-w-3xl leading-relaxed text-stone-700">
-          Three steps, in this order. You can jump straight to practice, but the study guide is what makes the questions
-          click.
+          Three steps, in this order. You can jump straight to practice — and on the practice-only certifications that
+          is the whole path.
         </p>
         <ol className="mt-5 grid gap-4 md:grid-cols-3">
           {steps.map((step) => (
@@ -155,72 +166,81 @@ export default function Courses() {
       <section id="certifications" className="scroll-mt-24">
         <h2 className="text-2xl font-bold tracking-tight text-stone-900">Choose your certification</h2>
         <p className="mt-2 max-w-3xl leading-relaxed text-stone-700">
-          Listed easiest first. Pick the one that matches your role — each opens its own overview, study guide and
+          Grouped by vendor, easiest first. Pick the one that matches your role — each opens its own overview and
           question bank.
         </p>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          {PATH_ORDER.map((code) => {
-            const cert = certByCode[code]
-            const copy = courseCopy[code]
-            if (!cert || !copy) return null
-            return (
-              <article key={code} className="flex flex-col rounded-lg border border-stone-200 bg-white p-5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-800">
-                    {cert.code}
-                  </span>
-                  <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">
-                    {cert.level}
-                  </span>
-                </div>
-                <h3 className="mt-4 text-xl font-semibold text-stone-900">{copy.title}</h3>
-                <p className="mt-2 leading-relaxed text-stone-700">{copy.description}</p>
-                <p className="mt-3 text-sm leading-relaxed text-stone-500">{cert.audience}</p>
+        {byVendor(certRegistry).map((group) => (
+          <div key={group.vendor} className="mt-8">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-stone-500">{group.label}</h3>
+            <div className="mt-3 grid gap-4 md:grid-cols-2">
+              {group.certs.map((cert) => {
+                const copy = courseCopy[cert.code] ?? { title: cert.name, description: '' }
+                const study = hasStudy(cert)
+                return (
+                  <article key={cert.code} className="flex flex-col rounded-lg border border-stone-200 bg-white p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-800">
+                        {cert.code}
+                      </span>
+                      <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">
+                        {cert.level}
+                      </span>
+                      {!study && <Tag kind="neutral">Practice only</Tag>}
+                    </div>
+                    <h4 className="mt-4 text-xl font-semibold text-stone-900">{copy.title}</h4>
+                    <p className="mt-2 leading-relaxed text-stone-700">{copy.description}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-stone-500">{cert.audience}</p>
 
-                <ExamFacts cert={cert} />
+                    <ExamFacts cert={cert} />
 
-                <div className="mt-auto pt-5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Link
-                      to={`/${cert.code}`}
-                      className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                    >
-                      Start here →
-                    </Link>
-                    <Link
-                      to={`/${cert.code}/study`}
-                      className="text-sm font-medium text-indigo-700 underline-offset-2 hover:underline"
-                    >
-                      Study guide
-                    </Link>
-                    <Link
-                      to={`/${cert.code}/practice`}
-                      className="text-sm font-medium text-indigo-700 underline-offset-2 hover:underline"
-                    >
-                      Practice
-                    </Link>
-                  </div>
-                  <a
-                    href={copy.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-block text-sm text-stone-500 underline-offset-2 hover:text-stone-800 hover:underline"
-                  >
-                    Also on Udemy — lifetime access to the full practice sets ↗
-                  </a>
-                </div>
-              </article>
-            )
-          })}
-        </div>
+                    <div className="mt-auto pt-5">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                          to={`/${cert.code}`}
+                          className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                        >
+                          Start here →
+                        </Link>
+                        {study && (
+                          <Link
+                            to={`/${cert.code}/study`}
+                            className="text-sm font-medium text-indigo-700 underline-offset-2 hover:underline"
+                          >
+                            Study guide
+                          </Link>
+                        )}
+                        <Link
+                          to={`/${cert.code}/practice`}
+                          className="text-sm font-medium text-indigo-700 underline-offset-2 hover:underline"
+                        >
+                          Practice
+                        </Link>
+                      </div>
+                      {copy.url && (
+                        <a
+                          href={copy.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-block text-sm text-stone-500 underline-offset-2 hover:text-stone-800 hover:underline"
+                        >
+                          Also on Udemy — lifetime access to the full practice sets ↗
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        ))}
       </section>
 
       <section>
         <h2 className="text-2xl font-bold tracking-tight text-stone-900">What you get in each certification</h2>
         <p className="mt-2 max-w-3xl leading-relaxed text-stone-700">
-          Four ways to work, all sharing the same objective tags — so your practice results tell you exactly which study
-          section to reread.
+          All of it shares the same objective tags, so your practice results tell you exactly which part of the
+          blueprint to go back to.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {features.map((f) => (
@@ -237,8 +257,9 @@ export default function Courses() {
 
       <aside className="rounded-lg border border-stone-200 bg-stone-50 p-5 text-sm leading-relaxed text-stone-600">
         These are independent educational and exam-preparation resources. They are not affiliated with or endorsed by
-        Anthropic. Official exam details should always be confirmed on Anthropic&apos;s certification pages. Progress in
-        this browser remains stored locally on this device.
+        Anthropic or Microsoft, and the questions are original — not exam dumps. Official exam details should always be
+        confirmed on the vendor&apos;s own certification pages. Progress in this browser remains stored locally on this
+        device.
       </aside>
     </div>
   )

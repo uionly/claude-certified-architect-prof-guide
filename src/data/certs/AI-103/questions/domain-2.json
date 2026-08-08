@@ -1,0 +1,1211 @@
+[
+  {
+    "id": 201,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Your interactive support assistant and a nightly job that summarizes 40,000 tickets both call the same Global Standard chat model deployment in a Microsoft Foundry project. Every night the batch job saturates the deployment's tokens-per-minute quota: the batch sees continuous 429 responses and the interactive app's p95 latency jumps from 1.2 s to 9 s. What is the most appropriate change?",
+    "options": [
+      "Create a separate deployment for the offline summarization job using the Batch deployment type, and leave the interactive traffic on its own Standard deployment with its own quota allocation",
+      "Keep the single deployment and add exponential backoff with jitter to the batch client so that it retries 429s until the nightly run finishes",
+      "Switch the interactive app to a smaller model so each interactive request consumes fewer tokens per minute from the shared quota",
+      "Move both workloads onto one Provisioned Throughput deployment sized for the batch job's peak token rate so that capacity is reserved"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Quota is enforced per deployment, so the only way to stop one workload starving another is to give them separate deployments. The offline job has no interactive latency requirement, so the Batch deployment type processes it asynchronously at lower cost while the Standard deployment keeps its full token budget for live users.",
+      "Backoff is good hygiene and the batch job needs it regardless, but it does not create capacity. The retries still consume the same shared quota, so the interactive app keeps queueing behind batch traffic and the p95 latency spike persists every night.",
+      "This misreads the failure: the interactive app is the victim, not the cause. Shrinking its token footprint frees a little quota but the batch job will simply absorb it, and you have degraded answer quality for live users without isolating the two workloads.",
+      "Provisioned Throughput reserves capacity, but sizing it for the batch peak means paying for that reserved capacity 24 hours a day, and a single shared deployment still lets the batch job consume the whole reservation. Isolation, not reservation, is what this problem needs."
+    ],
+    "principle": "quota is enforced per deployment, so isolate workloads with different latency profiles",
+    "relatedConcept": "Foundry deployment types — Standard, Global Standard, Data Zone, Provisioned and Batch — differ in latency guarantees, data residency and billing, and each deployment carries its own rate limits.",
+    "overallExplanation": "Give the offline job its own Batch deployment and keep interactive traffic on a dedicated Standard deployment. Rate limits apply per deployment, so co-locating a bursty batch workload with latency-sensitive traffic guarantees contention no matter how carefully the batch client retries."
+  },
+  {
+    "id": 202,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A field-service platform classifies about 2 million short maintenance notes per day into a fixed taxonomy of 12 fault categories. It currently sends each note to a large frontier reasoning model, which costs far more than the team's budget allows and averages 3.1 s per note. Accuracy on a labelled sample is 96%, and a fine-tuned small model reaches 95% on the same sample. What should you deploy?",
+    "options": [
+      "Deploy a small language model from the Foundry model catalog for the bulk classification path, and route only the rare free-text escalation summaries to the large model",
+      "Keep the frontier reasoning model but set its reasoning effort to the lowest setting and temperature to 0 so that responses are shorter and cheaper",
+      "Keep the frontier model and add a response cache keyed on the exact note text so that repeated notes skip the model entirely",
+      "Replace the classifier with a multimodal model, because technicians sometimes attach photographs to the maintenance notes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A closed 12-label taxonomy over short text is exactly the workload small language models are sized for, and losing one accuracy point buys an order-of-magnitude reduction in cost and latency at 2 million calls a day. Keeping the large model for the small volume of open-ended summaries preserves quality where judgement is genuinely required.",
+      "Lower reasoning effort trims output tokens but you still pay frontier per-token pricing for every one of the 2 million notes, and the per-request overhead of a large model keeps latency high. Parameter tuning cannot close an order-of-magnitude unit-cost gap.",
+      "Caching helps only to the extent that note text repeats verbatim, which free-typed technician notes rarely do. It leaves the cost of every cache miss unchanged, so it is a marginal optimization rather than a fix for the wrong model choice.",
+      "This changes the modality without addressing cost or latency, and multimodal models are more expensive per request than text-only models. Photograph handling is a separate requirement that should be solved on its own path, not by upgrading the bulk text classifier."
+    ],
+    "principle": "match model size to task complexity, not to the most capable model available",
+    "relatedConcept": "The Foundry model catalog spans frontier LLMs, small language models, code models and multimodal models; high-volume, narrow tasks are usually the ones where a small model wins on cost and latency.",
+    "overallExplanation": "Use a small language model for the high-volume fixed-taxonomy classification and reserve the frontier model for the rare open-ended work. Matching model capability to task complexity is the single biggest lever on cost and latency in a production generative application."
+  },
+  {
+    "id": 203,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A Python app lets customers photograph a damaged parcel and asks a multimodal model deployment to describe the visible damage. The developer builds the request as messages=[{\"role\": \"user\", \"content\": \"Describe the damage: \" + base64_image}] and the model replies that it cannot see any image and appears to treat the base64 blob as text. What is the correct fix?",
+    "options": [
+      "Send content as a list of typed content parts — a text part with the instruction and an image part carrying the picture as a data URL or an accessible HTTPS URL",
+      "Prefix the base64 string with \"data:image/jpeg;base64,\" inside the same text string so that the model recognizes the encoding",
+      "Run the image through an OCR step first and pass the extracted text to the model, because chat completions accept text only",
+      "Upload the photograph to the Foundry project's file store and reference it by file name in the prompt text so that the deployment resolves it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Multimodal chat requests represent a single user turn as an array of content parts, each with its own type. The image must travel in an image content part — as a data URL or a URL the service can fetch — so the service routes it to the vision encoder rather than tokenizing it as characters.",
+      "The data URL prefix is required inside an image content part, but adding it to a plain text string changes nothing structurally: the value is still a text part, so the model still receives characters, not pixels. The problem is the content type, not the encoding header.",
+      "This encodes the misconception that chat completions are text-only. Multimodal deployments accept images natively, and OCR would discard exactly the information the scenario needs — dents, tears and crushed corners are visual damage, not text on the box.",
+      "There is no mechanism by which a chat deployment resolves a bare file name mentioned in prompt text into image bytes. Storing the file is fine, but the request must still carry either the bytes as a data URL or a URL the service can retrieve."
+    ],
+    "principle": "images travel as typed content parts, not as text in the prompt string",
+    "relatedConcept": "Consuming multimodal deployments means constructing multi-part message content, where each part declares whether it is text, an image or another supported modality.",
+    "overallExplanation": "Build the user message as a list of content parts with a separate image part carrying a data URL or fetchable URL. Pasting base64 into the text string leaves the payload as tokens, which is why the model reports that it sees no image."
+  },
+  {
+    "id": 204,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "multi",
+    "question": "Your RAG assistant retrieves from an Azure AI Search index of 180,000 HR policy chunks using pure vector search with top-k of 5. Questions that quote an exact policy identifier such as \"What does HR-4417 say about carry-over leave?\" return semantically similar but wrong policies, and the groundedness evaluator averages 0.62 on that query class. Which two retrieval changes should you make? (Choose two.)",
+    "options": [
+      "Enable hybrid retrieval so that the keyword (BM25) side of the query matches the literal identifier alongside the vector similarity side",
+      "Add semantic ranking over a larger candidate set, so the top 50 hybrid candidates are re-scored and only the best few reach the prompt",
+      "Raise the generation temperature to 0.9 so the model explores more of the retrieved context before answering",
+      "Increase top-k to 100 and pass every retrieved chunk into the prompt so the correct policy is guaranteed to be present"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Embeddings blur rare literal tokens such as \"HR-4417\", which is precisely why a semantically close but incorrect policy wins. Hybrid search runs keyword and vector retrieval together and fuses the results, so exact identifiers are matched lexically while natural-language phrasing is still matched semantically.",
+      "Correct. Semantic ranking re-scores a wide candidate list with a deeper relevance model, so recall can be raised by retrieving more candidates without polluting the prompt. Retrieve broadly, rerank, then pass only the top few chunks — that is the standard fix for good recall with poor precision at the top.",
+      "Temperature governs sampling of the model's output tokens; it has no effect on which documents are retrieved. Raising it on a grounded question-answering task increases the chance of fabricated detail, so this would push groundedness down rather than up.",
+      "Flooding the prompt with 100 chunks raises cost and latency and dilutes attention across mostly irrelevant text, which typically lowers answer quality. Retrieval precision, not prompt volume, is the lever here — and the wrong-policy chunks would still be present to mislead the model."
+    ],
+    "principle": "hybrid retrieval plus reranking fixes exact-token recall that embeddings alone lose",
+    "relatedConcept": "Grounding quality in RAG is determined mostly at the retrieval stage; hybrid search with semantic reranking is the default configuration for mixed natural-language and identifier queries.",
+    "overallExplanation": "Turn on hybrid (keyword + vector) retrieval and add semantic reranking over a wider candidate set. Exact identifiers are lexical signals that embeddings smooth away, and reranking lets you retrieve broadly while still sending the model a small, precise context."
+  },
+  {
+    "id": 205,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A RAG assistant over machine-maintenance manuals answers procedural questions with steps that stop halfway, and citations often point at a chunk that begins mid-sentence. Ingestion splits each PDF into fixed 4,000-token chunks with no overlap, discarding heading structure, so a single procedure or table is frequently cut across two chunks. What should you change first?",
+    "options": [
+      "Re-chunk the manuals along document structure into smaller, semantically coherent units with overlap, carrying section headings as chunk metadata",
+      "Move to a model with a larger context window so that more of the manual fits into each request",
+      "Set temperature to 0 so the model stops inventing the missing half of each procedure",
+      "Embed each complete manual as a single vector so that no procedure can ever be split across chunks"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The defect is created at ingestion: a retrieval unit that begins mid-sentence and ends mid-procedure cannot ground a complete answer no matter what the model does. Structure-aware chunking with overlap keeps each procedure intact, and heading metadata gives both the ranker and the model the context a fragment otherwise loses.",
+      "A larger context window lets you pass more chunks, but every chunk is still a truncated fragment. You would be paying for more tokens to carry the same broken retrieval units, and the truncated-procedure symptom would remain.",
+      "Temperature affects output sampling, not what the retriever supplies. With half a procedure in context, a deterministic model simply produces the same incomplete answer every time — the grounding gap is upstream of generation.",
+      "One vector per manual destroys retrieval precision: a single embedding cannot represent hundreds of pages, so the retriever loses the ability to locate the specific procedure. This trades a chunking bug for a far worse recall problem."
+    ],
+    "principle": "the chunk is the unit of grounding, so chunk on meaning, not on a fixed token count",
+    "relatedConcept": "RAG ingestion decisions — chunk size, overlap, structure awareness and retained metadata — bound the best answer quality any downstream model can achieve.",
+    "overallExplanation": "Re-chunk along document structure with overlap and preserve heading metadata. Truncated answers with mid-sentence citations are an ingestion defect, and no model parameter or larger context window repairs a retrieval unit that never contained the whole procedure."
+  },
+  {
+    "id": 206,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Auditors testing your grounded benefits assistant find that when the search index returns no matching chunk — for example for a benefit the company does not offer — the assistant still produces a fluent, confident, entirely invented answer with no citation. Retrieval scores for those queries are far below the scores seen on answerable questions. What is the most effective mitigation?",
+    "options": [
+      "Gate on the retrieval score in application code and, when no chunk clears the threshold, either skip the model call or pass an empty-context prompt whose instructions require an explicit \"not covered in the provided sources\" reply with citations otherwise mandatory",
+      "Set temperature and top_p to 0 so that the assistant's answers become deterministic and therefore factual",
+      "Fine-tune the model on 5,000 historical benefits questions and answers so it learns the company's actual benefits catalogue",
+      "Increase top-k from 5 to 20 so that there is always some context for the model to ground its answer in"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Fabrication on unanswerable questions is a control-flow problem as much as a prompting problem: the application must recognize that retrieval failed and must define what the assistant says in that state. A score threshold in code plus instructions that mandate citations and an explicit abstention response gives the model a sanctioned way to say nothing.",
+      "Determinism is not accuracy. A temperature of 0 makes the assistant invent the same fabricated benefit on every run, which is arguably worse for auditors because the failure now looks reproducible and authoritative.",
+      "Fine-tuning bakes a snapshot of the catalogue into weights that drift the moment benefits change, and it still gives the model no signal that a particular question is unanswerable. It also does not produce the citations the audit requires.",
+      "Retrieving 20 chunks when zero are relevant simply supplies 20 irrelevant chunks, which invites the model to stitch an answer from unrelated policies. Raising top-k addresses recall, not the abstention behaviour the auditors flagged."
+    ],
+    "principle": "an assistant needs a sanctioned way to say \"I don't know\"",
+    "relatedConcept": "Detecting and preventing fabrication in RAG combines retrieval-score gating in application code with instructions that require citations and permit explicit abstention.",
+    "overallExplanation": "Check the retrieval score before generating and require an explicit abstention response, with citations mandatory otherwise. Fabrication on unanswerable questions is fixed by giving the system a defined empty-retrieval path, not by tightening sampling parameters."
+  },
+  {
+    "id": 207,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "An invoice-processing solution must always run the same three stages: extract fields from the PDF, validate totals and vendor identifiers against the ERP, then post the invoice. A developer proposes giving a single model all three capabilities as tools and letting it decide the order each run. Finance requires that no invoice is ever posted before validation succeeds. How should the flow be designed?",
+    "options": [
+      "Orchestrate the three stages as a deterministic workflow in application code, calling the model only for the extraction stage where judgement is required",
+      "Keep the model-driven design but add a system instruction stating that validation must always precede posting",
+      "Keep the model-driven design and lower temperature to 0 so the model always chooses the same tool order",
+      "Let the model plan freely and add a post-run evaluator that flags any invoice posted before validation so finance can reverse it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The stage order is fixed, known in advance and safety-critical, which is the definition of a workflow rather than an agent. Encoding the sequence in code makes the ordering guarantee structural, while the model still does the one genuinely probabilistic job — reading a messy PDF.",
+      "Instructions shape probabilities; they do not enforce invariants. A single unusual invoice, a prompt injection embedded in a PDF, or an ordinary sampling anomaly can still produce a post-before-validate sequence, which is exactly what finance said must never happen.",
+      "Temperature 0 reduces variability but is not a guarantee: the same deployment can still choose differently as inputs vary or as the deployed model version changes. Determinism of sampling is not the same as a hard ordering constraint.",
+      "Detecting the violation after the money has moved is a compensating control, not a prevention. Reversing posted invoices creates audit and reconciliation work that a five-line deterministic sequence in code would have avoided entirely."
+    ],
+    "principle": "if the sequence is known in advance, it is a workflow, not an agent",
+    "relatedConcept": "Designing generative solutions means separating deterministic orchestration, which belongs in code, from the specific steps where language understanding is actually needed.",
+    "overallExplanation": "Implement the fixed three-stage sequence as a deterministic workflow and use the model only for extraction. Model instructions bias behaviour but cannot enforce a safety-critical ordering invariant; code can."
+  },
+  {
+    "id": 208,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "multi",
+    "question": "A quoting assistant handles one long prompt that reads a customer specification, applies tiered volume discounts and regional tax rules, and emits a formatted quote. Sales reports that about 12% of quotes contain arithmetic errors — discount tiers applied to the wrong subtotal, tax computed on the pre-discount amount — even though the extracted specification is correct. Which two changes best address this? (Choose two.)",
+    "options": [
+      "Expose the pricing calculation as a deterministic tool the model calls with structured parameters, and have the tool, not the model, compute discounts and tax",
+      "Split the single prompt into discrete steps with a schema-validated hand-off, so extraction output is validated before it is passed to the pricing step",
+      "Lower the temperature from 0.2 to 0 so that the arithmetic becomes deterministic and therefore correct",
+      "Append \"Please double-check all calculations carefully before answering\" to the end of the system prompt"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Arithmetic over business rules is deterministic work that should never be sampled token by token. Moving the calculation into a tool means the model's job shrinks to identifying the right parameters, and the pricing logic becomes testable, auditable and exactly repeatable.",
+      "Correct. A single monolithic prompt hides where the failure occurs and lets a malformed intermediate value flow straight into pricing. Discrete steps with a validated schema between them localize the error, make each step independently testable, and stop bad extractions from silently corrupting downstream math.",
+      "This confuses determinism with correctness. Temperature 0 makes the model apply the discount to the wrong subtotal consistently rather than occasionally, which removes the variance that was making the bug visible without removing the bug.",
+      "Exhortations like this produce small, unreliable gains and no guarantee. A 12% error rate on money is a design defect, and prompt encouragement leaves the arithmetic in exactly the place — free-form generation — where it cannot be verified."
+    ],
+    "principle": "deterministic computation belongs in a tool, not in generated tokens",
+    "relatedConcept": "Tool-augmented and multistep reasoning pipelines work by narrowing the model to the language-understanding parts of the task and delegating exact computation and validation to code.",
+    "overallExplanation": "Move the pricing math into a deterministic tool and break the monolithic prompt into schema-validated steps. Models are unreliable calculators; the fix is architectural — delegate exact computation to code and validate the hand-offs between stages."
+  },
+  {
+    "id": 209,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "An RFP assistant must answer eight independent sub-questions, each needing its own retrieval against a different index section, before composing a single response. The current implementation loops through the sub-questions one at a time, and end-to-end latency averages 22 s — roughly 2.5 s per sub-question plus a final composition call. Answers are accurate. What change reduces latency the most?",
+    "options": [
+      "Issue the eight retrieval-and-generation calls concurrently with asyncio and then run one composition call over the collected results",
+      "Merge all eight sub-questions into one prompt with all retrieved context concatenated so only a single model call is needed",
+      "Enable response streaming so the user starts seeing tokens sooner while the eight sub-questions are still being processed",
+      "Increase max_tokens on each sub-question call so the model does not have to work as hard to stay within the limit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The sub-questions are independent, so the sequential loop is spending 20 s waiting on I/O that could overlap. Running them concurrently collapses eight serial round trips into roughly one, and the final composition call still sees every result — accuracy is preserved while wall-clock time drops to near the slowest branch.",
+      "One giant prompt does cut round trips, but it concatenates eight retrieval sets into a single context, which dilutes attention and typically degrades per-question accuracy. The scenario states answers are currently accurate, so a change that risks that quality is the wrong trade.",
+      "Streaming improves perceived latency for the final composition only. The eight upstream calls must still finish before composition begins, so the user still waits roughly 20 s before the first token appears.",
+      "max_tokens caps output length; it does not make the model faster and it does not reduce the number of serial round trips. If anything, a larger cap permits longer generations and slightly higher per-call latency."
+    ],
+    "principle": "independent steps should run concurrently, not in a loop",
+    "relatedConcept": "Multistep generative pipelines are usually latency-bound on serialized I/O; fan-out then synthesize is the standard shape when sub-tasks do not depend on one another.",
+    "overallExplanation": "Fan the eight independent sub-questions out concurrently and synthesize once at the end. Sequential loops over independent model calls waste wall-clock time on I/O waits, and unlike prompt merging, concurrency preserves the per-question accuracy you already have."
+  },
+  {
+    "id": 210,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Before releasing a grounded clinical-policy assistant, you must produce evidence for the review board about how often the assistant asserts facts that its retrieved sources do not support. You have a set of 300 evaluation questions with the retrieved context captured for each, but no human-written reference answers. Which evaluator should you run?",
+    "options": [
+      "The groundedness evaluator, scoring each response against the query and the retrieved context it was given",
+      "The relevance evaluator, scoring whether each response actually addresses the question that was asked",
+      "The coherence and fluency evaluators, since well-formed answers are less likely to contain fabricated claims",
+      "The similarity evaluator, comparing each response with the reference answer for that question"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Groundedness asks precisely the review board's question: is every claim in the response supported by the supplied context? It needs the query, the context and the response but no ground-truth answer, which matches the data you actually have.",
+      "Relevance measures whether the answer is on-topic for the question. A response can be perfectly relevant and still assert unsupported clinical facts, so relevance would miss exactly the failure mode under review.",
+      "Coherence and fluency measure readability and logical flow of the language. Fabrications are typically fluent and coherent — that is what makes them dangerous — so these evaluators provide no signal about factual support.",
+      "The similarity evaluator requires ground-truth reference answers, which this evaluation set does not have. It also penalizes valid paraphrases and rewards wording overlap, neither of which is a measure of source support."
+    ],
+    "principle": "groundedness measures support by the context; relevance measures fit to the question",
+    "relatedConcept": "Foundry's evaluators split into RAG metrics (groundedness, retrieval, relevance), general quality metrics (coherence, fluency), ground-truth metrics (similarity, F1) and safety evaluators.",
+    "overallExplanation": "Run the groundedness evaluator over query, context and response. It is the metric defined to detect claims unsupported by retrieved sources, and unlike similarity it needs no human-written reference answers."
+  },
+  {
+    "id": 211,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A consumer-facing assistant is going to public preview and the risk committee wants quantitative evidence about how it behaves when users deliberately try to elicit harmful content or bypass its instructions. The team has content filters enabled at the deployment and a suite of quality evaluators, but no data on adversarial behaviour. What should you add before launch?",
+    "options": [
+      "Run safety evaluations driven by the adversarial simulator, which generates attack and jailbreak prompts and scores responses for hateful, violent, sexual and self-harm content",
+      "Raise every content filter category to its strictest severity threshold and record the number of requests the filter blocks in production",
+      "Add the coherence, fluency and relevance evaluators to the release gate, since low-quality outputs correlate with unsafe outputs",
+      "Have two engineers spend a day writing about 20 hostile prompts by hand and review the responses in a meeting"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The committee asked for measurement under adversarial conditions, and that is what a simulator-driven safety evaluation produces: synthesized attack and jailbreak prompts run at scale, with per-category harm scores and defect rates you can trend release over release.",
+      "Content filters are a runtime mitigation, not a measurement. Tightening them without evaluation data trades unknown safety gains for known false-positive costs, and a production block count tells you nothing before launch.",
+      "Quality evaluators measure whether text reads well and answers the question. A jailbroken response is usually fluent, coherent and highly relevant to the attacker's request, so these metrics would look healthy while the risk remains unmeasured.",
+      "A manual red-team pass is valuable qualitative input but 20 hand-written prompts give no statistical coverage across harm categories and cannot be re-run automatically on each release to detect regressions."
+    ],
+    "principle": "filters mitigate risk; evaluations measure it — a launch gate needs both",
+    "relatedConcept": "Safety evaluation in Foundry pairs an adversarial simulator that synthesizes attack prompts with harm-category evaluators, producing repeatable defect rates rather than anecdotes.",
+    "overallExplanation": "Run simulator-driven safety evaluations that generate adversarial and jailbreak prompts and score the responses by harm category. Content filters reduce risk at runtime but produce no pre-launch evidence, and quality evaluators are blind to harmful-but-fluent output."
+  },
+  {
+    "id": 212,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Your RAG assistant scores 0.91 average groundedness across the evaluation set, yet a user study finds that roughly a quarter of answers are technically supported by their citations but do not answer what the user actually asked. Your evaluation pipeline currently measures groundedness and fluency only. What should you add to explain the gap?",
+    "options": [
+      "Retrieval and relevance metrics, so you can tell whether the retrieved documents were the right ones for the query and whether the answer addresses the question",
+      "A higher groundedness pass threshold, raising the release gate from 0.80 to 0.95 so weakly supported answers fail",
+      "A larger generation model, since more capable models produce answers that better match user intent",
+      "A second groundedness run using a different judge model to confirm that the 0.91 score is reliable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. High groundedness with low usefulness is the signature of faithful answers built on the wrong documents. Splitting evaluation into a retrieval stage metric and a response relevance metric shows whether the retriever surfaced the right chunks and whether the final answer addresses the query — the two things groundedness deliberately does not measure.",
+      "Tightening the threshold on a metric that is already high just fails more answers for weak sourcing. The failing behaviour is well-sourced but off-target, so it would keep passing a stricter groundedness gate.",
+      "A larger model can only reason over the context it receives. If retrieval hands it the wrong policy or the wrong section, a more capable model produces a more articulate off-target answer, at higher cost.",
+      "Cross-checking with a second judge tests the reliability of the groundedness score, not its coverage. Even a perfectly calibrated groundedness score is silent on whether the answer addressed the user's question."
+    ],
+    "principle": "evaluate retrieval and generation separately — grounded in the wrong document is still wrong",
+    "relatedConcept": "RAG evaluation is two-stage: retrieval metrics judge whether the right context was found, generation metrics such as groundedness and relevance judge what the model did with it.",
+    "overallExplanation": "Add retrieval-stage and response-relevance metrics alongside groundedness. An answer faithfully grounded in an irrelevant document scores well on groundedness and still fails the user, so the retrieval stage needs its own measurement."
+  },
+  {
+    "id": 213,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A Python service running in containers on Azure Kubernetes Service currently reads an API key from an environment variable to call a Foundry model deployment. Security has mandated that no long-lived secrets exist anywhere in the deployment manifests, and the service also needs to enumerate the project's model deployments and connections at startup. How should the application connect to the Foundry project?",
+    "options": [
+      "Instantiate AIProjectClient with the project endpoint and DefaultAzureCredential, backed by a workload identity that holds the appropriate Azure AI role on the project, then obtain inference clients from the project client",
+      "Keep the API key but move it into Azure Key Vault and fetch it at startup with a Key Vault SDK call using the pod's managed identity",
+      "Embed a service principal client ID and client secret in a Kubernetes secret and exchange them for a token at startup",
+      "Continue using the key, and rotate it automatically every 24 hours with a scheduled pipeline that updates the deployment manifest"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The project client is the entry point for project-scoped operations such as listing deployments and connections, and DefaultAzureCredential resolves the pod's workload identity in AKS and a developer's sign-in locally. Authorization comes from an Azure role assignment on the project, so there is no secret to store, rotate or leak.",
+      "This is better than an environment variable, but it is still key-based authentication: the key exists, can be exfiltrated from process memory or logs, and must be rotated. It also fails the stated requirement that no long-lived secret exists at all.",
+      "A client secret is precisely the long-lived credential the mandate prohibits, and storing it in a Kubernetes secret means it sits base64-encoded in etcd and in whatever manifests produced it. Managed identity exists to remove this class of credential.",
+      "Rotation shortens the exposure window but does not eliminate the secret, and writing keys into deployment manifests on a schedule spreads the credential through the pipeline and its logs. It also leaves the project-scoped operations without a clean authenticated client."
+    ],
+    "principle": "connect with a project client and a managed identity, never a stored key",
+    "relatedConcept": "Configuring an application to connect to a Foundry project means pointing a project client at the project endpoint and authenticating with Entra ID through DefaultAzureCredential and role assignments.",
+    "overallExplanation": "Use the project client with the project endpoint and DefaultAzureCredential backed by workload identity. Keyless authentication satisfies the no-secrets mandate and the project client is what exposes deployments and connections to the app."
+  },
+  {
+    "id": 214,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Your generative app reads the Azure AI Search endpoint and an admin key from application settings that were copied by hand when the index was created. The search service has since been recreated in a new resource group, three environments are now out of sync, and the same resource is already registered as a connection in the Foundry project. What is the cleanest way to make the app resilient to this?",
+    "options": [
+      "Resolve the search resource at runtime from the Foundry project's connections, so the endpoint and authentication details come from the project rather than from copied app settings",
+      "Move the endpoint and admin key into Key Vault and reference them from app configuration in each environment",
+      "Hard-code the endpoint but read the admin key from an environment variable that the release pipeline injects per environment",
+      "Create a separate Azure AI Search service per environment and give each one a fixed, environment-specific naming convention the app can compute"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A project connection is the single registered definition of an external resource — endpoint plus authentication mode — so reading it at runtime means the app follows whatever the project points at. Recreating or repointing the search service updates one connection instead of three sets of copied settings.",
+      "Key Vault protects the secret but does not solve the drift: you now have three vault entries containing hand-copied endpoints and keys, and recreating the search service still means updating each one. The duplication of resource metadata is the actual problem.",
+      "This keeps the endpoint hard-coded, which is the value that changed when the resource moved, and it retains an admin key that a keyless connection would eliminate. Injecting it per environment institutionalizes the drift rather than removing it.",
+      "Naming conventions do not remove the copied credential and do not help when a resource is recreated in a different resource group or subscription. The app still holds its own private view of where the search service lives."
+    ],
+    "principle": "external resources belong in project connections, not in copied app settings",
+    "relatedConcept": "Foundry connections centralize endpoints and authentication for external resources such as Azure AI Search, storage and other services, so applications and agents resolve them by name.",
+    "overallExplanation": "Resolve the search resource from the project's connections at runtime. Connections give one authoritative definition of the endpoint and its authentication, which removes per-environment copies of endpoints and admin keys."
+  },
+  {
+    "id": 215,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "Your team wants to run a four-week A/B test between two chat models from different providers in the Foundry model catalog, both deployed in the same project, and plans to swap in further candidates later. The current code calls the provider-specific SDK directly, so every candidate model requires a new client class, new message construction code and new tests. What should you adopt?",
+    "options": [
+      "The Azure AI Inference SDK's chat completions client, which exposes a single, provider-neutral request and response shape across catalog model deployments",
+      "A provider-specific SDK for each candidate model, isolated behind a facade class that your application code calls",
+      "Direct REST calls built with an HTTP client, with a per-provider request template selected by configuration",
+      "One deployment per provider in a separate Foundry project, with traffic split by an Azure Front Door routing rule"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The inference SDK exists precisely for this: one chat completions surface with a common message, tool and response schema that works across model deployments from different providers in the catalog. Swapping a candidate becomes a configuration change of the deployment name rather than a new client implementation.",
+      "A hand-written facade can work but you are re-implementing, testing and maintaining the abstraction that the inference SDK already ships. Every new candidate still requires new adapter code, which is the cost the team is trying to eliminate.",
+      "Hand-rolled REST plus per-provider templates gives up typed clients, retry handling, telemetry integration and credential handling, and it fails the same way: each new provider means a new template and new tests.",
+      "Splitting providers across projects and routing at the edge complicates deployment, monitoring and quota management without touching the actual problem, which is provider-specific client code inside the application."
+    ],
+    "principle": "a provider-neutral inference client makes model swaps a configuration change",
+    "relatedConcept": "Foundry SDKs layer up: the project client resolves project resources and connections, and the inference client provides a uniform chat surface across catalog deployments.",
+    "overallExplanation": "Use the provider-neutral Azure AI Inference chat client so candidate models differ only by deployment name. Writing your own facade or REST templates re-creates an abstraction the SDK already provides and keeps per-provider code in the app."
+  },
+  {
+    "id": 216,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A claims-intake service asks a model to return an object with claim_number, incident_date, amount and injury_flag. About 6% of responses fail downstream parsing: some wrap the object in a markdown fence, some add an explanatory sentence, and some omit injury_flag when the narrative is ambiguous. The prompt already says \"Respond with JSON only.\" What is the most reliable fix?",
+    "options": [
+      "Set the response format to a JSON schema in strict mode, declaring the four fields and their types, so the service constrains decoding to that schema",
+      "Set the response format to JSON object mode, which forces the model to emit syntactically valid JSON",
+      "Add three worked examples of correctly formatted output to the prompt and repeat the \"JSON only\" instruction in the user message",
+      "Wrap the call in a parse-and-retry loop that reissues the request up to three times whenever json.loads raises an exception"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Schema-constrained decoding in strict mode enforces both the syntax and the shape: no markdown fence, no prose preamble, and no missing property, because tokens that would violate the schema cannot be produced. That covers all three observed failure classes rather than just the parse errors.",
+      "JSON object mode guarantees the output parses, which removes the fences and the prose, but it says nothing about which properties must be present. The ambiguous-narrative case that drops injury_flag would still produce valid JSON of the wrong shape.",
+      "Few-shot examples move the failure rate down but leave it stochastic, and they add tokens to every request. When a hard structural guarantee is available from the service, prompt persuasion is the weaker control.",
+      "Retrying catches syntax failures but not the silently missing field, which parses cleanly. It also multiplies latency and cost for the 6% of requests, and it treats a preventable formatting problem as a runtime error to be absorbed."
+    ],
+    "principle": "constrain the output with a schema instead of asking the model to behave",
+    "relatedConcept": "Structured output support ranges from free text, through JSON object mode which guarantees only syntax, to strict JSON schema mode which guarantees the shape of the object.",
+    "overallExplanation": "Use strict JSON schema response format so the service constrains decoding to the declared shape. JSON object mode fixes only syntax, and prompt instructions or retries leave the missing-field case unaddressed."
+  },
+  {
+    "id": 217,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "single",
+    "question": "A regression test asserts that a summarization endpoint returns byte-identical text for a fixed input. The team set temperature to 0, yet the test fails roughly once in every 30 runs with a response that differs by a word or two. Nothing else about the request changes between runs. How should the team handle this?",
+    "options": [
+      "Treat temperature 0 as greedy sampling rather than a determinism guarantee — pass a fixed seed, track the returned system fingerprint, and assert on schema and semantic properties instead of byte equality",
+      "Also set top_p to 0, because determinism requires both sampling parameters to be pinned to their minimum values",
+      "Cache each response keyed by a hash of the prompt so that repeated identical requests always return the previously stored text",
+      "Fine-tune the model on the expected summaries so that the input reliably maps to a single memorized output"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Temperature 0 selects the highest-probability token but floating-point non-determinism, batching and backend model updates can still change a token here and there. A seed plus the system fingerprint gives you best-effort reproducibility and a signal when the backend changes, while assertions on structure and meaning make the test robust to harmless wording differences.",
+      "top_p and temperature are two ways of restricting the same sampling distribution, and pinning both does not remove the sources of variation described above. Setting top_p to 0 also risks degenerate behaviour on some deployments without buying the guarantee the team wants.",
+      "A cache makes the test pass by never exercising the model again, which defeats the purpose of a regression test. It also hides genuine model-behaviour regressions, which is exactly what this test exists to catch.",
+      "Fine-tuning to memorize outputs is enormously expensive relative to the problem, generalizes badly, and still does not guarantee identical decoding. It confuses making the model prefer an answer with making the runtime deterministic."
+    ],
+    "principle": "temperature 0 is greedy decoding, not a determinism contract",
+    "relatedConcept": "Tuning generation behaviour means understanding what each parameter actually controls: temperature and top_p shape the sampling distribution, while seed and system fingerprint provide best-effort reproducibility.",
+    "overallExplanation": "Use a fixed seed, watch the system fingerprint, and assert on schema and meaning rather than exact bytes. Temperature 0 makes decoding greedy but never promises byte-identical responses across runs or backend updates."
+  },
+  {
+    "id": 218,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build generative applications by using Foundry",
+    "type": "multi",
+    "question": "You enable strict JSON schema output for a contract-extraction call. The service rejects the request with a 400 stating that the schema is not supported: your schema marks governing_law and renewal_notice_days as optional, and the nested party object does not restrict which properties may appear. The extraction must still tolerate contracts where those two values are genuinely absent. Which two schema changes resolve this? (Choose two.)",
+    "options": [
+      "List every property, including governing_law and renewal_notice_days, in the required array, and express absence by allowing null in each of those properties' type unions",
+      "Set additionalProperties to false on the root object and on the nested party object so no unlisted properties are permitted",
+      "Drop strict mode and fall back to JSON object mode, then validate the parsed object against your schema in application code",
+      "Set the temperature to 0 on the request so the model consistently emits every property defined in the schema"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Strict schema mode requires that every property be listed as required, so optionality is expressed by permitting null in the type rather than by omitting the key. The extractor still distinguishes \"absent\" from \"present\", but the output shape becomes fixed and predictable for downstream parsing.",
+      "Correct. Strict mode also requires additionalProperties to be false on every object in the schema, including nested ones. Declaring it closes the object so the model cannot invent extra fields, which is both what the service demands and what makes the payload safe to map onto a typed model.",
+      "This abandons the guarantee instead of fixing the schema. JSON object mode enforces only syntax, so you are back to validating shape after the fact and retrying on failures — the situation strict mode was adopted to eliminate.",
+      "Temperature does not influence whether a request's schema is accepted; the 400 is a validation error raised before generation. Sampling parameters cannot substitute for a schema that satisfies the strict-mode constraints."
+    ],
+    "principle": "in strict schema mode every property is required and every object is closed",
+    "relatedConcept": "Strict structured output trades schema expressiveness for a hard guarantee: all properties required, additionalProperties false, and optionality modelled with nullable types.",
+    "overallExplanation": "Mark all properties required with nullable types for genuinely optional values, and set additionalProperties to false on every object. Strict mode's constraints are what make the shape guarantee possible; falling back to JSON object mode gives the guarantee up."
+  },
+  {
+    "id": 219,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A procurement agent is meant to help staff raise purchase requests, but it also answers HR and payroll questions and its tone swings between terse and chatty. The team's current approach is to prepend a 400-word persona-and-scope paragraph to every user message before sending it, and behaviour still drifts as conversations get longer. What is the right way to fix this?",
+    "options": [
+      "Define the role, goal, explicit scope boundaries and tone once in the agent's instructions at agent creation, and send only the user's actual message on each turn",
+      "Keep prepending the paragraph, but repeat the scope rules again at the end of every user message so they stay close to the model's most recent context",
+      "Fine-tune the underlying model on 2,000 procurement conversations so the persona and scope are learned rather than instructed",
+      "Enable a content filter to block HR and payroll topics before they reach the agent"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An agent's instructions are the durable definition of who it is, what it is for and what it must refuse, and they apply to every turn without being restated. Moving persona and scope there removes the per-message token overhead and stops the definition competing with, or getting buried by, the user's own words.",
+      "Duplicating the block at both ends doubles the token cost of every turn and still leaves the definition inside user content, where it is easy for a long conversation, or a user's own instructions, to dilute or contradict.",
+      "Fine-tuning is a heavyweight, slow-to-iterate way to express something that is a one-paragraph configuration change, and it makes scope adjustments require a new training run. It also cannot express hard refusal rules reliably.",
+      "Content filters classify harmful content categories; they are not a topical scope mechanism, and HR or payroll questions are perfectly benign. Scope belongs in the agent's definition, not in a safety filter."
+    ],
+    "principle": "role, goal and scope live in agent instructions, not in every user message",
+    "relatedConcept": "Defining an agent means specifying its role and goal, the boundaries of what it will do, the tools it may use, and how conversation state is tracked.",
+    "overallExplanation": "Put role, goal, scope and tone in the agent's instructions at creation time and send only the user's message each turn. Instructions are persistent and privileged; a persona paragraph repeated inside user content is neither."
+  },
+  {
+    "id": 220,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "Testers report that your Foundry agent asks for the order number again on every follow-up question. Reviewing the code, you see that each incoming chat message creates a new thread, adds the user message to it, starts a run, returns the reply, and discards the thread identifier. The agent definition and tools are otherwise correct. What should you change?",
+    "options": [
+      "Create the thread once when the conversation starts, store its identifier with the user's session, and add each subsequent message to that same thread",
+      "Keep creating a thread per message, but replay the entire prior transcript into the new thread before each run",
+      "Increase the model deployment's context window so that more conversation history fits into each run",
+      "Store the extracted order number in the agent's instructions after the first turn so it is available on later runs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The thread is the conversation-tracking primitive: it holds the ordered message history that each run reads. Creating one per turn throws that history away, so persisting the thread identifier alongside the user session is exactly the missing piece.",
+      "Replaying the transcript would restore the content, but it re-uploads the entire history on every turn and duplicates state the service already maintains. It is a workaround for not persisting an identifier, and it grows more wasteful as conversations lengthen.",
+      "The context window is not the constraint — the runs are not being truncated, they genuinely contain no prior messages. Enlarging a window that is already mostly empty changes nothing.",
+      "Instructions define the agent, not a specific conversation, and they are shared by every user of that agent. Writing one caller's order number into them leaks state across conversations and does not scale past a single user."
+    ],
+    "principle": "one thread per conversation is what gives an agent memory across turns",
+    "relatedConcept": "Conversation tracking in Foundry agents is thread-based: agents are stateless definitions, threads hold message history, and runs execute an agent against a thread.",
+    "overallExplanation": "Create the thread once per conversation and persist its identifier with the session. Threads are the server-side conversation state; discarding the thread each turn means every run starts with no history."
+  },
+  {
+    "id": 221,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A triage agent supports long shifts, and conversations regularly reach 60 or more turns. Telemetry shows prompt tokens per run climbing from about 900 at turn 5 to about 38,000 at turn 60, with per-turn latency rising from 1.4 s to 6.8 s. Operators must still be able to refer back to decisions made early in the shift. What memory strategy should you implement?",
+    "options": [
+      "Summarize older turns into a compact running summary that stays in the thread, while keeping the most recent turns verbatim",
+      "Truncate the history to the last two turns before each run so prompt size stays flat",
+      "Switch to a model deployment with a larger context window and leave the full history in place",
+      "Disable conversation tracking and require operators to restate any earlier context they need"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Rolling summarization is the standard trade: recent turns keep full fidelity where precision matters most, while older turns are compressed into a summary that preserves decisions and commitments. Prompt growth becomes roughly bounded, so both cost and latency stop scaling with shift length.",
+      "A two-turn window flattens tokens but destroys exactly the capability the operators need — recalling decisions made hours earlier. It optimizes the metric while breaking the requirement.",
+      "A larger window postpones the wall without addressing it: you still pay for and process 38,000 tokens per turn, latency keeps climbing, and quality often degrades as relevant details are buried in a very long context.",
+      "Removing memory pushes the burden onto operators mid-incident and guarantees inconsistent context. It converts an engineering problem into a human error source."
+    ],
+    "principle": "bound context growth by compressing old turns, not by deleting them",
+    "relatedConcept": "Conversation memory strategies trade fidelity for cost: full history, sliding windows, rolling summaries and externally stored facts each suit different conversation lengths.",
+    "overallExplanation": "Use a rolling summary of older turns plus verbatim recent turns. This bounds prompt growth so cost and latency stop scaling with conversation length, while still preserving the earlier decisions operators must be able to reference."
+  },
+  {
+    "id": 222,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A developer registers a custom function tool named issue_credit(customer_id, amount) with an agent and expects the service to run the Python function whenever the model decides a credit is warranted. In testing, runs stop in a state indicating that action is required and no credit is ever issued, although the run's payload contains the function name and well-formed arguments. What is happening?",
+    "options": [
+      "The model only selects the tool and produces arguments; the application must validate and authorize the call, execute the function itself, and submit the output back to the run before it can continue",
+      "The function tool was registered without an execution handler, so registering the same schema again with the handler attached will let the service run it",
+      "Custom function tools require the run to be created in streaming mode, because only streaming runs dispatch function execution",
+      "The model lacks permission to call the tool, so granting the agent's identity a data-plane role on the target service will allow the run to proceed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. For custom functions, the division of responsibility is fixed: the model chooses the tool and emits arguments, and your code decides whether the call is permitted, executes it, and returns the output to the run. The required-action state is the service telling the application that it is now the application's turn to act.",
+      "This encodes the misconception that the service can run your code. A tool registration is a schema — a name, description and parameter definition — and there is nowhere for the service to obtain or execute your process's function body.",
+      "Streaming changes how run events are delivered, not who executes custom functions. A streaming run surfaces the same required-action event and still waits for the application to submit the tool output.",
+      "Role assignments govern what your application's identity may call in Azure; they do not make the platform execute a function that lives inside your process. The run is not blocked on authorization, it is blocked waiting for tool output."
+    ],
+    "principle": "the model selects a tool; application code validates, executes and returns the result",
+    "relatedConcept": "Function calling splits responsibility between the model, which proposes a call, and the application, which enforces authorization and business rules before executing it and returning output to the run.",
+    "overallExplanation": "The run pauses in a required-action state because custom function execution is the application's job: validate and authorize the proposed call, run it, then submit the output. Registering a schema never gives the service the ability to run your code."
+  },
+  {
+    "id": 223,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "Your agent's create_ticket tool takes priority and region. The tool schema types both as plain strings with the description \"the ticket priority\" and \"the region\". In production the model supplies values such as \"very urgent\", \"P1-high\" and \"US-East\", and the downstream API rejects roughly 9% of calls with HTTP 400. What is the best fix?",
+    "options": [
+      "Tighten the tool schema — model priority and region as enums of the exact accepted values with precise descriptions and required flags — and, when arguments are still invalid, return a descriptive error as the tool result so the model can correct itself",
+      "List the accepted priority and region values in the agent's instructions and remind the model to use only those values",
+      "Set temperature to 0 so the model consistently emits the same argument values for similar requests",
+      "Add a mapping table in application code that normalizes any free-text priority or region string onto the nearest accepted value"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Tool schemas are the contract the model reasons over, and enums remove the guesswork by enumerating exactly which values exist. Returning a descriptive error as the tool result rather than throwing closes the loop, because the model sees what was wrong and can retry with a valid argument.",
+      "Instructions are far from the point of use and compete with everything else in context, so argument-shaped rules stated there are followed inconsistently. The schema is where the model looks when constructing a call, which is why constraints belong in it.",
+      "Temperature 0 makes wrong arguments consistent rather than correct: if the model believes \"very urgent\" is a valid priority, it will emit it every time. Determinism does not supply the missing information about the allowed value set.",
+      "Fuzzy normalization can be a useful backstop, but as the primary fix it silently guesses user-visible outcomes — mapping \"P1-high\" to the wrong tier is worse than a rejected call — and it leaves the model uninformed about the real contract."
+    ],
+    "principle": "constrain tool arguments in the schema and return errors the model can act on",
+    "relatedConcept": "Tool schema design — clear names, precise descriptions, enums, required fields — is the highest-leverage control over how correctly a model calls your functions.",
+    "overallExplanation": "Encode the accepted values as enums in the tool schema and return descriptive errors as tool results so the model can self-correct. Argument constraints stated only in instructions, or patched by fuzzy normalization in code, leave the contract ambiguous."
+  },
+  {
+    "id": 224,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "Your agent sometimes proposes three tool calls in a single turn — get_inventory, get_shipping_eta and get_price. Your handler executes all three, concatenates the results into one string, and submits it as a single tool output. The service then rejects the submission, reporting that outputs are missing for two of the tool call identifiers. What must the handler do?",
+    "options": [
+      "Submit one tool output per proposed call, each carrying the identifier of the tool call it answers",
+      "Disable parallel tool calling on the run so the model can only propose one tool at a time",
+      "Submit the concatenated output against the first tool call identifier and let the model infer the rest from the combined text",
+      "Start a separate run for each proposed tool call so every run has exactly one output to submit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Each proposed call carries its own identifier, and the protocol requires a matching output for every one of them so the model can attribute each result to the request that produced it. Emitting one output per identifier is the direct fix and preserves the latency benefit of executing the three lookups together.",
+      "Serializing the calls would make the error go away, but it triples the round trips for three independent lookups and treats a correlation bug in your handler as a platform limitation. Parallel calls are a performance feature worth keeping.",
+      "This is exactly the failure being reported: two identifiers still have no output, so the submission is invalid. Even if it were accepted, forcing the model to disentangle three results from one blob invites misattribution.",
+      "Splitting into separate runs discards the thread's in-progress state for that turn and multiplies overhead. The proposed calls belong to one run's required action and must be answered within it."
+    ],
+    "principle": "every proposed tool call needs its own result, matched by call id",
+    "relatedConcept": "Parallel tool calling lets a model request several independent functions in one turn; the application executes them and returns a correlated result per call identifier.",
+    "overallExplanation": "Return one tool output per tool call identifier. The identifiers are how results are correlated with requests, so concatenating them into a single output breaks the protocol and loses attribution."
+  },
+  {
+    "id": 225,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A compliance agent must answer questions from 30 PDF standard operating procedures that are updated a few times a year, and every answer must cite the document and section it came from. A prototype pastes the extracted text of all 30 PDFs into the agent's instructions, which now exceed the instruction size limit and produce answers with no traceable source. What should the agent use instead?",
+    "options": [
+      "Upload the PDFs into a vector store and attach the file search tool to the agent, so it retrieves relevant passages at query time and returns citation annotations",
+      "Keep the documents in the instructions but ask the model to append the file name and section it used to each answer",
+      "Attach the code interpreter tool and have the agent open and read each PDF from disk when a question arrives",
+      "Write a custom function that downloads all 30 PDFs from blob storage and returns their full text as the tool result"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. File search indexes the uploaded documents into a vector store and retrieves only the passages relevant to each question, which keeps prompts small and removes the size limit problem. It also returns citation annotations pointing back at the source file and passage, which is precisely the traceability the compliance requirement demands.",
+      "Asking the model to name its source after the fact produces plausible-looking attributions rather than verified ones, and it does nothing about the instruction size limit that already broke the prototype.",
+      "The code interpreter runs code in a sandbox for computation and data manipulation; it is not a retrieval system, and having it parse 30 PDFs per question is slow, brittle and produces no ranked passages or citation metadata.",
+      "Returning the full text of 30 documents as a tool result just relocates the oversized context from instructions into the message history. Cost and latency rise on every question and the model still has to find the relevant passage unaided."
+    ],
+    "principle": "large knowledge belongs in a retrieval tool, not in the agent's instructions",
+    "relatedConcept": "Knowledge integration for agents ranges from file search over an uploaded vector store, through connected search indexes, to custom retrieval functions — all of which fetch only what the current question needs.",
+    "overallExplanation": "Put the PDFs in a vector store and attach the file search tool so passages are retrieved per question with citation annotations. Instructions are for defining the agent, not for carrying a document corpus."
+  },
+  {
+    "id": 226,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "multi",
+    "question": "Your support agent must ground its answers in an existing Azure AI Search index named kb-articles that lives in a different resource group from the Foundry project and is already populated by a nightly indexer. The agent currently has no way to reach it, and security requires that no admin key is embedded in the agent definition. Which two steps wire the index into the agent? (Choose two.)",
+    "options": [
+      "Register the Azure AI Search resource as a connection in the Foundry project, authenticated with the project's managed identity rather than an admin key",
+      "Add the Azure AI Search tool to the agent's tool list, referencing that connection and the kb-articles index name",
+      "Export the top 50 articles from the index and append them to the agent's instructions as a fallback for when search is unavailable",
+      "Assign each end user's Entra ID account the Search Index Data Reader role on the search service so their queries are authorized"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A project connection is how a Foundry project learns about an external resource, and configuring it for identity-based authentication satisfies the no-embedded-key requirement while keeping the credential out of the agent definition entirely.",
+      "Correct. The connection makes the resource reachable; adding the search tool with the connection and index name is what actually gives the agent the ability to query kb-articles during a run. Both halves are required — a connection alone grants no capability.",
+      "Duplicating article text into instructions bloats every run, goes stale as soon as the nightly indexer runs, and produces answers that cannot be traced to the index. A stale in-prompt copy is a worse failure mode than a temporarily unavailable search tool.",
+      "The agent queries the index with the project's identity, not with each end user's identity, so per-user role assignments on the search service do not authorize the tool call. Access trimming for individual users is a separate concern solved with security filters in the index, not with this role assignment."
+    ],
+    "principle": "a connection makes a resource reachable; a tool makes it usable",
+    "relatedConcept": "Integrating agent tools with Azure resources is a two-part configuration: a project connection that defines endpoint and authentication, and a tool attached to the agent that references it.",
+    "overallExplanation": "Create an identity-based project connection to the search service, then attach the Azure AI Search tool referencing that connection and index. Connections define reachability and credentials; the tool attachment is what grants the agent the capability at run time."
+  },
+  {
+    "id": 227,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "An inventory platform exposes 14 operations through a documented OpenAPI 3.0 specification and is secured by an API key sent in a header. To let an agent use it, a developer has hand-written 14 Python function tools that each build a request, add the header and parse the response — roughly 600 lines that must be updated whenever the API changes. What is the better integration?",
+    "options": [
+      "Register an OpenAPI-specified tool with the agent using the existing specification, and supply the credential through a project connection so the operations become callable tools without wrapper code",
+      "Keep the 14 custom functions but generate them from the specification with a code generator run in the build pipeline",
+      "Paste the OpenAPI specification into the agent's instructions and let the model construct the HTTP calls itself",
+      "Put the API key in the agent's instructions so the model can include the header when it calls the inventory endpoints"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An OpenAPI-specified tool turns the specification itself into the tool contract, so operation names, parameters and schemas come straight from the document the API team already maintains. Authenticating through a project connection keeps the key out of the agent definition and out of your code.",
+      "Code generation reduces the hand-editing, but you still own, build, version and deploy 14 generated wrappers plus a generator step, when the platform can consume the specification directly. It is a smaller version of the same avoidable cost.",
+      "An agent cannot make arbitrary outbound HTTP calls just because it has read a specification; tools are what grant capability. This also spends thousands of tokens per run on a document the model would have to re-read every time.",
+      "Instructions are neither a secret store nor an execution mechanism. The key would be visible to anyone who can read the agent definition, could surface in traces or responses, and the model still has no way to issue the call."
+    ],
+    "principle": "let the API specification be the tool contract instead of hand-writing wrappers",
+    "relatedConcept": "Agent tools span custom functions, OpenAPI-specified tools for existing REST services, knowledge tools such as search and file search, and hosted tools like code interpreter.",
+    "overallExplanation": "Register the existing OpenAPI specification as a tool and authenticate through a project connection. The specification already defines every operation and schema, so wrapper functions — hand-written or generated — are maintenance you do not need to own."
+  },
+  {
+    "id": 228,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A single operations agent has accumulated 41 tools spanning billing, shipping, device diagnostics and account administration. Evaluation shows tool-selection accuracy falling from 94% at 12 tools to 71% at 41, several tools have overlapping descriptions such as \"look up an order\" and \"fetch order details\", and each run now sends about 9,000 tokens of tool definitions. What is the right restructuring?",
+    "options": [
+      "Split the capability into specialized agents with focused, non-overlapping toolsets and have a coordinating agent delegate each request to the right specialist",
+      "Keep the single agent but rewrite all 41 tool descriptions to be longer and more detailed so the model can distinguish them",
+      "Keep the single agent and set temperature to 0 so that tool selection becomes deterministic",
+      "Keep the single agent and force tool use on every turn so the model cannot answer without consulting a tool"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Selection accuracy degrades as the candidate set grows and as descriptions overlap, so the structural fix is to shrink the choice each model call faces. Specialists with a handful of coherent tools each, behind a coordinator that routes by domain, restores a small decision space and cuts the per-run tool-definition tokens.",
+      "Longer descriptions add to the 9,000 tokens already spent per run and do not resolve genuinely duplicated capabilities — two tools that do the same thing stay ambiguous however elaborately they are described. Deduplication and decomposition come first.",
+      "Determinism is not accuracy: temperature 0 makes the agent choose the same wrong tool every time for a given phrasing. The problem is the size and ambiguity of the candidate set, which sampling parameters cannot change.",
+      "Forcing tool use addresses whether a tool is called, not which one. With 41 overlapping options the model is just as likely to pick the wrong one, and requests that need no tool now waste a call."
+    ],
+    "principle": "shrink the decision space — specialists beat one agent with dozens of tools",
+    "relatedConcept": "Multi-agent orchestration decomposes a broad capability into focused agents so that each model call reasons over a small, unambiguous set of tools.",
+    "overallExplanation": "Decompose into specialized agents with focused toolsets behind a coordinating agent. Tool-selection accuracy falls as the candidate set grows and overlaps, and no amount of description tuning or parameter pinning changes that."
+  },
+  {
+    "id": 229,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A supplier due-diligence solution runs three analyses — financial health, legal exposure and technical capability — each using different sources and none depending on the others' output, followed by a single ranked recommendation. The current design hands off from one specialist to the next in a chain, takes about 95 s end to end, and the technical specialist's summary keeps echoing the legal specialist's wording. Which orchestration should you use?",
+    "options": [
+      "Run the three specialists concurrently over the same brief and pass their three independent outputs to a synthesizing agent that produces the recommendation",
+      "Keep the sequential chain but instruct each specialist to ignore the previous specialist's output when writing its own",
+      "Merge the three specialists into one agent with all their tools and ask it to produce all three analyses in a single response",
+      "Keep the sequential chain and cache each specialist's output so repeat suppliers skip the earlier stages"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The three analyses are independent, so a concurrent fan-out cuts elapsed time to roughly the slowest specialist rather than the sum, and it structurally prevents anchoring because no specialist ever sees another's text. The synthesizer then has three genuinely independent assessments to weigh.",
+      "This tries to fix contamination with an instruction while leaving the contaminating text in context. Models anchor on what they can see, and the sequential chain also keeps the 95 s latency that concurrency would remove.",
+      "One agent with every tool loses the specialization and the separate evaluation surface, and generating three analyses in one response makes them share a single reasoning trace — the strongest form of the anchoring problem you are trying to eliminate.",
+      "Caching helps only on repeat suppliers and does nothing for the first assessment of a new one. It also leaves the anchoring defect fully intact for every cache miss."
+    ],
+    "principle": "match the orchestration shape to the dependency graph of the work",
+    "relatedConcept": "Common multi-agent patterns include sequential handoff for dependent stages, concurrent fan-out for independent analyses, and a synthesizer that reconciles parallel results.",
+    "overallExplanation": "Fan the three independent analyses out concurrently and synthesize the results. Sequential chaining is for genuinely dependent stages; using it for independent work costs latency and lets each specialist anchor on the previous one's wording."
+  },
+  {
+    "id": 230,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A coordinating agent delegates warranty questions to a specialist agent by sending it the text \"Handle this warranty question.\" Traces show the specialist immediately asking for the serial number, purchase date and region — values the coordinator already collected earlier in the conversation — so the user is asked for them twice. What is the correct fix?",
+    "options": [
+      "Define an explicit input contract for the specialist and have the coordinator pass the collected fields as structured context in the delegation request",
+      "Give the specialist agent read access to the coordinator's thread so it can search the history for the values it needs",
+      "Add an instruction to the specialist telling it to assume sensible defaults rather than asking the user for missing details",
+      "Have the coordinator restate the entire conversation transcript verbatim in the delegation message"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Delegation is an interface, and interfaces need a contract: state which fields the specialist requires and have the coordinator supply them explicitly. That makes the hand-off testable, keeps the specialist independent of how the coordinator gathered the data, and removes the duplicate questioning entirely.",
+      "Sharing raw conversation state couples the two agents to each other's internals and forces the specialist to re-derive facts by reading history, which is both slower and error-prone. It also widens the data the specialist can see beyond what its task requires.",
+      "Guessing a warranty region or purchase date produces confidently wrong outcomes on exactly the inputs that determine eligibility. The information exists — the problem is that it was never passed, not that the specialist is too cautious.",
+      "Dumping the full transcript is expensive, grows without bound, and leaves the specialist to extract the fields itself. It replaces a missing contract with more context rather than with a defined one."
+    ],
+    "principle": "agents hand off through explicit contracts, not shared memory",
+    "relatedConcept": "In orchestrated multi-agent solutions, each delegation should specify the inputs the sub-agent needs and the shape of the result it returns, so agents stay independently testable.",
+    "overallExplanation": "Give the specialist a defined input contract and pass the collected fields as structured context. Sub-agents do not inherit the coordinator's context, and replacing a contract with a shared thread or a transcript dump trades a clean interface for coupling and cost."
+  },
+  {
+    "id": 231,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "multi",
+    "question": "Finance will let a support agent issue refunds without a human when the amount is under 50 USD, but every refund at or above that amount must be approved by a named agent supervisor before the money moves. The agent already has a process_refund function tool, and the underlying payments API accepts any amount the caller sends. Which two safeguards should you implement? (Choose two.)",
+    "options": [
+      "Implement the threshold check in the tool-execution path, so proposed refunds at or above 50 USD are suspended and executed only after a supervisor records an approval decision",
+      "Scope the credential the tool executes with so the payments API itself rejects amounts above the ceiling, giving a second enforcement point independent of the agent",
+      "Add an instruction telling the agent to ask the supervisor for permission before issuing any refund of 50 USD or more",
+      "Log every refund the agent issues to Application Insights and have a supervisor review the previous day's refunds each morning"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The approval gate must sit where execution happens: the model proposes the refund, and the application decides whether it may proceed. Suspending the run pending a recorded approval decision makes the control enforceable and produces the audit trail finance needs.",
+      "Correct. Defense in depth means the boundary is enforced even if the orchestration layer is bypassed or buggy. A credential or API-side limit that cannot issue more than the ceiling turns a policy into a technical constraint that no prompt injection can talk its way past.",
+      "Instructions influence behaviour probabilistically. A cleverly worded customer message, an unusual case, or ordinary sampling variance can produce a refund without the approval step, which is why financial controls are never implemented as prompt text.",
+      "Daily review is detection after the money has left, not prevention. It is a useful supplementary control but it does not satisfy a requirement that approval happen before the refund is issued."
+    ],
+    "principle": "approval gates and hard limits belong in code, never in instructions",
+    "relatedConcept": "Semiautonomous agents combine autonomous action inside a bounded envelope with human-in-the-loop approval for consequential operations, enforced by the application rather than the model.",
+    "overallExplanation": "Enforce the approval gate in the tool-execution path and back it with a credential or API-side ceiling. Prompt instructions bias behaviour but cannot guarantee it, and after-the-fact log review detects violations rather than preventing them."
+  },
+  {
+    "id": 232,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "Your agent's charge_card tool calls a payments API with a 30 s client timeout. During a provider slowdown, several calls exceeded the timeout, your handler retried them, and 23 customers were charged twice — the original request had in fact succeeded server-side after the client gave up. What change prevents this recurring?",
+    "options": [
+      "Send a stable idempotency key derived from the tool call identifier with every attempt, so the payments API recognizes a retry of the same logical operation and returns the original result",
+      "Raise the client timeout from 30 s to 120 s so slow responses have time to arrive before the handler retries",
+      "Remove the retry from the handler and let the agent decide from the error message whether to call charge_card again",
+      "Wrap the call in a try/except block that records the timeout and reports a failure to the user without retrying"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A timeout tells you nothing about whether the server completed the work, so safe retries require the operation to be idempotent. A key that is stable across attempts but unique per logical operation lets the payments API deduplicate, so the retry returns the original charge instead of creating a second one.",
+      "A longer timeout narrows the window without closing it: any request that still exceeds 120 s reproduces the identical double-charge, and every genuinely failed call now blocks the agent for two minutes. Timeout tuning is not a correctness control.",
+      "Delegating retry decisions to the model makes a financial correctness property depend on how it interprets an error string, and it can just as easily decide to charge again. Retry safety is application logic, not a judgement call.",
+      "Never retrying avoids duplicates but converts every transient blip into a failed customer payment, and it still leaves the ambiguous case — the charge may well have succeeded — unresolved for the customer and for reconciliation."
+    ],
+    "principle": "any side-effecting tool that can be retried must be idempotent",
+    "relatedConcept": "Agent runs retry on timeouts and transient errors, so tools with external side effects need deduplication keys to keep at-least-once delivery from becoming at-least-twice execution.",
+    "overallExplanation": "Pass a stable idempotency key derived from the tool call so the payments API can deduplicate retries. Timeouts leave the outcome unknown, which is why retry safety must be built into the operation rather than tuned around."
+  },
+  {
+    "id": 233,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "Overnight, a data-quality agent entered a loop: a downstream validation tool began returning HTTP 503, the agent retried it with slightly reworded arguments 63 times over four hours, consumed about 410,000 tokens, and no one was alerted until the morning stand-up. Every individual tool call and model call was well formed. What safeguard should the orchestration add?",
+    "options": [
+      "Enforce per-run limits — a maximum number of iterations and a token or cost budget — plus a circuit breaker that stops after repeated failures of the same tool and escalates to a human",
+      "Add an instruction telling the agent to stop retrying a tool that has failed more than three times in a row",
+      "Increase the model deployment's rate limit so that a looping run cannot exhaust capacity for other workloads",
+      "Switch the run to a smaller, cheaper model so that a loop of this kind costs far less if it happens again"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Autonomy needs a bounded envelope enforced by the code that drives the run: iteration caps and budgets bound the blast radius, a circuit breaker recognizes that the tool itself is down rather than the arguments being wrong, and escalation puts a human in the loop while the incident is still live.",
+      "The looping agent is following its instructions to complete the task; an added instruction is one more probabilistic signal competing with that goal. Runaway-cost protection must not depend on the model choosing to obey it.",
+      "Rate limits protect other workloads from this run but do nothing to stop it. The agent would still spin all night, just more slowly, and the tool would still be down with nobody notified.",
+      "A cheaper model reduces the bill for the same broken behaviour. The defect is an unbounded loop against a failing dependency with no alerting, and model choice does not address any part of that."
+    ],
+    "principle": "autonomy needs budgets, circuit breakers and an escalation path",
+    "relatedConcept": "Safeguards for autonomous workflows are enforced by the orchestration layer: iteration and cost budgets, circuit breakers on repeatedly failing tools, and escalation when limits are reached.",
+    "overallExplanation": "Bound the run with iteration and cost limits, break the circuit on a repeatedly failing tool, and escalate to a human. Runaway autonomous behaviour is contained by the orchestrator, never by asking the model to restrain itself."
+  },
+  {
+    "id": 234,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A deployed scheduling agent produces answers that read well and are grounded in its knowledge source, but operators complain that it frequently misreads what was asked — booking a reschedule when a cancellation was requested — and calls check_availability with the wrong technician identifier. Groundedness averages 0.93. Which evaluators should you add to quantify these specific failures?",
+    "options": [
+      "Intent resolution, tool call accuracy and task adherence evaluators, which score whether the agent understood the request, called the right tools with the right arguments, and stayed within its instructions",
+      "Groundedness and retrieval evaluators run against a larger and more diverse evaluation set",
+      "Coherence and fluency evaluators, since misunderstood requests usually produce less coherent responses",
+      "Content safety evaluators across the harm categories, run on the same scheduling conversations"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. These are agent-specific metrics aimed at exactly the reported defects: intent resolution measures whether the agent correctly understood what the user wanted, tool call accuracy measures whether the right tool was invoked with the right parameters, and task adherence measures whether it stayed inside its assigned job.",
+      "The scenario already reports 0.93 groundedness, so the failure is not about unsupported claims. Running the same content-support metrics on more data measures the thing that is already working.",
+      "Coherence and fluency assess the language, and a confidently wrong reschedule is usually perfectly coherent. These metrics would stay high while the operational failures continue.",
+      "Safety evaluators look for harmful content, which is unrelated to misreading intent or passing a wrong technician identifier. They are a necessary part of a release gate but blind to this class of defect."
+    ],
+    "principle": "agent quality is measured on intent, tool calls and adherence, not just on grounding",
+    "relatedConcept": "Agent evaluation adds behaviour-level metrics — intent resolution, tool call accuracy, task adherence — on top of the response-level quality and safety metrics used for generative apps.",
+    "overallExplanation": "Add intent resolution, tool call accuracy and task adherence evaluators. Response-level metrics such as groundedness and fluency can look excellent while the agent misunderstands requests and calls tools with wrong arguments."
+  },
+  {
+    "id": 235,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "single",
+    "question": "A deployed agent fails to complete about 8% of runs. The team's response has been to add retries around every tool call and to rewrite the system prompt twice, with no measurable improvement. Tracing is enabled and each run emits spans for retrieval, model calls and each tool invocation, with inputs and outputs recorded. What should the team do next?",
+    "options": [
+      "Sample the failed runs' traces, classify each failure by the span where it first went wrong, and fix the largest category first",
+      "Increase the retry count and add a longer backoff, since the failures are most likely transient service errors",
+      "Move to a larger, more capable model deployment so that fewer runs fail regardless of the underlying cause",
+      "Rewrite the system prompt a third time with more explicit step-by-step instructions and re-measure the failure rate"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The team has been guessing, and the traces already contain the answer. Classifying failures by the first failing span separates distinct root causes — empty retrieval, malformed tool arguments, downstream 4xx, run timeouts — that need different fixes, and it tells you which one accounts for most of the 8%.",
+      "Blanket retries are already in place and have not helped, which is evidence that the failures are not transient. More retries would also amplify any non-idempotent side effects while masking the real defect.",
+      "Swapping the model is an expensive change made without a hypothesis. If most failures come from a downstream API rejecting arguments or from empty retrieval, a better model changes little and the cost per run rises for everyone.",
+      "A third prompt rewrite continues the same unmeasured loop. Prompt changes are a valid remedy for some failure categories, but only once error analysis has shown that the model's reasoning, rather than a tool or retrieval, is where runs break down."
+    ],
+    "principle": "classify failures from traces before choosing a fix",
+    "relatedConcept": "Error analysis for deployed agents uses trace data to bucket failures by the span in which they originate, turning an aggregate failure rate into specific, addressable causes.",
+    "overallExplanation": "Sample failed traces, bucket them by the first failing span, and fix the biggest category first. An 8% failure rate is several different bugs, and untargeted retries, prompt rewrites and model upgrades each address at most one of them."
+  },
+  {
+    "id": 236,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Build agents by using Foundry",
+    "type": "multi",
+    "question": "A nightly reconciliation \"agent\" processes about 5,000 records. Traces show that in 97% of runs it calls fetch_ledger, then match_transactions, then post_exceptions, in exactly that order, and the model contributes no branching. The remaining 3% are records with ambiguous vendor names where a judgement call genuinely helps. The job costs 1.9 million tokens a night. Which two changes should you make? (Choose two.)",
+    "options": [
+      "Replace the fixed three-step sequence with a deterministic workflow in application code that calls the three operations directly",
+      "Route only the ambiguous vendor-name records to a model-driven step, so language understanding is applied where branching actually exists",
+      "Keep the agent loop but raise the maximum iteration limit so ambiguous records get more attempts to resolve themselves",
+      "Keep the agent loop and add more tools so the model has richer options when it plans each night's run"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. When the trace shows the same three calls in the same order almost every run, the model is being paid to rediscover a sequence you already know. Encoding it in code makes the job faster, cheaper, deterministic and trivially testable, and removes an entire class of nondeterministic failure.",
+      "Correct. The 3% of ambiguous vendor names is where judgement genuinely adds value, so that is where the model belongs. Routing only those records preserves the benefit while collapsing the token cost by roughly two orders of magnitude.",
+      "More iterations increase cost and latency for the same fundamentally deterministic pipeline, and the 97% case does not need iteration at all. This treats a design mismatch as a tuning parameter.",
+      "Adding tools enlarges the decision space the model must reason over each night, which reduces selection accuracy and increases tokens, all in service of a sequence that never actually varies."
+    ],
+    "principle": "if the trace shows no branching, it is a workflow wearing an agent costume",
+    "relatedConcept": "Choosing between an agent and a workflow is an evidence-based decision: agents earn their nondeterminism only where the next step genuinely depends on judgement.",
+    "overallExplanation": "Convert the fixed sequence into deterministic code and reserve a model-driven step for the ambiguous 3%. Traces showing an invariant tool order are the clearest signal that the workload is a workflow, with a narrow agentic step inside it."
+  },
+  {
+    "id": 237,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "A release-notes generator must emit three short sections in a fixed order with dates written as 2026-04-16 and no marketing adjectives. The prompt describes these rules in two paragraphs of prose, temperature is 0.7, and reviewers reject roughly a third of drafts for reordered sections, dates like \"16 April 2026\", and phrases such as \"exciting new capability\". What should you change first?",
+    "options": [
+      "Add three short few-shot examples that demonstrate the exact section order, date format and tone, and lower temperature to around 0.2 for this task",
+      "Raise temperature to 0.9 so the model explores more phrasings and is more likely to find one that matches the house style",
+      "Rewrite the two paragraphs of rules at greater length and repeat the most important ones at the top and bottom of the prompt",
+      "Fine-tune a model on the last two years of accepted release notes so the house style is learned rather than described"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Format and tone are far easier for a model to imitate than to infer from prose rules, so a couple of correctly shaped examples usually eliminate most drift immediately. Lowering temperature narrows sampling toward the demonstrated pattern, which is what a style-conformance task wants.",
+      "Higher temperature increases variety, which is the opposite of what a fixed-format task needs. Reviewers are rejecting drafts for deviating from a house style, so more exploration produces more rejections, not fewer.",
+      "More prose about the rules adds tokens and still asks the model to infer a format it could simply be shown. Repetition at both ends helps marginally at best and leaves the 0.7 temperature driving variation.",
+      "Fine-tuning is a reasonable long-term option but it is slow, costly and hard to iterate for a problem that a few examples and a parameter change usually solve. Try the cheap, reversible fix before training a model."
+    ],
+    "principle": "show the format with examples before describing it at greater length",
+    "relatedConcept": "Tuning generation behaviour combines prompt technique — instructions, few-shot demonstrations, output structure — with parameter choices such as temperature suited to the task.",
+    "overallExplanation": "Add a few correctly formatted examples and lower temperature for this task. Demonstration outperforms description for format and tone, and a creative-writing temperature is the wrong setting for a fixed-shape document."
+  },
+  {
+    "id": 238,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "multi",
+    "question": "A meeting-notes service asks a model for a JSON object containing a summary and an array of action items, with the maximum output token setting left at 256. For long meetings the response arrives cut off mid-string and json.loads raises an exception, which the service catches and logs as \"model returned invalid JSON\". Measured full responses need about 900 output tokens. Which two changes should you make? (Choose two.)",
+    "options": [
+      "Raise the maximum output token limit above the observed requirement, with headroom for the longest meetings",
+      "Inspect the response's finish reason and treat a value of \"length\" as a truncation condition to handle explicitly, rather than letting the parse failure stand in for it",
+      "Lower the temperature to 0 so the model produces a more compact and predictable response that fits within 256 tokens",
+      "Catch the parse exception and retry the identical request up to five times until a complete object is returned"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The response is not malformed, it is unfinished: generation stopped at the cap. Setting the limit above the measured 900-token requirement, with headroom, removes the actual cause rather than the symptom.",
+      "Correct. The finish reason distinguishes a truncated completion from a genuine formatting error, and today's log message misattributes one as the other. Handling \"length\" explicitly gives accurate telemetry and lets the service degrade deliberately — for example by requesting a shorter summary — instead of failing opaquely.",
+      "Temperature affects which tokens are chosen, not how many are allowed. A deterministic response of the same length is truncated at exactly the same point, so the parse failure recurs unchanged.",
+      "Retrying an identical request against an unchanged token cap reproduces the same truncation, so the loop burns five times the cost and latency before failing anyway. Retries help with transient errors, not with a deterministic limit."
+    ],
+    "principle": "read the finish reason — truncation is not a formatting error",
+    "relatedConcept": "Operationalizing generative calls means treating the response's finish reason as a first-class signal so that length limits, content filtering and normal completion are handled distinctly.",
+    "overallExplanation": "Raise the output token limit past the measured requirement and branch on a finish reason of \"length\". Truncated JSON is a budget problem, and diagnosing it as invalid output hides the real cause from your telemetry."
+  },
+  {
+    "id": 239,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "To stop a summarizer repeating stock phrases, a developer simultaneously set temperature to 0.1, top_p to 0.2 and frequency_penalty to 1.5. The repetition is gone, but summaries are now stilted, and domain terms that must appear on every occurrence — such as the policy number repeated in each clause reference — are being dropped or replaced with pronouns. How should the team proceed?",
+    "options": [
+      "Reset top_p to 1 and the penalties to 0, tune temperature alone against the evaluation set, and address any remaining repetition with instructions and examples",
+      "Raise frequency_penalty further, to about 2.0, so the model is pushed even harder away from repeating phrases",
+      "Set both temperature and top_p to 0 so that sampling is maximally constrained and output becomes predictable",
+      "Move to a larger model deployment, since bigger models repeat themselves less and handle domain vocabulary better"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Temperature and top_p both narrow the same sampling distribution, so tightening both compounds the effect and produces stilted text, while a high frequency penalty explicitly discourages tokens that have already appeared — which is why the mandatory repeated policy number is disappearing. Tuning one parameter at a time against a measured evaluation set is the only way to attribute effects.",
+      "This deepens the exact mechanism causing the damage: the penalty does not distinguish stock filler from required domain vocabulary, so a stronger penalty drops the policy number more often, not less.",
+      "Zeroing both parameters makes output maximally greedy and repetitive in a different way, and it does nothing about the penalty that is suppressing required terms. It also confuses predictability with quality.",
+      "A larger model may improve fluency, but it inherits the same parameter settings — a frequency penalty of 1.5 will suppress required repeated terms on any model. The misconfiguration must be fixed regardless of model choice."
+    ],
+    "principle": "change one sampling parameter at a time and know what each one suppresses",
+    "relatedConcept": "Temperature and top_p are two views of the same sampling distribution, while frequency and presence penalties act on token reuse — which makes them hostile to text that must repeat identifiers.",
+    "overallExplanation": "Reset top_p and the penalties, then tune temperature alone against an evaluation set. Stacking overlapping sampling controls makes effects impossible to attribute, and repetition penalties cannot tell filler phrases from required domain terms."
+  },
+  {
+    "id": 240,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "An analyst-report generator drafts a 1,200-word market summary from ten retrieved sources. Review finds that about 11% of individual statements are not supported by any retrieved source, and compliance requires that number to fall below 2% before launch. The team can tolerate roughly doubled latency and cost on the final draft only. What should they implement?",
+    "options": [
+      "A self-critique pass over the completed draft in which a second call checks each claim against the retrieved sources and either revises it or flags it for human review",
+      "Appending \"Let's think step by step\" to the drafting prompt so the model reasons more carefully as it writes",
+      "Generating three drafts at temperature 0.8 and selecting the longest one, on the basis that more detail means better sourcing",
+      "Raising the retrieval top-k from 10 to 40 so that every claim the model might make is likely to be covered by some source"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A verification pass separates generation from checking, so the second call's only job is to test each claim against the evidence — a much easier task than writing well and staying grounded at the same time. Applying it to the final draft alone fits the stated cost and latency budget, and the flag path keeps a human on the residual cases.",
+      "A generic reasoning instruction produces small and inconsistent gains and provides no verification step or audit artifact. Compliance needs a measurable reduction with evidence, not a prompt that encourages care.",
+      "Sampling several drafts and picking the longest optimizes for verbosity, which typically increases the number of unsupported statements. Length is not a proxy for grounding, and nothing in this approach checks claims against sources.",
+      "More retrieved context can help coverage but also dilutes attention and gives the model more material to conflate. It does not detect the unsupported statements that remain, so it cannot demonstrate the required reduction."
+    ],
+    "principle": "verification is a separate pass, not a nicer instruction",
+    "relatedConcept": "Reflection and self-critique loops split generation from evaluation so a second pass can check claims, revise them, or escalate — trading extra tokens for measurable quality gains.",
+    "overallExplanation": "Add a self-critique pass that checks each claim in the final draft against the retrieved sources and revises or flags it. Splitting writing from verification is what produces a measurable, auditable reduction in unsupported statements."
+  },
+  {
+    "id": 241,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "A team ports a complex root-cause-analysis prompt from a general chat model to a reasoning model deployment. They keep the elaborate \"think step by step, show your working, then critique your own answer\" scaffolding, set the reasoning effort to its lowest level to save money, and find that answers are worse than before while latency is higher. How should the prompt and settings be adjusted?",
+    "options": [
+      "Remove the chain-of-thought scaffolding, state the problem, constraints and success criteria plainly, and raise the reasoning effort for this genuinely hard task",
+      "Keep the scaffolding and lower the temperature to 0 so the enforced reasoning steps are followed consistently",
+      "Keep the scaffolding and the low reasoning effort, but ask for the answer twice in one prompt and instruct the model to reconcile the two attempts",
+      "Return to the general chat model, since reasoning models are only beneficial for mathematics and code generation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Reasoning models perform their deliberation internally, so scaffolding that dictates a visible reasoning procedure competes with it and wastes tokens. Giving a clear problem statement with explicit success criteria and paying for adequate reasoning effort is how these models are meant to be driven on hard analytical tasks.",
+      "Temperature does not resolve the conflict between an externally imposed reasoning script and the model's internal deliberation, and it leaves the reasoning effort starved. The output would be consistently mediocre rather than variably mediocre.",
+      "Asking for two attempts inside a single low-effort call multiplies output tokens without adding real deliberation, and self-reconciliation within one pass is a weak substitute for the reasoning budget that was deliberately turned down.",
+      "Reasoning models help on any task requiring multistep analysis, including root-cause investigation. The problem here is that they were configured as if they were chat models, not that the task is unsuited to them."
+    ],
+    "principle": "reasoning models want a clear goal and a reasoning budget, not a scripted thought process",
+    "relatedConcept": "Chain-of-thought prompting compensates for models that do not reason internally; reasoning models replace it with a configurable internal reasoning effort that must be sized to the task.",
+    "overallExplanation": "Drop the chain-of-thought scaffolding, state the problem and success criteria clearly, and raise reasoning effort for a hard task. Prompt patterns designed for chat models actively interfere with models that reason internally."
+  },
+  {
+    "id": 242,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "Your nightly quality gate asks the same deployment that generated each answer, using the same prompt template and persona, to rate its own answer from 1 to 5. Scores average 4.8 and never drop below 4.3, while a blind human review of the same 200 answers averages 3.1 and identifies several factual errors the gate passed. How should the evaluation be redesigned?",
+    "options": [
+      "Score with an independent judge configuration and an explicit rubric that defines what each score means, then calibrate the judge against the human-labelled sample and track their agreement",
+      "Ask the model to grade itself five times and use the median score, which cancels out individual grading errors",
+      "Keep the self-grading design but add \"be extremely strict and critical\" to the grading prompt",
+      "Replace the score with a fluency metric, which is objective and correlates with human judgement of quality"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A model grading its own output with its own persona inherits the same blind spots that produced the errors, and an undefined 1-to-5 scale invites uniformly generous scores. A separate judge configuration with a rubric that describes each score, calibrated against human labels and monitored for agreement, is what makes the gate trustworthy.",
+      "Repeating a biased measurement five times produces a stable biased result. The variance was never the problem — the median of five self-flattering scores is still self-flattering.",
+      "Telling a self-grader to be harsh shifts the distribution unpredictably without fixing the underlying issue: the grader shares the generator's misconceptions, so it cannot see the factual errors regardless of how strict it is told to be.",
+      "Fluency measures how well text reads and has little to do with factual correctness. The failing answers were fluent, which is why they slipped through, so this would make the gate less informative rather than more."
+    ],
+    "principle": "a judge must be independent of the generator and anchored to a rubric",
+    "relatedConcept": "Chain-of-thought evaluation and LLM-as-judge scoring are only as good as their independence and calibration, which is why judge scores are validated against human-labelled samples.",
+    "overallExplanation": "Use an independent judge with an explicit rubric and calibrate it against human labels. Self-grading with the generator's own prompt inherits its blind spots, and averaging or scolding a biased judge does not remove the bias."
+  },
+  {
+    "id": 243,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "multi",
+    "question": "After a production incident, the team could not reconstruct what a Foundry agent did during a failing run: they had application logs showing only \"run started\" and \"run failed\", with no view of retrieval, model or tool spans. They now want end-to-end run traces queryable alongside the rest of the platform's telemetry. Which two steps set this up? (Choose two.)",
+    "options": [
+      "Connect an Application Insights resource to the Foundry project so run telemetry has a destination",
+      "Enable the OpenTelemetry instrumentation in the application so agent, model and tool operations emit spans to that destination, deciding explicitly whether prompt and response content is recorded",
+      "Set the SDK's logging level to DEBUG and collect the resulting stdout from the container logs",
+      "Turn on resource-level diagnostic settings so request counts and latency metrics flow to a Log Analytics workspace"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Traces need somewhere to land, and connecting Application Insights to the project provides the store and the query surface where run telemetry can be correlated with the rest of the application's traces.",
+      "Correct. The instrumentation is what actually emits the spans for retrieval, model calls and tool invocations that reconstruct a run. Content recording is an explicit choice because prompts and responses may contain personal data, so it must be enabled deliberately rather than by accident.",
+      "DEBUG logging produces unstructured text without span identifiers or parent-child relationships, so you cannot reconstruct a run's shape or its timing breakdown. It also risks dumping prompt content into container logs with no governance.",
+      "Diagnostic settings give aggregate metrics such as request counts, latency and throttling — useful for capacity work, but they contain no per-run span detail, so the incident would still be unreconstructable."
+    ],
+    "principle": "traces need both an exporter destination and instrumentation that emits spans",
+    "relatedConcept": "Observability for generative systems is built on OpenTelemetry tracing into Application Insights, where each run's retrieval, model and tool operations appear as correlated spans.",
+    "overallExplanation": "Connect Application Insights to the project and enable OpenTelemetry instrumentation in the app, choosing deliberately whether to record prompt content. Verbose logs and resource metrics are not substitutes for correlated per-run spans."
+  },
+  {
+    "id": 244,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "Traces for a RAG endpoint show p95 latency of 4.8 s, broken down as embedding the query 0.2 s, the Azure AI Search query 2.6 s, reranking 0.3 s, the model call 1.2 s and a metadata tool call 0.3 s. The team's proposal is to move to a smaller, faster model deployment, which benchmarks suggest would save about 0.4 s. What should they do instead?",
+    "options": [
+      "Investigate and optimize the 2.6 s search span first — index and query design, filters, replica capacity — because it dominates the total",
+      "Proceed with the smaller model, since 0.4 s is a guaranteed saving and model changes are easy to roll back",
+      "Enable streaming so the user sees the first token sooner, which will make the p95 latency measurement fall",
+      "Run the metadata tool call concurrently with the model call to remove 0.3 s from the critical path"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The search span is 54% of end-to-end latency, so it bounds any improvement the other spans can deliver. Optimizing there — reviewing the query shape and filters, index and vector configuration, and whether the service has enough replicas — is where the achievable gain actually lives.",
+      "Spending effort on a 0.4 s saving while a 2.6 s span sits untouched is optimizing the wrong span, and swapping the model also risks answer quality. Ease of rollback is not a reason to work on the smaller of two problems.",
+      "Streaming improves the time to first token, which is a perceived-latency win, but the underlying end-to-end p95 is unchanged: retrieval must still complete before generation starts. It hides the problem rather than reducing it.",
+      "Overlapping a 0.3 s call is a real but tiny gain, and it only helps if the tool result is genuinely independent of the model call. It leaves the dominant span exactly as it was."
+    ],
+    "principle": "find the dominant span before optimizing anything",
+    "relatedConcept": "Latency breakdowns from tracing attribute end-to-end time across retrieval, model and tool spans, so optimization effort can be aimed at the span that actually bounds performance.",
+    "overallExplanation": "Attack the 2.6 s search span, which is over half of end-to-end latency. Model swaps, streaming and small parallelizations are marginal while the dominant span is untouched — the trace already tells you where the time is."
+  },
+  {
+    "id": 245,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "Monthly spend on a support assistant tripled with no change in request volume. Token analytics show prompt tokens are 92% of consumption: average prompt size grew from 6,000 to 24,000 tokens after a release that appended a 9,000-token static instruction and policy block to every request and raised retrieval top-k from 5 to 20 without reranking. Output averages 350 tokens. What should you change?",
+    "options": [
+      "Cut the input side — trim and stabilize the static block so it can benefit from prompt caching, and restore a small top-k by reranking a wider candidate set down to a few chunks",
+      "Reduce the maximum output token setting from 800 to 300 so responses are shorter and cheaper",
+      "Move the assistant to a cheaper model deployment and keep the current prompt construction unchanged",
+      "Set temperature to 0, since deterministic responses let the service reuse work across identical requests"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The telemetry is unambiguous: 92% of the spend is input tokens, and the two named regressions created them. Trimming the static block and keeping its prefix stable makes it a candidate for prompt caching, while reranking a wide candidate set down to a few chunks restores small prompts without giving up recall — and usually improves answer quality too.",
+      "Output is 8% of consumption, so even eliminating it entirely could not explain or reverse a tripling. Capping responses at 300 tokens also risks truncating legitimate answers for a negligible saving.",
+      "A cheaper model reduces the unit price of a prompt that is four times larger than it needs to be, so you keep paying for 18,000 wasted tokens per request while also giving up answer quality. Fix the waste before renegotiating the rate.",
+      "Temperature has no effect on token accounting, and determinism is not what makes caching apply. This confuses sampling behaviour with the prefix stability and length conditions that actually govern cached input."
+    ],
+    "principle": "optimize the token category the telemetry says you are spending on",
+    "relatedConcept": "Token analytics separate prompt from completion consumption, which is what tells you whether cost work belongs in prompt construction and retrieval or in output control and model choice.",
+    "overallExplanation": "Attack the input side: trim and stabilize the static block for prompt caching and rerank a wide candidate set down to a small top-k. With prompt tokens at 92% of spend, output caps and cheaper models address the wrong 8%."
+  },
+  {
+    "id": 246,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "Analysis of 50,000 support conversations shows that about 80% are answered correctly by a small model deployment, while the remaining 20% — multi-part questions and account-specific troubleshooting — need the large model. Everything currently goes to the large model. Quality must not regress, and the team can build any routing logic they need. What design should they adopt?",
+    "options": [
+      "Attempt each request on the small model first and escalate to the large model when a defined check — such as low confidence, an abstention, or a failed validation of the answer — indicates the small model could not handle it",
+      "Route by a static keyword list, sending any message containing words like \"account\" or \"billing\" to the large model and everything else to the small model",
+      "Send every request to both models concurrently and return whichever response arrives first",
+      "Keep the large model for everything and reduce cost by shortening the system prompt and capping output length"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A cascade captures the 80% of easy traffic at the small model's price while an explicit escalation signal protects quality on the rest. The critical design decision is the escalation criterion — confidence, explicit abstention, or a validation check on the produced answer — because that is what bounds the quality regression.",
+      "Keyword routing is brittle: it misroutes paraphrases that never use the listed words and over-routes simple questions that happen to mention billing. It also cannot adapt as the conversation mix shifts, so the quality risk is unbounded.",
+      "Running both models on every request pays for the large model on all traffic plus the small model on top, so cost rises rather than falls. Returning the first response also means the small model usually wins, including on the hard 20%.",
+      "Prompt trimming and output caps produce modest savings on a workload where 80% of requests do not need the large model at all. It leaves the main lever — model selection per request — entirely unused."
+    ],
+    "principle": "cascade to a cheaper model first and define the signal that escalates",
+    "relatedConcept": "Orchestrating multiple models means routing each request to the cheapest model that can handle it, with an explicit, measurable criterion for escalating to a stronger one.",
+    "overallExplanation": "Use a small-model-first cascade with a defined escalation signal such as low confidence, abstention or a failed answer validation. Keyword routing is too brittle to protect quality, and racing both models raises cost instead of lowering it."
+  },
+  {
+    "id": 247,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "single",
+    "question": "A regulated lender must decide loan eligibility from a fixed, auditable rule set — debt-to-income ratio, employment history length and credit score bands — while also reading free-text employment letters that vary widely in wording. Regulators require that two identical applications always receive the same decision and that each decision cite the rules applied. How should the system be composed?",
+    "options": [
+      "Use the model to normalize the unstructured employment letters into structured fields, evaluate eligibility in a deterministic rules engine, and use the model again only to explain the rules-engine decision in plain language",
+      "Put the full rule set in the prompt and have the model decide eligibility, requiring it to list the rules it applied in its answer",
+      "Fine-tune a model on ten years of historical eligibility decisions so it learns the lender's policy directly",
+      "Have the model decide eligibility and then run the rules engine afterwards to verify the decision, flagging any disagreement for review"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This assigns each component the work it is uniquely good at: language understanding for messy documents, deterministic logic for a decision that must be identical for identical inputs and traceable to specific rules, and language generation for the customer-facing explanation. The regulated decision never depends on sampling.",
+      "A model applying rules from a prompt can produce different outcomes for equivalent applications and can list rules it did not actually apply, since the explanation is generated text rather than an execution record. That fails both the consistency and the auditability requirements.",
+      "Fine-tuning on historical decisions bakes in whatever inconsistencies and biases those decisions contained, produces no rule citations, and makes any policy change require retraining. It is the least auditable option available.",
+      "Verifying after the fact means the authoritative decision is still probabilistic and the rules engine merely disagrees with it sometimes. It also creates a review queue for a decision that could simply have been computed correctly the first time."
+    ],
+    "principle": "deterministic policy runs in the rules engine; the model handles language",
+    "relatedConcept": "Hybrid architectures combine LLMs with rules engines so that regulated, repeatable decisions stay deterministic while language understanding and explanation are delegated to the model.",
+    "overallExplanation": "Let the model structure the unstructured input and explain the outcome, but compute eligibility in a deterministic rules engine. Identical inputs must yield identical, rule-citable decisions, and only executed rules — not generated text — can prove which rules applied."
+  },
+  {
+    "id": 248,
+    "domain": "Implement generative AI and agentic solutions",
+    "objective": "Optimize and operationalize generative AI systems",
+    "type": "multi",
+    "question": "During business-hours peaks your primary model deployment returns HTTP 429 for about 4% of requests, and your client immediately retries in a tight loop, which extends the throttling window. Availability targets require that user-facing requests still succeed during these peaks, and you have spare quota available in a second region. Which two changes should you make? (Choose two.)",
+    "options": [
+      "Honour the Retry-After header and use exponential backoff with jitter instead of retrying immediately",
+      "Fail over to a second deployment in the other region when the primary is throttled, routing the overflow rather than queuing behind it",
+      "Increase the client's request timeout so throttled calls have longer to complete before the client gives up",
+      "Raise the maximum output token setting so that fewer, larger requests are needed to serve the same peak traffic"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A tight retry loop against a throttled endpoint adds load precisely when the service is shedding it, prolonging the incident. Respecting Retry-After and backing off exponentially with jitter lets the window clear and stops synchronized clients from retrying in lockstep.",
+      "Correct. Backoff makes the retries polite but does not create capacity, so meeting an availability target during peaks needs somewhere else for the overflow to go. A second deployment with spare quota turns a throttled request into a served one instead of a delayed one.",
+      "A longer timeout does not change a 429: the service has already refused the request, so waiting longer simply keeps the caller blocked. It affects slow responses, not rejected ones.",
+      "Raising the output cap increases tokens consumed per request, which pushes you further into the rate limit rather than away from it. It also has no relationship to the number of requests arriving at peak."
+    ],
+    "principle": "back off politely, then route overflow to capacity that exists",
+    "relatedConcept": "Operationalizing model traffic combines client-side resilience — honouring Retry-After, exponential backoff with jitter — with multi-deployment routing so peak demand has somewhere to go.",
+    "overallExplanation": "Honour Retry-After with jittered exponential backoff and fail over to the second region's deployment. Backoff stops your client from amplifying the throttling, and only additional capacity actually serves the peak."
+  }
+]

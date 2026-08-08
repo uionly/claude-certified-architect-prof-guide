@@ -1,0 +1,1060 @@
+[
+  {
+    "id": 101,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "Contoso Logistics routes 4.2 million support emails a month through a triage step that assigns one of eight intent labels and pulls out the tracking number. The step runs on a Global Standard gpt-4.1 deployment, costs roughly $38,000 a month, and shows p95 latency of 2.1 seconds against a 96.4% accuracy score on a labelled holdout set. The team wants the cost and latency down without losing measurable accuracy. Which change should they evaluate first?",
+    "options": [
+      "Deploy a small language model such as Phi-4-mini from the Foundry model catalog, score it against the same labelled holdout set, and fall back to gpt-4.1 only for low-confidence messages",
+      "Keep the gpt-4.1 deployment but reduce max_tokens and set temperature to 0 so each triage call consumes fewer tokens and returns faster",
+      "Fine-tune gpt-4.1 on 50,000 historical triage emails so the fine-tuned model needs shorter prompts and produces the labels more cheaply",
+      "Switch the triage step to a reasoning model so the extra deliberation raises accuracy enough to justify the current spend"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Fixed-taxonomy classification plus one short extraction is exactly the workload a small language model handles at a fraction of the cost and latency of a frontier model, and the labelled holdout set already exists so the accuracy claim can be measured rather than assumed. Routing only low-confidence items to gpt-4.1 preserves the tail quality while moving the bulk of 4.2 million calls to the cheap model.",
+      "Tempting because token settings do affect cost, but this workload emits a label and a tracking number — the output is already tiny, so the bill is dominated by input tokens and per-call model pricing. Trimming max_tokens shaves a rounding error off a $38,000 invoice and does nothing about per-token input price on a frontier model.",
+      "Fine-tuning does shorten prompts, but it keeps you on the expensive model family, adds hosting charges for the fine-tuned deployment, and locks in a training-time snapshot of the intent taxonomy that has to be retrained whenever labels change. For a simple eight-class problem, a smaller base model is cheaper to run and far cheaper to maintain.",
+      "Reasoning models spend extra internal tokens on deliberation, which raises both cost and latency — the opposite of the stated goal. They pay off on multi-step planning or hard analytical problems, not on a single-pass classification task that is already at 96.4%."
+    ],
+    "principle": "match model size to task difficulty, then prove it on your own eval set",
+    "relatedConcept": "The Foundry model catalog spans frontier LLMs, small language models, and multimodal models precisely so each step of a pipeline can run on the cheapest model that clears its quality bar.",
+    "overallExplanation": "High-volume, narrow tasks like fixed-label classification belong on a small language model, with a confidence-based fallback to a larger model for the hard tail. Always validate the swap against the labelled holdout set you already have instead of arguing about it."
+  },
+  {
+    "id": 102,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A claims processor receives about 30,000 scanned repair invoices a day in mixed formats: printed line items, handwritten adjuster notes in the margin, and photographs of damaged parts stapled to the page. Downstream systems need a consistent JSON record with vendor, line items, totals, and a description of the visible damage. Which Foundry approach fits the requirement best?",
+    "options": [
+      "Configure an Azure Content Understanding analyzer that defines the target fields once and processes the document and image content into structured JSON for every invoice",
+      "Send each page as an image to a chat completion call with a prompt asking for the fields as JSON, and parse whatever the model returns",
+      "Run the pages through an OCR-only text extraction step and pass the raw text to a small language model for field extraction",
+      "Fine-tune a multimodal model on 5,000 labelled invoices so it learns the specific layouts used by the top vendors"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Content Understanding is the Foundry Tool built for multimodal extraction: you declare a field schema in an analyzer and it combines OCR, layout, and visual understanding to return the same structured JSON for every input, including handwriting and attached photos. Declaring the schema once is what makes 30,000 documents a day predictable instead of prompt-by-prompt guesswork.",
+      "Freeform prompting a chat model can work for a demo, but it gives no schema contract, so field names and types drift between calls and parsing failures surface only downstream. It also ignores layout signals that a purpose-built analyzer uses to keep line items aligned with their totals.",
+      "OCR-only extraction throws away exactly the information that makes this case hard: handwritten margin notes read poorly as flat text and the damage photographs contain no text at all. A text-only pipeline cannot produce the visual damage description the requirement calls for.",
+      "Fine-tuning is heavy machinery for a problem the platform already solves declaratively, and a layout-specific fine-tune degrades the moment a vendor changes its invoice template. It also does nothing to guarantee schema-valid output, which is the actual downstream requirement."
+    ],
+    "principle": "declarative extraction schemas beat freeform prompts for repeatable document workloads",
+    "relatedConcept": "Foundry Tools such as Content Understanding cover multimodal document, image, audio, and video extraction so teams do not hand-build OCR plus prompt pipelines for every format.",
+    "overallExplanation": "Mixed print, handwriting, and photo content that must land in a fixed JSON shape is the Content Understanding analyzer scenario. Declaring fields once gives schema stability across 30,000 documents a day that ad-hoc prompting cannot."
+  },
+  {
+    "id": 103,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "An underwriting assistant must decide whether an applicant qualifies for a commercial policy by combining seven rule documents, three prior loss runs, and an exclusions matrix, then show the chain of deductions it followed. On a GPT-4.1 deployment the assistant reaches the right verdict on 71% of the 200-case regression suite, usually failing when the exclusions interact. Latency of up to 30 seconds per case is acceptable. What is the most appropriate model choice?",
+    "options": [
+      "Deploy a reasoning model from the model catalog for the eligibility step and keep the cheaper chat model for summarizing the final decision for the customer",
+      "Keep GPT-4.1 and raise temperature to 0.9 so the model explores more interpretations of the interacting exclusions",
+      "Keep GPT-4.1 and add the phrase asking it to think step by step to the system prompt, since that produces the same deliberation as a reasoning model",
+      "Move the eligibility step to a small language model and pass the exclusions matrix as a longer, more explicit prompt"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Multi-document deduction with interacting rules is the workload reasoning models are trained for, and the 30-second latency budget makes their extra deliberation affordable. Splitting the pipeline keeps the expensive model on the hard step while a cheap chat model handles the plain-language write-up.",
+      "Higher temperature increases sampling randomness, not analytical depth. On a rules-and-exclusions problem it makes the verdict less reproducible across runs, which is the opposite of what an underwriting audit trail needs.",
+      "Prompted step-by-step text helps a little, but it is surface-level narration produced by the same model that is already failing on interacting exclusions. A reasoning model allocates real inference-time compute to the deduction, which prompt wording cannot manufacture.",
+      "Going smaller on the hardest step in the pipeline trades away exactly the capability the failures point to. Longer prompts add context but do not give a small model the deductive depth to resolve interacting exclusions."
+    ],
+    "principle": "spend inference-time reasoning only where the deduction is genuinely hard",
+    "relatedConcept": "Choosing a model per task means mixing families inside one solution — reasoning models for planning and deduction, standard chat models for drafting and summarizing.",
+    "overallExplanation": "Interacting-rule deduction with a generous latency budget is the canonical reasoning-model case; temperature and step-by-step prompt wording do not substitute for inference-time reasoning. Keep the cheap chat model for the presentation step."
+  },
+  {
+    "id": 104,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A contact centre wants agents in Manila to take live calls from Spanish-speaking customers. The requirement is that the customer's speech is rendered as Spanish text and English audio with under two seconds of lag while the caller is still speaking, and that a transcript in both languages is stored for QA. Which Foundry capability should anchor the design?",
+    "options": [
+      "Azure AI Speech in Foundry Tools, using continuous speech translation with streaming recognition and text to speech for the rendered audio",
+      "A multimodal chat model called once per completed call with the recorded audio file attached and a prompt asking for a translated transcript",
+      "Azure AI Translator called on the final call transcript after the call ends, with the translated text played back to the agent afterwards",
+      "A custom function tool on an agent that uploads 30-second audio chunks to blob storage and polls a batch transcription job"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Speech translation in Azure AI Speech is designed for streaming audio: it recognizes and translates continuously while the speaker talks and emits partial results, which is what keeps lag inside two seconds, and text to speech renders the English audio. The service returns both recognized and translated text, so the bilingual QA transcript falls out of the same pipeline.",
+      "A single post-call multimodal call cannot help a live conversation at all — the translation arrives after the customer has hung up. Batch multimodal audio analysis is a good fit for QA scoring, not for in-call assistance.",
+      "Translator handles text well, but it starts from text that does not exist yet during a live call and this design explicitly defers playback until the call ends. It solves the transcript requirement while missing the latency requirement entirely.",
+      "Chunk upload plus batch transcription polling adds storage round trips and job scheduling delay measured in tens of seconds. Batch transcription targets recorded archives, not the sub-two-second interactive path."
+    ],
+    "principle": "real-time modality requirements pick the service before the model does",
+    "relatedConcept": "Foundry Tools include purpose-built speech, translation, and vision services; a generative model is the wrong tool when the hard requirement is streaming latency.",
+    "overallExplanation": "Live bilingual calls need streaming speech translation plus text to speech, not post-call batch processing. Latency requirements, not model capability, are what disqualify the batch-shaped options here."
+  },
+  {
+    "id": 105,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A benefits helpdesk assistant must answer from roughly 400 HR policy documents. Policies are revised every week by the HR team, answers must quote the exact clause and link to the source document, and an incorrect quotation is treated as a compliance incident. The team is debating how to give the model this knowledge. Which approach fits the constraints?",
+    "options": [
+      "Index the documents in Azure AI Search and ground each answer with retrieved passages, returning the document link and clause as citations with the response",
+      "Fine-tune a chat model on the policy corpus each month so the knowledge is carried in the model weights and no retrieval hop is needed",
+      "Paste the full policy corpus into the system prompt of a long-context model so every answer sees all 400 documents",
+      "Store the policies as few-shot examples in the prompt template, refreshing the examples whenever HR publishes a revision"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Retrieval keeps the knowledge outside the model, so a weekly policy revision is an index update rather than a model change, and the retrieved passage is the natural source of a verbatim clause plus its document link. Grounding on retrieved text is also what makes the citation checkable, which is the compliance requirement.",
+      "Fine-tuning teaches style and format far better than it teaches facts, and a monthly cycle guarantees the model is stale for up to four weeks against weekly revisions. Worse, weights carry no citation, so there is nothing to link a quoted clause back to.",
+      "Even where the context window physically fits, sending 400 documents on every question is enormously expensive per call, pushes latency up, and dilutes attention across mostly irrelevant policy text. It also gives no retrieval score to justify which clause was used.",
+      "Few-shot examples shape output format; they are not a knowledge store, and a handful of examples cannot represent 400 documents. This conflates demonstrating an answer style with providing the source material an answer must be grounded in."
+    ],
+    "principle": "frequently changing, citable knowledge belongs in an index, not in weights",
+    "relatedConcept": "Choosing a grounding service is a separate decision from choosing a model: Azure AI Search supplies the passages, the model supplies the wording.",
+    "overallExplanation": "Weekly-changing policies that must be quoted and linked are a retrieval-grounding problem. Fine-tuning and prompt-stuffing both fail the freshness and citation constraints that define this scenario."
+  },
+  {
+    "id": 106,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "multi",
+    "question": "You are designing a field-service agent in Microsoft Foundry Agent Service. It must answer repair questions from 60,000 internal maintenance PDFs and it must also read live equipment status from an existing internal REST API that already publishes an OpenAPI 3.0 specification with 40 operations. Which two integrations should the design use? (Choose two.)",
+    "options": [
+      "Attach an Azure AI Search index of the maintenance PDFs to the agent as a knowledge tool so retrieval happens inside the agent run",
+      "Register the equipment status API with the agent as an OpenAPI specified tool so the agent can call its operations directly",
+      "Copy the maintenance PDFs into the agent instructions as background context so no retrieval service is required",
+      "Write a single custom function tool that proxies all 40 API operations behind one action parameter the model must fill in"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A knowledge tool backed by an Azure AI Search index is the supported way to ground an agent in a large private corpus, and running retrieval inside the agent run keeps citations and tool traces attached to the thread. Sixty thousand PDFs is far past anything that belongs in instructions.",
+      "Correct. Foundry Agent Service can import an OpenAPI 3.0 specification and expose its operations as tools, so an API that already publishes a spec needs no bespoke wrapper code and its schemas and auth are described declaratively.",
+      "Agent instructions are a system prompt, not a document store — 60,000 PDFs exceed any context window, and even a subset would be paid for on every single turn. This confuses giving an agent knowledge with giving it a persona.",
+      "Collapsing 40 operations into one generic action parameter destroys the per-operation schemas the model relies on to call tools correctly, which drives argument errors up. It is also strictly more code to maintain than importing the spec that already exists."
+    ],
+    "principle": "use the platform's declarative tool and knowledge integrations before writing glue code",
+    "relatedConcept": "Agent solutions assemble knowledge, memory, and tool integrations; Foundry supplies search-backed knowledge tools and OpenAPI tool import so each is configuration rather than custom plumbing.",
+    "overallExplanation": "Ground a large private corpus with an Azure AI Search knowledge tool and expose an existing documented API through OpenAPI tool import. Stuffing documents into instructions or hand-proxying 40 operations both fight the platform."
+  },
+  {
+    "id": 107,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A parts-lookup assistant retrieves from an Azure AI Search index using pure vector search over embedded product descriptions. Users report that natural-language questions work well, but queries containing exact identifiers such as BRK-4471-A or ISO 4762 return semantically similar parts and almost never the exact one. Recall on the identifier subset of the evaluation set is 0.41. What should you change in the retrieval design?",
+    "options": [
+      "Switch to hybrid retrieval that runs keyword and vector queries together and fuses the result sets, then apply the semantic ranker to reorder the top results",
+      "Increase k from 5 to 50 so the exact part is more likely to appear somewhere in the retrieved set",
+      "Re-embed the corpus with a larger embedding model and more dimensions so identifiers are represented more precisely",
+      "Lower the vector similarity threshold so borderline matches are no longer filtered out of the result set"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Embeddings capture meaning, not exact token identity, so rare alphanumeric identifiers are systematically weak in vector space — the keyword arm of a hybrid query matches them lexically, and fusing the two result sets recovers the exact document. Adding the semantic ranker then reorders the fused candidates so the exact match surfaces at the top rather than merely being present.",
+      "Widening k is a blunt instrument: it inflates prompt size and cost, and it only helps if the exact document was ranked just below the cutoff. Here the vector representation of an identifier is weak in the first place, so the right document often is not in the top 50 either.",
+      "Larger embedding models improve semantic nuance, not lexical exactness. A rare SKU token is still diluted into a dense vector regardless of dimension count, so this spends compute and index storage for essentially no gain on the failing subset.",
+      "Loosening the threshold returns more marginally similar parts — precisely the wrong parts users are already complaining about. It treats a representation mismatch as if it were an over-aggressive filter."
+    ],
+    "principle": "identifiers need lexical matching; meaning needs vectors; production needs both",
+    "relatedConcept": "Choosing a retrieval method means matching query shape to search mode — keyword, vector, or hybrid with semantic reranking — rather than defaulting to vectors everywhere.",
+    "overallExplanation": "Exact-identifier queries fail in pure vector search because embeddings encode meaning, not tokens. Hybrid retrieval with fused keyword and vector results plus the semantic ranker is the standard fix."
+  },
+  {
+    "id": 108,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A media company keeps 2.1 million documents in Azure Blob Storage; about 9,000 are added or edited each day. They need a searchable vector index kept close to current, and the platform team wants as little bespoke pipeline code as possible. Which indexing approach should they choose?",
+    "options": [
+      "Configure an Azure AI Search indexer with a skillset that performs integrated vectorization on a schedule, relying on change tracking to process only new and modified blobs",
+      "Write a nightly job that reads every blob, calls the embeddings deployment for each document, and pushes the full corpus to the index with the push API",
+      "Have the application embed and upload each document at query time so the index is only populated for content users actually ask about",
+      "Store the documents as agent knowledge files and let the agent re-read the blob container on each run instead of maintaining an index"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An indexer with a skillset gives you chunking and integrated vectorization inside Azure AI Search, and blob change tracking means each scheduled run touches only the roughly 9,000 changed documents rather than all 2.1 million. That is both the cheapest incremental path and the least custom code to own.",
+      "A full nightly re-embed of 2.1 million documents burns embedding tokens on unchanged content every single night and takes a long maintenance window. The push API is the right choice when you need custom transforms, not when the platform already offers change-tracked incremental indexing.",
+      "Embedding at query time means the first user to ask about a document gets a miss, so the index is permanently incomplete and recall depends on query history. It also puts embedding latency directly on the user's request path.",
+      "Re-reading a 2.1 million document container on every agent run is not a retrieval strategy — there is no ranking, no incremental update, and enormous per-run cost. Knowledge files suit small curated sets, not a corpus of this size."
+    ],
+    "principle": "prefer change-tracked incremental indexing over full re-processing",
+    "relatedConcept": "Indexing method selection covers who chunks and embeds the content: an indexer with integrated vectorization, or a custom push pipeline you build and operate yourself.",
+    "overallExplanation": "Large corpora with a small daily delta call for an Azure AI Search indexer plus skillset with integrated vectorization and change tracking. Nightly full re-embeds and query-time indexing both pay repeatedly for work already done."
+  },
+  {
+    "id": 109,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A retail search index holds 48 million chunks with 3,072-dimension float32 embeddings. The search service is close to its storage quota, monthly cost is the main complaint, and the team has confirmed that a small drop in top-10 ranking quality is acceptable as long as the final results stay accurate. Which change addresses the cost pressure most directly?",
+    "options": [
+      "Enable vector compression with quantization on the index and configure oversampling with rescoring against the original vectors",
+      "Reduce the number of documents in the index by dropping every chunk that has not been returned in a query in the last 90 days",
+      "Switch the vector profile from an HNSW algorithm to exhaustive KNN so no graph structure has to be stored",
+      "Move the vector fields into a second search service so the storage is spread across two quotas"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Quantization compresses each vector to a much smaller representation, which is the dominant storage cost at 48 million by 3,072 dimensions, and oversampling with rescoring against the retained full-precision vectors recovers most of the ranking quality lost to compression. That trade is exactly the one the team already agreed to accept.",
+      "Pruning by recent query history silently deletes long-tail content, so questions about it become unanswerable rather than merely lower-ranked. It also attacks document count when the real driver is bytes per vector.",
+      "Exhaustive KNN removes the ANN graph but scans every vector at query time, so latency scales linearly with a 48 million document index. It trades a modest storage saving for a serious query-performance regression.",
+      "Splitting fields across two services multiplies fixed service cost, forces the application to merge results from two systems, and does nothing to reduce total bytes stored. It relabels the quota problem instead of solving it."
+    ],
+    "principle": "shrink the vectors before you shrink the corpus",
+    "relatedConcept": "Retrieval design decisions include index-level storage settings — vector dimensions, compression, and oversampling — not just which search mode to query with.",
+    "overallExplanation": "Vector storage cost at scale is addressed with quantization plus oversampling and rescoring, which preserves most ranking quality. Deleting content, disabling ANN, or splitting services all trade away more than they save."
+  },
+  {
+    "id": 110,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A travel agent built on Foundry Agent Service currently keeps conversation state in the web tier: the app stores every user and assistant message in its own session cache and replays the whole transcript into a new run each turn. After a deployment that scaled the web tier to three replicas, users behind the load balancer intermittently see the agent forget what was just said. What should the team change?",
+    "options": [
+      "Use Agent Service threads as the conversation store, creating a thread per conversation and adding each new user message to that thread before starting a run",
+      "Enable sticky sessions on the load balancer so every request from a user lands on the replica holding that user's cache",
+      "Increase the session cache TTL in the web tier and raise the number of messages retained per session",
+      "Move the transcript into the agent instructions before each run so the conversation history travels with the agent definition"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Agent Service threads are server-side, durable conversation state: the thread holds the message history and each run reads it, so any replica can continue the conversation by referencing the thread id. That removes the per-replica cache that the scale-out just exposed as the real bug.",
+      "Sticky sessions hide the symptom by pinning users to a replica, but the state is still confined to a single process — a replica restart, rebalance, or deployment loses the conversation. It also undermines even load distribution across the three replicas.",
+      "TTL and retention tuning make the in-process cache hold more for longer, which does nothing about the fact that a different replica has no copy at all. This treats an eviction problem that is not happening.",
+      "Agent instructions define role and behaviour and are not a per-conversation store; rewriting them per run mutates shared agent configuration and would leak one user's transcript into another's session. Conversation history belongs on the thread, not the agent."
+    ],
+    "principle": "conversation memory belongs in durable server-side threads, not in app process state",
+    "relatedConcept": "Choosing memory integration for agents means deciding where conversation state lives — Agent Service threads give a managed, run-aware store that survives scale-out.",
+    "overallExplanation": "Server-side threads make conversation state independent of which replica serves a request, which is exactly what breaks when app-tier caches meet horizontal scale. Sticky sessions and bigger caches only postpone the same failure."
+  },
+  {
+    "id": 111,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "single",
+    "question": "A legal knowledge agent must serve four practice groups from one corpus of 180,000 documents. Each document carries a group access list, and a user must never receive content from a group they do not belong to — not even as a summary. The team is choosing between agent file search over uploaded files and an Azure AI Search connection. Which design satisfies the access requirement?",
+    "options": [
+      "Index the documents in Azure AI Search with a group field, and have the application pass the caller's groups as a search filter on every retrieval so restricted documents are never returned",
+      "Upload all 180,000 documents to a single agent file search store and add an instruction telling the agent to ignore documents the user is not entitled to see",
+      "Upload the documents to file search and post-process the model's answer, removing any sentence that cites a document outside the caller's groups",
+      "Index everything in Azure AI Search without an access field and rely on a content filter policy to block responses that contain restricted material"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Security trimming works by never retrieving what the caller may not see: a group field on each document plus a filter derived from the authenticated caller's identity makes the restriction a query-time predicate the model cannot talk its way around. Enforcement happens before any restricted text reaches the prompt.",
+      "An instruction is a request, not an access control — the restricted text is already in the model's context, so a prompt injection, an ambiguous question, or plain model error can leak it. Access decisions must not be delegated to model compliance.",
+      "Filtering the output after generation means the restricted content was retrieved, sent to the model, and influenced the answer even if a citation is stripped. Summaries and paraphrases carry the leaked information without the citation the filter looks for.",
+      "Content filters classify harmful content categories such as hate or violence; they have no notion of who the caller is or which practice group owns a document. This misapplies a safety control to an authorization problem."
+    ],
+    "principle": "enforce entitlements at retrieval time, never in the prompt or the output",
+    "relatedConcept": "Knowledge integration choices for agents differ in what they can enforce: an Azure AI Search connection supports filters over document metadata, which is what per-user trimming requires.",
+    "overallExplanation": "Per-user entitlements are enforced by filtering the retrieval query on document metadata, so restricted content never enters the context. Instructions, output scrubbing, and content filters all operate after the leak has already happened."
+  },
+  {
+    "id": 112,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Choose the appropriate Foundry services for generative AI and agents",
+    "type": "multi",
+    "question": "A finance operations agent in Foundry Agent Service must do two things: compute variance statistics and produce a chart from CSV exports that analysts upload during the conversation, and file an approved journal entry in the ERP system by triggering an existing enterprise workflow that already runs in Azure Logic Apps. Which two tool integrations should you configure? (Choose two.)",
+    "options": [
+      "The code interpreter tool, so the agent can run generated code against the uploaded CSV to compute statistics and render the chart",
+      "An Azure Logic Apps tool binding, so the agent can invoke the existing workflow that performs the ERP journal entry",
+      "A prompt instruction telling the agent to calculate the variance arithmetic itself and describe the chart in text",
+      "A custom function tool that reimplements the ERP posting logic in Python inside the agent's own service"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Code interpreter gives the agent a sandboxed execution environment for uploaded files, so numeric work is actually computed rather than predicted token by token, and chart images are produced as real output files. Deterministic arithmetic on user-supplied data is exactly the boundary where code beats generation.",
+      "Correct. Binding an existing Logic Apps workflow as a tool lets the agent invoke a process that already encodes the ERP connectivity, retries, and approvals, rather than duplicating it. Reusing the workflow also keeps the existing operational monitoring around that integration intact.",
+      "Asking a language model to do the arithmetic itself is precisely the failure mode code interpreter exists to prevent: results look plausible and are silently wrong, which is unacceptable in finance. A textual description of a chart is also not the chart the analysts asked for.",
+      "Reimplementing ERP posting inside the agent forks business-critical logic, duplicates credentials and error handling, and guarantees the two implementations drift. The existing Logic Apps workflow is already the tested path to the same system."
+    ],
+    "principle": "compute with code, integrate through existing workflows",
+    "relatedConcept": "Agent tool integration in Foundry spans code interpreter, function calling, OpenAPI tools, and connectors to Azure Functions and Logic Apps, so most enterprise actions are a binding rather than new code.",
+    "overallExplanation": "Deterministic calculation on uploaded files belongs in code interpreter, and an enterprise action that already exists as a Logic Apps workflow should be bound as a tool. Model-computed arithmetic and reimplemented integrations both add risk for no benefit."
+  },
+  {
+    "id": 113,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A German insurer must keep all inference processing for its claims assistant inside the European Union, confirmed in writing to its regulator. The workload is bursty, peaking at about 900,000 tokens per minute for two hours each morning, and the team does not want to commit to reserved capacity yet. Which deployment option should they choose for the model?",
+    "options": [
+      "A Data Zone Standard deployment in an EU-based Foundry resource, so traffic is processed within the EU data zone while still billing per token",
+      "A Global Standard deployment, because it offers the highest available throughput and the lowest per-token price",
+      "A Global Provisioned deployment, because provisioned capacity is dedicated to the customer and therefore stays in region",
+      "A Standard deployment in a single EU region with a manual failover script that redirects to a US region during the morning peak"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Data Zone Standard constrains processing to the data zone associated with the resource — for an EU resource, EU geographies — while keeping the pay-per-token consumption model the team wants until demand is predictable. It gives residency and burst headroom without a capacity commitment.",
+      "Global Standard routes requests to available capacity anywhere in the global fleet, which is exactly what the regulator's commitment forbids. Price and throughput are real advantages, but they do not survive a hard data-residency constraint.",
+      "Provisioned throughput reserves capacity, but the Global variant still routes globally — dedicated capacity is a performance and quota property, not a geographic one. It also forces the reserved commitment the team explicitly wanted to avoid.",
+      "Failing over to a US region during peak deliberately moves EU processing to the United States precisely when volume is highest. Regional Standard is a legitimate residency choice, but the failover design destroys the guarantee it provides."
+    ],
+    "principle": "data residency is a deployment-type decision, not a resource-location one",
+    "relatedConcept": "Foundry model deployment types trade off routing scope and cost: Global, Data Zone, and Regional variants exist for Standard, Provisioned, and Batch.",
+    "overallExplanation": "Data Zone Standard keeps processing inside the EU data zone while preserving token-based billing for bursty demand. Global deployment types route anywhere in the fleet, so they cannot satisfy a residency commitment regardless of their price or throughput advantages."
+  },
+  {
+    "id": 114,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A trading-desk copilot runs a steady 1.4 million tokens per minute during market hours with a contractual p99 latency ceiling, and it currently sits on a Standard deployment where latency varies noticeably under load. Twice a week an unpredictable news event pushes demand roughly 40% above the steady baseline for a few minutes. What deployment configuration best meets both the latency ceiling and the spikes?",
+    "options": [
+      "Provision a Provisioned Throughput deployment sized to the steady baseline and enable spillover to a Standard deployment so overflow traffic is served during spikes",
+      "Provision a Provisioned Throughput deployment sized for the twice-weekly peak so the reserved capacity never runs out",
+      "Keep the Standard deployment and add aggressive client-side retries with exponential backoff to absorb the spikes",
+      "Create three Standard deployments of the same model and round-robin requests across them to smooth the latency distribution"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Provisioned throughput gives the dedicated, predictable latency the contractual p99 requires for the steady load, and spillover routes the overflow that exceeds provisioned capacity to a Standard deployment instead of returning errors. Sizing to baseline rather than peak is what keeps the reservation economical.",
+      "Sizing reserved capacity to a peak that occurs for a few minutes twice a week means paying full time for capacity that idles almost always. Provisioned throughput is a commitment, so overprovisioning is a pure cost decision with no latency benefit at baseline.",
+      "Retries with backoff make a client survive throttling; they do nothing for the p99 latency ceiling and in fact add latency to the very requests that were slow. Standard deployments share capacity, which is the source of the variance being complained about.",
+      "Multiple Standard deployments draw on the same regional quota pool for the subscription, so this does not multiply available capacity and shared-capacity variance persists. It adds routing complexity while leaving the latency guarantee unmet."
+    ],
+    "principle": "reserve capacity for the baseline and let spillover absorb the tail",
+    "relatedConcept": "Choosing between Standard and Provisioned deployments is a latency-predictability decision; spillover exists so a provisioned deployment does not have to be sized for its worst minute.",
+    "overallExplanation": "Provisioned throughput sized to steady load plus spillover to Standard meets a latency SLA without paying for peak capacity full time. Retries and extra Standard deployments do not change shared-capacity latency behaviour."
+  },
+  {
+    "id": 115,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A retailer needs to generate product description summaries for 2.4 million catalogue items. The job runs once, results are consumed by a nightly publishing pipeline, and anything finishing within 24 hours is fine. The team's first attempt looped the items through their interactive Standard deployment and immediately began throttling the customer-facing chat app that shares the same quota. What is the right deployment choice for this job?",
+    "options": [
+      "Submit the work to a Global Batch deployment, which processes the job asynchronously against separate batch quota at a reduced token price",
+      "Keep the Standard deployment but add a fixed sleep between requests so the loop stays under the throttling threshold",
+      "Request a large temporary quota increase for the Standard deployment and run the loop with more parallelism",
+      "Create a Provisioned Throughput deployment for the duration of the job and delete it when the catalogue is finished"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Batch deployments exist for exactly this shape of work: a large offline job with a 24-hour completion target, priced well below Standard and drawing on its own enqueued token quota so it does not compete with interactive traffic. Submitting a file of requests also removes the hand-written throttling loop entirely.",
+      "Sleeping between requests keeps the loop under the limit but stretches 2.4 million items across an impractical wall-clock window and still consumes the shared interactive quota the whole time. It manages the symptom rather than moving the work off the interactive path.",
+      "Raising Standard quota to accommodate a one-off bulk job means the interactive app and the batch loop still share one pool, so a burst in either can starve the other. It also pays full interactive token prices for work with no latency requirement.",
+      "Provisioned throughput is a reserved-capacity commitment tuned for predictable low latency, which this job does not need, and it is billed accordingly. Standing one up for a single overnight run is the most expensive way to solve a latency-insensitive problem."
+    ],
+    "principle": "latency-insensitive bulk work belongs on batch quota, not interactive quota",
+    "relatedConcept": "Deployment options in Foundry include Standard, Provisioned, and Batch; picking correctly starts with the workload's latency requirement, not its size.",
+    "overallExplanation": "A one-off 2.4 million item job with a 24-hour window is the canonical Global Batch case: separate quota, asynchronous processing, and a lower token price. Throttling loops and quota increases keep bulk work on the interactive path where it damages the user-facing app."
+  },
+  {
+    "id": 116,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "Your Foundry project lives in a resource in North Europe. A newly released multimodal model appears in the model catalog, but when you try to create a Standard deployment in that resource the model is not offered, and the model's documentation lists a smaller set of supported regions that excludes North Europe. The application must call this model within two weeks. What is the correct action?",
+    "options": [
+      "Create the model deployment in a Foundry resource located in one of the model's supported regions and have the application call that deployment's endpoint, adding a project connection to it",
+      "Open a support request to have the model enabled in North Europe, since regional model availability is a per-subscription allowlist",
+      "Deploy the closest previous-generation model available in North Europe and rely on prompt engineering to reproduce the newer model's multimodal behaviour",
+      "Recreate the entire Foundry project and all of its connections in a supported region, since a project cannot reference a deployment outside its own region"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Model availability is per region and per deployment type, so the working pattern is to place the deployment where the model is actually offered and reference it from the application, wiring it up as a connection so credentials and endpoints stay managed. Nothing forces model deployments to sit in the same region as every other component.",
+      "Regional availability reflects where Microsoft has enabled the model's capacity, not a per-subscription entitlement flag, so a support ticket cannot conjure a region into the supported list. This wastes the two-week window waiting on a request that will not be granted.",
+      "Substituting an older model abandons the multimodal capability the requirement is built on, and prompting cannot add a modality a model does not support. This is a downgrade dressed as a workaround.",
+      "Rebuilding the project is a large, disruptive migration justified by a constraint that does not exist — applications routinely call deployments in other regions. If the whole solution needs to move for latency reasons that is a separate decision, not a prerequisite for using this model."
+    ],
+    "principle": "check regional model availability before choosing where things live",
+    "relatedConcept": "Designing Azure infrastructure for AI apps includes placing model deployments where the chosen models and deployment types are actually offered, and connecting projects to them.",
+    "overallExplanation": "When a model is not available in your project's region, deploy it in a supported region and reference that deployment through a connection. Regional availability is a capacity fact, not a subscription toggle, and it does not require rebuilding the project."
+  },
+  {
+    "id": 117,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A regulated healthcare summarizer passed validation against a specific model version and the evidence pack cites that version. Six weeks later the clinical review board reports that outputs changed format overnight; the deployment's version upgrade policy is set to auto-update to default, and the model's default version had rolled forward. What should the team configure going forward?",
+    "options": [
+      "Pin the deployment to a specific model version and introduce a controlled process that validates each new version on a separate deployment before switching production over",
+      "Leave auto-update enabled but add a nightly regression test that alerts the team when the output format changes",
+      "Set the deployment to auto-update but lower temperature to zero so the newer version produces the same output as the validated one",
+      "Create a second deployment of the same model version and load balance across both so an upgrade only affects half the traffic"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Pinning the version makes the production deployment immutable with respect to Microsoft's default-version rollouts, which is what a validated, evidence-backed clinical workflow requires. Validating the next version on a parallel deployment first turns the upgrade into a deliberate, testable release rather than an overnight surprise.",
+      "A nightly regression test detects the change after users have already received differently formatted summaries, and in a regulated workflow that is a documented incident. Detection is valuable, but it does not substitute for preventing an unreviewed model change in production.",
+      "Temperature controls sampling randomness within one model version; it cannot make a newer version reproduce an older one's formatting or behaviour. This confuses run-to-run variance with version-to-version change.",
+      "Load balancing across two deployments of the same version does nothing once the default version rolls forward, because the same auto-update policy applies to both. It halves nothing and adds a second thing to manage."
+    ],
+    "principle": "validated workloads pin the model version and upgrade on purpose",
+    "relatedConcept": "Configuring model deployments includes the version upgrade policy, which decides whether Microsoft's default-version rollouts reach production automatically.",
+    "overallExplanation": "Pin the model version for validated workloads and qualify each new version on a separate deployment before promoting it. Auto-update plus monitoring detects the change only after users are affected, and sampling settings cannot mask a version difference."
+  },
+  {
+    "id": 118,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "multi",
+    "question": "A Python service that calls a Foundry project is being promoted from dev to test to prod. Today the project endpoint URL, the model deployment name, and an API key are all literals in the source, and each environment has its own Foundry resource. Which two changes should the CI/CD pipeline introduce so the same build artefact runs correctly in every environment? (Choose two.)",
+    "options": [
+      "Read the project endpoint and the model deployment name from environment configuration injected per environment by the pipeline",
+      "Authenticate with DefaultAzureCredential so the same code uses a developer identity locally and the workload's managed identity in each deployed environment",
+      "Keep the values in source but add an if statement that selects the right endpoint based on the hostname the service is running on",
+      "Publish separate branches of the repository per environment so each branch carries the correct literal endpoint and key"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Endpoints and deployment names are environment facts, not code, so injecting them as configuration is what lets one immutable artefact be promoted through the pipeline unchanged. It also means a new environment is a config change rather than a code change and rebuild.",
+      "Correct. DefaultAzureCredential resolves whatever identity is available — a signed-in developer locally, the assigned managed identity in Azure — so the credential acquisition path stops being environment-specific code. As a bonus it removes the API key literal that should never have been in source at all.",
+      "Hostname sniffing hardcodes the environment topology into the application, so every new environment or renamed host requires a code change and a redeploy. It also leaves the secrets in source control, which is the more serious of the two problems here.",
+      "Per-environment branches guarantee configuration drift: fixes land on one branch and not others, and the thing tested in test is literally not the thing shipped to prod. Branching is for code changes, not for deployment configuration."
+    ],
+    "principle": "build once, configure per environment, and never ship credentials in source",
+    "relatedConcept": "Integrating Foundry projects with CI/CD means parameterizing endpoints, deployment names, and resource ids, and letting managed identity supply credentials at run time.",
+    "overallExplanation": "Promote one artefact by injecting endpoint and deployment name as per-environment configuration and by acquiring credentials through DefaultAzureCredential. Hostname branching and per-environment repository branches both hardcode topology and invite drift."
+  },
+  {
+    "id": 119,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A bank is moving an internal agent from a proof of concept to production. Audit requires that conversation threads, uploaded files, and the vector store used for agent knowledge all live in subscriptions the bank owns, inside its own storage accounts, with customer-managed keys where applicable. Which setup should the team use for Foundry Agent Service?",
+    "options": [
+      "Use the standard agent setup, bringing your own Azure Cosmos DB account, Azure Storage account, and Azure AI Search service and connecting them to the project",
+      "Use the basic agent setup and add a nightly export job that copies threads and files into the bank's own storage account",
+      "Use the basic agent setup and enable customer-managed keys on the Foundry resource, which relocates thread and file storage into the bank's subscription",
+      "Skip Agent Service and rebuild the agent loop directly against the model deployment, storing everything in the bank's own database"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The standard agent setup exists to let customers bring their own Cosmos DB for thread storage, Storage account for files, and AI Search for the vector store, so agent state resides in resources the bank owns and governs. That is the configuration that satisfies an audit demand for customer-owned data stores rather than platform-managed ones.",
+      "A nightly export makes a copy; the authoritative data still lives in platform-managed storage for up to a day, which is precisely what the audit finding is about. It also adds a synchronization job that can silently fall behind.",
+      "Customer-managed keys change who controls the encryption key, not where the data physically resides. Conflating key ownership with data residency is a common exam trap and would not close the audit item.",
+      "Hand-rolling the agent loop discards managed tools, thread management, and tracing, and replaces a supported configuration option with a large amount of code to maintain. The platform already offers a bring-your-own-resources mode for this exact requirement."
+    ],
+    "principle": "bring-your-own-resources is a setup choice, not something you bolt on later",
+    "relatedConcept": "Designing Azure infrastructure for agent solutions includes choosing between basic and standard agent setup, which determines whether thread, file, and vector storage is platform-managed or customer-owned.",
+    "overallExplanation": "Standard agent setup with your own Cosmos DB, Storage, and AI Search puts agent state in customer-owned resources, which is what data-governance audits require. Exports copy data after the fact and customer-managed keys control encryption, not location."
+  },
+  {
+    "id": 120,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "Security requires that a Foundry resource be reachable only from the company's virtual network. You created a private endpoint for the resource in the app subnet and disabled public network access. From a VM in that VNet, calls now fail during connection setup, and nslookup for the resource host returns a public IP address in the 20.x range. What is missing?",
+    "options": [
+      "The private DNS zone for the service is not linked to the virtual network, so the host name is still resolving to the public endpoint instead of the private IP",
+      "The application is missing a role assignment on the Foundry resource, which is why the connection is refused after public access was disabled",
+      "The private endpoint needs public network access left enabled until the DNS records propagate, so disabling it too early breaks resolution",
+      "The subnet is missing a service endpoint for Azure AI services, which is what rewrites the host name to the private address"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A private endpoint gives the resource a private IP, but clients only use it if name resolution returns that IP — which requires the matching privatelink DNS zone to contain the A record and to be linked to the VNet. A public IP in the nslookup result is the definitive signature of the missing zone link.",
+      "An authorization problem surfaces as an HTTP 403 after a connection and a successful token exchange, not as a failure during connection setup with a public IP in DNS. This misreads a network-layer symptom as an RBAC one.",
+      "Private DNS records are created with the private endpoint and do not need public access as a fallback while they settle; leaving public access on would merely mask the resolution bug. The design goal was to close the public path in the first place.",
+      "Service endpoints and private endpoints are different mechanisms: service endpoints keep traffic on the Azure backbone from the subnet but do not create a private IP or change DNS resolution. Only the private DNS zone makes the host name resolve privately."
+    ],
+    "principle": "a private endpoint without private DNS resolves to the public address",
+    "relatedConcept": "Designing Azure infrastructure for AI apps includes the network path: private endpoint, private DNS zone linked to the VNet, and public network access disabled on the resource.",
+    "overallExplanation": "Private endpoints require the corresponding privatelink private DNS zone to be linked to the VNet, or clients keep resolving the public IP. Public-IP resolution is a DNS symptom, not an RBAC or service-endpoint one."
+  },
+  {
+    "id": 121,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A GitHub Actions workflow deploys Foundry infrastructure and model deployments using a service principal client secret stored as a repository secret. The secret expired at 2 a.m., breaking the release, and the security team has flagged long-lived credentials in CI as a finding. What should the team change in the pipeline's authentication?",
+    "options": [
+      "Configure workload identity federation so the workflow exchanges its GitHub OIDC token for an Azure AD token, removing the stored client secret entirely",
+      "Move the client secret into Azure Key Vault and have the workflow fetch it at the start of each run",
+      "Extend the service principal secret expiry to the maximum allowed and add a calendar reminder before it lapses",
+      "Switch the workflow to use the Foundry resource's API key, since keys do not expire on a fixed schedule"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Federated credentials let the workflow present its short-lived GitHub OIDC token and receive an Azure AD access token in exchange, so there is no secret to store, rotate, or expire. It also scopes trust to a specific repository, branch, or environment, which is stronger than any secret sitting in a settings page.",
+      "Key Vault protects the secret at rest, but the workflow still needs a credential to authenticate to Key Vault, so a long-lived secret exists somewhere and the expiry problem is merely relocated. It reduces exposure without removing the class of failure.",
+      "A longer expiry postpones the outage and leaves a highly privileged, long-lived credential in CI — the exact security finding raised. Calendar reminders are a process control standing in for a technical one.",
+      "Resource API keys are static shared secrets with broad data-plane access and no per-pipeline identity, so this is a step backwards from a service principal. Keys also cannot perform the control-plane operations needed to create deployments."
+    ],
+    "principle": "prefer federated, short-lived identity over any stored secret in CI",
+    "relatedConcept": "Integrating Foundry projects with CI/CD includes how the pipeline authenticates to Azure, which sets the blast radius of the automation identity.",
+    "overallExplanation": "Workload identity federation replaces stored client secrets with a short-lived OIDC token exchange scoped to the repository, eliminating both the expiry outage and the long-lived credential finding. Vaulting or extending the secret only moves or delays the problem."
+  },
+  {
+    "id": 122,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "A platform team runs dev, test, and prod for an AI product inside one Foundry resource, separating environments only by naming conventions such as chat-dev and chat-prod on deployments and connections. A load test against chat-dev exhausted the shared regional token quota and prod requests began failing. Auditors have separately asked how prod access is restricted. How should the environments be restructured?",
+    "options": [
+      "Give each environment its own Foundry resource and project in its own resource group, so quota, role assignments, and connections are isolated per environment",
+      "Keep the single resource but rename the deployments with a stricter prefix scheme and document which prefixes are production",
+      "Keep the single resource and apply Azure Policy to deny changes to any deployment whose name ends with -prod",
+      "Keep the single resource and move dev traffic to a second region while leaving prod where it is"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Quota is tracked per subscription and region for a model, and role assignments and connections are scoped to the resource, so separating environments into their own resources is what actually isolates both the throughput blast radius and the access boundary. It also gives auditors a clean scope to point at for who can reach production.",
+      "Naming conventions are documentation, not enforcement: a prefix cannot stop a load test from consuming shared quota or stop a developer's role assignment from covering prod. It addresses neither the outage nor the audit question.",
+      "Azure Policy on names can block certain control-plane operations, but the incident was data-plane token consumption, which policy does not throttle. It also leaves data-plane permissions identical across environments.",
+      "Splitting regions can relieve the quota collision, but the two environments still share a resource, its role assignments, its connections, and its content filter configuration. It fixes one symptom and leaves the access-isolation finding untouched."
+    ],
+    "principle": "environment isolation means separate resources, not separate names",
+    "relatedConcept": "Designing Azure infrastructure for AI solutions includes the resource topology, because quota, RBAC scope, and connections are all resource- and subscription-scoped facts.",
+    "overallExplanation": "Separate Foundry resources per environment isolate quota consumption and give distinct RBAC and connection scopes. Naming conventions and policies on names provide no runtime isolation for either throughput or access."
+  },
+  {
+    "id": 123,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "multi",
+    "question": "A team promotes changes to a customer-facing Foundry application every sprint, and the last two releases regressed answer groundedness without anyone noticing until support tickets arrived. They want the release pipeline itself to catch this class of regression before all users are exposed. Which two pipeline practices should they add? (Choose two.)",
+    "options": [
+      "Run an automated evaluation of the release candidate against a versioned golden dataset in the pipeline, failing the stage when scores such as groundedness fall below an agreed threshold",
+      "Roll the release out to a small percentage of traffic first and compare production quality and safety signals against the current version before completing the rollout",
+      "Increase unit test coverage of the application's Python code until every prompt-building function is exercised by a test",
+      "Require two human reviewers to approve the prompt diff in the pull request before the release is allowed to proceed"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A golden dataset plus quality evaluators turns groundedness into a measurable gate a build can fail, which is the only way a pipeline catches a regression automatically. Versioning the dataset means the threshold comparison is like-for-like across releases rather than drifting with the test data.",
+      "Correct. Offline evaluation cannot cover every real query distribution, so a staged or canary rollout with production quality and safety signals compared against the incumbent limits exposure while giving real-world evidence. It is the natural complement to a pre-deployment gate.",
+      "Unit tests verify that prompt-building code does what the developer intended; they say nothing about whether the resulting answers are grounded in the retrieved sources. Perfect coverage of deterministic code is compatible with a serious quality regression.",
+      "Human review of a prompt diff is useful hygiene but is a subjective judgement made without measurement, and reviewers are exactly who missed the last two regressions. It adds latency to releases without producing a score anyone can compare."
+    ],
+    "principle": "gate releases on measured quality, then expose gradually",
+    "relatedConcept": "Integrating Foundry projects with CI/CD includes automated evaluation stages and staged rollout, because generative regressions are invisible to conventional software tests.",
+    "overallExplanation": "Catch generative regressions with an automated evaluation gate against a versioned golden dataset, then limit exposure with a canary rollout compared to the incumbent. Code coverage and human prompt review do not measure answer quality."
+  },
+  {
+    "id": 124,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Set up AI solutions in Foundry",
+    "type": "single",
+    "question": "Two workloads share one model in the same region: an interactive assistant that must stay responsive, and a nightly enrichment job. Both currently call the same Standard deployment, and the enrichment job regularly consumes most of the tokens per minute, throttling the assistant. The subscription's total regional quota for that model cannot be increased right now. What deployment configuration resolves the contention?",
+    "options": [
+      "Create two deployments of the model and allocate a fixed share of the available tokens-per-minute capacity to each, sizing the interactive deployment for its peak and giving the remainder to the enrichment job",
+      "Keep one deployment and have the enrichment job retry with a longer backoff whenever it receives HTTP 429",
+      "Keep one deployment and raise its capacity setting to a value above the subscription's remaining regional quota so it can burst when needed",
+      "Move the enrichment job to a different model family that has separate documentation, so the two workloads no longer interact"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Deployment capacity is expressed in tokens per minute drawn from the region's quota for that model, so splitting the pool across two deployments creates a hard ceiling on what the enrichment job can consume. The interactive workload then has a reserved share that a runaway batch cannot take.",
+      "Longer backoff makes the batch job politer, but both workloads still draw from one shared limit and the assistant is still throttled whenever the job happens to be in flight. Client-side manners are not capacity isolation.",
+      "A deployment's capacity cannot exceed the unallocated quota available in the region, so the request simply fails rather than granting burst headroom. This misunderstands capacity as a soft hint rather than an allocation from a fixed pool.",
+      "Model family does not determine quota isolation by itself, and swapping models to dodge contention changes output characteristics the enrichment pipeline was validated against. It also leaves the same contention pattern in place if the new model shares regional capacity."
+    ],
+    "principle": "isolate workloads by allocating capacity, not by asking them to behave",
+    "relatedConcept": "Configuring model deployments includes assigning tokens-per-minute capacity from the region's quota, which is how competing workloads are given independent ceilings.",
+    "overallExplanation": "Split the regional quota into two deployments with explicit tokens-per-minute allocations so batch work cannot starve interactive traffic. Backoff and oversized capacity requests do not create isolation within a single shared deployment."
+  },
+  {
+    "id": 125,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "During a product launch, your Python service starts receiving HTTP 429 responses from a Standard model deployment on roughly 12% of calls. The responses carry a retry-after header, average token usage per request is unchanged, and the deployment is running at its assigned tokens-per-minute ceiling. The current client immediately retries three times in a tight loop. What is the correct short-term and long-term response?",
+    "options": [
+      "Honour the retry-after value and retry with exponential backoff plus jitter, and in parallel request additional quota so the deployment's tokens-per-minute allocation matches launch demand",
+      "Rotate the resource key and recreate the client, since 429 indicates the current credential has exhausted its allowance",
+      "Catch the 429 and fall back to returning a cached generic answer to the user, so the error rate reported by the service drops to zero",
+      "Remove the retry logic entirely so failed calls surface immediately and users can resubmit their request themselves"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. HTTP 429 is a rate-limit signal, and the service tells you how long to wait through retry-after; honouring it with exponential backoff and jitter stops the tight retry loop from amplifying the congestion it is reacting to. Backoff only smooths the peak, so the durable fix is raising the deployment's tokens-per-minute allocation to match sustained launch demand.",
+      "Keys authenticate; they do not carry per-credential throughput allowances, so rotating one changes nothing about the rate limit. This confuses a throttling response with an authentication failure, which would be a 401.",
+      "Serving a cached generic answer hides a capacity problem behind a degraded user experience and makes the metric that would have triggered a quota increase look healthy. Suppressing the signal is how a launch-day capacity issue becomes a silent quality issue.",
+      "Removing retries makes every transient throttle a user-visible failure, when a brief backoff would have succeeded. Transient rate limiting is precisely the case retry logic exists for — the bug is the tight loop, not the retry."
+    ],
+    "principle": "429 means slow down and get more capacity, not re-authenticate",
+    "relatedConcept": "Managing rate limits means combining client-side behaviour — respecting retry-after, exponential backoff, jitter — with capacity planning through quota allocation.",
+    "overallExplanation": "Answer a 429 by honouring retry-after with exponential backoff and jitter, then raise the deployment's tokens-per-minute quota for sustained demand. Key rotation targets authentication, and cached fallbacks merely hide the capacity shortfall."
+  },
+  {
+    "id": 126,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "Finance reports that the AI platform's monthly bill grew from $22,000 to $61,000 across a quarter. Four internal applications share one Foundry resource, and nobody can say which application drove the increase because every app authenticates with the same resource key and calls the same deployment. What should the platform team do first?",
+    "options": [
+      "Give each application its own deployment and identity, then use Azure Monitor metrics for token usage split by deployment to attribute spend before deciding what to optimize",
+      "Halve the max_tokens setting on the shared deployment so every application's responses get cheaper immediately",
+      "Move all four applications to a smaller model, since the increase is clearly driven by model choice",
+      "Set a budget alert on the subscription so finance is notified when spend passes $50,000 next month"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. You cannot optimize what you cannot attribute, and per-application deployments with distinct identities make processed-token metrics in Azure Monitor break down by consumer. Once one application is identified as the growth driver, the optimization — caching, a smaller model, prompt trimming — can be targeted instead of guessed.",
+      "Cutting max_tokens across all four applications truncates legitimate long answers for every consumer to address a cost driver that has not been identified. It is an untargeted quality regression justified by an assumption.",
+      "Model choice may be part of the story, but nothing in the evidence supports it, and forcing four different workloads onto a smaller model risks quality failures in the ones that needed the larger model. Diagnose the growth before changing every application's model.",
+      "A budget alert tells you the bill grew again next month, which is already known; it produces no attribution and no reduction. Alerting is a useful backstop but is not a first step towards cost control."
+    ],
+    "principle": "attribute spend per consumer before optimizing anything",
+    "relatedConcept": "Managing cost footprints starts with observability: per-deployment token metrics and per-application identities are what turn a single aggregate invoice into an actionable breakdown.",
+    "overallExplanation": "Separate deployments and identities per application so Azure Monitor token metrics attribute spend, then optimize the actual driver. Blanket parameter cuts and model downgrades trade quality for savings without evidence."
+  },
+  {
+    "id": 127,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "A summarization service ran unchanged for three months. Support now reports that summaries have become noticeably longer and less faithful to the source, but no application deployment happened. The deployment's version upgrade policy allows automatic updates and there is no continuous evaluation on production traffic. How should the team establish what happened and prevent a repeat?",
+    "options": [
+      "Compare the deployment's current model version against the version recorded when the service was validated, then add continuous evaluation that scores sampled production responses for groundedness and flags a drop",
+      "Restart the service and clear its response cache, since stale cached completions are the most likely cause of the change in output style",
+      "Ask users to rate individual summaries with a thumbs-up control and treat the resulting score as the drift detector",
+      "Retrain the embedding model used for retrieval, because embedding drift is the usual cause of longer outputs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. With no application change, the environment changed, and the auto-update policy makes the model version the prime suspect — comparing the current version to the validated one settles it in minutes. Adding continuous evaluation on sampled production traffic converts the next such change from a support ticket into an alert with a measured groundedness delta.",
+      "A cache would replay old outputs, which would make responses look unchanged rather than newly verbose. This inverts the symptom: cached content cannot explain a shift towards longer, less faithful summaries.",
+      "Thumbs-up feedback is sparse, biased towards the annoyed, and arrives without a reference answer, so it detects large failures late and small quality drifts never. It complements measured evaluation but cannot serve as the detector.",
+      "Embeddings do not change on their own, and nothing suggests retrieval quality moved; embedding models also do not control output length. This proposes an expensive re-index against a hypothesis with no supporting signal."
+    ],
+    "principle": "when the code did not change, look at what the platform changed",
+    "relatedConcept": "Monitoring model performance and drift covers change in the environment as well as change in the data — model version rollovers are a routine cause of unexplained behaviour shifts.",
+    "overallExplanation": "Unexplained quality shifts with no code deployment point at a model version rollover under an auto-update policy. Continuous evaluation of sampled production traffic for groundedness is what detects the next one automatically."
+  },
+  {
+    "id": 128,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "A RAG assistant over 90,000 support articles is in production. Leadership wants an ongoing measure of whether answers stay anchored to retrieved sources, with alerting when the measure degrades, but the team cannot afford to have humans label every production answer. Which monitoring design fits the requirement?",
+    "options": [
+      "Enable continuous evaluation on a sampled percentage of production traces, scoring each sampled response with groundedness and relevance evaluators, and alert on a sustained score drop",
+      "Log every prompt and response to a storage account and have a reviewer read a random 20 answers each morning",
+      "Track average response latency and token counts as proxies, since a poorly grounded answer generally takes longer to produce",
+      "Rerun the pre-release offline evaluation suite weekly and treat its scores as the production quality measure"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Continuous evaluation scores a sample of real production traces with model-graded evaluators such as groundedness and relevance, which gives an ongoing, unlabelled quality signal that can drive alerts. Sampling controls the evaluation cost while still tracking the trend leadership asked for.",
+      "Twenty manual reads a day covers a vanishing fraction of traffic, produces no consistent numeric series, and cannot support alerting. It is useful qualitative review on top of measurement, not a substitute for it.",
+      "Latency and token counts are operational metrics with no reliable relationship to groundedness — a confidently fabricated short answer is fast and cheap. Proxy metrics here would give false assurance precisely when quality fails.",
+      "The offline suite uses a fixed golden dataset, so rerunning it weekly against unchanged questions mostly re-measures the same thing and misses shifts in what real users ask. It validates releases; it does not monitor production."
+    ],
+    "principle": "monitor grounding quality on sampled production traffic, not on the release test set",
+    "relatedConcept": "Monitoring grounding quality uses the same evaluators as pre-release testing, but applied continuously to sampled live traces so drift shows up as a trend.",
+    "overallExplanation": "Continuous evaluation over sampled production traces with groundedness and relevance evaluators gives an affordable, alertable quality signal. Manual spot reads, operational proxies, and reruns of the offline suite all miss live drift."
+  },
+  {
+    "id": 129,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "multi",
+    "question": "After a content migration, users of a knowledge assistant complain that recently published articles are never cited and some answers reference material that was deleted weeks ago. The Azure AI Search index is refreshed by a scheduled indexer with a skillset. Which two monitoring signals should the team put in place to catch this class of problem going forward? (Choose two.)",
+    "options": [
+      "Alert on indexer execution history showing failed or skipped documents and on the gap between source document count and indexed document count",
+      "Track retrieval quality over a fixed set of golden queries with known correct documents, alerting when ranking metrics regress after an index refresh",
+      "Alert whenever the search service's query volume per minute changes by more than 10% week over week",
+      "Alert whenever the average length of indexed documents changes, since content changes usually show up as length changes first"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Silent indexer failures and document-count divergence are the direct explanation for both symptoms — new articles never arrived and deleted ones were never removed — and both are visible in indexer execution history and count comparisons. This is the ingestion-health half of the problem.",
+      "Correct. A golden query set with known relevant documents converts relevance into a number that can be compared before and after each refresh, so a degradation in what gets retrieved is caught even when the pipeline reports success. This is the relevance half of the problem.",
+      "Query volume measures user demand, not index correctness — an index can be badly stale while traffic is perfectly flat. It would alert on marketing campaigns and holidays rather than on ingestion faults.",
+      "Average document length is a weak and noisy proxy that moves for entirely benign editorial reasons and would not budge when a handful of new articles fail to index. It monitors a statistic nobody has tied to the failure mode."
+    ],
+    "principle": "watch both that content arrived and that the right content ranks",
+    "relatedConcept": "Monitoring data ingestion quality, index health, and relevance performance are three distinct checks; pipeline success alone does not prove retrieval still works.",
+    "overallExplanation": "Monitor indexer execution history and document-count parity for ingestion health, and a golden query set with ranking metrics for relevance. Traffic volume and document-length statistics are unrelated to whether the index is complete or ranking correctly."
+  },
+  {
+    "id": 130,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "A Python API running in Azure Container Apps uses DefaultAzureCredential with a user-assigned managed identity to call a Foundry model deployment. Logs show the token request succeeds and returns an access token for the cognitive services scope, but the very next call fails with HTTP 403 and a message about the principal lacking permission over the resource. What is the fix?",
+    "options": [
+      "Assign the managed identity an appropriate data-plane role such as Cognitive Services OpenAI User on the Foundry resource scope",
+      "Recreate the user-assigned managed identity and re-attach it to the container app, because its credentials have gone stale",
+      "Switch the client from token authentication to the resource API key, which does not depend on role assignments",
+      "Add the container app's outbound IP addresses to the resource's network allow list so the calls are accepted"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A successful token acquisition proves authentication worked — Entra ID knows who the principal is — so a subsequent 403 is an authorization verdict, which is settled by a role assignment at the correct scope. Data-plane calls to a model deployment need a data-plane role such as Cognitive Services OpenAI User, which control-plane roles like Contributor do not imply.",
+      "Managed identity credentials are issued and rotated by the platform, and the evidence shows a token was issued successfully, so nothing is stale. Recreating the identity also invalidates any role assignments that do exist, making the situation worse.",
+      "Falling back to a key trades a diagnosable authorization gap for a long-lived shared secret and abandons the keyless posture the design chose. It makes the error disappear without anyone understanding which permissions the workload actually needs.",
+      "A network restriction produces a connection-level rejection or a 403 citing a network rule, and it would prevent the call from being evaluated against a principal at all. The message names the principal's permissions, which points squarely at RBAC."
+    ],
+    "principle": "a 403 after a successful token means RBAC, not authentication",
+    "relatedConcept": "Securing AI systems with managed identity separates authentication (getting a token) from authorization (having a data-plane role at the right scope) — the error code tells you which one failed.",
+    "overallExplanation": "Token acquired plus 403 equals missing role assignment; grant the managed identity a data-plane role such as Cognitive Services OpenAI User at the resource scope. Recreating identities or falling back to keys mistakes an authorization gap for an authentication one."
+  },
+  {
+    "id": 131,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "A security review finds that a Foundry resource's API keys are pasted into three application settings, a notebook, and one archived support ticket. The team migrates every workload to DefaultAzureCredential with managed identity and grants the required roles, and all applications verify successfully. What remaining step best guarantees the leaked keys can no longer be used?",
+    "options": [
+      "Disable local authentication on the resource so key-based access is rejected outright and only Entra ID tokens are accepted",
+      "Regenerate both keys on the resource so the copies that leaked stop working",
+      "Store the keys in Azure Key Vault and restrict access to the vault with RBAC",
+      "Add a diagnostic setting that logs key-based requests so the team can investigate anyone still using them"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Disabling local authentication removes key-based access as a mechanism, so the resource only honours Entra ID tokens and no leaked or future key can be replayed. Once every workload is already on managed identity, this is the step that makes the keyless posture enforced rather than merely adopted.",
+      "Regenerating invalidates the specific leaked values, but the resource still accepts key authentication, so the next key that ends up in a notebook or a ticket is just as dangerous. It is remediation for one incident rather than removal of the attack surface.",
+      "Key Vault is the right answer when you must keep using a secret, but here the workloads no longer need keys at all. Vaulting an unnecessary credential preserves the mechanism you were trying to eliminate.",
+      "Logging key usage gives visibility after the fact and depends on someone acting on the alert. It is a detective control where a preventive one is available at no operational cost."
+    ],
+    "principle": "keyless is only real once local authentication is disabled",
+    "relatedConcept": "Configuring keyless credentials is a two-part change: move workloads to managed identity with role assignments, then switch off key-based authentication on the resource.",
+    "overallExplanation": "Disabling local authentication is what stops leaked keys from ever working again, and it is safe once every workload uses managed identity. Regenerating keys, vaulting them, or logging their use all leave key-based access enabled."
+  },
+  {
+    "id": 132,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "multi",
+    "question": "A public-sector customer requires that a Foundry resource and its connected Azure AI Search service be unreachable from the internet, with all traffic from their application subnet traversing the Microsoft backbone. The team has already deployed the applications into a virtual network. Which two configuration steps are required? (Choose two.)",
+    "options": [
+      "Create private endpoints for the Foundry resource and the search service and link the corresponding privatelink private DNS zones to the virtual network",
+      "Set public network access to disabled on both resources so requests arriving over the public endpoint are refused",
+      "Assign a network security group rule that denies outbound internet traffic from the application subnet on port 443",
+      "Route all outbound traffic through an Azure Firewall with the resources' public host names allowed in an application rule"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Private endpoints give each resource a private IP inside the VNet, and linking the matching privatelink DNS zones is what makes clients resolve the host names to those private addresses instead of the public ones. Without both halves the traffic never leaves the public path.",
+      "Correct. A private endpoint adds a private path but does not by itself close the public one, so the resource remains reachable from the internet until public network access is disabled. Turning it off is what converts a private option into a private-only requirement.",
+      "Blocking outbound 443 from the subnet breaks every other HTTPS dependency the application has and still does nothing about inbound reachability of the AI resources from elsewhere on the internet. It is a blunt egress control aimed at the wrong direction.",
+      "Firewall application rules with allowed public host names keep traffic on the public endpoints, which is exactly what the requirement forbids, and add a hop without changing the path. Egress filtering complements private endpoints; it does not replace them."
+    ],
+    "principle": "private endpoint plus private DNS, then close the public door",
+    "relatedConcept": "Private networking for AI resources is a pair of changes — establish the private path with endpoints and DNS, then disable public network access so nothing falls back to it.",
+    "overallExplanation": "Private endpoints with linked privatelink DNS zones create the private path, and disabling public network access removes the public one. Egress blocking and firewall allow-lists on public host names address neither requirement."
+  },
+  {
+    "id": 133,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Manage, monitor, and secure AI systems",
+    "type": "single",
+    "question": "Trust and safety asks to be alerted within an hour whenever content filter activity on a customer-facing assistant spikes, since a surge of blocked prompts has previously signalled a coordinated abuse campaign. Today nobody can see filter activity outside individual request responses. What should the platform team implement?",
+    "options": [
+      "Add a diagnostic setting on the resource that sends the relevant request and safety logs to a Log Analytics workspace, then create an alert rule on the rate of filtered requests",
+      "Have the application write its own counter to a text file whenever it receives a filtered response, and have someone check the file each morning",
+      "Rely on the resource overview blade in the portal, since filtered requests appear there as part of the default metrics chart",
+      "Lower the content filter severity thresholds so more requests are blocked, making the spike easier to notice in overall traffic volume"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Diagnostic settings stream the resource's logs into Log Analytics where they can be queried and used as the basis for an alert rule, which is what turns per-request filter results into a monitorable rate with a one-hour response target. It also gives trust and safety a queryable history when they investigate a campaign.",
+      "A local text file counter is not durable across instances or restarts, is invisible to anyone else, and a morning check cannot meet a one-hour alerting requirement. It reinvents telemetry badly instead of using the platform's diagnostics pipeline.",
+      "The default metrics view shows operational counters such as calls and latency and is not a substitute for safety log analysis or alerting. Watching a portal chart also relies on someone happening to be looking at it.",
+      "Deliberately blocking more legitimate content to make abuse easier to spot degrades the product for every honest user and still provides no alert. Threshold tuning is a policy decision, not a monitoring mechanism."
+    ],
+    "principle": "safety events need a telemetry pipeline and an alert rule, not eyeballs",
+    "relatedConcept": "Monitoring safety events means exporting resource logs through diagnostic settings so filter activity becomes a queryable, alertable time series alongside performance metrics.",
+    "overallExplanation": "Route resource logs to Log Analytics with a diagnostic setting and alert on the rate of filtered requests to meet a one-hour detection target. Local counters, portal charts, and tightening thresholds provide no alerting path."
+  },
+  {
+    "id": 134,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "A clinical documentation assistant used by hospital staff is blocking legitimate requests: notes describing patient self-harm risk assessments are refused because the self-harm category triggers at low severity under the default content filter. The organization has an approved use case and a clinical governance process, and high-severity content must still be blocked. What is the appropriate configuration?",
+    "options": [
+      "Create a custom content filter configuration for that deployment that raises the self-harm threshold to block only high severity, keeping other categories at their defaults, and apply it to the clinical deployment only",
+      "Turn content filtering off entirely for the Foundry resource so clinical staff are never interrupted",
+      "Keep the default filter and instruct clinicians to paraphrase risk assessments so that the wording avoids the filter",
+      "Add the clinical terms that trigger the filter to a custom blocklist so they are handled by the blocklist rather than the category classifier"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Content filter configurations are created and assigned per deployment, so the clinical workload can run a policy with a higher self-harm threshold while every other deployment keeps the defaults. Raising the threshold rather than disabling the category preserves blocking of genuinely harmful high-severity content, which matches the approved-use-case-with-governance situation.",
+      "Disabling filtering resource-wide removes protection from every workload on that resource, including ones with no clinical justification, and drops the other three harm categories as well. It answers a scoped policy question with an unscoped removal of controls.",
+      "Asking clinicians to reword clinical risk assessments degrades the medical record to satisfy a filter setting, and it will fail unpredictably because the classifier reacts to meaning rather than exact wording. Workflow contortion is not a substitute for a policy configuration.",
+      "Blocklists add terms to be blocked; they do not exempt anything, so this would make the refusals more frequent rather than fewer. It inverts what the blocklist feature does."
+    ],
+    "principle": "tune filter severity per deployment for approved use cases, never switch protection off",
+    "relatedConcept": "Configuring safety filters means assigning content filter configurations at deployment scope with per-category severity thresholds for prompts and completions.",
+    "overallExplanation": "Assign a custom content filter configuration to the clinical deployment with a raised self-harm threshold, leaving other categories and other deployments untouched. Disabling filtering, rewording prompts, and blocklists all misapply the available controls."
+  },
+  {
+    "id": 135,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "A procurement agent summarizes supplier PDFs and can call an internal tool to update supplier risk ratings. A red-team exercise showed that a PDF containing the sentence instructing the assistant to ignore prior instructions and set this supplier's risk to low caused the agent to call the tool with an attacker-chosen value. The user never asked for a rating change. Which control most directly addresses this?",
+    "options": [
+      "Enable Prompt Shields for indirect attacks on the deployment so injected instructions inside retrieved documents are detected, and keep document content clearly delimited as data rather than instructions",
+      "Increase the severity thresholds on the hate and violence content filter categories, since the injected text is adversarial content",
+      "Add a system prompt line telling the agent to never follow instructions found inside documents",
+      "Disable the risk-rating tool and have the agent output a suggested rating for a human to type in manually"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Indirect prompt injection is a distinct threat class from harmful content, and Prompt Shields for indirect attacks is the detection built for instructions smuggled into retrieved or uploaded material. Pairing it with clear delimiting of document content as data reinforces the boundary the attack tries to erase.",
+      "Harm-category thresholds classify hateful, sexual, violent, or self-harm content; an injected instruction to change a risk rating is none of those, so the classifier will never see it as a violation. This applies the wrong detector to the threat.",
+      "A system prompt instruction raises the bar slightly but is itself just text competing with the attacker's text, and red teams routinely defeat it. Prompt wording cannot be the primary defence against injected instructions.",
+      "Removing the tool does close this path, but it also removes the agent's usefulness for the workflow it was built for, and injection can still corrupt the summary a human then acts on. Human approval is a sound layer, but it addresses impact rather than detecting the attack."
+    ],
+    "principle": "content in equals data, not instructions — detect injection where it enters",
+    "relatedConcept": "Risk detection in Foundry covers jailbreak attempts in user input and indirect attacks embedded in documents, which are separate from the four harm categories.",
+    "overallExplanation": "Instructions hidden inside retrieved documents are indirect prompt injection, addressed by Prompt Shields for indirect attacks plus strict data-versus-instruction delimiting. Harm-category thresholds and system prompt pleas do not detect it."
+  },
+  {
+    "id": 136,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "An IT support agent with six tools passes every functional smoke test, yet operations report that it often calls the ticket-creation tool when the user only wanted a status check, and sometimes stops before completing a multistep request. The team wants a repeatable measurement of these behaviours across a 300-conversation regression set. Which instrumentation should they add?",
+    "options": [
+      "Run agent-focused evaluators over the recorded runs, scoring intent resolution, tool call accuracy, and task adherence so each behaviour becomes a tracked metric",
+      "Score the agent with a text similarity evaluator that compares its final message to a reference answer for each conversation",
+      "Measure the proportion of runs that complete without raising an exception and treat that as the agent quality metric",
+      "Add more detail to the tool descriptions and re-run the smoke tests to confirm the problems have gone"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The reported failures are about understanding the request, choosing and parameterizing tools, and finishing the task — which map onto intent resolution, tool call accuracy, and task adherence evaluators respectively. Running them over a fixed 300-conversation set turns anecdotes into per-behaviour scores that can be compared release over release.",
+      "Final-message similarity ignores the trajectory entirely, so an agent that created a spurious ticket on the way to a well-worded answer still scores highly. The failures here live in the tool calls, not in the final wording.",
+      "Exception-free completion measures whether the code ran, not whether the agent did the right thing — every reported failure in this scenario happened without an exception. It is an availability metric masquerading as a quality metric.",
+      "Improving tool descriptions is a plausible remedy, but without measurement nobody can tell whether it helped, and smoke tests already pass while the behaviour is wrong. Fixing before measuring is how these regressions returned unnoticed in the first place."
+    ],
+    "principle": "evaluate the trajectory, not just the final message",
+    "relatedConcept": "Responsible AI instrumentation for agents includes evaluators aimed at agent behaviour — intent resolution, tool call accuracy, task adherence — alongside quality and safety evaluators.",
+    "overallExplanation": "Agent misbehaviour in tool selection and task completion is measured with intent resolution, tool call accuracy, and task adherence evaluators over a fixed conversation set. Final-answer similarity and exception rates miss trajectory failures entirely."
+  },
+  {
+    "id": 137,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "multi",
+    "question": "A consumer-facing wellbeing assistant is two weeks from general availability. The team has quality metrics from a golden dataset but has done no adversarial testing, and the risk review asks for evidence about how the assistant behaves when users deliberately push it towards harmful or unsafe responses. Which two activities should the team run before launch? (Choose two.)",
+    "options": [
+      "Run an automated AI red teaming pass that generates adversarial prompts across harm categories and attack strategies, and record the attack success rate per category",
+      "Run safety evaluations that score generated responses for harmful content categories and jailbreak susceptibility, using an adversarial simulator to produce the test conversations",
+      "Increase the size of the existing golden dataset so the quality evaluators cover more ordinary user questions",
+      "Have the engineering team manually try a handful of jailbreak prompts they have seen on social media and note whether the assistant refuses"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Automated red teaming systematically generates adversarial prompts across risk categories and attack strategies and reports an attack success rate, which is the reproducible evidence a risk review can act on. Doing it before general availability means findings can still change the launch decision.",
+      "Correct. Safety evaluations score responses for harm categories and jailbreak susceptibility, and an adversarial simulator produces the hostile conversations these evaluators need as input. Together they measure how the assistant behaves under pressure rather than how it performs on cooperative questions.",
+      "Expanding the golden dataset improves confidence on ordinary questions, which the team already has, and adds nothing about adversarial behaviour. It answers a question that was not asked.",
+      "Ad-hoc manual jailbreak attempts are unsystematic, unrepeatable, and biased towards whichever attacks the engineers happened to read about. They may find something, but they cannot produce coverage or a metric to compare against the next release."
+    ],
+    "principle": "adversarial evidence must be generated systematically and scored",
+    "relatedConcept": "Safety evaluations and AI red teaming are the pre-launch half of responsible AI instrumentation, complementing the quality evaluators used for ordinary traffic.",
+    "overallExplanation": "Before general availability, run automated red teaming for attack success rates and safety evaluations driven by an adversarial simulator. Larger golden datasets and improvised manual jailbreak attempts produce no systematic adversarial evidence."
+  },
+  {
+    "id": 138,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "An internal audit of a Foundry agent asks the team to reconstruct, for a specific customer complaint from six weeks ago, what the agent was asked, which tools it invoked with which arguments, and which retrieved documents informed the answer. Today the application logs only the final assistant message and an HTTP status. What should the team implement?",
+    "options": [
+      "Enable tracing for the agent so each run emits spans covering the messages, tool invocations and their arguments, and retrieval steps, exporting them to Application Insights with a retention period that covers the audit window",
+      "Increase the application's log level to debug and log the full request and response bodies from the Python service to standard output",
+      "Store every user question and final answer in a database table with a timestamp so complaints can be matched by date",
+      "Rerun the same question against the agent today and record what happens as the reconstruction of the original interaction"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Tracing captures the whole run as structured spans — messages, tool calls with arguments, retrieval operations — so an auditor can follow the causal chain rather than infer it from an output. Exporting to Application Insights with retention that spans the audit window is what makes a six-week-old interaction still available to query.",
+      "Debug-level body logging captures the outer HTTP call, not the agent's internal steps, so tool invocations and retrieval remain invisible. It also sprays unstructured, potentially sensitive payloads into console output with no correlation between related steps.",
+      "A question-and-answer table records the endpoints of the interaction and none of the middle, which is precisely what the audit asks for. Timestamps let you find the row; they do not explain the behaviour.",
+      "Replaying the question today exercises the current agent configuration, model version, and index contents, so it cannot evidence what happened six weeks ago. Non-determinism alone makes this an unsound reconstruction."
+    ],
+    "principle": "audits need the trace of how an answer happened, not just the answer",
+    "relatedConcept": "Auditing through trace logging records the full run — prompts, tool calls, retrieval — as correlated telemetry that outlives the request itself.",
+    "overallExplanation": "Enable agent tracing to Application Insights with retention covering the audit period so runs can be reconstructed step by step. Debug logs, answer tables, and replays capture the wrong data or the wrong point in time."
+  },
+  {
+    "id": 139,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "A regulator will review outputs of a lending guidance assistant and expects, for any archived answer, evidence of which source passages supported it and which system produced it. The assistant currently returns clean prose with no attribution, and the team argues that citations clutter the interface. What should the team add to satisfy the requirement?",
+    "options": [
+      "Return and persist provenance metadata with every answer — the retrieved source identifiers and passages used, plus the model and deployment version and the content filter results — surfacing citations in the interface where appropriate",
+      "Persist only the final answer text along with a hash of the prompt, so the record is compact and tamper evident",
+      "Record the retrieval index name and the date on which the answer was produced, which together identify the source material",
+      "Ask the model to include a sentence at the end of each answer stating which documents it used, based on its own recollection"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Provenance is a record of the specific inputs and system state behind an output: the passage identifiers actually retrieved, the model and deployment version that generated the text, and the safety verdicts applied. Persisting that alongside the answer is what lets a reviewer six months later verify support for a claim rather than take it on trust.",
+      "A hash proves the prompt was not altered but reveals nothing about which sources supported the answer or which model version produced it. Tamper evidence is not the same property as traceability to sources.",
+      "An index name and a date identify a corpus that has changed since, not the passages that were actually retrieved for that answer. Two answers from the same index on the same day can rest on entirely different documents.",
+      "A model-authored recollection of its sources is generated text and can be confidently wrong, which is exactly the failure mode a regulator is guarding against. Provenance must be captured from the retrieval step, not narrated by the model."
+    ],
+    "principle": "capture provenance from the pipeline, never from the model's own account",
+    "relatedConcept": "Provenance metadata — retrieved passages, model and deployment version, filter outcomes — is the auditing counterpart to trace logging and is what makes an archived answer defensible.",
+    "overallExplanation": "Persist the actual retrieved passage identifiers, the model and deployment version, and the filter results with each answer. Hashes, index names, and model-narrated source lists all fail to tie a specific output to the evidence that produced it."
+  },
+  {
+    "id": 140,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "A retail refunds agent may issue refunds automatically up to $200, but policy says anything above that must be approved by a human supervisor before money moves. In pre-production testing the agent issued a $2,400 refund after a persistent customer argued the case across several turns. The current control is a line in the system prompt stating the $200 limit. How should the control be implemented?",
+    "options": [
+      "Enforce the threshold outside the model: have the refund tool require an explicit human approval step for amounts above $200 and reject unapproved calls server-side",
+      "Strengthen the system prompt with capitalized emphasis and repeat the $200 limit at the start and end of the instructions",
+      "Add a second model call that reviews the proposed refund and vetoes amounts above the threshold before the tool executes",
+      "Lower the agent's temperature to zero so it follows the stated policy deterministically"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A monetary limit is a business rule and must live where it cannot be argued with — in the tool implementation, which rejects any above-threshold call lacking a recorded approval. Making high-impact actions require an approval step is the standard safeguard for semiautonomous workflows, and it holds regardless of how persuasive the conversation was.",
+      "Emphasis and repetition change the odds, not the guarantee, and the incident already demonstrates that sustained user pressure overcomes prompt instructions. A policy that can be negotiated away is not a control.",
+      "A reviewing model call adds a probabilistic gate that is itself susceptible to the same persuasion, and it can be fed the same misleading framing. It is a reasonable extra signal but cannot be the enforcement point for a financial limit.",
+      "Temperature affects sampling randomness within the model's behaviour; it does not turn an instruction into an enforced constraint. A deterministic model can deterministically follow a persuasive argument to the wrong conclusion."
+    ],
+    "principle": "high-impact actions are gated in code with approval, never by instructions",
+    "relatedConcept": "Approval workflows are the human-in-the-loop control for autonomous and semiautonomous agents: the agent proposes, a person authorizes, and the tool enforces.",
+    "overallExplanation": "Enforce the refund threshold in the tool with a required human approval for amounts above $200, rejecting unapproved calls server-side. Prompt emphasis, reviewer models, and temperature settings are all probabilistic where a hard limit is needed."
+  },
+  {
+    "id": 141,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "multi",
+    "question": "A newly deployed operations agent is configured with the full tool set used by the platform team, including a database tool whose managed identity holds Contributor on the data subscription, and it runs unattended overnight. Governance wants the agent constrained so that a misbehaving run cannot damage systems it has no business touching. Which two changes should be made? (Choose two.)",
+    "options": [
+      "Give the agent only the tools its task requires, removing the rest from its definition rather than relying on it to choose sensibly",
+      "Scope the tool's managed identity to least privilege, replacing subscription-level Contributor with the narrowest data-plane role on the specific resources it must use",
+      "Keep every tool available but add instructions describing which tools the agent should use in which situations",
+      "Keep the broad role assignment but enable diagnostic logging so any destructive action is recorded for later review"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A tool the agent does not have cannot be called under any prompt, injection, or reasoning error, so trimming the tool set is the most reliable constraint available. It also improves tool selection accuracy, because the model chooses among fewer, more relevant options.",
+      "Correct. The agent's real blast radius is defined by the permissions of the identity behind its tools, so subscription-wide Contributor means one bad call can affect anything in the subscription. Narrowing to the minimum data-plane role on specific resources bounds the damage independently of agent behaviour.",
+      "Instructions guide a probabilistic system and are exactly what governance is asking to stop relying on. Every tool remains callable, so the blast radius is unchanged and an injected or confused run can still reach it.",
+      "Logging is a detective control that records destruction after it happens, which for an unattended overnight run means discovery hours later. It belongs in the design, but not as a replacement for reducing permissions."
+    ],
+    "principle": "constrain agents by capability and permission, not by instruction",
+    "relatedConcept": "Governing agent behaviour combines tool-access controls — which tools exist for this agent — with least-privilege identities behind those tools, so oversight does not depend on the model's judgement.",
+    "overallExplanation": "Restrict the agent to the tools its task needs and scope the tool identity to least privilege on specific resources. Instructions and after-the-fact logging leave the blast radius of an unattended run unchanged."
+  },
+  {
+    "id": 142,
+    "domain": "Plan and manage an Azure AI solution",
+    "objective": "Implement responsible AI across generative AI and agentic systems",
+    "type": "single",
+    "question": "A marketing copy generator is being prepared for external use. Legal raises two concerns: outputs occasionally reproduce long passages that match published copyrighted text, and the assistant sometimes names a competitor brand in comparisons, which brand guidelines forbid. Which combination of platform controls addresses both concerns?",
+    "options": [
+      "Enable protected material detection for text on the deployment and add a custom blocklist containing the prohibited competitor brand terms",
+      "Raise the severity thresholds on all four harm categories so more content is blocked, which will catch both the copied passages and the brand names",
+      "Add both requirements to the system prompt and instruct the model never to reproduce copyrighted text or mention competitors",
+      "Use a groundedness evaluator on each generation and reject any output whose groundedness score falls below a threshold"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. These are two different problems with two matching platform features: protected material detection for text flags completions that match known published content, while a custom blocklist enforces an organization-specific term list such as competitor names. Neither is covered by the standard harm categories, which is why both must be configured explicitly.",
+      "The four harm categories cover hate, sexual, violence, and self-harm content, and no threshold setting makes them recognize copyrighted passages or brand names. Raising thresholds would also block more legitimate marketing copy while missing both stated concerns.",
+      "System prompt rules are advisory: the model has no reliable way to know which text is copyrighted, and brand mentions slip through in paraphrase or comparison. Legal exposure of this kind needs detection at the response level, not a request in the instructions.",
+      "Groundedness measures whether an answer is supported by provided sources, which is unrelated to whether generated text matches copyrighted material or names a competitor. It is the right evaluator for a RAG assistant and the wrong control here."
+    ],
+    "principle": "match each risk to the control built for it",
+    "relatedConcept": "Content moderation in Foundry extends past the four harm categories to protected material detection and custom blocklists for organization-specific terms.",
+    "overallExplanation": "Protected material detection for text catches reproduction of copyrighted passages, and a custom blocklist enforces prohibited brand terms. Harm-category thresholds, prompt instructions, and groundedness scoring do not detect either risk."
+  }
+]

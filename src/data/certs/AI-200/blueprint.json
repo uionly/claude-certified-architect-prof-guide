@@ -1,0 +1,67 @@
+{
+  "cert": {
+    "name": "Azure AI Cloud Developer Associate",
+    "code": "AI-200",
+    "vendor": "Microsoft",
+    "level": "Associate",
+    "audience": "Developers implementing AI solutions on Azure back-end services — data, messaging, containers, security and monitoring — using Python.",
+    "examQuestions": null,
+    "questionsPerSet": 50,
+    "examTimeMinutes": 120,
+    "examMinutesPerQuestion": 2.4,
+    "passingScore": "700 / 1000 (scaled)",
+    "format": "Proctored via Pearson VUE · multiple choice & multiple response · may include interactive components",
+    "examFee": null,
+    "validityMonths": 12,
+    "registrationUrl": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-cloud-developer-associate/",
+    "practiceSets": 3,
+    "content": { "study": false, "revision": false }
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Develop containerized solutions on Azure",
+      "weight": 24,
+      "questionCount": 12,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Implement container application hosting", "questions": 6 },
+        { "objective": "Implement container-orchestrated solutions", "questions": 6 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Develop AI solutions by using Azure data management services",
+      "weight": 28,
+      "questionCount": 14,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL", "questions": 5 },
+        { "objective": "Develop AI solutions by using Azure Database for PostgreSQL", "questions": 6 },
+        { "objective": "Integrate Azure Managed Redis in AI solutions", "questions": 3 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Connect to and consume Azure services",
+      "weight": 24,
+      "questionCount": 12,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Develop event- and message-based AI solutions", "questions": 7 },
+        { "objective": "Develop and implement Azure Functions", "questions": 5 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Secure, monitor, troubleshoot Azure solutions",
+      "weight": 24,
+      "questionCount": 12,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Implement secure Azure solutions", "questions": 6 },
+        { "objective": "Monitor and troubleshoot Azure solutions", "questions": 6 }
+      ]
+    }
+  ]
+}

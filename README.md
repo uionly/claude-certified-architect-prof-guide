@@ -1,14 +1,18 @@
-# Claude Cert Prep — Study Guides & Question Banks
+# Cert Prep — Study Guides & Question Banks
 
-A study + practice web app covering multiple Claude certifications. Each certification gets:
+A study + practice web app covering multiple AI certifications, currently from two vendors: Anthropic (Claude) and Microsoft (Azure AI). Every certification gets a question bank; the Claude certifications also get a study guide and a revision pass:
 
+- **Question bank** — reasoning-based scenario questions distributed by domain weight, every question tagged with its exact blueprint objective and (where one exists) linking back to the study section that teaches it.
 - **Study guide** — one page per exam domain, one section per blueprint objective, each ending with a "Practice this objective" deep link into the question bank.
-- **Question bank** — reasoning-based scenario questions distributed by domain weight, every question tagged with its exact blueprint objective and linking back to the study section that teaches it.
 - **Revision** — the last-mile pass: for every blueprint objective, a short recap (key points + the trap to watch for) and exactly one high-yield question with a reveal-answer toggle. Unscored and unsaved, built to be read straight through the day before the exam.
+
+A cert declares which of these it ships via `cert.content` in its blueprint (see [Blueprint schema](#blueprint-schema)). Practice-only certs hide the Study Guide and Revision nav, and their study/revision routes redirect to Practice.
 
 No backend: React + Vite + Tailwind, all state client-side, attempt history persisted to `localStorage`.
 
 ## Supported certifications
+
+### Anthropic — Claude
 
 | Code | Name | Content |
 |---|---|---|
@@ -19,7 +23,22 @@ No backend: React + Vite + Tailwind, all state client-side, attempt history pers
 
 Cert codes are the official Anthropic exam codes. The three Foundations blueprints (domains, weights, objective strings) are transcribed from the official exam guides published on the [Anthropic Partner Academy](https://anthropic-partners.skilljar.com/page/partner-certifications) (v1.0, effective July 2026). Each Foundations bank holds **3 distinct, non-overlapping practice sets**, each the size and domain/objective distribution of the real exam (CCAO-F 60, CCDV-F 53, CCAR-F 60 questions per set).
 
-The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
+### Microsoft — Azure AI
+
+| Code | Name | Content |
+|---|---|---|
+| AI-103 | Azure AI Apps and Agents Developer Associate | ✅ practice only (150 questions = 3 × 50-question sets) |
+| AI-200 | Azure AI Cloud Developer Associate | ✅ practice only (150 questions = 3 × 50-question sets) |
+
+Blueprints (domains, weights, objective strings) are transcribed from the official Microsoft Learn study guides: [AI-103](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-103) (**skills measured as of April 16, 2026**) and [AI-200](https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/ai-200) (outline undated; page last updated 2026-05-05). Re-check both before a large content pass — Microsoft publishes two versions of the skills outline around an update.
+
+Three transcription notes:
+
+- **Objectives are the study guide's sub-skill *group headings*, not its individual bullets.** AI-103 has 64 bullets across 5 domains but only 50 questions per set, so several domains couldn't give every bullet an item. The group headings are also pure ASCII, whereas the bullets contain U+2011 non-breaking hyphens (`Event‑driven`, `alt‑text`) that would be fragile in the `?objective=` deep links the app matches character-for-character. The finer-grained bullet topic goes in each question's `principle` instead.
+- **AI-200 domain 4 has two official spellings.** "Skills at a glance" and the exam page say `Secure, monitor, troubleshoot Azure solutions`; the study guide's section heading adds "and". We use the former.
+- **Level.** Microsoft's "At a glance → Level" says *Intermediate* for both; we record `"Associate"` to match the credential names and the app's existing level vocabulary.
+
+The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification grouped by vendor with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice, minus whatever that cert doesn't ship) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
 
 ## Setup
 
@@ -75,14 +94,15 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 ```json
 {
   "cert": {
-    "name": "...", "code": "...",
+    "name": "...", "code": "...", "vendor": "Anthropic",
     "level": "Associate", "audience": "who this exam is for",
     "examQuestions": 60, "examTimeMinutes": 120, "examMinutesPerQuestion": 2.0,
     "passingScore": "720 / 1000 (scaled)",
     "format": "Multiple choice & multiple response · online proctored or test center",
     "examFee": "$99 USD", "validityMonths": 12,
     "registrationUrl": "https://anthropic-partners.skilljar.com/...",
-    "practiceSets": 3
+    "practiceSets": 3,
+    "content": { "study": true, "revision": true }
   },
   "domains": [
     {
@@ -97,7 +117,11 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 }
 ```
 
-`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to `examQuestions` (when it's known); each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to the per-set question count (`examQuestions`, or `questionsPerSet` where the vendor doesn't publish an item count — see below); each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+
+`vendor` is the exam vendor. It groups the landing-page cards and the header cert switcher; the display label and the vendor/cert ordering live in `src/lib/vendors.js`. A cert missing from those order arrays still renders — it's appended, never silently dropped.
+
+`content` (optional, defaults to both `true`) declares which content trees the cert ships. `{ "study": false, "revision": false }` makes it **practice-only**: the Study Guide and Revision nav disappear, objective tags in the feedback panel and results screen stop linking to study sections, and `/:cert/study*` and `/:cert/revision*` redirect to `/:cert/practice`. The validator then skips those checks *and* fails if a `study/` or `revision/` file exists anyway, so a half-written tree can't ship unvalidated. Read it in components via `hasStudy(cert)` / `hasRevision(cert)` from `src/data/loader.js` — both accept a `certRegistry` entry or `useCertData().cert`, which are different objects.
 
 **Exam facts** (`level`, `audience`, `examQuestions`, `examTimeMinutes`, `passingScore`, `format`, `examFee`, `validityMonths`, `registrationUrl`) drive the "About this exam" panel on the cert overview and the fact rows on the landing page. The nullable ones must be **present as keys** — use `null` when the official value isn't known yet, and the UI omits that fact instead of inventing one.
 
@@ -111,9 +135,21 @@ All four certs' facts are transcribed from Anthropic's official exam guide PDFs 
 | Fee | $99 | $125 | $125 | $175 |
 | Validity | 12 months | ← | ← | ← |
 
-Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — Anthropic doesn't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
+The two Microsoft certs' facts come from Microsoft Learn (study guide + certification page), checked August 2026:
 
-Validation rules: when `practiceSets` is declared, `examQuestions` must equal the sum of per-domain `questionCount` (which describes one exam), so bank size can never be mistaken for exam size. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
+| | AI-103 | AI-200 |
+|---|---|---|
+| Items | **not published** | **not published** |
+| Time limit | 120 min | 120 min |
+| Passing score | 700 / 1000 scaled | ← |
+| Fee | varies by country/region | ← |
+| Validity | 12 months (annual renewal) | ← |
+
+Because Microsoft doesn't publish an item count, `examQuestions` is `null` for both and the overview page says so rather than inventing a number. `examMinutesPerQuestion: 2.4` is **derived** (120 min ÷ our 50-question set), not a sourced fact — it only sets the Exam-mode pace.
+
+Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — vendors don't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
+
+Validation rules: when `practiceSets` is declared, the per-set question count must equal the sum of per-domain `questionCount`, so bank size can never be mistaken for set size. That count comes from `examQuestions` when the official figure is known, otherwise from **`questionsPerSet`** — one of the two must be present, or nothing would check that a set really holds what it claims. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
 
 `examQuestions`, `questionCount`, and per-objective `questions` always describe **one real exam** (transcribed from the official guide). The optional `practiceSets` (default 1) says how many distinct full exams the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into `practiceSets` non-overlapping CSVs, each matching the official exam's exact size and distribution.
 
@@ -173,7 +209,7 @@ Validation rules: when `practiceSets` is declared, `examQuestions` must equal th
 - Exactly **one** question per objective. Prefer `"single"`; use `"multi"` only where the objective genuinely tests a choose-two skill (stem then ends with "(Choose two.)").
 - Revision questions are new items — do **not** reuse practice-bank ids or add them under `questions/`.
 - `keyPoints` are distilled from that domain's `study/domain-N.json` (`explanation` / `whyItMatters` / `pitfalls`). Precision over length; the study guide already carries the depth.
-- The validator requires a revision file for every domain that has questions + a study guide.
+- The validator requires a revision file for every domain that has questions + a study guide, unless the cert is practice-only (`cert.content.revision: false`).
 
 ## Content-generation guidelines
 
@@ -187,7 +223,8 @@ Follow these when adding questions for any cert so new items match the existing 
 6. **`relatedConcept`** — one line connecting the question to the broader domain theme.
 7. **Distribute evenly** — roughly 5–6 questions per objective bullet so every objective gets meaningful coverage.
 8. **No stubs** — never commit TODO/placeholder text; the validator rejects it.
-9. Ground content in real Claude/Anthropic concepts (model tiers, prompt caching, MCP, Claude Code, the workflow/agent pattern taxonomy) — don't invent product features or topics outside the blueprint, and match technical depth to the cert's level (Foundations-level certs should be more conceptual than CCAR-P's Professional-level architecture scenarios).
+9. Ground content in real, current product behaviour for that cert's vendor — for Claude certs: model tiers, prompt caching, MCP, Claude Code, the workflow/agent pattern taxonomy; for the Azure certs: Microsoft Foundry, Azure AI Search, Content Understanding, Container Apps/AKS/ACR, Cosmos DB, PostgreSQL + pgvector, Managed Redis, Service Bus/Event Grid/Functions, Key Vault, App Configuration, OpenTelemetry and KQL. Don't invent product features, SDK methods or topics outside the blueprint, and match technical depth to the cert's level (Foundations-level certs should be more conceptual than CCAR-P's Professional-level architecture scenarios).
+10. **Watch the practice-set split.** `export-practice-sets.mjs` round-robins each objective's items by id, so within an objective the 1st/2nd/3rd item land in sets 1/2/3. Author each group of three at comparable difficulty and on distinct topics, or set 1 ends up systematically easier and the sets read as near-duplicates.
 
 Study guide sections follow the same spirit: plain-language explanation, why it matters in production, 1–2 worked examples, 3–5 pitfalls, documentation tone (no marketing copy). Schema is in any `src/data/certs/<CODE>/study/domain-N.json`.
 
@@ -252,4 +289,33 @@ After adding content: `npm run validate` (or `node scripts/validate-content.mjs 
 | 5. Context Management & Reliability | 15% | ✅ 27/27 | ✅ done | ✅ done |
 | **Total** | 100% | **180/180** | **5/5** | **5/5** |
 
-App shell: ✅ scaffold · ✅ purpose-first landing page with exam facts · ✅ multi-cert switcher · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass
+### AI-103 — Azure AI Apps and Agents Developer Associate
+
+Practice only (no study guide, no revision). 3 practice sets × 50 questions (bank = 150). Per-domain bank counts (each set gets ⅓):
+
+| Domain | Weight | Questions | Study guide | Revision |
+|---|---|---|---|---|
+| 1. Plan and manage an Azure AI solution | 28% | ✅ 42/42 | — practice only | — practice only |
+| 2. Implement generative AI and agentic solutions | 32% | ✅ 48/48 | — practice only | — practice only |
+| 3. Implement computer vision solutions | 14% | ✅ 21/21 | — practice only | — practice only |
+| 4. Implement text analysis solutions | 14% | ✅ 21/21 | — practice only | — practice only |
+| 5. Implement information extraction solutions | 12% | ✅ 18/18 | — practice only | — practice only |
+| **Total** | 100% | **150/150** | — | — |
+
+Weights are the midpoints of Microsoft's published bands (25–30 / 30–35 / 10–15 / 10–15 / 10–15), chosen so each domain's per-set count is a whole number of questions and the weights still sum to 100.
+
+### AI-200 — Azure AI Cloud Developer Associate
+
+Practice only (no study guide, no revision). 3 practice sets × 50 questions (bank = 150). Per-domain bank counts (each set gets ⅓):
+
+| Domain | Weight | Questions | Study guide | Revision |
+|---|---|---|---|---|
+| 1. Develop containerized solutions on Azure | 24% | ✅ 36/36 | — practice only | — practice only |
+| 2. Develop AI solutions by using Azure data management services | 28% | ✅ 42/42 | — practice only | — practice only |
+| 3. Connect to and consume Azure services | 24% | ✅ 36/36 | — practice only | — practice only |
+| 4. Secure, monitor, troubleshoot Azure solutions | 24% | ✅ 36/36 | — practice only | — practice only |
+| **Total** | 100% | **150/150** | — | — |
+
+Every weight sits inside its published band (20–25 / 25–30 / 20–25 / 20–25).
+
+App shell: ✅ scaffold · ✅ purpose-first landing page with exam facts · ✅ vendor-grouped cert cards & switcher · ✅ multi-cert switcher · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass · ✅ practice-only certs

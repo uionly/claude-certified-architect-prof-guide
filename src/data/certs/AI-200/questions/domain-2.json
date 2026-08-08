@@ -1,0 +1,1060 @@
+[
+  {
+    "id": 201,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A retail chatbot API runs on Azure Container Apps and reads product documents from Azure Cosmos DB for NoSQL. The handler constructs `CosmosClient(...)` inside every request and closes it before returning. Under 300 requests per second, p99 latency climbs to 900 ms and the container logs show constant TLS handshakes and metadata calls to the account endpoint. What is the correct fix?",
+    "options": [
+      "Create one CosmosClient at application startup, keep it alive for the process lifetime, and share it across all request handlers",
+      "Switch the client to Gateway connection mode so each new client reuses the shared HTTPS gateway instead of opening direct TCP connections",
+      "Raise the container's provisioned throughput so the extra RU headroom absorbs the connection overhead seen in the latency percentiles",
+      "Wrap each request in a retry policy with exponential backoff so transient handshake failures no longer surface as long-tail latency"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. CosmosClient is designed to be a long-lived singleton: it caches the account topology, partition key ranges and routing metadata, and maintains a warm connection pool. Constructing one per request throws that cache away and pays for endpoint discovery plus a TLS handshake on every call, which is exactly the signature in the logs.",
+      "Gateway mode routes requests through the gateway rather than direct to replicas, but it does not make a per-request client cheap: each new client still performs endpoint discovery and opens fresh HTTPS connections. It also usually adds a network hop, so latency would likely get worse rather than better.",
+      "This treats a client-lifetime problem as a capacity problem. RU exhaustion shows up as HTTP 429 responses and rising RU consumption metrics, neither of which is reported here; buying more throughput cannot remove TLS handshakes and metadata round-trips from the request path.",
+      "Retries help with transient faults, but nothing here is failing — the requests succeed and are merely slow. Adding backoff on top of an already slow path can only extend the tail; the handshakes are a per-request cost of the design, not an intermittent error."
+    ],
+    "principle": "database clients are long-lived singletons, not per-request objects",
+    "relatedConcept": "The Cosmos DB SDK caches routing and partition metadata inside the client instance, so client lifetime is a first-order performance decision.",
+    "overallExplanation": "Create a single CosmosClient at startup and reuse it for the process lifetime. Per-request clients discard cached routing metadata and pay a TLS handshake on every call, which is a design cost that no amount of RU headroom or retry logic can remove."
+  },
+  {
+    "id": 202,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A healthcare document-ingestion service must reach Azure Cosmos DB for NoSQL without any account keys in configuration. The platform team assigned the app's managed identity the Azure RBAC Contributor role on the Cosmos DB account and disabled local authentication. The app authenticates with `DefaultAzureCredential`, but every `create_item` call fails with a 403 stating the principal is not authorized to perform the data action. What is the cause?",
+    "options": [
+      "Contributor is a control-plane role; the identity also needs a Cosmos DB data-plane role assignment such as Cosmos DB Built-in Data Contributor",
+      "DefaultAzureCredential cannot be used with Cosmos DB, so the app must acquire a token for the account scope manually and pass it as a raw string",
+      "Disabling local authentication blocks the SDK's data plane entirely, so writes must go through the control plane or a private endpoint",
+      "The managed identity has not been granted the Reader role on the resource group, which Cosmos DB requires before evaluating any data-plane request"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Cosmos DB separates control-plane Azure RBAC (managing the account, containers, throughput) from data-plane role-based access control over items. Contributor lets the identity manage resources but grants no item read or write actions, so a data-plane role definition such as Cosmos DB Built-in Data Contributor must be assigned to the principal at the account scope.",
+      "DefaultAzureCredential is precisely what the Cosmos DB SDK expects for token-based auth — you pass the credential object as `credential=`. The failure is an authorization decision, not a credential-type problem, and hand-rolling token acquisition would produce the same 403.",
+      "Disabling local auth only turns off key-based access; token-based data-plane access continues to work and is the entire point of the configuration. The request reached the data plane and was evaluated, which is why a 403 rather than a connection error was returned.",
+      "Reader on the resource group is another control-plane assignment and adds no item-level permissions. Cosmos DB does not chain data-plane authorization off resource-group RBAC, so this would leave the 403 exactly as it is."
+    ],
+    "principle": "control-plane RBAC never grants data-plane item access",
+    "relatedConcept": "Keyless access to Cosmos DB combines a managed identity, DefaultAzureCredential, and an explicit Cosmos DB data-plane role assignment.",
+    "overallExplanation": "Cosmos DB has two independent permission systems: Azure RBAC for the account and a separate data-plane role model for items. A keyless app needs a data-plane role assignment such as Cosmos DB Built-in Data Contributor; Contributor alone yields a 403 on every item operation."
+  },
+  {
+    "id": 203,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A RAG service hydrates citations by fetching roughly 40 documents by id for every answer it returns. The current code issues `SELECT * FROM c WHERE c.id = @id` for each id with the partition key supplied, and the diagnostics show about 2.9 RUs per lookup against a 1 KB document. The team wants the cheapest possible per-document retrieval. What should they change?",
+    "options": [
+      "Replace each query with `container.read_item(item=id, partition_key=pk)`, which performs a point read charged at roughly 1 RU for a 1 KB document",
+      "Rewrite the lookups as a single `WHERE c.id IN (...)` query so 40 documents are retrieved in one round trip and billed once",
+      "Add a composite index on /id and the partition key path so the equality predicate is served from the index rather than the document store",
+      "Switch the container to eventual consistency so the reads are served from the nearest replica at a reduced RU charge"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A point read that supplies both the item id and the partition key bypasses the query engine entirely and is the cheapest read in Cosmos DB — about 1 RU for a 1 KB document — whereas even a fully indexed single-item query pays query-engine overhead of roughly 2.3 RUs or more. Fetching known ids is the textbook case for read_item.",
+      "An IN query does save round trips, but it is still a query: it is billed for the RUs each matched document consumes plus query overhead, so the per-document cost stays above a point read. It also risks fanning out across partitions if the listed ids do not share one partition key value.",
+      "The id property is already indexed by default, and the query is not slow because of a missing index — 2.9 RUs is normal query-engine cost for a served-from-index equality lookup. A composite index helps multi-property ORDER BY, not single-property equality.",
+      "Consistency level affects read RU charge only for strong and bounded staleness, which cost about twice as much as the weaker levels; session is already in the cheaper tier. Weakening consistency here trades correctness for no meaningful saving relative to switching to a point read."
+    ],
+    "principle": "when you know the id and partition key, read the item — never query for it",
+    "relatedConcept": "Point reads are the RU-optimal retrieval path in Cosmos DB and are the standard way a RAG layer hydrates documents from ids returned by a search step.",
+    "overallExplanation": "Use read_item with the id and partition key for known documents: a point read costs about 1 RU per 1 KB document, while an equivalent query pays query-engine overhead of 2.3 RUs or more. Reserve queries for cases where you must filter or sort."
+  },
+  {
+    "id": 204,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "An ingestion pipeline writes 1 KB chunk documents to Cosmos DB for NoSQL. Each document carries a 1536-float `embedding` array plus a large `rawHtml` string, and writes cost about 68 RUs each — far above the roughly 5 RUs expected for a small document. Queries only ever filter on `tenantId`, `docId` and `publishedAt`. What change most directly reduces the write cost?",
+    "options": [
+      "Set an indexing policy that excludes /embedding/* and /rawHtml/* and includes only the paths the queries actually filter or sort on",
+      "Switch the container's indexing mode to none so writes stop paying indexing cost, and rely on the query engine to scan at read time",
+      "Move the embedding and rawHtml values into a second container so the primary container's documents stay under the 1 KB write threshold",
+      "Enable analytical store on the container so the large properties are written to column storage instead of the transactional index"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Cosmos DB indexes every property by default, so each write pays to index all 1536 embedding elements and the whole HTML blob. Excluding those paths and keeping the handful of paths queries actually use collapses the indexing work per write, which is the dominant term in the 68 RU charge.",
+      "Turning indexing off entirely does cut write cost, but it removes the index the existing tenantId, docId and publishedAt filters depend on. Those queries would then require full scans with sharply higher read RU charges — trading a write problem for a much worse read problem.",
+      "Splitting the document adds a second write and a join at read time without addressing the cause, and the 1 KB figure is not a threshold that changes billing. The RU charge is driven by indexed property count, not by an arbitrary size boundary.",
+      "Analytical store is a separate column store for analytics with its own cost, and enabling it does not stop the transactional index from indexing the same properties. It adds a pipeline rather than reducing the transactional write charge."
+    ],
+    "principle": "you pay to index every property on every write, so index only what you query",
+    "relatedConcept": "Indexing policy is the main lever on write RU consumption in Cosmos DB, and embedding arrays are the classic path to exclude.",
+    "overallExplanation": "Cosmos DB's default policy indexes all paths, so large arrays and blobs inflate write RUs. Excluding /embedding/* and /rawHtml/* while including only queried paths cuts write cost without weakening the queries that matter."
+  },
+  {
+    "id": 205,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "multi",
+    "question": "A support-ticket search screen runs `SELECT * FROM c WHERE c.tenantId = @t ORDER BY c.priority DESC, c.updatedAt DESC` against Cosmos DB for NoSQL and fails with an error stating the ORDER BY query does not have a corresponding composite index. Which two changes are required to make the query succeed? (Choose two.)",
+    "options": [
+      "Add a composite index to the container's indexing policy containing /priority and /updatedAt as its two paths",
+      "Define the composite index paths in the same order and with directions matching the ORDER BY clause, or its exact inverse",
+      "Increase the container's provisioned throughput so the sort can be completed within the request's RU allowance",
+      "Add /priority and /updatedAt to includedPaths as separate range indexes, which together satisfy the multi-property sort"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Multi-property ORDER BY in Cosmos DB for NoSQL is only serviceable from a composite index that covers the sorted properties. Adding a composite index entry listing /priority and /updatedAt is the first half of the fix.",
+      "Correct. Composite indexes are order- and direction-sensitive: the definition must list the paths in the same sequence as the ORDER BY and with matching directions, or with every direction flipped, which the engine can read backwards. A composite index of (/priority ASC, /updatedAt DESC) would not serve this query.",
+      "This misreads a definition error as a capacity error. The query is rejected before execution because no index can serve it, so no amount of provisioned RU/s changes the outcome — the failure is not a 429.",
+      "Range indexes on individual properties serve filters and single-property sorts, and both paths are already indexed under the default policy — which is why the error still appears. Cosmos DB cannot combine two independent range indexes to satisfy a two-property ORDER BY."
+    ],
+    "principle": "multi-property ORDER BY needs a composite index whose path order and directions match the query",
+    "relatedConcept": "Composite indexes are the Cosmos DB mechanism for sorting on more than one property, and their definition must mirror the query shape.",
+    "overallExplanation": "A multi-property ORDER BY requires a composite index over exactly those paths, defined in the same order with matching directions or their full inverse. Separate range indexes cannot be combined to satisfy it, and extra throughput does not address a missing-index error."
+  },
+  {
+    "id": 206,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A conversational commerce API replicates a Cosmos DB for NoSQL account to three regions and runs with strong consistency. Read RU consumption is double the team's model, and read latency from the secondary regions is dominated by cross-region round trips. Product requirements state a user must always see their own recent writes, but small cross-user lag is acceptable. Which consistency level fits?",
+    "options": [
+      "Session, which guarantees read-your-own-writes within a session and is billed at the lower read RU rate",
+      "Eventual, which offers the lowest latency and cost and therefore the best fit for a chat-style read-heavy workload",
+      "Bounded staleness, which bounds divergence to a configured number of versions or time interval and keeps per-user guarantees",
+      "Consistent prefix, which guarantees reads never see out-of-order writes and therefore includes read-your-own-writes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Session consistency provides exactly the stated guarantee — monotonic reads, monotonic writes and read-your-own-writes within a session — while allowing other users' views to lag slightly. It is also in the cheaper read tier, so it removes the doubled read charge that strong and bounded staleness incur.",
+      "Eventual is the cheapest and lowest-latency option, but it offers no read-your-own-writes guarantee: a user could submit an order and then not see it on refresh. That directly violates the stated product requirement.",
+      "Bounded staleness does bound lag, but it is billed at the same doubled read RU rate as strong consistency, so it leaves the cost problem untouched. It is also stronger than the requirement needs, which is per-session rather than global bounds.",
+      "Consistent prefix guarantees that reads never see writes out of order, but it does not guarantee a client sees its own most recent write. Confusing ordering guarantees with recency guarantees is the trap in this option."
+    ],
+    "principle": "pick the weakest consistency level that still satisfies the stated user-visible guarantee",
+    "relatedConcept": "Consistency level is simultaneously a correctness, latency and RU-cost decision — strong and bounded staleness reads are charged at roughly double the RU rate.",
+    "overallExplanation": "Session consistency gives read-your-own-writes per session at the cheaper read RU rate, matching a requirement of per-user recency with tolerable cross-user lag. Strong and bounded staleness both double read RUs, and eventual or consistent prefix offer no recency guarantee."
+  },
+  {
+    "id": 207,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A telemetry container in Cosmos DB for NoSQL is provisioned at 60,000 RU/s and partitioned on `/eventDate` in yyyy-MM-dd form. Total consumption averages 21,000 RU/s, yet the ingestion service receives constant 429 responses. Metrics show one physical partition at 100% utilization while the rest sit near zero. What explains the throttling?",
+    "options": [
+      "All current writes land in a single logical partition for today's date, so they are capped by that partition's share of the total throughput",
+      "The account's total RU/s is being throttled at the account level because burst capacity has been exhausted by the ingestion spike",
+      "Date-typed partition keys are hashed differently from string keys, so the routing layer cannot distribute the writes evenly",
+      "The container has exceeded the maximum number of logical partitions, so new writes are queued behind existing partition metadata"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Provisioned throughput is spread evenly across physical partitions, so a key on the current date concentrates every write of the day into one logical partition and therefore one physical partition. That partition can only consume its slice of the 60,000 RU/s, which is why 429s appear while account-wide usage looks low.",
+      "Burst capacity absorbs short spikes above the provisioned rate; it does not create account-level throttling while two thirds of provisioned throughput sits unused. The single-partition saturation in the metrics contradicts an account-wide explanation.",
+      "Partition keys are hashed as values regardless of whether they look like dates, and the hash function is not the problem. The distribution is skewed because the values themselves are skewed — every write today shares one key value.",
+      "Cosmos DB does not impose a partition-count ceiling that queues writes; the relevant hard limit is 20 GB of data per logical partition, which produces a different error. Nothing here indicates the container ran out of partitions."
+    ],
+    "principle": "a partition key that concentrates writes caps throughput no matter the RU budget",
+    "relatedConcept": "Provisioned RU/s is divided across physical partitions, so partition key cardinality and write distribution determine the throughput actually reachable.",
+    "overallExplanation": "A date-based partition key funnels every write of the day into one logical partition, which can only draw its share of the container's RU/s. The fix is a high-cardinality or synthetic key (for example device id, or date combined with a bucket) that spreads writes across partitions."
+  },
+  {
+    "id": 208,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "An analytics endpoint runs `SELECT * FROM c WHERE c.status = 'open' AND c.assignee = @user` over a Cosmos DB for NoSQL container partitioned on `/tenantId` that holds 900 physical partitions. Each call costs about 480 RUs and takes 1.4 seconds, even though it returns 12 documents. The calling service always knows the tenant. What is the most effective change?",
+    "options": [
+      "Include the tenant in the predicate and pass `partition_key=tenant_id` to `query_items` so the query is routed to a single partition",
+      "Set max_item_count to 12 so the SDK stops fetching pages once the requested number of documents has been produced",
+      "Add a composite index on /status and /assignee so the two equality predicates can be evaluated from a single index lookup",
+      "Enable the container's integrated cache so repeated executions of this query are served without re-reading from the partitions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Without the partition key the query is a cross-partition fan-out: the gateway must ask all 900 physical partitions and merge results, and RU cost and latency scale with partitions touched rather than documents returned. Scoping the query to one partition value collapses it to a single-partition query with a fraction of the RU charge.",
+      "max_item_count controls page size, not fan-out. The engine still contacts every partition to determine which documents match, so the dominant cost — 900 partition round trips — remains, and small pages can even increase the number of round trips.",
+      "Composite indexes serve multi-property ORDER BY, not multiple equality filters, and both properties are already indexed by the default policy. Even a perfectly indexed predicate must still be evaluated on every partition when the partition key is absent.",
+      "The integrated cache can help identical repeated reads within its window, but it masks the design flaw rather than fixing it, does nothing for first-time or varied user filters, and requires dedicated gateway provisioning."
+    ],
+    "principle": "cost and latency track partitions touched, not rows returned",
+    "relatedConcept": "Cross-partition fan-out is the most common source of surprise RU charges in Cosmos DB; supplying the partition key turns a scatter-gather into a single-partition read.",
+    "overallExplanation": "Queries that omit the partition key fan out to every physical partition, so RU charge and latency scale with partition count rather than result size. Passing the known tenant as the partition key routes the query to one partition and eliminates the scatter-gather."
+  },
+  {
+    "id": 209,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A booking assistant runs on six replicas behind a load balancer with the Cosmos DB account set to session consistency. A user writes a reservation through replica 2 and immediately reads it back through replica 5, which occasionally returns the pre-write document. Each replica holds its own CosmosClient. What is the correct explanation and remedy?",
+    "options": [
+      "Session guarantees are scoped to a session token held by one client, so the write's session token must be captured and passed on the follow-up read",
+      "Session consistency only applies to single-region accounts, so the account must be reconfigured to strong consistency to guarantee the read",
+      "The read replica has not yet been assigned a lease on the partition, so the client should retry until lease propagation completes",
+      "Load-balanced reads always bypass session guarantees, so all reads must be pinned to the same replica that served the write"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Under session consistency the read-your-own-writes guarantee is carried by a session token that the SDK tracks per client instance. When a subsequent request is served by a different process with its own client, that token must be propagated — read the token from the write response and supply it on the read — otherwise the second client has no knowledge of the write.",
+      "Session consistency works in single- and multi-region accounts alike; region count is not the issue. Escalating to strong consistency would mask the symptom at roughly double the read RU cost and, in multi-region write configurations, is not even available.",
+      "Leases are a change feed processor concept for distributing feed ranges among consumers; they have nothing to do with read consistency for item reads. Blind retrying is a timing-dependent workaround, not a guarantee.",
+      "Pinning every user to one replica is sticky-session routing that harms availability and scaling, and it is unnecessary: the session token exists precisely so the guarantee can follow the user across processes."
+    ],
+    "principle": "session consistency follows the session token, not the user",
+    "relatedConcept": "In horizontally scaled services, the session token is the portable carrier of read-your-own-writes guarantees between independent SDK clients.",
+    "overallExplanation": "Session consistency is enforced through a per-client session token. Across load-balanced replicas each client has its own token, so the write response's token must be captured and passed to the reading client; pinning users or escalating to strong consistency are worse answers."
+  },
+  {
+    "id": 210,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "multi",
+    "question": "A knowledge-base team is creating a Cosmos DB for NoSQL container to hold 4 million chunks, each with a 1536-dimension float32 embedding under `/embedding`, and wants to run vector similarity search with `VectorDistance` using cosine distance. Which two configuration steps belong in the container definition? (Choose two.)",
+    "options": [
+      "Define a vector embedding policy on the container declaring the path, float32 data type, cosine distance function and 1536 dimensions",
+      "Add /embedding/* to the indexing policy's excludedPaths so the raw float array is not also indexed by the standard index",
+      "Set the container's default consistency to strong so vector search results are deterministic across replicas",
+      "Store each embedding as a base64-encoded string so the vector index can compress it before similarity comparisons"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The vector embedding policy is declared when the container is created and tells the engine where vectors live, their element type, their dimensionality and the distance function to use. Without it, VectorDistance cannot be backed by a vector index.",
+      "Correct. Leaving the embedding path in the standard index means every one of the 1536 elements is indexed on every write, which inflates write RUs dramatically for no query benefit. Excluding the path while declaring a vector index on it is the documented pairing.",
+      "Consistency level governs recency of reads across replicas, not similarity-search behaviour. Strong consistency would roughly double read RU charges and is unrelated to whether vector search is configured correctly.",
+      "Embeddings must be stored as a numeric array matching the declared data type and dimension count; a base64 string is opaque to the engine and no vector index could be built over it. This invents a compression step the service does not perform."
+    ],
+    "principle": "declare the vector policy and exclude the vector path from the normal index",
+    "relatedConcept": "Vector search in Cosmos DB for NoSQL relies on a container-level embedding policy plus a vector index entry, with the raw array excluded from the standard index.",
+    "overallExplanation": "Enabling vector search means declaring a vector embedding policy at container creation (path, data type, distance function, dimensions) and excluding the embedding path from the standard indexing policy so writes do not pay to index 1536 scalars."
+  },
+  {
+    "id": 211,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A multi-tenant RAG service queries `SELECT TOP 10 c.id, c.text, VectorDistance(c.embedding, @q) AS score FROM c ORDER BY VectorDistance(c.embedding, @q)` against a container partitioned on `/tenantId`. Retrieval costs about 950 RUs per request and sometimes surfaces chunks belonging to a different tenant. What should the team change?",
+    "options": [
+      "Add `WHERE c.tenantId = @tenant` and pass the tenant as the partition key so the vector search is scoped to that tenant's partition",
+      "Sort on the `score` alias instead of repeating the VectorDistance expression, which lets the engine reuse the computed distance",
+      "Raise TOP to 50 and filter the tenant's chunks in application code before passing the surviving results to the model",
+      "Switch the distance function in the query to Euclidean, which returns better-separated scores and avoids cross-tenant matches"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Without a tenant predicate the query is an unscoped cross-partition vector search: it fans out over every tenant's data, which explains both the RU charge and the leakage of other tenants' chunks. Filtering on tenantId and supplying it as the partition key restricts the search to one partition and makes isolation a property of the query, not of post-processing.",
+      "Reusing the alias is a reasonable style choice but does not change what the query scans; the engine still evaluates distance for candidate documents across all partitions. It addresses neither the cost nor, more importantly, the tenant-isolation defect.",
+      "Over-fetching and filtering in application code is post-filtering: it still pays to search every tenant's vectors, and it can return fewer than 10 tenant-relevant chunks when the global top 50 is dominated by other tenants. Correctness that depends on over-fetching is not correctness.",
+      "The distance function must match the one declared in the container's vector embedding policy and reflects how the embedding model was trained; switching it degrades relevance. Distance metric has no bearing on which tenant's documents are eligible for retrieval."
+    ],
+    "principle": "tenant isolation belongs in the query predicate and partition scope, not in post-filtering",
+    "relatedConcept": "Filtered vector search in Cosmos DB combines a partition-scoped predicate with VectorDistance ordering so semantic retrieval stays both cheap and correctly bounded.",
+    "overallExplanation": "Scope vector search with a tenant predicate and the matching partition key. An unscoped VectorDistance ORDER BY fans out across all partitions, driving RU cost up and allowing other tenants' chunks into the result set; post-filtering in application code fixes neither."
+  },
+  {
+    "id": 212,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "An engineering team must choose a vector index type for a Cosmos DB for NoSQL container that will grow to 30 million chunks with 1536-dimension embeddings. Queries must stay under 200 ms at p95, and the team accepts a small recall trade-off. Which vector index type should they configure?",
+    "options": [
+      "DiskANN, which is designed for large vector collections at high dimensionality and keeps latency low as the container grows",
+      "Flat, because it stores the full-fidelity vectors and therefore gives the best latency once the container is large",
+      "QuantizedFlat with the dimension count reduced to 505 so the index fits the flat index limits",
+      "No vector index at all, relying on VectorDistance to compute distances on the fly against the standard range index"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. DiskANN is the approximate, graph-based vector index intended for large collections and high dimensionality; it supports embeddings well beyond 505 dimensions and holds query latency roughly steady as the vector count grows, which is exactly the stated requirement with an accepted small recall trade-off.",
+      "Flat performs exact search by comparing against every vector, so latency grows linearly with collection size — the opposite of what 30 million chunks needs. Flat also caps at 505 dimensions, so a 1536-dimension embedding cannot use it at all.",
+      "This invents a workaround: you cannot arbitrarily truncate an embedding to 505 dimensions without destroying its semantics, and quantizedFlat is aimed at smaller collections than 30 million vectors. Quantization reduces footprint but still scans the compressed set.",
+      "With no vector index, VectorDistance is computed by scanning candidate documents, and the standard range index cannot accelerate nearest-neighbour ordering. RU charge and latency would rise with collection size, failing the p95 target badly."
+    ],
+    "principle": "index type follows collection size and dimensionality, not intuition about fidelity",
+    "relatedConcept": "Cosmos DB offers flat, quantizedFlat and DiskANN vector indexes, trading exactness for scalability as the vector collection grows.",
+    "overallExplanation": "DiskANN is the right vector index for tens of millions of high-dimensional embeddings with a p95 latency target: it is approximate but scales. Flat is exact and limited to 505 dimensions, quantizedFlat targets smaller collections, and no index means scanning."
+  },
+  {
+    "id": 213,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "multi",
+    "question": "A team is building a background worker that must re-embed documents whenever they are created or updated in a Cosmos DB for NoSQL container, using the change feed processor from the Python SDK across several Container Apps replicas. Which two elements are required for this design to work correctly? (Choose two.)",
+    "options": [
+      "A separate lease container, partitioned on /id, that the processor uses to store state and distribute feed ranges",
+      "An idempotent handler, because the change feed processor delivers changes at least once and can replay a batch after a failure",
+      "A unique processor name per replica so each instance owns its own leases and never competes with the others",
+      "Strong consistency on the monitored container so the processor never observes an item before it is committed"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The change feed processor persists its checkpoints and ownership records in a lease container that must be partitioned on /id. Multiple replicas coordinate through those lease documents, which is how work is distributed and rebalanced when instances come and go.",
+      "Correct. Checkpointing happens after a batch is processed, so a crash between processing and checkpointing causes the batch to be delivered again. Re-embedding must therefore be safe to repeat — for example keyed by document id and content hash — or duplicates and wasted model calls result.",
+      "This inverts how the processor scales: instances that share the same processor name cooperate over one lease set and split feed ranges between them. Giving each replica a unique name creates independent consumers that each process every change, multiplying work.",
+      "The change feed only ever exposes committed items, so consistency level is not what protects the worker from reading uncommitted data. Strong consistency would raise read cost without changing change feed semantics."
+    ],
+    "principle": "change feed consumers need a shared lease container and idempotent handlers",
+    "relatedConcept": "The change feed processor turns Cosmos DB writes into an at-least-once event stream, with leases providing distribution and checkpointing across instances.",
+    "overallExplanation": "A multi-instance change feed processor requires a dedicated lease container partitioned on /id and a shared processor name so replicas split feed ranges, plus idempotent handlers because delivery is at least once and batches can replay after a crash."
+  },
+  {
+    "id": 214,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A vector index in Azure AI Search is kept in step with a Cosmos DB for NoSQL container by a change feed processor running in latest-version mode. Newly created and edited documents are reflected within seconds, but documents deleted from Cosmos DB remain searchable indefinitely. What is the most appropriate remedy?",
+    "options": [
+      "Replace hard deletes with a soft-delete flag plus TTL, so the deletion surfaces as an update the processor can act on",
+      "Reduce the processor's poll interval so it observes the deletion before the document is physically removed from the container",
+      "Enable the container's integrated cache and invalidate it on delete, which propagates removals to downstream consumers",
+      "Rebuild the entire search index on a nightly schedule, which is the only supported way to remove documents from a downstream store"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. In latest-version mode the change feed emits creates and updates but not deletes, so a hard delete is invisible to the consumer. Marking the item as deleted — an update the processor sees — and letting TTL remove the tombstone afterwards is the standard pattern for propagating deletions downstream.",
+      "Polling faster does not help because deletes are never written to the latest-version feed at all; there is no window in which the processor could catch them. This treats a semantic gap as a timing race.",
+      "The integrated cache is a read-path optimisation for queries and point reads inside Cosmos DB. It has no channel to downstream systems and no interaction with the change feed, so invalidating it changes nothing in the search index.",
+      "A nightly rebuild is a heavyweight workaround that leaves deleted documents searchable for up to a day and is not the only option. Soft deletes, or switching the feed to all versions and deletes mode, give near-real-time removal."
+    ],
+    "principle": "the latest-version change feed carries creates and updates, never deletes",
+    "relatedConcept": "Keeping a downstream vector index consistent with Cosmos DB requires an explicit deletion strategy — soft delete plus TTL, or the all versions and deletes feed mode.",
+    "overallExplanation": "Latest-version change feed does not emit deletes, so hard-deleted documents never reach downstream consumers. Use a soft-delete flag with TTL so the removal arrives as an update, or switch to all versions and deletes mode."
+  },
+  {
+    "id": 215,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Cosmos DB for NoSQL",
+    "type": "single",
+    "question": "A change feed processor that summarizes new claim documents is deployed to four instances. During a rolling restart, monitoring shows one feed range was processed twice and the downstream summariser billed duplicate model calls. The handler currently writes summaries with `create_item` and checkpoints implicitly after each batch. What is the most robust fix?",
+    "options": [
+      "Make the handler idempotent by upserting the summary under a deterministic id derived from the document id and its _etag or content hash",
+      "Switch to manual checkpointing and checkpoint before the batch is handed to the summariser so a restart cannot replay it",
+      "Reduce the number of processor instances to one so leases never move and no feed range can be handled twice",
+      "Add a distributed lock in Azure Managed Redis around each batch so only one instance can process a given change at a time"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The change feed processor guarantees at-least-once delivery, and lease rebalancing during a restart is a normal event that can replay an uncheckpointed batch. Making the write idempotent — a deterministic id plus upsert — turns a replay into a harmless no-op instead of a duplicate, which is the only durable answer to at-least-once semantics.",
+      "Checkpointing before processing converts the problem into a worse one: a crash mid-batch would now skip those changes permanently, silently losing summaries. At-most-once delivery is rarely an acceptable trade for a data-enrichment pipeline.",
+      "Collapsing to a single instance removes parallelism and availability while not actually removing replay: a single instance that crashes mid-batch still reprocesses those changes on restart. It treats concurrency as the cause when the cause is delivery semantics.",
+      "A distributed lock adds an external dependency and failure mode without solving replay by the same instance after a restart. Leases already ensure a feed range has one owner at a time; the duplication came from reprocessing, not concurrent ownership."
+    ],
+    "principle": "at-least-once delivery makes idempotency the consumer's responsibility",
+    "relatedConcept": "Checkpoints in the change feed processor bound how much is replayed after a failure, but they never eliminate replay — handlers must tolerate it.",
+    "overallExplanation": "The change feed processor delivers at least once, so restarts and lease rebalancing can replay a batch. Write summaries idempotently with a deterministic id and upsert; checkpointing early would trade duplicates for silent data loss."
+  },
+  {
+    "id": 216,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A Python service connects to Azure Database for PostgreSQL flexible server using Microsoft Entra authentication: at startup it calls `DefaultAzureCredential().get_token(...)` and passes the token string as the connection password for a pool of 20 connections. The service runs fine for about an hour, then every attempt to open a new pooled connection fails with a password authentication error. What should the team change?",
+    "options": [
+      "Fetch a fresh access token inside the pool's connection factory so every new connection authenticates with a currently valid token",
+      "Increase the pool's minimum size so all 20 connections are opened at startup while the original token is still valid",
+      "Store the initial token in Azure Key Vault and read it from there whenever a new connection is required",
+      "Disable Entra authentication for the application principal and fall back to a PostgreSQL password role for background workloads"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An Entra access token is a short-lived bearer credential, typically valid for about an hour, and it is only consumed when a connection is established. Acquiring the token inside the factory that creates connections means each new physical connection gets a valid token, and the credential object caches and refreshes transparently.",
+      "Pre-opening all connections only delays the failure: pools recycle connections on error, idle timeout or max lifetime, and each replacement will still be created with the stale token. It also breaks the moment the server drops a connection for any reason.",
+      "Key Vault stores long-lived secrets; caching an already-expired token there does not make it valid again, and the token is not a secret the app should persist. This adds a dependency without addressing expiry at all.",
+      "Abandoning Entra authentication throws away centralised identity, rotation and auditing to work around a token-refresh bug that is a few lines of code. It also reintroduces a stored password, which is usually what the platform team was trying to eliminate."
+    ],
+    "principle": "short-lived tokens must be minted at connection time, not at process start",
+    "relatedConcept": "Entra-authenticated PostgreSQL uses the access token as the connection password, so token lifetime becomes part of the connection-pool design.",
+    "overallExplanation": "Entra tokens expire in roughly an hour and are only checked when a connection is opened. Acquire the token inside the pool's connection factory so each new connection uses a fresh one; pre-warming the pool or caching the token elsewhere only postpones the failure."
+  },
+  {
+    "id": 217,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A nightly job re-embeds a corpus by running `SELECT id, chunk_text FROM chunks` over 4.2 million rows in Azure Database for PostgreSQL and iterating the result in Python. The container is killed by the orchestrator for exceeding its 2 GB memory limit before the loop produces its first embedding. What is the correct change to the data-access code?",
+    "options": [
+      "Use a server-side (named) cursor and iterate it in batches so only a bounded window of rows is materialized in the client",
+      "Add `LIMIT 100000` to the query and rerun the job repeatedly until a run returns fewer than 100,000 rows",
+      "Raise the container memory limit to 8 GB, since a 4.2 million row result set is inherently large and must be held in memory",
+      "Wrap the query in a read-only transaction with repeatable read isolation so PostgreSQL streams rows without buffering them"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A client-side cursor pulls the entire result set into client memory before the first row is yielded, which is exactly the observed behaviour. A named cursor keeps the result set on the server and fetches it in configurable batches, so client memory stays bounded regardless of row count.",
+      "Bare LIMIT without a stable ordering and offset key gives no guarantee about which rows are returned, so runs can repeat and skip rows. Keyset pagination on id could work, but it is more code and more round trips than simply streaming with a server-side cursor.",
+      "This buys headroom rather than fixing the pattern, and the corpus will keep growing — 8 GB merely moves the failure. It also wastes memory on rows the job processes one at a time and then discards.",
+      "Isolation level controls visibility of concurrent changes, not how the driver buffers rows. A repeatable-read transaction with a client-side cursor would consume exactly the same memory."
+    ],
+    "principle": "stream large result sets with a server-side cursor instead of materializing them",
+    "relatedConcept": "Driver cursor semantics are part of PostgreSQL data access: client-side cursors buffer everything, named cursors stream in batches.",
+    "overallExplanation": "Client-side cursors materialize the whole result set before yielding a row. Use a server-side named cursor with a batch size so memory stays bounded, rather than raising limits or paginating with an unordered LIMIT."
+  },
+  {
+    "id": 218,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A developer inserts embeddings into an Azure Database for PostgreSQL table whose column is declared `embedding vector(1536)`. Passing a Python list of floats as a parameter raises an error that the type cannot be adapted, and casting the list to a string inserts values that later fail to compare with the `<=>` operator. What is the correct approach?",
+    "options": [
+      "Register the pgvector type adapter on the connection so Python lists and NumPy arrays map to and from the vector type",
+      "Store the values in a `float8[]` column instead, since PostgreSQL arrays are the supported representation for embeddings",
+      "Serialize each embedding to JSON and store it in a jsonb column, casting to vector inside every similarity query",
+      "Create the extension inside each transaction before inserting so the vector type is visible to the driver's type cache"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. pgvector ships client-side adapters (for example register_vector on a psycopg connection) that teach the driver how to send and receive the vector type. With the adapter registered, lists and NumPy arrays round-trip natively and distance operators work as expected.",
+      "float8[] is a generic array type: it stores the numbers but supports none of pgvector's distance operators and cannot back an HNSW or IVFFlat index. Similarity search would have to be computed in application code over full table scans.",
+      "jsonb plus a per-query cast prevents any vector index from being used, because the planner sees an expression rather than an indexed column. Every query would degrade to a scan with per-row parsing overhead.",
+      "CREATE EXTENSION is a one-time, database-scoped operation, not a per-transaction step, and the extension is clearly already installed since the column type exists. The gap is client-side type adaptation, not server-side availability."
+    ],
+    "principle": "the driver needs a type adapter before a custom column type round-trips correctly",
+    "relatedConcept": "Working with pgvector from Python means installing the extension server-side and registering its type adapter client-side.",
+    "overallExplanation": "Register pgvector's type adapter on the connection so Python lists and NumPy arrays map to the vector type. Substituting float8[] or jsonb stores numbers but loses the distance operators and index support that make vector search viable."
+  },
+  {
+    "id": 219,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "multi",
+    "question": "A team is designing the chunk table for a RAG system on Azure Database for PostgreSQL. Each chunk has text, a 1536-dimension embedding, and variable metadata (source system, department, effective date, sensitivity) that queries must filter on. Which two schema decisions best support fast filtered vector search? (Choose two.)",
+    "options": [
+      "Declare the embedding as `vector(1536)` in the chunk table so pgvector operators and indexes apply directly",
+      "Store the variable metadata in a `jsonb` column and add a GIN index to support containment filters",
+      "Keep embeddings in a separate one-to-one table joined at query time so the chunk table stays narrow",
+      "Store the embedding as a `text` column of comma-separated floats and cast it to vector inside the ORDER BY clause"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A fixed-dimension vector column is what pgvector's distance operators and HNSW or IVFFlat indexes are defined over. Declaring the dimension also enforces at write time that every row carries an embedding of the right size, catching model mismatches early.",
+      "Correct. jsonb with a GIN index handles heterogeneous, evolving metadata while still being filterable in SQL, which lets the planner combine metadata predicates with the vector ordering in one query. Frequently used, highly selective keys can additionally be promoted to typed columns with B-tree indexes.",
+      "Splitting embeddings into a separate table forces a join between the filter and the vector ordering, which frequently defeats the index-driven top-k path and adds latency. Vectors are stored out of line by TOAST anyway, so the narrowness benefit is largely imaginary.",
+      "A text column cannot be indexed by pgvector, and casting in the ORDER BY makes the expression opaque to any index, forcing a full scan plus per-row parsing. It also allows malformed or wrong-length embeddings to be inserted silently."
+    ],
+    "principle": "model vectors as vectors and metadata as filterable columns in the same row",
+    "relatedConcept": "Schema design for RAG on PostgreSQL keeps the embedding and its filter metadata co-located so one query can filter and rank together.",
+    "overallExplanation": "Use a native `vector(1536)` column so pgvector operators and indexes apply, and a jsonb metadata column with a GIN index for evolving filters. Text or array encodings and split tables both break the index-driven filter-plus-rank path."
+  },
+  {
+    "id": 220,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A team migrates from a 1536-dimension embedding model to one producing 3072 dimensions and stores the result in `embedding vector(3072)` on Azure Database for PostgreSQL. `CREATE INDEX ... USING hnsw (embedding vector_cosine_ops)` fails because the column exceeds the dimension limit for an HNSW index over the vector type. Which option preserves the new model's output while enabling an approximate index?",
+    "options": [
+      "Store the column as `halfvec(3072)` and build the HNSW index with `halfvec_cosine_ops`, which supports a higher dimension ceiling",
+      "Keep `vector(3072)` and build an IVFFlat index instead, since IVFFlat has no dimension limit for indexed columns",
+      "Truncate every embedding to its first 2000 elements before insert so the existing HNSW index definition succeeds",
+      "Split the embedding across two `vector(1536)` columns and index each half separately, then average the two distances"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. pgvector's half-precision type stores each element in 16 bits, which both halves index size and raises the indexable dimension ceiling above what the full-precision vector type allows. Recall loss from half precision is typically small for text embeddings, so this keeps the model's full 3072 dimensions while making an HNSW index possible.",
+      "IVFFlat is subject to the same indexed-dimension ceiling as HNSW for the full-precision vector type, so swapping index types does not lift the limit. It would also be a poor fit for a corpus that keeps changing, since its lists are built from a snapshot of the data.",
+      "Arbitrarily truncating an embedding discards learned dimensions and degrades relevance in ways that are hard to detect. Dimension reduction is only safe with a model explicitly trained to support it, or with a proper projection fitted on the data.",
+      "Splitting a vector in half and averaging two distances is not equivalent to the original cosine distance and produces incorrect rankings. It also doubles index maintenance and query complexity for a result that no longer matches the model's geometry."
+    ],
+    "principle": "match the vector data type to the model's dimensionality and the index's limits",
+    "relatedConcept": "pgvector offers vector, halfvec and sparsevec types with different storage sizes and indexable dimension ceilings, so the type choice is part of index planning.",
+    "overallExplanation": "Use halfvec(3072) with halfvec_cosine_ops to index high-dimensional embeddings: half precision cuts storage in half and raises the indexable dimension limit, whereas truncating or splitting vectors corrupts the model's distance geometry."
+  },
+  {
+    "id": 221,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "Ingestion workers in three Azure regions write document metadata to Azure Database for PostgreSQL with `ingested_at timestamp` (no time zone), each worker inserting its local wall-clock time. A recency filter that keeps only chunks from the last 24 hours behaves inconsistently, and documents sometimes appear an hour out of order after a daylight-saving change. What is the correct schema fix?",
+    "options": [
+      "Change the column to `timestamptz` so values are stored as absolute instants and compared consistently regardless of the writer's local zone",
+      "Keep `timestamp` and have each worker convert to UTC in application code before inserting the value",
+      "Store the value as an integer Unix epoch so no time-zone semantics are involved in comparisons",
+      "Add a separate `tz_offset` column and apply the offset in every recency query that filters on ingested_at"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. timestamptz stores an absolute point in time and normalizes on input, so values written from different regions are directly comparable and daylight-saving transitions cannot reorder them. Making the type carry the semantics means every current and future query is correct by construction.",
+      "Converting in application code can work, but it makes correctness depend on every writer — including future ones, ad-hoc scripts and backfills — remembering the convention. The column type still advertises no time zone, so the next developer has no way to know the values are UTC.",
+      "Epoch integers are unambiguous but discard type safety and readability: no date arithmetic, interval comparison or indexing helpers apply naturally, and every query must reimplement conversions. It solves the ambiguity by giving up the database's date handling.",
+      "A separate offset column pushes correction into every query, and any query that forgets the join or arithmetic is silently wrong. It also does not fix already-ambiguous local times during a daylight-saving fall-back hour."
+    ],
+    "principle": "let column types carry temporal semantics rather than relying on writer discipline",
+    "relatedConcept": "Data-type choice in an AI data model determines which classes of bug are possible at all — recency filters and freshness ranking depend on comparable instants.",
+    "overallExplanation": "Use timestamptz so instants are stored and compared unambiguously across regions and daylight-saving changes. Application-side UTC conversion, epoch integers or an offset column all move correctness out of the schema and into code that can be forgotten."
+  },
+  {
+    "id": 222,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A support knowledge base on Azure Database for PostgreSQL holds 6 million chunks and ingests roughly 40,000 new chunks per day. The team built an IVFFlat index with 2,000 lists shortly after the initial load; three months later recall has visibly degraded and newly ingested content is often missed. Which index strategy best fits this workload?",
+    "options": [
+      "Rebuild the index as HNSW, whose graph structure absorbs continuous inserts without periodic retraining",
+      "Keep IVFFlat and raise `ivfflat.probes` to search more lists at query time so newly added chunks are found",
+      "Keep IVFFlat and drop the number of lists to 200, which places more vectors in each list and improves recall",
+      "Remove the vector index entirely so every query performs exact nearest-neighbour search over the full table"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. IVFFlat clusters vectors into lists using the data present when the index is built, so a corpus that grows and shifts drifts away from those centroids and recall decays until the index is rebuilt. HNSW builds an incrementally maintained proximity graph, which is why it is the better fit for continuously ingesting corpora.",
+      "Raising probes does improve recall by scanning more lists, but it also raises query cost roughly proportionally and does not repair centroids that no longer represent the data. It is a dial to trade latency for recall, not a cure for staleness.",
+      "Fewer lists means each list holds more vectors, so scanning one list costs far more while still being chosen by stale centroids. This trades latency away without addressing the drift, and 200 lists is well below the usual guidance for 6 million rows.",
+      "Exact search over 6 million high-dimensional vectors means a full scan per query, with latency far beyond an interactive budget. Exactness is the right choice only for small tables or offline evaluation."
+    ],
+    "principle": "IVFFlat is trained on a snapshot; HNSW is maintained as data arrives",
+    "relatedConcept": "Choosing between HNSW and IVFFlat is a trade of build cost and memory against tolerance for continuous change in the corpus.",
+    "overallExplanation": "IVFFlat's lists are computed from the data at build time, so recall decays as a corpus grows and drifts. HNSW maintains a proximity graph incrementally and suits continuous ingestion; probes and list-count tuning only trade latency for recall."
+  },
+  {
+    "id": 223,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A retrieval endpoint backed by an HNSW index on Azure Database for PostgreSQL runs with `hnsw.ef_search = 400` and shows p95 latency of 130 ms against a 60 ms budget. An offline evaluation reports recall@10 of 0.995, while the product team states 0.95 is acceptable. CPU on the server is the bottleneck. What is the most direct tuning step?",
+    "options": [
+      "Lower hnsw.ef_search toward 60–100 and re-measure recall, trading surplus recall for reduced per-query work",
+      "Rebuild the index with a larger `m` so the graph has more links and each query traverses it faster",
+      "Increase the server's storage size to raise provisioned IOPS and shorten index page reads",
+      "Add `LIMIT 10` to the query if it is missing, so the index stops searching once ten neighbours are found"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. ef_search sets how many candidates the graph traversal keeps, so it is the direct dial between recall and CPU cost per query. With recall 0.045 above requirement, reducing ef_search cuts the traversal work proportionally and is reversible and measurable without an index rebuild.",
+      "Raising m adds links per node, which increases index size, build time and memory footprint and generally increases traversal work per query rather than reducing it. It is a recall-oriented parameter, and it requires a full rebuild to change.",
+      "The bottleneck is stated to be CPU, and a well-sized HNSW index is served largely from memory. Buying IOPS addresses a storage bottleneck that the evidence does not support.",
+      "LIMIT bounds the rows returned but the traversal breadth is governed by ef_search, which must be at least the limit; a query returning ten rows with ef_search 400 still explores 400 candidates. This misattributes the cost to result size."
+    ],
+    "principle": "tune recall down to the requirement rather than paying for accuracy nobody asked for",
+    "relatedConcept": "Approximate nearest-neighbour search exposes explicit recall/latency dials — ef_search for HNSW, probes for IVFFlat — that should be set against a measured target.",
+    "overallExplanation": "hnsw.ef_search is the query-time recall/latency dial. With recall well above the requirement and CPU saturated, lowering ef_search and re-measuring is the direct fix; raising m or buying IOPS addresses different bottlenecks."
+  },
+  {
+    "id": 224,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "multi",
+    "question": "During a design review for a pgvector-backed retrieval service on Azure Database for PostgreSQL, engineers debate whether to create a vector index at all for a 30,000-row compliance corpus that must return provably exact nearest neighbours. Which two statements about exact versus approximate search are correct? (Choose two.)",
+    "options": [
+      "With no vector index, `ORDER BY embedding <=> $1 LIMIT 10` computes distances over every row and returns exact nearest neighbours",
+      "Creating an HNSW index makes results approximate, so returned neighbours may differ from the exact set and recall is tuned with hnsw.ef_search",
+      "IVFFlat returns exact results because each list stores full-precision vectors rather than a compressed representation",
+      "An approximate index guarantees the same top result as exact search and only differs in the ordering of the remaining neighbours"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Without an index the planner performs a sequential scan and evaluates the distance operator for every row, which is by definition exact k-nearest-neighbour search. At 30,000 rows this is usually fast enough, which is why small exactness-critical corpora often skip the index entirely.",
+      "Correct. HNSW is an approximate method: the graph traversal explores a bounded neighbourhood, so it can miss true neighbours. hnsw.ef_search controls how wide that exploration is and therefore where the query sits on the recall/latency curve.",
+      "This confuses storage fidelity with search exactness. IVFFlat does store uncompressed vectors, but it only scans the lists selected by `probes`, so true neighbours living in unscanned lists are missed — the search is approximate regardless of precision.",
+      "No approximate index guarantees the exact top-1 result; a traversal that never visits the true nearest vector's region will not return it. Treating the first result as exact while the tail is approximate is a common and dangerous misreading."
+    ],
+    "principle": "index type decides exactness; a scan is exact, ANN is a recall/latency trade",
+    "relatedConcept": "For small or correctness-critical corpora, exact search via sequential scan is a legitimate design choice rather than a missing optimisation.",
+    "overallExplanation": "Unindexed vector search is exact because it scans every row, while HNSW and IVFFlat are both approximate — IVFFlat's full-precision storage does not make it exact, and no ANN index guarantees the true top-1. Recall is tuned with ef_search or probes."
+  },
+  {
+    "id": 225,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A RAG endpoint on Azure Database for PostgreSQL runs `SELECT id, chunk_text FROM chunks WHERE tenant_id = $1 ORDER BY embedding <=> $2 LIMIT 10` with an HNSW index on embedding. For large tenants it returns ten rows, but for tenants holding under 1% of the corpus it frequently returns only two or three rows even though hundreds match the filter. What is happening and what is the right fix?",
+    "options": [
+      "The HNSW scan returns a fixed candidate set that is then filtered, so enabling pgvector's iterative index scans lets the scan continue until the limit is satisfied",
+      "The tenant_id predicate is not selective enough for the planner, so adding a GIN index on tenant_id will restore the missing rows",
+      "The embeddings for small tenants are too far from the query vector, so the fix is to normalize all vectors to unit length before insert",
+      "The HNSW index is corrupt for sparsely populated tenants and must be reindexed after every bulk tenant import"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An approximate index scan produces a bounded number of candidates governed by ef_search, and the tenant filter is applied to those candidates; when a tenant occupies a small slice of the corpus, most candidates are discarded and fewer than LIMIT rows survive. pgvector's iterative index scans let the scan resume and fetch more candidates until the limit is met, which is the purpose-built answer to this exact symptom.",
+      "The predicate is in fact highly selective — that selectivity is the cause, not a planner misestimate — and a GIN index is aimed at composite types such as jsonb or arrays rather than a scalar equality. A different index on tenant_id does not change how many candidates the vector scan yields.",
+      "Normalization affects distance values, not how many post-filter rows survive an approximate scan, and with cosine distance it changes nothing about ranking. The result set is short because candidates were filtered away, not because distances were large.",
+      "Nothing here indicates corruption: the behaviour is deterministic, well documented and a direct consequence of filtering after an approximate scan. Routine REINDEX would be pure cost with no change in outcome."
+    ],
+    "principle": "filtering after an approximate scan can starve the limit, so let the scan iterate",
+    "relatedConcept": "Combining metadata filters with ANN search is the core RAG pattern, and the interaction between filter selectivity and candidate count is where it usually breaks.",
+    "overallExplanation": "Selective filters applied on top of an approximate index scan can leave fewer than LIMIT rows, because the scan yields a bounded candidate set first. Enable pgvector's iterative index scans (or partition/partially index by tenant) so the scan continues until the limit is satisfied."
+  },
+  {
+    "id": 226,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "After creating `CREATE INDEX ON chunks USING hnsw (embedding vector_l2_ops)` on Azure Database for PostgreSQL, retrieval latency is unchanged at 2.3 seconds for a 5 million row table. `EXPLAIN ANALYZE` on the production query `ORDER BY embedding <=> $1 LIMIT 10` shows a parallel sequential scan followed by a top-N sort, with no index scan. What is the cause?",
+    "options": [
+      "The index operator class does not match the query's distance operator, so rebuild it with vector_cosine_ops to serve `<=>`",
+      "The planner has stale statistics for the chunks table, so running ANALYZE will make it choose the vector index",
+      "HNSW indexes are only used when the query includes an explicit `WHERE` clause that narrows the candidate rows",
+      "The LIMIT is too small for the planner to consider an index scan worthwhile, so raising it to 100 will switch the plan"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A pgvector index is built for one distance function through its operator class: vector_l2_ops serves `<->`, vector_cosine_ops serves `<=>`, and vector_ip_ops serves `<#>`. Because the query uses cosine distance and the index was built for L2, no index can satisfy the ordering and the planner falls back to a scan plus sort.",
+      "Stale statistics change cost estimates between viable plans, but here the index is not a candidate at all for this operator. ANALYZE would leave the plan exactly as it is.",
+      "This is backwards: an ANN index is most naturally used for pure ordering queries, and adding a WHERE clause tends to complicate rather than enable index use. Nothing in pgvector requires a filter for the index to be considered.",
+      "Small limits favour index-driven top-k, not disfavour it; raising LIMIT increases the work an index scan must do. The plan is a scan because no compatible index exists, so the limit value is irrelevant."
+    ],
+    "principle": "the index operator class must match the distance operator the query uses",
+    "relatedConcept": "pgvector index definitions are distance-specific, so a mismatch silently degrades every retrieval query to a full scan.",
+    "overallExplanation": "pgvector operator classes bind an index to one distance function: vector_cosine_ops for `<=>`, vector_l2_ops for `<->`, vector_ip_ops for `<#>`. A mismatch makes the index unusable and leaves a sequential scan plus sort in the plan."
+  },
+  {
+    "id": 227,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "An HR policy assistant retrieves the top 8 chunks by cosine distance from Azure Database for PostgreSQL and passes them to the model with an instruction to ignore superseded policies. Users still receive answers citing policies withdrawn two years ago, because those chunks remain in the table with `status = 'superseded'`. What is the most reliable correction?",
+    "options": [
+      "Apply the metadata predicate in SQL — `WHERE status = 'published' AND effective_to IS NULL` — so superseded chunks are never retrieved",
+      "Strengthen the system prompt with explicit examples of superseded policy wording so the model reliably filters them out",
+      "Re-rank the retrieved chunks by effective date after retrieval and pass only the most recent two to the model",
+      "Lower the distance threshold so only very close matches are returned, which will exclude the older policy text"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Retrieval scope is a data question, and metadata filters in the SQL predicate make superseded content unreachable rather than merely discouraged. Combining the filter with the vector ordering also keeps the top 8 slots occupied by eligible chunks instead of wasting them on content that will be ignored.",
+      "Prompt instructions are probabilistic and are applied only after the wrong content is already in context, where it can still influence the answer. It also wastes retrieval slots and tokens on chunks that should never have been fetched.",
+      "Post-retrieval re-ranking operates on whatever the vector search returned; if all eight chunks are superseded, re-ranking cannot conjure a current one. It also silently shrinks the evidence set, which harms answers on topics with several valid current policies.",
+      "Distance thresholds measure semantic similarity, not currency — a superseded policy is usually the most semantically similar text to a question about that policy. Tightening the threshold mostly reduces recall while leaving the wrong documents eligible."
+    ],
+    "principle": "eligibility is a retrieval filter, not a prompt instruction",
+    "relatedConcept": "RAG on PostgreSQL wins by expressing governance rules — status, tenancy, effective dates — as SQL predicates evaluated alongside vector ranking.",
+    "overallExplanation": "Enforce document eligibility with metadata predicates in the retrieval query so superseded content cannot be returned at all. Prompt-level instructions, post-hoc re-ranking and tighter distance thresholds all act after the wrong chunks have already consumed the context budget."
+  },
+  {
+    "id": 228,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A vector workload on Azure Database for PostgreSQL flexible server holds 12 million 1536-dimension embeddings whose HNSW index is roughly 80 GB. The server SKU has 32 GB of RAM. Retrieval p95 is 900 ms, the server shows sustained high read IOPS and low buffer-cache hit ratio, and CPU sits at 35%. Which change addresses the bottleneck most directly?",
+    "options": [
+      "Move to a memory-optimized SKU with enough RAM for the working set, or shrink the index with halfvec so it fits in memory",
+      "Scale up vCores on the same memory ratio, since more parallel workers will shorten each index traversal",
+      "Increase work_mem substantially so each retrieval query can cache more of the index in its own private memory",
+      "Enable read replicas and send all retrieval traffic to them so the primary's cache is reserved for writes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The symptom set — heavy read IOPS, poor cache hit ratio, spare CPU — is the classic signature of an index that does not fit in memory, so traversals fault to storage. Either give the server enough RAM to hold the working set or shrink the index, for example by storing half-precision vectors, which roughly halves its footprint.",
+      "Adding vCores without more memory leaves the index still larger than RAM, so extra workers simply generate more storage reads. CPU is at 35%, which is direct evidence that compute is not the constraint.",
+      "work_mem governs per-operation sort and hash memory, not index caching; shared buffers and the OS page cache hold index pages. Raising work_mem aggressively across many connections risks memory exhaustion while doing nothing for the fault rate.",
+      "Replicas add read capacity but each replica has the same 32 GB and would fault to storage identically. This multiplies the problem across servers rather than resolving the memory shortfall."
+    ],
+    "principle": "an ANN index that does not fit in memory turns every query into storage I/O",
+    "relatedConcept": "Sizing compute, memory and storage for vector workloads starts from the index footprint, because ANN performance assumes memory residency.",
+    "overallExplanation": "High read IOPS with a low cache hit ratio and idle CPU means the HNSW index is being read from storage. Size memory to hold the index working set, or reduce the footprint with half-precision vectors; more vCores or replicas do not change the residency problem."
+  },
+  {
+    "id": 229,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "An Azure Database for PostgreSQL flexible server hosting an embedding store runs on Premium SSD storage sized at 128 GiB. Bulk ingestion of 3 million chunks stalls with heavy write waits, and metrics show the storage IOPS metric pinned at its ceiling while only 60 GiB of the disk is used. The team does not want to pay for capacity it will not consume. Which option best resolves the throttling?",
+    "options": [
+      "Move the server to Premium SSD v2, where provisioned IOPS and throughput are configured independently of the disk size",
+      "Enable storage autogrow so the volume expands automatically once ingestion pushes utilisation past its threshold",
+      "Increase the number of vCores, since IOPS limits on flexible server are derived from the compute tier",
+      "Split the ingestion into smaller transactions so each commit writes fewer pages and stays below the IOPS ceiling"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. On Premium SSD the IOPS ceiling is tied to the provisioned disk size, so the only way to get more IOPS is to buy capacity you do not need. Premium SSD v2 decouples the two, letting the team raise IOPS and throughput while keeping the allocated size close to actual usage — exactly the stated constraint.",
+      "Autogrow protects against running out of space, which is not the problem: 60 GiB of 128 GiB is in use. Growth would only raise IOPS as a side effect of buying more capacity, which is precisely the cost the team wants to avoid.",
+      "On flexible server, storage IOPS limits come from the storage tier and provisioned size rather than from vCore count, so scaling compute leaves the ceiling in place. It would add cost while the writes continue to queue on storage.",
+      "Smaller transactions change commit granularity, not the total number of pages that must be written; the same data still has to reach storage. It can even increase total I/O through more frequent WAL flushes."
+    ],
+    "principle": "know whether your IOPS ceiling is bought with capacity or provisioned independently",
+    "relatedConcept": "Storage configuration for vector workloads has to account for ingestion and index-build I/O, not just the space the embeddings occupy.",
+    "overallExplanation": "Premium SSD ties IOPS to provisioned disk size, so an I/O-bound ingestion forces over-provisioning of capacity. Premium SSD v2 lets IOPS and throughput be set independently of size; autogrow, vCores and smaller transactions do not lift the ceiling."
+  },
+  {
+    "id": 230,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "multi",
+    "question": "Building an HNSW index over 8 million embeddings on an Azure Database for PostgreSQL flexible server with 64 GB of RAM has been running for nine hours during a maintenance window and is still incomplete, with the server showing single-threaded CPU use and constant temporary file writes. Which two server settings should the team raise for the build? (Choose two.)",
+    "options": [
+      "maintenance_work_mem, so the graph can be constructed in memory instead of spilling to temporary files",
+      "max_parallel_maintenance_workers, so the index build is parallelized across several worker processes",
+      "work_mem, so each backend has more memory available for sorting the vectors before they enter the graph",
+      "shared_buffers to roughly 90% of server memory, so the completed index is cached as soon as it is built"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. HNSW builds the graph in a memory arena bounded by maintenance_work_mem; when the graph exceeds it, the build switches to a much slower disk-based path, which is what the temporary file writes indicate. Raising it for the build session is the single biggest lever on build time.",
+      "Correct. Index builds can use parallel workers, and the observed single-threaded CPU pattern means the build is running with no helpers. Raising max_parallel_maintenance_workers (with max_parallel_workers high enough to supply them) lets several processes share the construction work.",
+      "work_mem applies to query-time sorts, hashes and similar per-operation memory, not to index construction, which draws from maintenance_work_mem. Raising it here consumes memory that the build itself needs, potentially making things worse.",
+      "Setting shared_buffers to 90% of RAM starves the OS page cache and the build's own working memory, and is well outside sensible guidance. It also targets post-build cache warmth rather than the build cost being asked about."
+    ],
+    "principle": "index builds draw on maintenance memory and parallel workers, not query memory",
+    "relatedConcept": "Provisioning for vector workloads must budget separately for the index build, which is far more memory- and CPU-hungry than steady-state serving.",
+    "overallExplanation": "HNSW builds use maintenance_work_mem and parallel maintenance workers. Spilling to temporary files means the graph exceeded maintenance memory, and single-threaded CPU means no parallel workers were available; work_mem and shared_buffers address different phases entirely."
+  },
+  {
+    "id": 231,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A retrieval API on Azure Container Apps scales from 3 to 90 replicas during traffic spikes, each replica opening a pool of 10 connections to Azure Database for PostgreSQL flexible server. At peak, clients receive \"too many connections\" errors and existing queries slow sharply even though CPU on the server is moderate. What is the most appropriate remedy?",
+    "options": [
+      "Put a connection pooler such as the built-in PgBouncer in front of the server in transaction pooling mode and bound each replica's own pool",
+      "Raise max_connections on the server to 2,000 so every replica's pool can be satisfied at maximum scale",
+      "Increase the scale-out threshold so the app scales to at most 30 replicas regardless of the incoming request rate",
+      "Give each replica a dedicated read replica of the database so connections are spread across multiple servers"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. 90 replicas × 10 connections is 900 backends, and each PostgreSQL backend is a process with its own memory and scheduling cost, which is why throughput degrades before CPU saturates. A transaction-mode pooler multiplexes many client connections onto a small set of server connections, and bounding the per-replica pool keeps the client side honest as well.",
+      "max_connections is capped by the SKU and, more importantly, every allowed connection consumes memory and adds context-switching overhead. Raising it to 2,000 converts hard errors into severe, harder-to-diagnose performance collapse.",
+      "Capping replica count throttles the application's ability to serve traffic in order to protect the database, which sacrifices the wrong thing. It also leaves the same fragile ratio in place — 30 replicas is only a smaller version of the same problem.",
+      "Read replicas add capacity for read traffic but do not reduce total connection count; they multiply the servers to be managed and still receive hundreds of connections each. They also cannot serve the write path."
+    ],
+    "principle": "connections are a scarce server resource, so multiplex them rather than multiply them",
+    "relatedConcept": "Connection optimization is where elastic, horizontally scaled AI services meet PostgreSQL's process-per-connection model.",
+    "overallExplanation": "Each PostgreSQL connection is a backend process, so hundreds of replica pools exhaust the server before CPU does. Use a transaction-mode connection pooler such as the built-in PgBouncer plus bounded client pools, rather than raising max_connections or capping app scale."
+  },
+  {
+    "id": 232,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "After routing a Python service through the built-in PgBouncer on Azure Database for PostgreSQL in transaction pooling mode, the team sees intermittent errors about prepared statements already existing, and a `SET statement_timeout` issued once per connection stops taking effect for later queries. What is the correct explanation and adjustment?",
+    "options": [
+      "Transaction pooling assigns a different server connection per transaction, so client-side prepared statements and session-level SET must be disabled or reissued per transaction",
+      "The pooler's pool size is too small, so connections are being reused before their prepared statements have been deallocated",
+      "Prepared statements are unsupported by Azure Database for PostgreSQL, so all queries must be sent as literal SQL strings",
+      "The application is missing an explicit BEGIN, so PostgreSQL runs each statement in its own implicit transaction and discards session state"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. In transaction pooling mode a client is bound to a server connection only for the duration of a transaction, so anything that lives in session state — named prepared statements, session GUCs set with SET, temporary tables, advisory locks — is not guaranteed to be there next time. The fix is to disable client-side statement preparation (for example by turning off the driver's prepare threshold) or set parameters per transaction, or to use session pooling where session state is required.",
+      "Pool size affects queuing and wait time, not the semantics of session state. Enlarging the pool would leave prepared statements just as likely to be created on a connection that already has them, since assignment is still per transaction.",
+      "PostgreSQL supports prepared statements fully, and the service worked before the pooler was introduced. The conflict is with transaction-level multiplexing, not with the database's capabilities.",
+      "PostgreSQL does apply implicit transactions to standalone statements, but that has always been true and does not discard session GUCs on a direct connection. The behaviour changed only when the pooler was introduced, which points at pooling mode."
+    ],
+    "principle": "transaction pooling gives up session state in exchange for connection multiplexing",
+    "relatedConcept": "Pooling mode is a contract about what survives between statements, so drivers and application code must be configured to match it.",
+    "overallExplanation": "Transaction-mode pooling rebinds the client to a different server connection each transaction, so named prepared statements, session SET, temp tables and advisory locks are unreliable. Disable client-side preparation and set parameters per transaction, or use session pooling when session state is genuinely required."
+  },
+  {
+    "id": 233,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Develop AI solutions by using Azure Database for PostgreSQL",
+    "type": "single",
+    "question": "A FastAPI retrieval service opens a fresh connection to Azure Database for PostgreSQL for every request, runs one 4 ms vector query, and closes it. End-to-end p50 is 71 ms, and traces show roughly 60 ms per request spent on TCP setup, TLS negotiation and Entra token authentication. What is the correct change?",
+    "options": [
+      "Create an async connection pool at application startup with a warm minimum size and acquire a connection from it per request",
+      "Cache each request's query results in memory for 60 seconds so most requests avoid opening a connection at all",
+      "Disable TLS on connections to the database because the traffic stays inside the virtual network",
+      "Move the vector query into a stored procedure so the round trip completes in a single server call"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Connection establishment — TCP handshake, TLS negotiation and authentication — is a fixed cost paid per connection, not per query, so the answer is to amortise it by keeping connections open in a pool. A warm minimum size means the first requests after a scale-out do not each pay the setup cost either.",
+      "Caching may help a read-heavy workload, but it changes freshness semantics and does nothing for cache misses, which still pay the full 60 ms. It is an optimisation layered on top of a connection design that remains broken.",
+      "Azure Database for PostgreSQL requires encrypted connections, and disabling TLS to shave handshake time would be a serious security regression for a modest saving. The handshake is only paid once per pooled connection anyway.",
+      "A stored procedure does not reduce connection setup, which happens before any statement is sent, and the query itself is already only 4 ms. This optimises the part of the request that is not the problem."
+    ],
+    "principle": "amortise connection setup with a pool instead of paying it per request",
+    "relatedConcept": "Connection optimization targets the fixed per-connection costs — handshake, TLS, authentication — that dominate short, fast queries.",
+    "overallExplanation": "Setup costs are paid per connection, so a per-request connect/close pattern makes a 4 ms query into a 71 ms request. Use a pool created at startup with a warm minimum; disabling TLS or moving logic server-side does not touch the handshake and authentication cost."
+  },
+  {
+    "id": 234,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "A product-recommendation API uses cache-aside against Azure Managed Redis, storing each response under `rec:{userSegment}` with a 10-minute TTL. Every ten minutes the popular segments expire simultaneously and several thousand concurrent requests all miss, all call the embedding and ranking pipeline, and downstream latency spikes to 6 seconds. What is the most effective mitigation?",
+    "options": [
+      "Add jitter to each key's TTL and guard recomputation with a short-lived per-key lock so only one caller regenerates a value",
+      "Remove the TTL so cached recommendations never expire and the recomputation spike cannot occur",
+      "Increase the cache size so more segments fit in memory and fewer requests result in a miss",
+      "Retry the failing requests with exponential backoff until a populated cache entry becomes available"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Identical TTLs written at the same time expire together, producing a synchronised stampede; randomising the TTL spreads expiries out, and a per-key lock (or single-flight guard) ensures that when a key does expire, one caller recomputes while the rest wait briefly or serve the previous value. Together they address both the synchronisation and the fan-out.",
+      "Removing expiry stops the stampede but guarantees permanently stale recommendations and unbounded memory growth until eviction starts discarding keys unpredictably. Correctness and capacity are both sacrificed to avoid a solvable concurrency problem.",
+      "Cache size is not the constraint: the entries were present and then expired on schedule, so they were not evicted for lack of memory. More memory would not change the moment of expiry or the resulting fan-out.",
+      "Backoff retries reduce pressure only after the pipeline is already overwhelmed, and they lengthen the very latency the users are experiencing. It is a symptom-level control that leaves the synchronised expiry in place."
+    ],
+    "principle": "uniform TTLs synchronise misses — jitter them and single-flight the refill",
+    "relatedConcept": "Cache-aside behaviour under load is governed by expiry patterns as much as by hit rate, and stampedes are the classic failure mode.",
+    "overallExplanation": "Identical TTLs make popular keys expire together and stampede the origin. Add jitter so expiries spread out and use a per-key lock so a single caller recomputes each value; removing TTLs or adding memory addresses neither the synchronisation nor the fan-out."
+  },
+  {
+    "id": 235,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "multi",
+    "question": "A pricing assistant caches catalogue lookups in Azure Managed Redis with a 30-minute TTL. After merchandisers change a price in the system of record, customers keep receiving the old price for up to half an hour, and the business requires the change to be visible within seconds. Which two changes achieve that? (Choose two.)",
+    "options": [
+      "Delete or overwrite the affected cache keys as part of the same workflow that commits the price change",
+      "Include a version or updated-at marker in the cache key so a price change makes previously cached entries unreachable",
+      "Rely on the maxmemory eviction policy to remove outdated entries once memory pressure builds",
+      "Enable data persistence on the cache so restarts do not reintroduce values that were already superseded"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. TTL bounds worst-case staleness but says nothing about when the source actually changes; active invalidation on write is what converts a 30-minute window into a sub-second one. Publishing the invalidation from the same workflow that commits the change keeps cache and source of record coupled at the point where they can diverge.",
+      "Correct. Versioned keys make invalidation implicit: a write that bumps the version means every subsequent read looks up a key that does not exist yet, so it misses and repopulates. Stale entries simply age out under their own TTL and can never be served again.",
+      "Eviction is a memory-pressure mechanism with no relationship to data correctness — it removes whichever keys the policy selects, which may well be fresh ones while stale entries survive. Depending on it for freshness gives you no bound at all.",
+      "Persistence controls whether data survives a restart; it neither detects source changes nor removes outdated values. If anything, persisting stale prices makes them survive a restart that would previously have cleared them."
+    ],
+    "principle": "TTL bounds staleness, but only invalidation on write removes it",
+    "relatedConcept": "Cache-aside correctness depends on pairing expiry with an explicit invalidation path triggered by writes to the system of record.",
+    "overallExplanation": "Bound staleness with TTL, but eliminate it by invalidating on write: delete or overwrite affected keys in the same workflow that commits the change, or embed a version in the key so old entries become unreachable. Eviction policy and persistence address neither."
+  },
+  {
+    "id": 236,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "An agent platform stores each user's running tool-approval ledger only in Azure Managed Redis, under keys with no expiry, with the eviction policy set to allkeys-lru. After a memory-pressure event, several users' ledgers vanish and an audit cannot reconstruct which approvals were granted. What is the correct architectural correction?",
+    "options": [
+      "Write the ledger to a durable store such as Azure Cosmos DB or PostgreSQL and keep Redis as a read cache in front of it",
+      "Change the eviction policy to volatile-lru so keys without a TTL are protected from eviction under memory pressure",
+      "Enable append-only persistence on the cache so evicted keys can be restored from the persisted file after the event",
+      "Scale the cache to a larger tier so memory pressure never triggers eviction for this workload again"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Redis is a cache, not a system of record: under memory pressure, failover or scaling operations, data can be evicted or lost, and no configuration turns it into an auditable ledger. Auditable state belongs in a durable transactional store, with Redis in front of it for latency.",
+      "volatile-lru would indeed skip keys with no TTL, but that converts eviction into out-of-memory write failures once the ledger fills the cache, and it still offers no durability across failover or scaling. It changes the failure mode rather than protecting the data.",
+      "Persistence improves recovery from a restart but does not undo eviction — evicted keys are removed from the dataset and are not resurrected from the persisted file. It addresses a different failure than the one described.",
+      "A bigger tier postpones the problem while the ledger grows without bound, and it does nothing for the failover and maintenance events that also disrupt cached data. Capacity is not a substitute for durability guarantees."
+    ],
+    "principle": "redis is a cache, never the system of record for data you must not lose",
+    "relatedConcept": "Choosing what may live only in Redis is a durability decision: cached derivations yes, authoritative state no.",
+    "overallExplanation": "Auditable state must live in a durable store, with Redis as a latency layer in front. Eviction policy changes, persistence and larger tiers alter the failure mode but never make a cache an acceptable system of record."
+  },
+  {
+    "id": 237,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "A semantic cache in Azure Managed Redis embeds each incoming prompt, searches cached prompt vectors, and returns the stored answer when cosine similarity is at least 0.80. Support reports that \"How do I cancel my policy?\" is being answered with the cached response for \"How do I cancel my payment method?\". Cache hit rate is 62%. What is the appropriate adjustment?",
+    "options": [
+      "Raise the similarity threshold and validate the new value against a labelled set of prompt pairs, accepting a lower hit rate",
+      "Keep the threshold and shorten the cached entries' TTL so incorrect matches are evicted sooner",
+      "Switch the distance metric from cosine to Euclidean, which separates unrelated prompts more reliably",
+      "Return the two closest cached answers and let the model choose between them at generation time"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The threshold is the precision/recall dial of a semantic cache: 0.80 is loose enough that topically adjacent but semantically different questions collide. Raising it and validating against labelled near-miss pairs trades hit rate for correctness, which is the right direction when wrong answers are being served.",
+      "TTL controls how long an entry lives, not which entries match. A shorter TTL means the same wrong match simply happens against a fresher entry, while overall hit rate falls — cost without correctness.",
+      "Switching metrics changes the numeric scale of the threshold rather than the underlying semantics, and for normalized text embeddings cosine and Euclidean rank neighbours nearly identically. It would require re-tuning the threshold anyway without fixing the collision.",
+      "Handing the model two cached answers reintroduces a generation call, which defeats the cache's purpose, and it invites the model to blend an irrelevant answer into the response. It adds cost and a new failure mode instead of resolving the matching error."
+    ],
+    "principle": "a semantic cache threshold is a precision dial, and wrong answers cost more than misses",
+    "relatedConcept": "Semantic caching keys entries by embedding similarity, so the threshold defines what counts as \"the same question\" and must be validated, not guessed.",
+    "overallExplanation": "Serving another question's answer means the similarity threshold is too permissive. Raise it and validate against labelled near-miss pairs, accepting a lower hit rate; TTL, distance metric and multi-answer returns do not change which entries match."
+  },
+  {
+    "id": 238,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "A multi-tenant SaaS assistant uses one semantic cache in Azure Managed Redis for all customers, storing prompt embedding, answer text and a `tenantId` field per entry. A security review finds that a question asked by tenant A can return an answer generated from tenant B's private documents. Which design change resolves this?",
+    "options": [
+      "Scope every similarity search to the caller's tenant with a tenant filter in the query, and include the tenant in the key prefix",
+      "Encrypt the cached answer text at rest so that entries belonging to other tenants cannot be read if returned",
+      "Reduce the cache TTL to five minutes so cross-tenant answers can only be served for a short window",
+      "Store one embedding per tenant-agnostic canonical question so answers are generic and safe to share"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Storing tenantId on the entry is useless unless the retrieval path enforces it, so the tenant must be part of the query — a filter combined with the vector search — and reflected in the key prefix so keyspaces are separable for both lookup and bulk invalidation. Isolation has to be enforced where matching happens, not merely recorded.",
+      "Encryption at rest protects against someone reading the underlying storage; it does nothing when the application itself decrypts and returns an entry it should never have matched. The failure is an authorization defect, not a storage-confidentiality one.",
+      "Shortening the TTL narrows the exposure window but leaves cross-tenant answers reachable within it, which no security review would accept. Time-boxing a data-leak path is not the same as closing it.",
+      "Forcing generic answers throws away the tenant-specific grounding that makes the assistant useful, and it does not prevent tenant-specific content from being cached in the first place. It solves the leak by removing the feature."
+    ],
+    "principle": "isolation must be enforced in the lookup path, not stored as a field",
+    "relatedConcept": "Semantic caches inherit the isolation requirements of the data that produced their entries, so tenancy belongs in both the key and the search filter.",
+    "overallExplanation": "Enforce tenancy where matching happens: filter similarity searches by tenant and prefix keys per tenant so keyspaces are separable. A tenantId field that no query checks provides no isolation, and encryption or short TTLs do not close the path."
+  },
+  {
+    "id": 239,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "A documentation assistant caches generated answers semantically in Azure Managed Redis with a 24-hour TTL. The underlying knowledge base is re-indexed nightly, and after each re-index users continue to receive answers built from the previous corpus for most of the following day. The team wants correctness immediately after every re-index without abandoning the cache. What should they do?",
+    "options": [
+      "Include the corpus version in the cache key prefix and index name, and cut over to the new prefix when re-indexing completes",
+      "Reduce the TTL to one hour so stale answers disappear soon after the nightly re-index finishes",
+      "Warm the cache immediately after each re-index by replaying yesterday's most frequent questions",
+      "Disable the semantic cache during the re-index window and re-enable it once the new index is live"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Versioning the keyspace makes cutover atomic from the reader's point of view: after re-indexing, lookups target the new prefix, immediately miss, and regenerate from the current corpus, while the old keyspace ages out under its TTL or is deleted in the background. Correctness stops depending on expiry timing.",
+      "A one-hour TTL still serves stale answers for up to an hour after every re-index and multiplies regeneration cost across the entire day for every entry. It weakens the cache badly while leaving a stale window that the requirement rules out.",
+      "Warming populates entries but does nothing about the ones already cached from the old corpus, which continue to match incoming questions until their TTL expires. It adds cost on top of the staleness rather than removing it.",
+      "Disabling the cache during re-indexing addresses only the window in which the index is being rebuilt; the entries generated before it remain valid-looking afterwards. The stale answers users see arrive after re-indexing, not during it."
+    ],
+    "principle": "version the cache keyspace so a source change invalidates everything at once",
+    "relatedConcept": "Semantic cache entries are derived data, so their lifetime must be tied to the version of the corpus that produced them rather than to elapsed time.",
+    "overallExplanation": "Tie cached answers to the corpus version by putting the version in the key prefix and index name, so a re-index cuts over to an empty keyspace and old entries can never match. TTL tuning, warming and pausing the cache all leave stale entries reachable."
+  },
+  {
+    "id": 240,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "A team enables the query engine on Azure Managed Redis to serve similarity search over 2.5 million product embeddings of 768 dimensions, with a p99 target of 25 ms and tolerance for approximate results. Their prototype index was created with a FLAT vector field and now takes about 400 ms per KNN query. What should they change?",
+    "options": [
+      "Recreate the index with an HNSW vector field so KNN queries traverse a graph instead of scanning every vector",
+      "Keep the FLAT index and reduce K from 10 to 3 so fewer neighbours must be compared per query",
+      "Shard the keyspace across more nodes and issue the same KNN query to each shard from the client",
+      "Store the embeddings as JSON documents rather than hashes, which lets the engine compress the vector field"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A FLAT vector field performs exact brute-force comparison against every indexed vector, so its latency grows linearly with the collection and 2.5 million vectors is far past its comfortable range. HNSW builds a navigable graph that returns approximate neighbours in roughly logarithmic time, which is exactly the trade the team has already said they accept.",
+      "K barely affects the cost of a FLAT search: the distance is still computed against all 2.5 million vectors, and only the size of the result heap changes. The scan dominates, so latency stays close to 400 ms.",
+      "Sharding spreads vectors across nodes and can reduce per-node work, but each shard still brute-force scans its slice and the client must merge results. It buys a constant factor at considerable complexity, where the algorithm choice offers an order of magnitude.",
+      "The storage model — hash or JSON — determines how documents are laid out, not which search algorithm the vector field uses. A FLAT field on JSON documents scans exhaustively exactly as it does on hashes."
+    ],
+    "principle": "flat vector indexes are exact and linear; hnsw is approximate and scalable",
+    "relatedConcept": "Redis vector indexing exposes the same exact-versus-approximate choice as other vector stores, decided when the index is created.",
+    "overallExplanation": "FLAT vector fields scan every vector, so latency scales with collection size. With 2.5 million vectors, a 25 ms target and tolerance for approximation, recreate the index with an HNSW vector field; reducing K, sharding or changing the document type do not change the scan."
+  },
+  {
+    "id": 241,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "multi",
+    "question": "A customer-service agent keeps per-conversation state — recent turns, the active tool context and a summary — in Azure Managed Redis so any stateless API replica can continue a conversation. The team must keep memory bounded while ensuring a completed conversation can still be reviewed months later for quality assurance. Which two practices should they adopt? (Choose two.)",
+    "options": [
+      "Keep each conversation in its own key or hash with an expiry that is refreshed on every turn, so idle conversations age out",
+      "Persist the completed transcript to a durable store at the end of the conversation, treating Redis as working state only",
+      "Remove expiry from conversation keys and rely on the cache's eviction policy to reclaim memory when needed",
+      "Store the entire transcript in one string value and rewrite the whole value on every turn to keep reads simple"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A per-conversation key with an expiry refreshed on each turn implements a sliding session window: active conversations stay resident and abandoned ones release memory automatically, without a sweeper job. It also keeps reads and writes scoped to a single key, which is what stateless replicas need for fast resumption.",
+      "Correct. Redis is working state that can be expired, evicted or lost across scaling and failover, so anything needed months later must be written to a durable store. Persisting the transcript on completion separates the latency-sensitive live path from the long-term record.",
+      "Without expiry, abandoned conversations accumulate indefinitely, and eviction then discards keys chosen by policy — quite possibly active conversations — producing user-visible state loss at the worst moment. Eviction is a memory-pressure valve, not a retention design.",
+      "Rewriting a growing transcript on every turn makes each write cost proportional to conversation length and produces large values that block other work as they are serialized. A hash or list of turns lets the agent append and read the recent window cheaply."
+    ],
+    "principle": "session state expires; the record of it must be persisted elsewhere",
+    "relatedConcept": "Conversation state in Redis is a sliding-window working set, which makes expiry policy and durable hand-off two halves of the same design.",
+    "overallExplanation": "Give each conversation its own key with an expiry refreshed per turn so idle sessions age out, and persist the completed transcript to a durable store because Redis can expire, evict or lose it. Relying on eviction or rewriting one giant value creates both memory and correctness problems."
+  },
+  {
+    "id": 242,
+    "domain": "Develop AI solutions by using Azure data management services",
+    "objective": "Integrate Azure Managed Redis in AI solutions",
+    "type": "single",
+    "question": "An index in Azure Managed Redis was created over hash keys with the prefix `doc:` and a vector field for embeddings. After a refactor, an ingestion worker began writing new chunks under keys prefixed `chunk:`, with an identical field layout. Similarity searches return only pre-refactor documents, and no errors appear in the worker's logs. What is the cause?",
+    "options": [
+      "The index only tracks keys matching the prefixes declared when it was created, so documents under a new prefix are never indexed",
+      "The index must be manually refreshed after bulk writes, and the worker never triggers the reindex operation",
+      "The new keys were written without a TTL, and the index only tracks keys that carry an expiry",
+      "The vector field on the new keys is stored in a different byte order, so the index silently rejects those documents"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The index definition specifies the key type and the prefixes it follows, and indexing is automatic only for keys that match. Writes under `chunk:` fall entirely outside the index's scope, so they succeed silently and never become searchable — which is precisely the observed pattern of no errors and no new results.",
+      "Indexing happens automatically as matching keys are written; there is no manual refresh step to forget. If a refresh were required, previously written documents would also be missing rather than only the post-refactor ones.",
+      "TTL has no bearing on whether a key is indexed; expiry removes documents from the index only when it actually fires. Pre-refactor documents would have to carry TTLs for this theory to hold, and nothing suggests they do.",
+      "The worker writes vectors the same way it always did — only the key prefix changed — and a genuine encoding mismatch would surface as indexing errors or wrong distances rather than silent absence. This invents a failure mode to explain a scoping problem."
+    ],
+    "principle": "an index covers exactly the key prefixes it was defined over",
+    "relatedConcept": "Redis vector indexes are defined at creation time against a key type and prefix set, so key-naming changes silently change what is searchable.",
+    "overallExplanation": "A Redis index automatically tracks only keys matching the prefixes in its definition, so documents written under a new prefix are stored but never searchable. Either keep the agreed prefix or recreate the index to cover it."
+  }
+]

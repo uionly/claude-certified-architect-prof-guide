@@ -1,0 +1,909 @@
+[
+  {
+    "id": 101,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "Your release pipeline replaced local Docker builds with `az acr build --registry ttnacr --image inference-api:2026.04.1 .`. The command reports \"Run ID: ca7 was successful\", and `az acr repository show-tags` lists the new tag, but the Azure App Service hosting the API is still serving the previous build forty minutes later. What is the correct explanation?",
+    "options": [
+      "`az acr build` only runs a cloud build and pushes the resulting image to the registry; the App Service must still be pointed at the new tag before it pulls anything",
+      "ACR Tasks pushes manifests asynchronously, so the image is unusable until background replication finishes and the app will pick it up on its own",
+      "The pushed manifest stays untagged until `az acr repository update` promotes it, so App Service cannot resolve `inference-api:2026.04.1` yet",
+      "App Service continuous deployment only ever reacts to the `latest` tag, so a version-numbered tag can never be deployed to a Web App for Containers"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. ACR Tasks is a build service, not a deployment service: `az acr build` uploads the context, builds in the cloud, and pushes the image. Build and deploy are separate steps, so the pipeline still needs a `az webapp config container set` (or a restart, if the tag is unchanged) for the app to pull the new digest.",
+      "Tempting because geo-replicated registries do replicate in the background, but a push completes synchronously against the home region and the tag is immediately pullable there. Replication would also not stop a same-region App Service from pulling, so it cannot explain a stalled deployment.",
+      "This invents a promotion step that does not exist. `az acr build --image name:tag` pushes the image already tagged, and `az acr repository update` only changes repository attributes such as write/delete/list-enabled — it has no role in making a pushed tag resolvable.",
+      "This overstates a real feature. The continuous-deployment webhook that `DOCKER_ENABLE_CI` wires up fires for whichever tag the app is configured to run, including version tags; the reason nothing happened here is that the app was never told about the new tag at all."
+    ],
+    "principle": "building an image and deploying it are two separate steps",
+    "relatedConcept": "ACR Tasks moves the build off developer machines and into the registry, but the deployment target still has to be updated to reference the new image.",
+    "overallExplanation": "`az acr build` performs a cloud build and pushes to the registry — nothing more. A pipeline must follow it with an explicit deployment step that points App Service at the new tag or digest."
+  },
+  {
+    "id": 102,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A document-summarization service is deployed to App Service from `ttnacr.azurecr.io/summarizer:latest`, which the pipeline overwrites on every merge. Two instances of the same app now return different summaries for identical input, and a rollback attempt reproduced the newest behaviour rather than the previous one. What should the team change first?",
+    "options": [
+      "Pin each deployment to an immutable, uniquely versioned tag (or the image digest) and lock the tag so it can never be overwritten",
+      "Enable the ACR retention policy for untagged manifests so old layers are purged and instances converge on one image",
+      "Scale the App Service plan out to more instances so a fresh pull happens on each worker after every merge",
+      "Turn on ACR geo-replication so all App Service workers pull from a consistent regional replica of the registry"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A mutable `latest` tag means the bytes behind the tag change over time, so instances that pulled at different moments run different code and rollback has no earlier tag to return to. Versioned tags — optionally hardened with `az acr repository update --image summarizer:2026.04.1 --write-enabled false` — make deployments reproducible and rollback a matter of redeploying a known tag.",
+      "Retention policies delete untagged manifests to control storage cost, which is useful housekeeping but irrelevant here. Purging old manifests would actually destroy the very images the team needs for rollback, making the situation worse rather than restoring determinism.",
+      "Adding instances multiplies the problem instead of solving it: each new worker pulls whatever `latest` points to at its own start time, so the fleet can end up running three versions instead of two. Scaling is a capacity lever, not a versioning one.",
+      "Geo-replication reduces pull latency and improves availability for multi-region deployments, and Premium-tier replicas are eventually consistent copies of the same mutable tag. It does nothing about the fact that the tag itself keeps being reassigned to new content."
+    ],
+    "principle": "immutable tags make deployments reproducible and rollback possible",
+    "relatedConcept": "Image versioning discipline in ACR is what turns a container deployment into a repeatable artifact promotion rather than a moving target.",
+    "overallExplanation": "Mutable `latest` tags produce drift between instances and make rollback impossible. Deploy uniquely versioned, immutable tags or digests so every instance provably runs the same bytes."
+  },
+  {
+    "id": 103,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "multi",
+    "question": "A containerized FastAPI app on App Service needs an Azure OpenAI endpoint URL, which is not sensitive, and an API key that the security team requires to stay in Azure Key Vault with no copy in the app configuration or the image. The team wants the running container to read both as ordinary environment variables. Which two configuration steps achieve this? (Choose two.)",
+    "options": [
+      "Add an app setting whose value is `@Microsoft.KeyVault(SecretUri=https://ttnkv.vault.azure.net/secrets/openai-key/)` for the key",
+      "Enable a managed identity on the Web App and grant it permission to get secrets from that Key Vault",
+      "Add the endpoint URL as a plain app setting so it is injected into the container as an environment variable",
+      "Bake the endpoint URL into the Dockerfile with an `ENV` instruction and mount the Key Vault as a volume in the container"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A Key Vault reference in an app setting keeps the secret in the vault: App Service resolves the `SecretUri` at startup and injects the resolved value as an environment variable, so the app code reads it exactly like any other setting and nothing sensitive lands in configuration or the image.",
+      "Correct. Key Vault references are resolved using the app's managed identity, so without an identity that holds a get-secrets permission (an RBAC role such as Key Vault Secrets User, or an equivalent access policy) the reference fails to resolve and the setting surfaces as empty. Identity plus permission is the half that makes the reference work.",
+      "This is a perfectly reasonable way to supply the non-secret endpoint, but the question asks for the two steps that satisfy the stated constraint, and the constraint is about keeping the key in Key Vault. A plain app setting is the fallback for non-secret values, not part of the secret-handling mechanism being tested.",
+      "Baking configuration into the image with `ENV` defeats the purpose of environment-specific settings — the same image can no longer be promoted from test to production — and App Service does not offer a Key Vault volume mount for Web Apps. The supported path is Key Vault references resolved by managed identity."
+    ],
+    "principle": "secrets stay in key vault and arrive as resolved references, never as stored values",
+    "relatedConcept": "App Service injects app settings as environment variables, and Key Vault references extend that mechanism so secret material is fetched at runtime under a managed identity.",
+    "overallExplanation": "Use a `@Microsoft.KeyVault(SecretUri=...)` app setting together with a managed identity that can read the vault. App Service resolves the reference and hands the container an ordinary environment variable."
+  },
+  {
+    "id": 104,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "During an audit it emerges that the App Service hosting a transcription API pulls its image using the ACR admin account, whose username and password are stored in the app's container settings. The auditors want no registry credentials in application configuration, while deployments must keep working unattended. What should you implement?",
+    "options": [
+      "Enable a managed identity on the Web App, grant it the AcrPull role on the registry, and configure the app to use managed-identity credentials for the registry",
+      "Rotate the ACR admin password on a schedule with an automation runbook that rewrites the app's container settings after each rotation",
+      "Create an ACR token with a scope map limited to pull, and store the token password in the app's container settings instead of the admin password",
+      "Make the registry publicly readable by enabling anonymous pull access so no credentials are needed for the deployment at all"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A managed identity removes the credential entirely: Azure issues and rotates the identity's tokens, the AcrPull role grants exactly the pull permission needed, and the platform authenticates to ACR on the app's behalf. Nothing secret remains in the app's configuration, which is precisely the audit requirement.",
+      "Rotation reduces the blast radius of a leak but does not satisfy the requirement, because a credential still lives in application configuration between rotations. It also adds a fragile moving part: any failure of the runbook breaks image pulls at the worst possible moment.",
+      "Scoped tokens are a genuine improvement over the admin account for third parties who cannot use Entra identities, and least-privilege pull scope is the right instinct. But it is still a password stored in app configuration, so the audit finding stands unaddressed.",
+      "Anonymous pull exists for public content distribution, and using it here would expose a private inference image containing proprietary code and model artefacts to the internet. Removing authentication is not the same as removing stored credentials."
+    ],
+    "principle": "prefer platform-managed identity over any stored registry credential",
+    "relatedConcept": "ACR authentication choices range from the admin account through scoped tokens to Entra-backed managed identities, and only the last removes secrets from configuration.",
+    "overallExplanation": "Give the Web App a managed identity with the AcrPull role and configure the app to authenticate to the registry with it. Tokens and admin passwords still leave a stored credential behind."
+  },
+  {
+    "id": 105,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "multi",
+    "question": "A compliance review found that the base image `python:3.12-slim` used by six inference services carries OS packages that are three months behind on security fixes, and nobody rebuilds unless application code changes. The team wants patched images produced automatically, without a developer running a build. Which two ACR Tasks capabilities address this? (Choose two.)",
+    "options": [
+      "Create the task with base-image update triggers enabled so ACR rebuilds dependent images when the base image is updated",
+      "Add a scheduled timer trigger to the task so the image is rebuilt on a recurring cadence regardless of source or base-image changes",
+      "Enable the registry retention policy for untagged manifests so vulnerable layers are deleted after the configured number of days",
+      "Switch the build to `docker build` on a self-hosted agent so the agent's local layer cache always resolves the newest base image"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A base-image update trigger is exactly the mechanism for this problem: ACR tracks the base image referenced in the Dockerfile and queues a rebuild of the dependent image when that base is updated, so patched images appear without human involvement.",
+      "Correct. A timer trigger complements the base-image trigger by guaranteeing a floor on rebuild frequency, which matters when a fix arrives through a package repository rather than a new base-image push. Together the two triggers cover both event-driven and time-driven patching.",
+      "Retention policies control storage growth by deleting untagged manifests; deleting an old manifest does not produce a patched one. This confuses cleaning up the registry with refreshing the contents of the images it holds.",
+      "Local layer caching pushes in the wrong direction — a warm cache is exactly what causes a stale base layer to be reused. It also reintroduces build agents to maintain, which is the operational burden ACR Tasks exists to remove."
+    ],
+    "principle": "patching is a trigger you configure, not a build you remember to run",
+    "relatedConcept": "ACR Tasks supports source-commit, base-image-update, and timer triggers, which together keep images current without a developer in the loop.",
+    "overallExplanation": "Base-image update triggers rebuild dependents when the upstream image changes, and timer triggers guarantee a periodic refresh. Both are ACR Tasks features designed to automate patching."
+  },
+  {
+    "id": 106,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A developer on an Apple Silicon laptop builds and pushes `embedder:1.4` with local Docker. The image runs fine on the laptop, but the Linux App Service container log shows `exec /usr/local/bin/python: exec format error` and the site never starts. What is the most reliable fix?",
+    "options": [
+      "Build the image in the cloud with `az acr build --platform linux/amd64 --registry ttnacr --image embedder:1.4 .` so the artefact matches the App Service architecture",
+      "Increase `WEBSITES_CONTAINER_START_TIME_LIMIT` so the container has longer to finish extracting its layers before the platform gives up",
+      "Set `WEBSITES_PORT` to the port the application listens on, because the platform aborts startup when it cannot complete its port probe",
+      "Restart the Web App and clear the container cache so the corrupted layer downloaded during the push is fetched again"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. `exec format error` is the kernel refusing to run a binary compiled for a different CPU architecture: the laptop produced a linux/arm64 image while App Service runs linux/amd64. Building with ACR Tasks and an explicit `--platform linux/amd64` produces the right artefact and removes the developer machine's architecture from the equation.",
+      "The start-time limit governs how long the platform waits for the container to respond after it starts, and raising it is the standard remedy for slow model warm-up. Here the process never executes at all, so no amount of extra waiting changes the outcome.",
+      "A missing or wrong `WEBSITES_PORT` is a very common App Service container failure, and it does produce a site that never comes up. But the symptom differs: the container would run and the platform would fail to reach it, whereas this log shows the entrypoint binary itself failing to execute.",
+      "This assumes layer corruption, which registries make effectively impossible because content is addressed and verified by digest on both push and pull. The image is intact; it is simply built for the wrong architecture."
+    ],
+    "principle": "build for the target architecture, not the developer's laptop",
+    "relatedConcept": "ACR Tasks builds in the cloud on a chosen platform, which eliminates architecture drift between developer machines and Azure hosts.",
+    "overallExplanation": "`exec format error` means an architecture mismatch. Build with `az acr build --platform linux/amd64` so the image matches the Linux App Service hosts rather than the ARM developer machine."
+  },
+  {
+    "id": 107,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A three-person team must host one stateless containerized REST API that wraps Azure OpenAI. Traffic is steady during business hours, there is a single container image, no background workers, and no service-to-service mesh requirement. They want custom domains, TLS, autoscale and staged releases with as little platform operations work as possible. Which hosting choice fits best?",
+    "options": [
+      "Azure App Service (Web App for Containers) with a deployment slot for staging",
+      "Azure Kubernetes Service with a Deployment, Service and Ingress controller they manage themselves",
+      "Azure Container Apps with a dedicated workload profile and multiple-revision mode",
+      "Azure Container Registry Tasks running the container directly with `az acr run` on a schedule"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A single always-on HTTP container with steady traffic is the textbook App Service case: managed TLS and custom domains, plan-level autoscale, and a staging slot that swaps into production give staged releases without any orchestrator concepts to learn or operate.",
+      "AKS would deliver everything asked for, but at the cost of node pools, upgrades, ingress controllers and cluster monitoring that a three-person team must then own. Choosing it here is over-engineering: the workload has none of the multi-service, custom-scheduling or CRD requirements that justify a cluster.",
+      "Container Apps is a strong fit for event-driven or scale-to-zero microservices, and its revisions give elegant traffic splitting. For one steady always-on HTTP API, though, it adds an environment and revision model without solving a problem App Service does not already solve more simply.",
+      "`az acr run` executes build and task steps inside the registry's build environment; it is tooling for producing images, not a hosting platform. Nothing about it provides custom domains, TLS termination, autoscale or a public endpoint."
+    ],
+    "principle": "match platform complexity to the workload's actual requirements",
+    "relatedConcept": "App Service, Container Apps and AKS form a ladder of increasing control and increasing operational cost; the right rung is the lowest one that meets the requirements.",
+    "overallExplanation": "For one stateless HTTP container with steady traffic and a small team, App Service with a staging slot is the simplest fit. Container Apps and AKS earn their complexity only when the workload needs it."
+  },
+  {
+    "id": 108,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A 4 GB inference image lives in a registry in West Europe. A new App Service deployment in Australia East takes eleven minutes to pull on every cold start and scale-out event, while the West Europe deployment of the same image takes under a minute. The team wants pulls to be fast in both regions from one logical registry. What should you do?",
+    "options": [
+      "Use a Premium-tier registry and add a geo-replication in Australia East so pulls are served from a local replica of the same registry",
+      "Create a second Basic registry in Australia East and have the pipeline run a separate `az acr build` against it after every release",
+      "Enable the dedicated data endpoint on the existing registry so the Australia East workers negotiate a faster transfer protocol",
+      "Increase the App Service plan tier in Australia East so the workers are allocated more network bandwidth for the pull"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Geo-replication is the Premium-tier feature built for exactly this: one registry name and one push, with content replicated to each configured region and pulls automatically served from the network-closest replica. Cross-continent transfer of a 4 GB image disappears from the cold-start path.",
+      "A second registry does remove the cross-region hop, but at the price of two registry names, two builds of the same source, and no guarantee the two artefacts are byte-identical. It reintroduces the drift problem that single-artefact promotion exists to prevent.",
+      "Dedicated data endpoints exist to give the registry's data plane stable, per-region hostnames so tight firewall rules can be written. They change which hostname serves the layers, not the physical distance the bytes must travel.",
+      "A larger plan gives more CPU and memory, and instance bandwidth is not the bottleneck when the constraint is intercontinental latency and throughput to a single remote region. This treats a data-locality problem as a compute-sizing problem."
+    ],
+    "principle": "put image bytes close to the hosts that pull them",
+    "relatedConcept": "Registry topology is part of deployment latency: geo-replication keeps one artefact identity while serving pulls locally in every region that runs it.",
+    "overallExplanation": "Geo-replicate the Premium registry into Australia East. One registry name and one push, with pulls served from the closest replica, is what fixes cross-region image pull times."
+  },
+  {
+    "id": 109,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "multi",
+    "question": "Your registry has grown to 900 GB, dominated by untagged manifests left behind by continuous integration, while a regulator requires that any image tag referenced by a production release can never be altered or deleted for twelve months. Which two registry configurations meet both goals? (Choose two.)",
+    "options": [
+      "Enable the untagged-manifest retention policy on the Premium registry so orphaned manifests are purged after a set number of days",
+      "Lock production tags with `az acr repository update --image api:2026.04.1 --write-enabled false --delete-enabled false`",
+      "Set the registry to the Basic tier so its lower included storage forces the pipeline to push fewer images",
+      "Disable anonymous pull on the registry so that only authenticated principals can overwrite existing production tags"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The retention policy targets precisely the garbage that continuous integration creates — manifests that no longer carry any tag — and deletes them automatically after the configured window, which reclaims the bulk of the 900 GB without touching tagged releases.",
+      "Correct. Disabling write and delete on a specific tagged image makes it immutable: it cannot be overwritten by a later push nor removed, which is what a twelve-month retention obligation on released artefacts requires.",
+      "Registry tiers differ in included storage, throughput and features, and exceeding the included storage simply incurs charges rather than blocking pushes. Downgrading would also remove geo-replication and the retention policy itself, which is the opposite of what is needed.",
+      "Anonymous pull, when enabled, grants unauthenticated read access only; turning it off is good hygiene but never governed the ability to overwrite a tag. Push and delete have always required authentication, so this changes nothing about tag mutability."
+    ],
+    "principle": "retention policies control cost, image locks control immutability",
+    "relatedConcept": "ACR separates lifecycle management of orphaned content from per-image mutability controls, so cleanup and compliance retention can coexist.",
+    "overallExplanation": "Purge untagged manifests with a retention policy and lock released tags with `--write-enabled false --delete-enabled false`. Cost cleanup and compliance immutability are two different registry controls."
+  },
+  {
+    "id": 110,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A containerized reranker loads a 1.2 GB model into memory at process start, which takes about four minutes. On App Service the container is repeatedly reported unhealthy and recycled, and the log stream ends with \"Container didn't respond to HTTP pings on port 8000, failing site start\" roughly four minutes after each attempt. What is the correct remedy?",
+    "options": [
+      "Raise `WEBSITES_CONTAINER_START_TIME_LIMIT` above the real warm-up time so the platform waits for the model to finish loading",
+      "Move the model load into the request handler so the container binds its port immediately and warms up lazily on first traffic",
+      "Enable Always On so the platform stops recycling the container between requests while the model is loading",
+      "Scale the App Service plan out to three instances so at least one instance has finished warming up at any moment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. App Service waits a bounded time for the container to answer its startup ping and recycles it otherwise; the default window is shorter than this model's four-minute load. Setting `WEBSITES_CONTAINER_START_TIME_LIMIT` to a value comfortably above the measured warm-up makes the platform's expectation match reality.",
+      "Deferring the load does let the port bind quickly, and it is a legitimate technique in some designs, but it moves a four-minute stall onto an unlucky user's request and risks several concurrent requests each triggering a load. It changes who suffers the wait rather than configuring the platform correctly.",
+      "Always On keeps the app from being unloaded during idle periods, which is about inactivity rather than startup. The container here is being killed while actively starting, so the setting does not intersect the failure at all.",
+      "More instances means more containers each independently failing the same startup ping — the fleet never converges on a healthy state. Scaling multiplies a per-instance startup problem instead of resolving it."
+    ],
+    "principle": "startup timeouts must reflect real warm-up time, not optimistic defaults",
+    "relatedConcept": "Model-loading containers routinely exceed default platform startup windows, so hosting configuration has to be tuned to measured warm-up behaviour.",
+    "overallExplanation": "Measure the real warm-up time and raise `WEBSITES_CONTAINER_START_TIME_LIMIT` past it. The container is healthy; the platform's default patience is simply shorter than the model load."
+  },
+  {
+    "id": 111,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A Python container serving Uvicorn on 0.0.0.0:8080 starts cleanly on App Service — the log shows \"Uvicorn running on http://0.0.0.0:8080\" — yet browsing the site returns a 502 and the platform log records that the container did not respond to HTTP pings on port 80. The Dockerfile has no `EXPOSE` instruction. What resolves this?",
+    "options": [
+      "Add an app setting `WEBSITES_PORT=8080` so App Service forwards inbound traffic to the port the container actually listens on",
+      "Change the container to listen on 127.0.0.1:8080 so only the platform's local health probe can reach the application",
+      "Configure a custom health check path on the Web App so the platform probes `/healthz` instead of the container root",
+      "Enable `WEBSITES_ENABLE_APP_SERVICE_STORAGE` so the platform can mount the shared filesystem the container needs before binding"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. App Service defaults to port 80 for a custom container unless told otherwise, either by an `EXPOSE` instruction or by the `WEBSITES_PORT` app setting. Declaring 8080 makes the platform forward requests to the listening socket, and the ping succeeds immediately.",
+      "Binding to loopback is the classic way to make a container unreachable: the platform's request forwarding arrives over the container's network interface, not from inside it. This would guarantee a permanent 502 rather than fix one.",
+      "A health check path is genuinely useful for taking unhealthy instances out of rotation once traffic flows, and pointing it at a cheap endpoint is good practice. But it changes the path being probed, not the port, so the platform would still probe the wrong port and see nothing.",
+      "That setting controls whether the `/home` directory is mounted into the container for persistence and shared content. It has no bearing on which port the platform forwards traffic to, so the port mismatch would remain."
+    ],
+    "principle": "the platform must be told which port the container listens on",
+    "relatedConcept": "Web App for Containers forwards to port 80 by default, so any non-standard listening port must be declared through EXPOSE or WEBSITES_PORT.",
+    "overallExplanation": "Set `WEBSITES_PORT=8080` (or add a matching `EXPOSE`). The application is healthy; App Service is simply probing the default port 80 instead of the one Uvicorn bound."
+  },
+  {
+    "id": 112,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A team wants the registry itself to run their unit tests inside the freshly built image and to push the image only when those tests pass, so a broken artefact never reaches a tag that deployments can reference. They already use ACR Tasks and have no build agents. What should they implement?",
+    "options": [
+      "A multi-step ACR task defined in a YAML task file with build, cmd and push steps, executed by `az acr run -f task.yaml .`",
+      "A single `az acr build` invocation, relying on the Dockerfile's `RUN pytest` layer to abort the build when tests fail",
+      "An ACR webhook that calls the test pipeline after the push and deletes the tag again if the test run reports a failure",
+      "A quarantine pull on the registry so untested images are pushed but marked unavailable until a reviewer approves them manually"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Multi-step tasks exist to express build-test-push as an ordered pipeline inside ACR: the `build` step produces the image, a `cmd` step runs the tests in that image, and the `push` step executes only if the preceding steps succeed. No external agents are involved and nothing is published unless the tests pass.",
+      "Running tests as a Dockerfile layer does fail the build on a non-zero exit, so the instinct is sound, but it welds test execution into the shipped image's build graph — test dependencies and fixtures become part of the artefact or force a more convoluted multi-stage layout. The task file keeps testing as a separate step against the built image.",
+      "This is a compensating control rather than a gate: the bad tag exists in the registry for the duration of the test run, and any deployment that fires in that window pulls it. Deleting afterwards cannot un-deploy what already pulled.",
+      "This describes a manual approval workflow that contradicts the stated goal of an automated gate, and it inverts the requirement by publishing first and vetting later. The team asked for tests to run before the image becomes referenceable."
+    ],
+    "principle": "gate the push on the test, do not clean up after it",
+    "relatedConcept": "ACR Tasks supports multi-step YAML task definitions so build, test and push run as one server-side pipeline with no build infrastructure to maintain.",
+    "overallExplanation": "Define a multi-step ACR task with build, cmd and push steps and run it with `az acr run -f task.yaml .`. The push only happens if the test step succeeds, so broken images never reach a deployable tag."
+  },
+  {
+    "id": 113,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A support-assistant API on App Service must move to a new image version with no visible downtime, and the team wants a few minutes of smoke testing against production-grade configuration before customers reach the new build, plus a fast way back if error rates rise. The staging environment must keep its own Azure OpenAI deployment name. What should they configure?",
+    "options": [
+      "Deploy the new image to a staging slot, mark the deployment-name app setting as a slot setting, verify, then swap — and swap back if metrics degrade",
+      "Update the production app's container tag directly and rely on the App Service plan's rolling restart across instances to avoid downtime",
+      "Create a second Web App with the new image and repoint the custom domain's DNS record once smoke tests pass",
+      "Scale the production app to six instances before updating the tag so some instances continue serving the old image during the pull"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Slots give a fully warmed instance of the app on the same plan, the swap exchanges routing rather than redeploying, and swapping back restores the previous build in seconds. Marking the deployment-name setting as a slot setting keeps it pinned to its environment so the staging value does not follow the code into production.",
+      "Changing the tag in place restarts the app with no warmed replacement waiting, so requests are served by containers that are still pulling and loading a model. There is also no fast rollback beyond another in-place change with the same disruption.",
+      "A second app with a DNS cutover is a workable pattern in general, but DNS TTL and client-side caching make both the cutover and the rollback slow and only partly under your control. Slots achieve the same isolation with an instant, deterministic routing switch.",
+      "Overprovisioning does not stagger anything by itself: the platform will move all instances to the new configuration, and having more of them simply means more simultaneous cold pulls. It is a capacity change dressed up as a release strategy."
+    ],
+    "principle": "swap warmed environments instead of mutating the live one",
+    "relatedConcept": "Deployment slots plus slot-sticky settings give App Service a blue/green release with instant rollback and per-environment configuration.",
+    "overallExplanation": "Use a staging slot, mark environment-specific settings as slot settings, verify, then swap — with a swap back as rollback. Warmed-environment swapping beats mutating production in place."
+  },
+  {
+    "id": 114,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "The team wants a merge to `main` to result in the App Service running the new image automatically, with no deployment step in their build pipeline. The app runs `ttnacr.azurecr.io/chat-api:staging`, and the pipeline uses `az acr build` to rebuild that tag on every merge. What must be in place for the app to pick up the rebuilt image?",
+    "options": [
+      "Set `DOCKER_ENABLE_CI=true` on the Web App and register the ACR webhook that notifies the app's deployment endpoint on push",
+      "Enable Always On so the app periodically re-resolves the tag and restarts when the underlying digest changes",
+      "Enable the ACR retention policy so the previous manifest is deleted, which forces the app to re-pull on its next request",
+      "Turn on system-assigned managed identity for the Web App, which makes it poll the registry for new digests every five minutes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Continuous deployment for Web App for Containers is push-driven: `DOCKER_ENABLE_CI` opts the app in, and the registry webhook fires on the push that `az acr build` performs, prompting the app to pull the tag again. That is what closes the gap between the build step and a running deployment.",
+      "Always On stops the app being unloaded when idle; it never re-resolves image tags or compares digests. The container image is resolved at start, so an idle-timeout setting cannot drive redeployment.",
+      "Retention policies delete untagged manifests as housekeeping and have no signalling relationship with a running app. Deleting an old manifest also does not cause a running container to restart, so nothing would trigger a pull.",
+      "Managed identity governs how the app authenticates to the registry, not whether it checks for new content. There is no polling behaviour attached to enabling an identity — deployment remains event-driven via the webhook."
+    ],
+    "principle": "continuous deployment is a push notification, not a polling loop",
+    "relatedConcept": "ACR webhooks plus DOCKER_ENABLE_CI connect a registry push to an App Service redeploy without a deployment task in the pipeline.",
+    "overallExplanation": "Enable `DOCKER_ENABLE_CI` on the Web App and wire the ACR webhook so the push performed by `az acr build` triggers the app to pull the tag again."
+  },
+  {
+    "id": 115,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "After a security incident, the Cosmos DB key referenced by an App Service container was rotated in Key Vault and a new secret version was created. The app setting uses `@Microsoft.KeyVault(SecretUri=https://ttnkv.vault.azure.net/secrets/cosmos-key/8f0c1a...)`, and the container keeps failing to authenticate hours later. What is the cause?",
+    "options": [
+      "The reference pins a specific secret version, so it keeps resolving the old value; use a version-less secret URI and restart the app to pick up the current version",
+      "Key Vault references are resolved only at Web App creation time, so the app must be recreated for any secret change to take effect",
+      "The app's managed identity lost its role assignment when the secret was rotated, so the reference now silently resolves to the previous cached value",
+      "App Service caches resolved Key Vault references for 24 hours by design, so the team must wait out the cache before the new key is used"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A `SecretUri` that includes a version identifier is an explicit pin to that immutable version, and rotation creates a new version that the pinned reference will never see. Omitting the version makes the reference track the current version, and restarting the app forces a fresh resolution.",
+      "References are resolved when the app starts and are periodically refreshed thereafter, not frozen at resource creation — otherwise no secret could ever be rotated without rebuilding the app. This overstates a real caching behaviour into an absolute.",
+      "Rotating a secret creates a new version within the same vault; it does not alter role assignments on the identity. And a permission failure would surface as an unresolved, empty setting rather than a stale-but-valid credential.",
+      "There is a refresh interval for resolved references, which is why a restart is the reliable way to force re-resolution, but no fixed 24-hour cache would explain this. The reference is pinned to a version, so waiting any length of time changes nothing."
+    ],
+    "principle": "version-less secret references are what make rotation actually take effect",
+    "relatedConcept": "Key Vault references in App Service can pin a version or track the latest, and rotation strategy depends on which form the setting uses.",
+    "overallExplanation": "A versioned `SecretUri` pins the old value forever. Use a version-less secret URI so rotation is picked up, and restart the app to force immediate re-resolution."
+  },
+  {
+    "id": 116,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "multi",
+    "question": "A partner integrator must pull exactly one repository, `partner/scoring-api`, from your Premium registry, with read-only access, an expiry date, and credentials that can be revoked without affecting your own pipelines. Which two registry features together deliver this? (Choose two.)",
+    "options": [
+      "Create a scope map that grants only `content/read` on the `partner/scoring-api` repository",
+      "Create a registry token bound to that scope map, with generated passwords carrying an expiration date",
+      "Share the registry admin account credentials with the partner and rotate the password after the engagement",
+      "Grant the partner's Entra tenant the AcrPush role on the registry so their pipeline can synchronise the repository"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A scope map is the permission definition: it enumerates repositories and the actions allowed on each, so granting only `content/read` on a single repository expresses read-only, single-repository access precisely rather than registry-wide.",
+      "Correct. A token is the identity bound to that scope map, and its generated passwords can be given an expiry and be regenerated or the token disabled independently. Revoking it affects only the partner, leaving your own pipelines' credentials untouched.",
+      "The admin account is a single registry-wide credential with full push and pull rights, so sharing it grants far more than one repository and cannot be revoked without breaking everything else that uses it. It is the anti-pattern this feature pair exists to replace.",
+      "AcrPush grants write access, which contradicts the read-only requirement, and cross-tenant role assignment is a much heavier mechanism than the scenario needs. Least privilege here means read on one repository, not push on the registry."
+    ],
+    "principle": "scope the permission, then bind a revocable identity to it",
+    "relatedConcept": "ACR tokens and scope maps provide repository-scoped, expirable credentials for consumers who cannot authenticate with an Entra identity.",
+    "overallExplanation": "Define a scope map with `content/read` on the single repository and issue a token bound to it with expiring passwords. That is repository-scoped, revocable, read-only access."
+  },
+  {
+    "id": 117,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "A containerized App Service app downloads 3 GB of model weights on every start, adding minutes to each scale-out and restart. The team wants the weights fetched once and shared by all instances of the app, without rebuilding the 300 MB application image into a multi-gigabyte one. What is the appropriate approach?",
+    "options": [
+      "Mount an Azure Files share into the container as a path with `az webapp config storage-account add` and load the weights from the mount",
+      "Write the weights to `/tmp` on first start and have subsequent instances read them from there, since the plan's workers share that path",
+      "Copy the weights into the image with a `COPY` layer so the pull benefits from registry layer caching on every worker",
+      "Store the weights as an App Service app setting so the platform injects them into the container at start-up"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Bring-your-own-storage mounts an Azure Files share into the container at a chosen path, giving every instance the same durable copy of large assets. The image stays small and unchanged while the weights are fetched once and shared across scale-out.",
+      "`/tmp` is the container's own writable layer and is discarded when the container is replaced; it is not shared between instances. Each new instance would find an empty directory and download the weights again, which is exactly the current behaviour.",
+      "Baking the weights in does remove the runtime download, and layer reuse helps on a worker that already holds the layer, but it inflates every pull on a cold worker to multiple gigabytes and forces a full rebuild and redeploy whenever the weights change. It trades one slow path for another.",
+      "App settings are environment variables intended for short configuration values, and they are size-limited and entirely unsuitable for binary model artefacts. This confuses configuration injection with data distribution."
+    ],
+    "principle": "large shared assets belong in mounted storage, not in the image or ephemeral disk",
+    "relatedConcept": "App Service containers have an ephemeral per-instance filesystem, so durable or shared data must come from a mounted Azure Files share.",
+    "overallExplanation": "Mount an Azure Files share into the container and read the weights from it. The image stays small, the download happens once, and every instance sees the same durable copy."
+  },
+  {
+    "id": 118,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container application hosting",
+    "type": "single",
+    "question": "Your governance model requires that the image running in production is bit-for-bit the artefact that passed testing in the development registry, and that production never rebuilds from source. Both registries are in the same subscription and the pipeline agent has no Docker daemon available. How should the release promote the image?",
+    "options": [
+      "Run `az acr import --name prodacr --source devacr.azurecr.io/scoring:2026.04.1 --image scoring:2026.04.1` to copy the artefact between registries",
+      "Run `az acr build` against the production registry using the same commit so the tag is reproduced identically",
+      "Use `docker pull` from the development registry followed by `docker tag` and `docker push` to the production registry",
+      "Enable geo-replication between the development and production registries so the tested tag appears in production automatically"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. `az acr import` copies an image directly between registries server-side, preserving the manifest and digest, and it needs no Docker daemon on the agent. The production registry ends up holding exactly the artefact that was tested, which is what the governance rule requires.",
+      "Rebuilding produces a new image even from the same commit: base-image updates and unpinned dependencies can change the layers, so the digest differs. That is precisely the rebuild-in-production the governance model forbids.",
+      "This is the classic promotion sequence and would preserve the content, but it requires a Docker daemon on the agent, which the scenario rules out. It also pulls gigabytes down to the agent and pushes them back up for no benefit over a server-side copy.",
+      "Geo-replication replicates a single registry's content across regions; it does not synchronise two separate registries, and it certainly does not implement a promotion gate between development and production. The environments would need to be one registry for this to mean anything."
+    ],
+    "principle": "promote the tested artefact, never rebuild it for the next environment",
+    "relatedConcept": "`az acr import` performs registry-to-registry copies without a local Docker daemon, making environment promotion a metadata operation rather than a rebuild.",
+    "overallExplanation": "Use `az acr import` to copy the tested image server-side into the production registry, preserving its digest. Rebuilding from source would produce a different artefact than the one that passed testing."
+  },
+  {
+    "id": 119,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "multi",
+    "question": "A retrieval API runs on Azure Container Apps and is about to receive a reranking model change that the team wants exposed to 10 percent of live traffic for two hours before full rollout, with an instant return to the current build if latency regresses. Which two actions implement this? (Choose two.)",
+    "options": [
+      "Put the container app into multiple-revision mode so the existing and new revisions can be active at the same time",
+      "Split ingress traffic across the two revisions with weights of 90 and 10, then shift the weights once the canary is healthy",
+      "Deploy the new image to a second container app in the same environment and split traffic between them with Azure Front Door",
+      "Set `minReplicas` to zero on the new revision so it only receives traffic after the old revision saturates"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. In single-revision mode each update deactivates the previous revision, so there is nothing to split traffic with. Multiple-revision mode keeps both revisions running and addressable, which is the precondition for any canary or blue/green rollout in Container Apps.",
+      "Correct. `az containerapp ingress traffic set` assigns percentage weights per revision, so 90/10 sends a tenth of live traffic to the canary. Rollback is a single weight change back to 100 percent on the known-good revision, which is the instant reversal the team asked for.",
+      "A second app plus Front Door does produce weighted routing, but it duplicates configuration, secrets and scale rules across two resources and puts the rollback behind an edge configuration change. Container Apps already provides revision-level traffic weights natively for exactly this case.",
+      "`minReplicas` controls the lower bound of the scaler for a revision; it has no relationship to traffic distribution and does not create any overflow or failover behaviour. A revision with zero minimum replicas still receives whatever share of traffic its weight assigns."
+    ],
+    "principle": "canary on revision weights, roll back by changing the weight",
+    "relatedConcept": "Container Apps revisions are immutable snapshots of an app's configuration, and ingress traffic weights across them provide built-in blue/green and canary releases.",
+    "overallExplanation": "Enable multiple-revision mode and set ingress traffic weights of 90/10 between the current and new revisions. Rollback is then a weight change rather than a redeploy."
+  },
+  {
+    "id": 120,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "An engineer updates the value of a Container Apps secret named `servicebus-conn` after a connection string rotation, and separately changes the `LOG_LEVEL` environment variable on the same app. They observe that one change produced a new revision and the other did not, and they want to understand the rule before writing the runbook. What is the correct explanation?",
+    "options": [
+      "Environment-variable changes are revision-scope so they create a new revision, while secret values are application-scope and apply across revisions once containers restart",
+      "Both changes are revision-scope, but secret updates reuse the existing revision name so the new revision is not visible in the revision list",
+      "Both changes are application-scope; the new revision appeared because the container image digest was re-resolved during the update",
+      "Secret changes are revision-scope and environment-variable changes are application-scope, which is why the secret rotation forced the new revision"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Container Apps splits configuration into revision-scope changes — image, environment variables, resources, scale rules — which produce a new immutable revision, and application-scope changes such as secret values, ingress and Dapr settings, which apply to all revisions. A rotated secret therefore reaches running revisions once their replicas restart, without a revision bump.",
+      "Revision names are unique and revisions are immutable, so a change that created one would always show up in `az containerapp revision list`. This explanation invents hidden revisions to reconcile the observation instead of accepting the two different scopes.",
+      "If both were application-scope, changing `LOG_LEVEL` would not have created a revision at all, so the premise fails immediately. Image digests are also not silently re-resolved on an unrelated configuration update.",
+      "This is the correct rule with the two categories swapped, which is the most common way the distinction is misremembered. Getting it backwards leads to a runbook that expects a revision bump on rotation and a silent update on env-var changes — the opposite of the real behaviour."
+    ],
+    "principle": "revision-scope changes create revisions, application-scope changes apply everywhere",
+    "relatedConcept": "Understanding which Container Apps settings are revision-scope determines whether a change is a new deployable artefact or a fleet-wide configuration update.",
+    "overallExplanation": "Environment variables, image, resources and scale rules are revision-scope and create a new revision; secrets, ingress and Dapr configuration are application-scope and apply across revisions."
+  },
+  {
+    "id": 121,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A nightly batch enriches documents by reading from the Service Bus queue `enrich-jobs`, which is empty for about twenty hours a day and then receives roughly 40,000 messages. The container app currently runs one replica around the clock and drains the backlog over six hours. The team wants no compute cost when the queue is empty and a much faster drain. Which configuration is correct?",
+    "options": [
+      "A KEDA `azure-servicebus` scale rule on `enrich-jobs` with a `messageCount` target, `minReplicas` 0 and `maxReplicas` 30",
+      "An HTTP scale rule with `concurrentRequests` set to 1, `minReplicas` 0 and `maxReplicas` 30, since the worker is triggered by messages arriving over HTTP",
+      "A CPU-utilisation scale rule at 70 percent with `minReplicas` 0 and `maxReplicas` 30 so replicas appear when the worker becomes busy",
+      "A KEDA `azure-servicebus` scale rule with `minReplicas` 1 and `maxReplicas` 30, because Container Apps cannot poll a queue with no running replica"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The `azure-servicebus` scaler polls queue depth outside the replicas, so it can activate the app from zero when messages arrive and add replicas in proportion to backlog against the `messageCount` target. `minReplicas` 0 removes idle cost and a `maxReplicas` bound keeps the fan-out from becoming unbounded.",
+      "HTTP scaling reacts to inbound requests through the app's ingress, and a queue consumer receives no HTTP traffic at all. With no requests arriving, the app would sit at zero replicas forever and the backlog would never be processed.",
+      "CPU-based scaling is a lagging signal that cannot activate an app from zero: with no replica running there is no CPU metric to observe, so the first message never wakes anything up. Queue depth is the leading indicator that matches the workload.",
+      "A permanently running replica is exactly the idle cost the team wants to eliminate, and the stated justification is wrong: KEDA's scaler runs in the Container Apps infrastructure, not inside the replica, which is what makes scale-to-zero possible for queue workloads."
+    ],
+    "principle": "scale on the backlog signal, and let the queue scaler wake the app from zero",
+    "relatedConcept": "KEDA scalers in Container Apps observe an external system such as a Service Bus queue, enabling activation from zero replicas and proportional scale-out on backlog.",
+    "overallExplanation": "Use a KEDA `azure-servicebus` scale rule with a message-count target, `minReplicas` 0 for zero idle cost, and a sensible `maxReplicas` ceiling to bound the fan-out."
+  },
+  {
+    "id": 122,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "After applying an updated Deployment manifest to AKS, four of ten pods stay `Pending`. `kubectl describe pod` shows the event `0/3 nodes are available: 3 Insufficient cpu`. The manifest requests `cpu: \"2\"` per pod and the node pool uses three Standard_D4s_v5 nodes. What is the correct interpretation and fix?",
+    "options": [
+      "The scheduler cannot place pods whose CPU requests exceed remaining allocatable capacity; add nodes or the cluster autoscaler, or lower the requests to match real usage",
+      "The pods are failing their readiness probes, so the scheduler is holding them in Pending until the probe succeeds",
+      "The image cannot be pulled from ACR, and Pending is how AKS reports a registry authorization failure before the pull is attempted",
+      "The Deployment's `maxSurge` is too high, so the rollout is deliberately holding the extra pods back until older pods terminate"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. `Insufficient cpu` is a scheduling verdict based on requests, not on actual utilisation: the sum of requested CPU across placed pods leaves less than 2 cores allocatable on every node. Either grow capacity — more nodes, larger SKUs, or the cluster autoscaler — or right-size the requests to what the workload really consumes.",
+      "Readiness probes only run once a pod is scheduled and its containers are starting; a failing probe produces a Running pod that is not Ready, never a Pending one. The described event also comes from the scheduler, not the kubelet.",
+      "An authorization failure against the registry surfaces as `ImagePullBackOff` or `ErrImagePull` on a scheduled pod, with an event naming the registry. Pending with an `Insufficient cpu` message is emitted before any node is selected, so no pull has been attempted.",
+      "`maxSurge` does allow extra pods above the desired count during a rollout, and those surge pods still need somewhere to run. It controls rollout pacing rather than admission, and it never produces an `Insufficient cpu` scheduling event."
+    ],
+    "principle": "kubernetes schedules on requests, not on observed utilisation",
+    "relatedConcept": "Resource requests in AKS manifests are the currency of scheduling, so oversized requests silently cap how many replicas a node pool can hold.",
+    "overallExplanation": "`Insufficient cpu` means requested CPU exceeds allocatable capacity. Add capacity or right-size the requests — probes and image pulls play no part in a Pending scheduling decision."
+  },
+  {
+    "id": 123,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "multi",
+    "question": "An AKS-hosted embedding service loads a model for roughly 150 seconds before it can serve. Pods enter `CrashLoopBackOff` shortly after start, and `kubectl describe pod` shows `Liveness probe failed: connection refused` followed by container restarts. The current manifest defines only a liveness probe with `initialDelaySeconds: 10` and `periodSeconds: 10`. Which two manifest changes fix this correctly? (Choose two.)",
+    "options": [
+      "Add a `startupProbe` whose `failureThreshold` multiplied by `periodSeconds` comfortably exceeds the 150-second warm-up",
+      "Add a `readinessProbe` so the Service only sends traffic once the model has finished loading and the pod reports ready",
+      "Remove the liveness probe entirely, since a container that has crashed will be restarted by the kubelet in any case",
+      "Raise the liveness probe's `timeoutSeconds` to 150 so a single probe attempt waits out the model load"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A startup probe exists precisely to protect slow-starting containers: while it is running, liveness and readiness checks are suspended, and only when it succeeds do they take over. Sizing `failureThreshold × periodSeconds` above the real warm-up gives the model time to load without the kubelet declaring the container dead.",
+      "Correct. Liveness answers \"should this container be restarted\" while readiness answers \"should this pod receive traffic\", and the second question is unanswered in the current manifest. Without a readiness probe the Service would route requests to a pod that is still loading, producing connection errors for real users.",
+      "Removing liveness leaves the deployment with no way to recover a hung-but-running process, which is the failure mode liveness exists to catch — a wedged worker that still holds its socket open is not a crash the kubelet would notice. The probe is not wrong here; its timing is.",
+      "`timeoutSeconds` bounds how long one probe attempt waits for a response, not how long the container may take to become responsive. With the connection actively refused, the attempt fails immediately regardless of the timeout, and restarts continue."
+    ],
+    "principle": "probes must reflect real warm-up time, not optimistic defaults",
+    "relatedConcept": "Startup, readiness and liveness probes answer three different questions, and slow model warm-up is the case that makes the distinction operationally visible.",
+    "overallExplanation": "Add a startup probe sized above the true warm-up so liveness is suspended during loading, and add a readiness probe so traffic arrives only when the model is ready."
+  },
+  {
+    "id": 124,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A summarization worker on AKS was scaled from 6 to 40 pods to clear a backlog. Throughput did not improve; instead the Azure OpenAI deployment it calls began returning HTTP 429 with `Retry-After` headers on most requests, and end-to-end latency tripled. CPU on the pods is under 15 percent. What is the correct diagnosis and action?",
+    "options": [
+      "The downstream deployment's token-per-minute quota is the binding constraint, so reduce concurrency, honour `Retry-After` with backoff, and raise or spread the quota",
+      "The pods are under-resourced, so raise their CPU limits and scale to 60 pods to push more requests through the retry window",
+      "The AKS node pool's outbound SNAT ports are exhausted, so add a NAT gateway and keep the replica count at 40",
+      "The horizontal pod autoscaler is misconfigured on CPU, so switch it to memory-based scaling to keep the replica count growing with load"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. HTTP 429 with `Retry-After` is the downstream service saying its rate or token quota is exhausted; adding callers only increases the rejected share and the retry amplification. The fix is on the demand and capacity side: bounded concurrency, exponential backoff that respects `Retry-After`, and more quota or additional deployments to spread the load.",
+      "This is the same lever that already failed, applied harder. Low CPU utilisation proves the pods are not compute-bound, so more CPU and more replicas simply generate more requests for the quota to reject.",
+      "SNAT exhaustion is a real AKS egress failure mode worth knowing, but it manifests as connection timeouts and failed TCP handshakes, not as application-layer 429 responses carrying `Retry-After`. The service is clearly reachable and is deliberately refusing work.",
+      "Changing the autoscaler metric only changes what drives replica count, and the replica count is precisely what is hurting. It also misreads the symptom, since neither CPU nor memory is saturated on the pods."
+    ],
+    "principle": "scaling pods cannot fix a throttled downstream dependency",
+    "relatedConcept": "In AI workloads the binding constraint is usually a quota on a downstream model endpoint, which makes concurrency control more valuable than replica count.",
+    "overallExplanation": "429 with `Retry-After` means the downstream quota is the bottleneck. Bound concurrency, back off properly, and increase or spread quota — more replicas only amplify the rejections."
+  },
+  {
+    "id": 125,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A platform team must host six related services: three HTTP APIs, two Service Bus queue workers that should scale to zero overnight, and a scheduled batch job. They need service-to-service calls inside a private network, per-service revisions and canary releases, and they have no Kubernetes operators, custom resource definitions or GPU node pools in their requirements. Which platform should they choose?",
+    "options": [
+      "Azure Container Apps, using one environment for all services with KEDA scale rules and revision-based canaries",
+      "Azure Kubernetes Service, because six interdependent services on one virtual network require a Kubernetes control plane",
+      "Six separate App Service plans, one per service, connected by virtual network integration",
+      "Azure Container Registry Tasks scheduled with timer triggers to execute each service on a cadence"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Everything on the list — private service-to-service networking inside a shared environment, KEDA-driven scale to zero for queue workers, revisions with traffic weights, and event-driven or scheduled jobs — is native to Container Apps, and none of it requires managing a cluster. With no CRD, operator or GPU-scheduling requirement, the extra control of AKS buys nothing.",
+      "Multiple services on a private network is not on its own a reason to adopt Kubernetes; Container Apps environments already provide that boundary. Choosing AKS here imports node pool lifecycle, upgrades and ingress operations that the team has no requirement to justify.",
+      "One plan per service multiplies cost and management, App Service has no native scale-to-zero for queue-driven workers, and the scheduled job has no natural home. It stretches a single-app platform across a multi-service topology it was not designed for.",
+      "ACR Tasks builds container images; a timer-triggered task is a build pipeline, not a hosting platform. None of the HTTP APIs would have an endpoint, and the queue workers would have no scaler."
+    ],
+    "principle": "adopt kubernetes for requirements only kubernetes satisfies",
+    "relatedConcept": "Container Apps covers the common microservice shape — HTTP, queue workers and jobs with scale to zero — while AKS is warranted by cluster-level extensibility needs.",
+    "overallExplanation": "Container Apps in a single environment covers private service-to-service calls, KEDA scale to zero, revisions and jobs. AKS is warranted only when cluster-level control such as operators, CRDs or custom scheduling is genuinely required."
+  },
+  {
+    "id": 126,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A newly applied AKS Deployment leaves every pod in `ImagePullBackOff`. `kubectl describe pod` shows `Failed to pull image \"ttnacr.azurecr.io/router:2026.05.2\": 401 Unauthorized`. The image and tag exist in the registry, and a developer can pull it after `az acr login`. What is the appropriate fix?",
+    "options": [
+      "Attach the registry to the cluster with `az aks update --attach-acr ttnacr` so the cluster's identity is granted AcrPull",
+      "Recreate the pods with `kubectl rollout restart deployment/router`, since the nodes cached a stale authentication token",
+      "Add the registry hostname to the cluster's DNS configuration so nodes can resolve `ttnacr.azurecr.io`",
+      "Rebuild and push the image with `az acr build` so the manifest is re-signed for the cluster's node pool"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A 401 on pull means the node's kubelet has no credential for the registry: the developer's success only proves their own identity works. `az aks update --attach-acr` grants the cluster's kubelet identity the AcrPull role, after which pulls authenticate without any imagePullSecret in the manifest; `az aks check-acr` confirms the path end to end.",
+      "Restarting the rollout recreates pods that will attempt the same unauthenticated pull and fail identically. It is a reasonable reflex for transient issues, but a missing role assignment is not transient — nothing about a restart creates a credential.",
+      "A DNS failure would surface as a resolution or connection error naming the host, not as an HTTP 401 from the registry. The 401 proves the node reached the registry and was refused on authentication grounds.",
+      "Rebuilding produces a new image but changes nothing about who is allowed to pull it, and image manifests are not signed per node pool. The same 401 would follow the new tag."
+    ],
+    "principle": "read the failure code — 401 is authorization, not availability",
+    "relatedConcept": "AKS pulls images with the cluster's kubelet identity, so registry access is an RBAC configuration on the cluster rather than a developer credential.",
+    "overallExplanation": "A 401 on image pull means the cluster identity lacks AcrPull. Attach the registry with `az aks update --attach-acr` and verify with `az aks check-acr`."
+  },
+  {
+    "id": 127,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A Container App exposes external ingress on port 80 and its Gunicorn process listens on 5000 inside the container. Requests to the app's FQDN return 502 Bad Gateway, while `az containerapp logs show` proves the application started and is answering its own internal health endpoint. What is the most likely cause?",
+    "options": [
+      "The ingress `targetPort` does not match the port the container listens on, so the ingress proxy cannot reach the application",
+      "The revision is inactive because the app is in single-revision mode, so ingress has no backend to route to",
+      "The container app has `minReplicas` set to zero, and cold starts always return 502 until the first replica is ready",
+      "Ingress is set to internal, so external DNS resolves the FQDN but the environment refuses the public request"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Container Apps ingress accepts traffic on 80/443 externally and forwards it to `targetPort` inside the container, so a `targetPort` left at the default while the app listens on 5000 leaves the proxy connecting to a closed port. That connection failure is reported to the caller as a 502, exactly as observed.",
+      "In single-revision mode the latest revision is the active one, so an app that is running and logging plainly has an active revision. If truly no revision were active the failure would present as an unavailable app rather than a proxy-level gateway error.",
+      "Scale-to-zero introduces cold-start latency and the ingress holds the request while a replica activates rather than returning 502 immediately. It also cannot explain a persistent failure when the logs show a replica already running and healthy.",
+      "Internal ingress produces an FQDN that only resolves and answers inside the environment's network, so an outside caller typically fails to connect or resolve rather than receiving a 502 from the proxy. The 502 indicates the proxy accepted the request and failed to reach the backend."
+    ],
+    "principle": "ingress must point at the port the process actually binds",
+    "relatedConcept": "Container Apps ingress terminates public traffic and forwards to targetPort, so port configuration is the first thing to check on a 502.",
+    "overallExplanation": "Set the ingress `targetPort` to 5000 to match Gunicorn's listening port. A 502 with healthy application logs is the signature of the ingress proxy failing to reach the container port."
+  },
+  {
+    "id": 128,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A chat completion endpoint on Container Apps holds each request open for six to nine seconds while streaming tokens. Under load, replicas sit at 20 percent CPU yet p95 latency climbs sharply and clients see queuing. The team wants scaling that reflects how this workload actually saturates. Which scale rule is most appropriate?",
+    "options": [
+      "An HTTP scale rule with a modest `concurrentRequests` target, so replicas are added as in-flight requests per replica rise",
+      "A CPU scale rule targeting 60 percent utilisation, because CPU is the canonical signal for HTTP services",
+      "A memory scale rule targeting 75 percent, since streaming responses accumulate buffers in memory",
+      "A KEDA `azure-servicebus` scale rule keyed to a queue the API writes each request to before responding"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The workload is latency-bound rather than compute-bound: each replica is mostly waiting on an upstream model, so concurrent in-flight requests — not CPU — is what saturates it. The Container Apps HTTP scaler adds replicas when concurrent requests per replica exceed the target, which matches the real saturation signal.",
+      "CPU is the reflexive choice and works well for compute-heavy services, but here it stays near 20 percent while the app is clearly overloaded. A metric that does not move under saturation cannot trigger scaling in time.",
+      "Memory scaling responds to a resource that is not the constraint; streaming a token buffer consumes very little, so the threshold would never be crossed. It would leave the app under-scaled for the same reason as CPU.",
+      "Inserting a queue in front of a synchronous streaming endpoint changes the architecture rather than the scaling policy, and it would add latency to an interaction whose whole value is immediacy. Queue-depth scaling belongs to genuinely asynchronous workers."
+    ],
+    "principle": "scale on the metric that actually saturates the replica",
+    "relatedConcept": "Long-lived, I/O-bound AI requests saturate on concurrency rather than CPU, which is why Container Apps offers an HTTP concurrency scaler alongside resource-based rules.",
+    "overallExplanation": "Use an HTTP `concurrentRequests` scale rule. Streaming endpoints are latency-bound, so concurrency per replica — not CPU or memory — is the signal that reflects saturation."
+  },
+  {
+    "id": 129,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "An AKS pod restarted twice overnight and the on-call engineer needs the Python traceback the process printed just before it died. Running `kubectl logs pod/scorer-7d9` returns only the current container's fresh startup lines, and the incident review requires evidence that survives pod deletion. Which combination should the engineer use?",
+    "options": [
+      "`kubectl logs pod/scorer-7d9 --previous` for the terminated container, plus Container Insights so `ContainerLogV2` retains the output in Log Analytics",
+      "`kubectl describe pod scorer-7d9` alone, since container stdout is included in the pod description alongside the events",
+      "`kubectl exec -it pod/scorer-7d9 -- cat /var/log/app.log`, because the kubelet writes each container's stdout into the pod filesystem",
+      "`az containerapp logs show --follow` against the cluster, which streams historical container output from the AKS control plane"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. `--previous` retrieves the log of the container instance that terminated, which is the only way to see the traceback that preceded the restart, and it is still lost once the pod object goes away. Container Insights ships stdout and stderr into the `ContainerLogV2` table in Log Analytics, giving the durable, queryable evidence the review needs.",
+      "`kubectl describe` returns the pod's spec, status and recent events, which is invaluable for scheduling and probe failures but never includes container stdout. It would show that a restart happened without revealing why.",
+      "Container stdout is captured by the container runtime, not written to a file inside the container unless the application does so itself, and anything on the container filesystem is destroyed on restart anyway. `kubectl exec` also requires a running container, which is not where the evidence lives.",
+      "`az containerapp logs` targets Azure Container Apps resources and has no relationship with an AKS cluster. Using it here confuses two different container platforms' tooling."
+    ],
+    "principle": "capture logs centrally, because pod-local evidence dies with the pod",
+    "relatedConcept": "Troubleshooting AKS layers ephemeral kubectl inspection over durable log collection in Log Analytics via Container Insights.",
+    "overallExplanation": "Use `kubectl logs --previous` for the terminated container and rely on Container Insights writing to `ContainerLogV2` for evidence that outlives the pod."
+  },
+  {
+    "id": 130,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A customer-facing assistant on Container Apps has `minReplicas: 0` and `maxReplicas: 20`. During quiet periods the first request after idleness takes 35 seconds because a replica must be activated and load its model, and the product owner requires a sub-two-second first response at all times. What is the correct change?",
+    "options": [
+      "Set `minReplicas` to at least 1 so a warmed replica is always resident and serves the first request immediately",
+      "Raise `maxReplicas` above 20 so more replicas are available to absorb the first request when it arrives",
+      "Move the model load out of container start-up into the first request handler so the replica activates faster",
+      "Switch the ingress from external to internal so requests bypass the cold-start activation path in the ingress proxy"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Scale to zero trades idle cost for cold-start latency, and a strict interactive latency target is the case where that trade stops paying. A minimum of one always-warm replica removes both activation and model loading from the user's first request, which is the only way to hold a two-second budget after idleness.",
+      "`maxReplicas` sets the upper bound of scale-out and does nothing when the current replica count is zero, because a higher ceiling has no warm capacity to draw on. It addresses throughput under sustained load, not first-request latency after an idle period.",
+      "Deferring the load does let the replica report started sooner, but it simply moves the same 35-second wait into a user's request instead of removing it. Model loading belongs in start-up behind a readiness probe so traffic only arrives at a replica that can answer quickly.",
+      "Ingress visibility determines who can reach the app, not whether a replica must be activated first. An internal caller hitting a scaled-to-zero app waits through exactly the same activation and warm-up sequence."
+    ],
+    "principle": "scale to zero is a cost choice that buys cold starts",
+    "relatedConcept": "minReplicas decides whether an interactive Container App ever pays activation and warm-up latency on a user-facing request.",
+    "overallExplanation": "Keep at least one warm replica. Scale to zero saves money precisely by permitting the cold start that the product owner's latency requirement has ruled out."
+  },
+  {
+    "id": 131,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "Every `kubectl apply` of a new image tag for an AKS-hosted API produces a two-minute window of 502s at the ingress, even though the replicas eventually stabilise. The Deployment sets `strategy.rollingUpdate.maxUnavailable: 50%` and defines no readiness probe. What manifest change removes the errors?",
+    "options": [
+      "Add a readiness probe and lower `maxUnavailable` toward 0 with a small `maxSurge`, so old pods are removed only as new pods report ready",
+      "Change the strategy to `Recreate` so all old pods terminate before new ones start, giving a clean cutover",
+      "Increase `terminationGracePeriodSeconds` so old pods stay alive longer while the new pods finish starting",
+      "Add a liveness probe so the kubelet restarts any new pod that is not yet serving traffic correctly"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Without a readiness probe, a pod is considered ready as soon as its containers start, so the Service adds it to the endpoints list before the application can serve — and `maxUnavailable: 50%` simultaneously removes half the healthy capacity. A readiness probe plus a conservative `maxUnavailable` and a small `maxSurge` makes the rollout add ready capacity before it takes any away.",
+      "`Recreate` guarantees downtime by design, since every old pod is terminated before a replacement starts. It would turn an intermittent two-minute error window into a deterministic outage on every deploy.",
+      "The grace period governs how long a terminating pod may finish in-flight work after it is removed from endpoints. It helps avoid cutting off active connections, but it does not stop unready new pods from being sent traffic.",
+      "Liveness restarts containers that have become unhealthy; applied to a pod that is merely still starting, it causes restart loops rather than protecting traffic. The missing signal here is readiness, which governs endpoint membership."
+    ],
+    "principle": "readiness gates traffic, and rollouts must add ready capacity before removing any",
+    "relatedConcept": "Rolling-update parameters and readiness probes work together in AKS manifests to make deployments invisible to callers.",
+    "overallExplanation": "Add a readiness probe and tighten `maxUnavailable` with a modest `maxSurge`. Rollout errors come from routing traffic to pods that are not ready while healthy capacity is withdrawn."
+  },
+  {
+    "id": 132,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A re-embedding workload drains the `reindex` Service Bus queue. Each message takes about eight minutes, work arrives in unpredictable bursts a few times a week, and the container must exit when the batch is done rather than stay resident. The team is already using a Container Apps environment. What is the right construct?",
+    "options": [
+      "An event-driven Azure Container Apps job with a Service Bus scale rule, which starts job executions when messages arrive and ends them on completion",
+      "A container app with `minReplicas` 0 and an HTTP scale rule, invoked by a Logic App that calls its endpoint when a message arrives",
+      "A manual Container Apps job that an operator triggers with `az containerapp job start` whenever the queue is observed to be non-empty",
+      "A container app with a CPU scale rule and an eight-minute liveness probe timeout to keep the long-running container alive"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Container Apps jobs model run-to-completion work: an event-driven job uses a KEDA scale rule such as `azure-servicebus` to start executions when the queue has messages, runs each execution to completion, and stops. That matches bursty batch processing far better than a long-lived app that must be kept alive.",
+      "This bolts an external trigger onto a service designed to stay running, adds a Logic App to maintain, and leaves the work inside a request that must survive eight minutes. The platform already exposes the queue trigger natively through jobs.",
+      "Manual jobs are the right construct for operator-initiated runs such as a one-off migration, but here the trigger is a queue that fills unpredictably. Requiring a human to notice the backlog defeats the purpose of event-driven processing.",
+      "This keeps a service resident to do batch work and papers over the mismatch with probe tuning; a liveness timeout also does not extend how long a unit of work may run. The requirement explicitly says the container should exit when the batch completes."
+    ],
+    "principle": "run-to-completion work belongs in a job, not a long-lived service",
+    "relatedConcept": "Container Apps jobs support manual, scheduled and event-driven trigger types, letting batch work reuse the same environment as long-running apps.",
+    "overallExplanation": "Use an event-driven Container Apps job with a Service Bus scale rule. Jobs start on the event, run to completion and exit, which is exactly the lifecycle bursty batch work needs."
+  },
+  {
+    "id": 133,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "After Cosmos DB was moved behind a private endpoint, AKS pods fail with a connection timeout to `ttncosmos.documents.azure.com`. From a debug pod, `nslookup ttncosmos.documents.azure.com` returns a public IP address, while the same lookup from a virtual machine in the same virtual network returns 10.4.2.7. What should you investigate first?",
+    "options": [
+      "Whether the cluster's DNS resolution path reaches the private DNS zone linked to the virtual network, since the pod is resolving the public record",
+      "Whether the Cosmos DB firewall is missing the AKS node pool's public egress IP address, which is why the connection times out",
+      "Whether the pods lack a Kubernetes NetworkPolicy permitting egress on port 443 to the Cosmos DB endpoint",
+      "Whether the container image bundles an outdated Cosmos DB SDK that cannot use private endpoint connections"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The two lookups are the whole diagnosis: a virtual-machine client resolves the private record from the linked private DNS zone, while the pod resolves the public one, so the pod's resolution path is not consulting that zone. Until DNS returns 10.4.2.7 the traffic will never enter the private endpoint, regardless of any other configuration.",
+      "Adding the egress IP to the account firewall would be the fix if public access were the intended path, but the whole point of the private endpoint is to stop using it. It also would not change the fact that the pod resolves a public address rather than the private one.",
+      "A NetworkPolicy denying egress is a genuine cause of timeouts in AKS and worth ruling out, but it would block traffic to any address equally and would not alter DNS answers. The differing lookup results point to resolution, not filtering.",
+      "Private endpoints are transparent at the network layer, so no SDK version awareness is required — the client simply connects to whatever address DNS returns. This misattributes an infrastructure resolution problem to application code."
+    ],
+    "principle": "private endpoints only work when dns resolves to the private address",
+    "relatedConcept": "End-to-end connectivity troubleshooting on AKS starts with name resolution, because private link failures usually surface first as a public DNS answer.",
+    "overallExplanation": "The pod resolves the public record while the virtual machine resolves 10.4.2.7, so fix the cluster's path to the linked private DNS zone. Private endpoints depend entirely on private DNS resolution."
+  },
+  {
+    "id": 134,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "multi",
+    "question": "A Container Apps worker with a Service Bus scale rule and no `maxReplicas` bound expanded to hundreds of replicas after a 500,000-message backlog was loaded. The downstream PostgreSQL flexible server hit its connection limit and the whole pipeline stalled. Which two changes make the scaling safe? (Choose two.)",
+    "options": [
+      "Set an explicit `maxReplicas` bound derived from what the downstream database can sustain",
+      "Raise the scale rule's message-count target so each replica processes more messages before another replica is added",
+      "Set `minReplicas` to 1 so the app never scales to zero and the backlog is consumed more evenly",
+      "Remove the Service Bus scale rule and scale the worker on CPU instead, since CPU reflects database pressure"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A replica ceiling is what converts an unbounded scaler into a governed one, and the right ceiling comes from the weakest downstream dependency — here the database's connection capacity. Without it, KEDA faithfully translates backlog into as many consumers as the platform allows.",
+      "Correct. The message-count target sets how much backlog each replica is expected to absorb, so a larger target produces fewer replicas for the same queue depth. Tuning it alongside a ceiling shapes both the slope and the limit of scale-out.",
+      "A minimum of one replica addresses cold starts and idle behaviour at the bottom of the range; the failure here happened at the top. It has no effect on how far the app scales out under a large backlog.",
+      "CPU is a poor proxy for database saturation — replicas blocked waiting on connections often show low CPU — and abandoning queue-depth scaling loses the ability to activate from zero. The scaler is not the problem; its missing bounds are."
+    ],
+    "principle": "bound autoscaling by the weakest downstream dependency",
+    "relatedConcept": "KEDA scale rules translate backlog into replicas, so min/max bounds and the target metric are the controls that keep that translation safe.",
+    "overallExplanation": "Set a `maxReplicas` ceiling sized to the database's capacity and raise the message-count target so scale-out is less aggressive. Unbounded queue-depth scaling simply relocates the bottleneck downstream."
+  },
+  {
+    "id": 135,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "A Container App must read an Azure OpenAI key as the environment variable `AZURE_OPENAI_KEY`, and the security team requires that the key lives only in Key Vault, is never visible in the app's configuration output, and is picked up on rotation without a redeploy. What should you configure?",
+    "options": [
+      "A Key Vault-backed container app secret resolved with a user-assigned managed identity, referenced from the environment variable with `secretref`",
+      "A plain container app secret holding a copy of the key, referenced from the environment variable with `secretref`",
+      "An environment variable set directly to the key value, protected by restricting management-plane RBAC on the container app",
+      "An init container that calls the Key Vault REST API at start-up and writes the key into a shared volume for the main container to read"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Container Apps can define a secret whose value comes from a Key Vault secret URL, resolved using a managed identity assigned to the app, and the environment variable then references that secret by name with `secretref`. The material stays in the vault, the app configuration shows only the reference, and rotation is picked up without a code or image change.",
+      "A plain secret does keep the value out of the environment-variable listing and out of the image, which is why it is tempting, but it stores a copy of the key in the container app resource. Rotation then requires updating that copy, which the requirement explicitly rules out.",
+      "Putting the key straight into an environment variable exposes it to anyone who can read the app definition and to any diagnostic export of the configuration. Management-plane RBAC narrows who can look, but the secret is still stored in cleartext in the resource.",
+      "This hand-builds what the platform already provides, adding a bespoke component to maintain, a volume that now holds plaintext key material, and a failure mode at every start-up. Key Vault-backed secrets deliver the same outcome declaratively."
+    ],
+    "principle": "reference secrets from the vault instead of copying them into the workload",
+    "relatedConcept": "Container Apps secrets can be literal values or Key Vault references resolved by managed identity, and only the latter keeps rotation outside the deployment cycle.",
+    "overallExplanation": "Use a Key Vault-backed container app secret resolved by a managed identity and reference it with `secretref`. The key never leaves the vault and rotation needs no redeploy."
+  },
+  {
+    "id": 136,
+    "domain": "Develop containerized solutions on Azure",
+    "objective": "Implement container-orchestrated solutions",
+    "type": "single",
+    "question": "An AKS-hosted Python service authenticates to Azure OpenAI and Key Vault using a client secret stored in a Kubernetes Secret and mounted as an environment variable. Security wants no long-lived credential in the cluster, while the code should keep using `DefaultAzureCredential`. What should you implement?",
+    "options": [
+      "Microsoft Entra Workload ID: federate a user-assigned managed identity with the cluster's OIDC issuer and annotate the pod's service account with the client ID",
+      "Move the client secret into Key Vault and have an init container fetch it at start-up using a bootstrap client secret held in the cluster",
+      "Enable a system-assigned managed identity on the AKS cluster, which automatically makes every pod authenticate as that identity",
+      "Rotate the Kubernetes Secret nightly with a CronJob so the stored client secret is never valid for more than 24 hours"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Workload ID exchanges the projected service-account token issued by the cluster's OIDC issuer for an Entra token via a federated credential, so no secret is ever stored in the cluster. Annotating the service account with the identity's client ID and labelling the pod is all `DefaultAzureCredential` needs to pick the workload identity path.",
+      "This is a bootstrapping circle: protecting a secret with another secret that also lives in the cluster leaves a long-lived credential exactly where security asked for none. It also adds an init container and a start-up failure mode for no security gain.",
+      "The cluster's system-assigned identity is used by the control plane for Azure resource operations such as pulling images and managing load balancers; it is not projected into application pods. Assuming pods inherit it leads to confusing authorization failures at runtime.",
+      "Frequent rotation shrinks the exposure window and is better than a static secret, but a valid credential still sits in the cluster at all times, which is precisely what the requirement forbids. It also adds a rotation job whose failure quietly breaks authentication."
+    ],
+    "principle": "federate identity instead of storing credentials in the cluster",
+    "relatedConcept": "Microsoft Entra Workload ID gives AKS pods token-based access to Azure services through the cluster's OIDC issuer, removing stored secrets from manifests.",
+    "overallExplanation": "Implement Microsoft Entra Workload ID with a federated user-assigned managed identity and an annotated service account. `DefaultAzureCredential` then obtains tokens with no secret stored in the cluster."
+  }
+]

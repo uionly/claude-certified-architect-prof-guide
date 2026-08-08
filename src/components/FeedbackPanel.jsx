@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Tag from './Tag.jsx'
-import { slugify } from '../data/loader.js'
+import { hasStudy, slugify } from '../data/loader.js'
 import { useCertData } from '../lib/cert.js'
 import { isCorrectSelection } from '../lib/quiz.js'
 
@@ -40,7 +40,8 @@ export default function FeedbackPanel({ question, selected }) {
   const correctSet = new Set(question.correct)
   const wrongPicks = selected.filter((i) => !correctSet.has(i))
   const domainId = domainIdForQuestion(question)
-  const studyLink = `/${cert.code}/study/${domainId}#${slugify(question.objective)}`
+  // Practice-only certs have no study guide, so the objective stays a plain label.
+  const studyLink = hasStudy(cert) ? `/${cert.code}/study/${domainId}#${slugify(question.objective)}` : null
 
   return (
     <div className="rounded-lg border border-stone-300 bg-white p-4 shadow-sm sm:p-5">
@@ -79,10 +80,10 @@ export default function FeedbackPanel({ question, selected }) {
           {question.relatedConcept}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <Tag kind="objective" to={studyLink}>
+          <Tag kind="objective" to={studyLink ?? undefined}>
             {question.objective}
           </Tag>
-          <span className="text-xs text-stone-500">← read the study section for this objective</span>
+          {studyLink && <span className="text-xs text-stone-500">← read the study section for this objective</span>}
         </div>
       </div>
 

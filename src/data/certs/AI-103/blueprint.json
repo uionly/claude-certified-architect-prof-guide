@@ -1,0 +1,81 @@
+{
+  "cert": {
+    "name": "Azure AI Apps and Agents Developer Associate",
+    "code": "AI-103",
+    "vendor": "Microsoft",
+    "level": "Associate",
+    "audience": "Azure AI engineers who build, manage and deploy agents and AI solutions on Microsoft Foundry, using Python.",
+    "examQuestions": null,
+    "questionsPerSet": 50,
+    "examTimeMinutes": 120,
+    "examMinutesPerQuestion": 2.4,
+    "passingScore": "700 / 1000 (scaled)",
+    "format": "Proctored via Pearson VUE · multiple choice & multiple response · may include interactive components",
+    "examFee": null,
+    "validityMonths": 12,
+    "registrationUrl": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-apps-and-agents-developer-associate/",
+    "practiceSets": 3,
+    "content": { "study": false, "revision": false }
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Plan and manage an Azure AI solution",
+      "weight": 28,
+      "questionCount": 14,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Choose the appropriate Foundry services for generative AI and agents", "questions": 4 },
+        { "objective": "Set up AI solutions in Foundry", "questions": 4 },
+        { "objective": "Manage, monitor, and secure AI systems", "questions": 3 },
+        { "objective": "Implement responsible AI across generative AI and agentic systems", "questions": 3 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement generative AI and agentic solutions",
+      "weight": 32,
+      "questionCount": 16,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Build generative applications by using Foundry", "questions": 6 },
+        { "objective": "Build agents by using Foundry", "questions": 6 },
+        { "objective": "Optimize and operationalize generative AI systems", "questions": 4 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Implement computer vision solutions",
+      "weight": 14,
+      "questionCount": 7,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Design and implement image- and video-generation solutions", "questions": 3 },
+        { "objective": "Design and implement multimodal understanding workflows", "questions": 3 },
+        { "objective": "Implement responsible AI for multimodal content", "questions": 1 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Implement text analysis solutions",
+      "weight": 14,
+      "questionCount": 7,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Apply language model text analysis", "questions": 4 },
+        { "objective": "Implement speech solutions", "questions": 3 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Implement information extraction solutions",
+      "weight": 12,
+      "questionCount": 6,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "Build retrieval and grounding pipelines", "questions": 3 },
+        { "objective": "Extract content from documents", "questions": 3 }
+      ]
+    }
+  ]
+}

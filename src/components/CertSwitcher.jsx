@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { certRegistry } from '../data/loader.js'
+import { byVendor } from '../lib/vendors.js'
 
 // When no cert is active (the landing page), the select shows a neutral
 // placeholder instead of implying a certification has already been chosen.
@@ -19,10 +20,14 @@ export default function CertSwitcher({ activeCertCode }) {
       aria-label={hasActive ? 'Switch certification' : 'Choose a certification'}
     >
       {!hasActive && <option value="">Choose a certification…</option>}
-      {certRegistry.map((c) => (
-        <option key={c.code} value={c.code}>
-          {c.code} — {c.name}
-        </option>
+      {byVendor(certRegistry).map((group) => (
+        <optgroup key={group.vendor} label={group.label}>
+          {group.certs.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.code} — {c.name}
+            </option>
+          ))}
+        </optgroup>
       ))}
     </select>
   )

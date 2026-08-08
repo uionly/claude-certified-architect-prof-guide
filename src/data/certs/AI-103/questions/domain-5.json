@@ -1,0 +1,456 @@
+[
+  {
+    "id": 501,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "A spare-parts marketplace grounds its agent on an Azure AI Search index of product descriptions. Natural queries such as 'quiet dishwasher for a small kitchen' work well, but when a technician pastes an exact part number like WPW10195416 the correct item is often missing from the top 50, because the number was embedded along with the surrounding description text. Both query styles must work through one endpoint. What should the team configure?",
+    "options": [
+      "Hybrid retrieval that runs a keyword query and a vector query and fuses the two result sets with reciprocal rank fusion",
+      "A larger k and a lower vector similarity threshold so more candidates are returned for every query",
+      "A second vector field containing an embedding of the part number on its own, queried alongside the description vector",
+      "A regular expression that detects part-number-shaped queries and routes them to a separate keyword-only index"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Exact identifiers are a lexical matching problem and paraphrased needs are a semantic one, and hybrid search runs both scorers over the same index and fuses their rankings. The part number matches as a rare token in the keyword leg while the descriptive query still benefits from the vector leg, all from a single endpoint.",
+      "Widening k and loosening the threshold returns more of the same semantically similar items. Embeddings place a rare alphanumeric string near other alphanumeric strings rather than near its specific product, so recall for exact identifiers does not improve materially while cost and noise both rise.",
+      "Vectors are the wrong representation for exact tokens no matter how they are isolated: embedding WPW10195416 by itself still yields a dense vector whose nearest neighbours are other part numbers. Exactness needs a lexical index, not a dedicated embedding.",
+      "Regex routing can work for cleanly separated query types but breaks on mixed queries such as 'is WPW10195416 quiet enough for a flat', maintains two indexes and two relevance behaviours, and needs a new pattern every time a supplier's numbering scheme changes."
+    ],
+    "principle": "exact identifiers need lexical matching, meaning needs vectors, so use both",
+    "relatedConcept": "Hybrid search fuses BM25 keyword scoring with vector similarity in one query, which is why it is the default recommendation whenever users mix precise identifiers with natural language.",
+    "overallExplanation": "Configure hybrid search so keyword and vector legs run together and fuse with reciprocal rank fusion. Exact part numbers match lexically while descriptive queries match semantically, without splitting the index or routing by regex."
+  },
+  {
+    "id": 502,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "A policy assistant's chunks are built by prefixing each passage with a line reading 'Region: EMEA | Effective: 2025-04-01 | Status: superseded' before embedding the whole string. Users report two problems: restricting answers to current EMEA policies is unreliable because superseded documents still surface, and semantic matches have become noticeably weaker since the prefix was added. What should change?",
+    "options": [
+      "Keep the metadata out of the embedded text, store it as filterable fields on each chunk, and apply an exact filter alongside the vector query",
+      "Repeat the metadata line three times at the top of each chunk so it carries more weight in the embedding",
+      "Append the constraint to the user's query text, so the query embedding also carries 'only EMEA current policies'",
+      "Retrieve without any constraint and drop non-matching documents in application code after the results come back"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Metadata that must match exactly belongs in filterable fields where a filter is applied as a hard predicate, not in the embedded text where it becomes a soft similarity signal. Removing it from the chunk also restores semantic precision, because the vector once again represents the passage's meaning rather than a boilerplate header.",
+      "Repeating the metadata makes the dilution worse: a larger share of the embedding now encodes the header, so passages about different topics with the same region and status look alike. It also still cannot guarantee exclusion of superseded documents.",
+      "Adding the constraint to the query keeps it in the semantic domain, where 'current' and 'superseded' are merely similar words. Vector similarity has no notion of exclusion, so superseded documents continue to rank.",
+      "Post-filtering breaks top-k retrieval: the search returns its best matches first, so if superseded EMEA documents dominate the top results, the correct current ones were never retrieved and cannot be recovered downstream. Filters must be pushed into the query."
+    ],
+    "principle": "filter exact metadata, embed only meaning",
+    "relatedConcept": "An index schema separates vectorized content fields from filterable and facetable metadata fields, and filters are evaluated as part of the query rather than after it.",
+    "overallExplanation": "Store region, effective date and status as filterable fields and apply an exact filter with the vector query, keeping metadata out of the embedded text. Embedding metadata dilutes semantics, and post-filtering cannot recover documents that never made top-k."
+  },
+  {
+    "id": 503,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "Diagnostics on a grounding pipeline show that the passage containing the answer is present in the top 50 results for 94% of evaluation questions, but its median rank is around 20 while the agent is only given the top 5 passages. The latency budget can absorb roughly another 100 milliseconds per query. What is the right change?",
+    "options": [
+      "Enable the semantic ranker so the top candidate set is re-scored by a ranking model, and take the top 5 from the re-ranked list",
+      "Increase the number of passages handed to the agent from 5 to 50 so the answer is always included",
+      "Re-embed the corpus with a higher-dimension embedding model to improve retrieval quality",
+      "Reduce the chunk size so more chunks fit inside the top 5 results"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The measurements say recall is fine and ordering is the defect, which is exactly what semantic reranking fixes: a ranking model scores query and passage together over the retrieved candidates, promoting the genuinely relevant passage into the top few. The 100-millisecond budget is the right order of magnitude for that extra stage.",
+      "Passing 50 passages inflates token cost per question, dilutes the prompt with 45 irrelevant passages, and exposes the model to the well-known degradation on material buried in the middle of a long context. It works around bad ordering by making the ordering irrelevant and the answer harder to find.",
+      "A different embedding model changes recall, which is already at 94% and is not the problem. It also means re-embedding the entire corpus and re-tuning the index for a metric that does not need improving.",
+      "Smaller chunks change what a result contains, not how results are ordered. It can even hurt, since a smaller chunk carries less context for both the ranker and the answering model."
+    ],
+    "principle": "fix ordering with reranking, not by stuffing more context",
+    "relatedConcept": "Retrieval quality decomposes into recall, which retrieval configuration governs, and precision at small k, which semantic reranking over the candidate set governs.",
+    "overallExplanation": "Recall is adequate and ranking is the problem, so enable the semantic ranker to re-score candidates and take the top 5 from the re-ranked list. Passing 50 passages instead trades cost and prompt dilution for the same information."
+  },
+  {
+    "id": 504,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "multi",
+    "question": "A RAG assistant over 40-page policy PDFs answers most questions correctly, but two complaints keep recurring: citations name only the whole document so reviewers cannot find the passage, and answers sometimes stop halfway through a procedure whose steps span a chunk boundary. Which two index-design changes address these? (Choose two.)",
+    "options": [
+      "Chunk with an overlap window so a procedure crossing a boundary appears complete in at least one chunk",
+      "Store the parent document id, title and page number as retrievable fields on every chunk so answers can cite a precise location",
+      "Index one vector per whole document instead of one per chunk so no procedure can ever be split",
+      "Raise the chunk size to roughly 8,000 tokens so almost nothing is split in the first place"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Overlapping windows are the standard remedy for boundary truncation: each chunk repeats the tail of its predecessor, so a multi-step procedure that straddles a split still appears whole in one of the chunks and can be retrieved intact.",
+      "Correct. Precise citation is an index schema decision — the chunk must carry the identity of where it came from. Keeping parent document id, title and page as retrievable fields lets the answer point reviewers at a page rather than a 40-page PDF.",
+      "One vector per document averages 40 pages of meaning into a single point, which destroys retrieval precision and then forces the whole document into the prompt. It removes boundary problems by removing the granularity that makes retrieval useful.",
+      "Very large chunks dilute embeddings so that a specific question matches poorly, and they still have boundaries — just fewer of them. They also consume far more prompt space per retrieved result while making citation coarser, not finer."
+    ],
+    "principle": "chunks need overlap for continuity and provenance fields for citation",
+    "relatedConcept": "RAG ingestion design is mostly chunking and schema: overlap protects continuity across boundaries, and per-chunk provenance fields make grounded answers verifiable.",
+    "overallExplanation": "Add overlap between chunks so procedures spanning a boundary survive intact, and carry parent document id, title and page on every chunk for precise citation. Document-level vectors and huge chunks both trade retrieval precision away."
+  },
+  {
+    "id": 505,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "During indexing, every contract chunk must be assigned a risk band by an internal scoring service that runs inside the company's private network and has no equivalent among the indexer's built-in capabilities. The rest of the enrichment — text splitting, OCR and key phrase extraction — is entirely standard and already works. What should the team add?",
+    "options": [
+      "A custom Web API skill in the skillset that calls the internal scoring service during enrichment, leaving the built-in skills in place for everything else",
+      "A separate post-indexing batch job that reads indexed documents, scores them and writes the risk band back",
+      "A fully custom ingestion program that replaces the indexer so all enrichment logic lives in one codebase",
+      "A query-time filter expression that computes the risk band from the document's text when a search is issued"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A custom Web API skill is exactly the extension point for enrichment logic the platform does not provide: it participates in the same skillset as the built-in skills, receives the document under enrichment, and writes its output into the index alongside everything else. Nothing already working has to be rebuilt.",
+      "A second pipeline creates a window in which documents are searchable without a risk band, needs its own scheduling, failure handling and back-pressure, and can drift out of sync with the indexer. It solves the same problem with two systems where one would do.",
+      "Replacing the indexer throws away working OCR, splitting and key phrase enrichment plus change detection and scheduling, all to accommodate one custom step. That is a large amount of new operational surface for a capability the skillset already supports.",
+      "Filter expressions evaluate stored field values; they cannot call a service or compute a classification from document text at query time. This attempts to move enrichment into the query path, where it does not belong."
+    ],
+    "principle": "extend the skillset with a custom skill rather than building a parallel pipeline",
+    "relatedConcept": "Enrichment pipelines mix built-in skills for OCR, splitting, language and entity work with custom Web API skills that call your own services inside the same indexer run.",
+    "overallExplanation": "Add a custom Web API skill to the existing skillset so the internal scoring service runs as part of enrichment. Post-indexing jobs and wholesale custom ingestion both duplicate machinery the indexer already provides."
+  },
+  {
+    "id": 506,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "An archive of 60,000 PDFs is indexed for a grounding pipeline. Text-native PDFs behave perfectly, but roughly a third of the archive consists of scanned image-only PDFs whose indexed documents have populated metadata and completely empty content, so they never match any query. What must be added to the ingestion flow?",
+    "options": [
+      "OCR in the skillset, with its output merged back together with any native text, so image-only pages produce searchable content",
+      "A higher indexer document size limit, since the scanned files are much larger than the text-native ones",
+      "A conversion step that renders the scanned PDFs to PNG images and indexes the images instead",
+      "A query-time step where a multimodal model reads the scanned page and answers from it directly"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. An image-only PDF contains no extractable text layer, so the content field is legitimately empty until OCR produces one. Adding OCR to the skillset and merging its output with any native text gives every page a searchable representation, which is the standard RAG ingestion pattern for mixed archives.",
+      "Size limits produce indexer warnings about truncated or skipped documents, not documents with populated metadata and empty content. The symptom points at a missing text extraction step rather than a quota.",
+      "Rendering to PNG changes the container without creating text, so the index still has nothing to match on. It reinforces the misconception that the problem is file format rather than the absence of a text layer.",
+      "A query-time reader can only be applied to a document the retriever surfaced, and these documents can never be surfaced because they have no indexed content. The gap is in ingestion, and no query-side capability closes it."
+    ],
+    "principle": "scanned pages are not searchable until OCR gives them text",
+    "relatedConcept": "RAG ingestion over mixed archives applies OCR during enrichment and merges the recognized text with any native text so every page has a retrievable representation.",
+    "overallExplanation": "Add OCR to the enrichment skillset and merge its output with native text so image-only PDFs gain searchable content. Empty content with populated metadata is the signature of a missing text-extraction step, not a size limit."
+  },
+  {
+    "id": 507,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "A support knowledge base must also cover 900 recorded training videos and 4,000 architecture diagrams. The team uploaded the media files into the same data source as the documents, the indexer reports success, and no query ever returns a video or a diagram. Answers must also be able to link a user to the relevant moment in a video. How should ingestion handle this content?",
+    "options": [
+      "Transcribe the audio into timestamped text and generate textual descriptions for the diagrams during ingestion, indexing that text with pointers back to the media and the timestamps",
+      "Store the media files in the index as base64-encoded fields so their content travels with the document",
+      "Embed the raw video and image bytes with the same text embedding model used for the documents",
+      "Index only the file names, folder paths and metadata of the media so at least the assets are discoverable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Search retrieves over text and vectors derived from content, so multimodal ingestion means converting each modality into a retrievable representation: transcripts with timestamps for audio and video, generated descriptions for images. Keeping the media pointer and timestamp on each chunk is what makes deep links to a moment possible.",
+      "Base64 payloads are opaque bytes to the analyzer and the embedding model, so they bloat the index without contributing a single searchable token. The indexer succeeds precisely because it stored a string it cannot interpret.",
+      "A text embedding model has no ability to encode raw video or image bytes; it would either fail or embed a meaningless byte string. Cross-modal representation requires a modality-appropriate model or a text description, not a text encoder pointed at binaries.",
+      "File names and paths make assets listable but not answerable: no grounding is possible and the timestamp requirement is entirely unmet. It is the minimum viable index rather than a solution to the stated problem."
+    ],
+    "principle": "index a textual representation of media, not the media itself",
+    "relatedConcept": "Ingesting documents, images, audio and video means normalizing every modality into text and vectors, retaining pointers and timestamps so answers can link back to the source moment.",
+    "overallExplanation": "Convert media to retrievable text during ingestion: timestamped transcripts for audio and video, generated descriptions for diagrams, each carrying a pointer back to the asset. Raw bytes in an index contribute nothing searchable."
+  },
+  {
+    "id": 508,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "single",
+    "question": "An HR agent must answer policy questions. The prototype runs one broad search at session start and loads the 60 highest-scoring chunks into the system prompt for the whole conversation. Answers are slow and expensive, they miss topics the opening search did not anticipate, and they go stale for hours after HR publishes a policy change. How should the retrieval pipeline be connected?",
+    "options": [
+      "Expose the search index to the agent as a retrieval tool so it queries at run time with the user's actual question and returns cited passages",
+      "Keep the preloading approach but refresh the assembled system prompt on a nightly schedule",
+      "Fine-tune the model on the policy corpus so the knowledge is available without retrieval",
+      "Move to a larger context window and load the entire policy handbook into every conversation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Wiring the index in as an agent tool makes retrieval demand-driven: the query is the user's real question rather than a guess made at session start, only relevant passages enter the context, and each answer carries citations. Because the index is read at run time, a policy published minutes ago is visible as soon as it is indexed.",
+      "Nightly refreshes shrink the staleness window but keep the fundamental defect: the retrieval query is still made before anyone has asked anything, so questions outside the preloaded topics remain unanswerable and the token cost per conversation is unchanged.",
+      "Fine-tuning bakes a snapshot into weights, so it is stale the moment policy changes and offers no citations for an HR answer that an employee may need to verify. It also cannot be corrected without another training run.",
+      "Loading the whole handbook maximizes cost and latency on every turn and buries the relevant clause among thousands of irrelevant ones, which measurably degrades answer quality. It also does nothing about freshness."
+    ],
+    "principle": "let the agent retrieve at run time instead of preloading a guess",
+    "relatedConcept": "Connecting a retrieval pipeline to an agent means registering the index as a tool the agent calls with the live question, returning scoped, cited passages rather than pre-stuffed context.",
+    "overallExplanation": "Register the search index as an agent retrieval tool so the agent queries with the user's real question and returns cited passages. Preloading, fine-tuning and whole-corpus context all fix the query before the question exists."
+  },
+  {
+    "id": 509,
+    "domain": "Implement information extraction solutions",
+    "objective": "Build retrieval and grounding pipelines",
+    "type": "multi",
+    "question": "A grounded intranet assistant has two live incidents. Employees are receiving answers citing documents from restricted HR sites they cannot open, and edits made in SharePoint take up to a week to appear in answers even though the business expects same-day freshness. Which two changes address these incidents? (Choose two.)",
+    "options": [
+      "Index each document's access-control identifiers into a filterable field and apply a security-trimming filter built from the caller's group memberships at query time",
+      "Run the indexer on a schedule with change and deletion detection so additions, edits and removals propagate within the freshness target",
+      "Instruct the agent in its system prompt to refuse to cite any document the user is not entitled to see",
+      "Drop and rebuild the entire index from scratch every night so both problems are resolved by a clean slate"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Security trimming is the standard pattern: store the permitted principal identifiers on each document and apply a filter derived from the authenticated caller's groups so unauthorized documents are never retrieved. Because the filter runs inside the query, restricted content cannot reach the model at all.",
+      "Correct. Scheduled indexer runs with change detection are how a source-of-truth system stays reflected in the index, and deletion detection matters just as much — without it, a retracted policy keeps being cited long after it was removed.",
+      "A prompt instruction is not an authorization boundary. The restricted content has already been retrieved into the model's context, so it can leak through paraphrase, and a compliant refusal still means the data crossed a boundary it should never have crossed.",
+      "Nightly full rebuilds are expensive at corpus scale, leave a rebuild window with degraded or absent results, and still do not enforce permissions — every restricted document is faithfully re-indexed. It also misses same-day freshness by design."
+    ],
+    "principle": "enforce permissions in the query filter and freshness in the indexer schedule",
+    "relatedConcept": "Operating a retrieval pipeline means keeping the index healthy on both axes: incremental change and deletion detection for freshness, and identity-based filters for authorization.",
+    "overallExplanation": "Apply security trimming with indexed access-control identifiers filtered by the caller's groups, and run the indexer on a schedule with change and deletion detection. Prompt-level refusals are not an authorization boundary."
+  },
+  {
+    "id": 510,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "Accounts payable ingests 20,000 supplier invoices a month from about 400 suppliers, each with its own layout. The current pipeline runs plain OCR and applies regular expressions for the total and invoice date; line items are never captured, and the regular expressions break whenever a supplier changes its template. Audit requires field-level confidence. What should the pipeline use?",
+    "options": [
+      "The prebuilt invoice model, which returns typed invoice fields including line items across varied layouts with per-field confidence and no per-supplier configuration",
+      "A custom extraction model trained per supplier layout, giving each of the 400 suppliers its own model",
+      "The existing regular expressions, extended with per-supplier override patterns maintained by the AP team",
+      "Plain OCR text passed to a language model with a prompt asking for the invoice fields as JSON"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Invoices are a solved document class: the prebuilt model already understands the semantics of totals, dates, tax and line-item tables across heterogeneous layouts, and it returns typed fields with confidence scores. That covers the line-item gap and the audit requirement without any per-supplier work.",
+      "Four hundred models means 400 training sets, 400 deployments and a re-training project every time a supplier redesigns its invoice. Custom models are for document types no prebuilt model covers, which is not the case for invoices.",
+      "Per-supplier overrides institutionalize the very fragility being reported, growing without bound and failing silently when a layout shifts. Regular expressions also cannot reconstruct a line-item table or produce confidence scores.",
+      "This is the most plausible alternative and often works, but plain OCR text has already lost the table structure that line items depend on, and a language model returns no field-level confidence or bounding regions for the audit trail."
+    ],
+    "principle": "use a prebuilt model when the document class is already a solved one",
+    "relatedConcept": "Multimodal document extraction combines OCR, layout understanding and field extraction, and prebuilt models package all three for common business documents such as invoices and receipts.",
+    "overallExplanation": "Use the prebuilt invoice model: it handles varied layouts, returns line items as structured fields, and supplies per-field confidence for audit. Regex overrides and per-supplier custom models both scale badly for a document class already covered."
+  },
+  {
+    "id": 511,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "Two-column regulatory PDFs come out of the current extraction step as sentences interleaved from both columns, and every table collapses into one long run of numbers with no row or column boundaries. Downstream chunking then produces passages that read as nonsense, and the grounded answers built on them are incoherent. What should the extraction step use?",
+    "options": [
+      "Layout analysis, which returns reading order along with table structure including cell row and column spans, and section headings",
+      "A post-processing step that sorts the recognized words by their vertical coordinate to restore reading order",
+      "A higher OCR resolution setting so the characters are recognized more accurately",
+      "A language model prompted to repair the scrambled text into a sensible order"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Reading order and table structure are layout problems, not character-recognition problems. Layout analysis returns the document's logical structure — column-aware reading order, tables as cells with spans, and heading hierarchy — which is what downstream chunking needs to produce coherent passages.",
+      "Sorting by vertical position is exactly what produces column interleaving, because a line in the left column and a line in the right column share a y coordinate. It is the naive heuristic that layout analysis exists to replace.",
+      "The characters are being recognized correctly; they are merely assembled in the wrong order and stripped of table structure. Raising resolution improves a metric that is not failing.",
+      "A model can sometimes guess a plausible order, but it is reconstructing information that was discarded rather than reading it, and it will silently invent table alignments. Recovering structure downstream is strictly worse than extracting it in the first place."
+    ],
+    "principle": "reading order and tables are layout output, not better OCR",
+    "relatedConcept": "Document extraction separates OCR, which recognizes characters, from layout analysis, which recovers reading order, tables, headings and other structural elements.",
+    "overallExplanation": "Use layout analysis to obtain column-aware reading order, table cells with row and column spans, and headings. Coordinate sorting causes the interleaving, and higher OCR resolution addresses a problem that is not occurring."
+  },
+  {
+    "id": 512,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "A freight company processes its own proprietary dock receipt form, which no prebuilt model covers. It needs 14 specific fields including a flag for whether the driver signature block is filled and a table of container numbers with seal numbers. The company has 250 historical examples and staff who can label them. What should be built?",
+    "options": [
+      "A custom extraction model with a declared field schema for the 14 fields, trained from labelled samples of the historical forms",
+      "The general document model with the 14 field names supplied in the prompt so it knows what to look for",
+      "The prebuilt invoice model, mapping its closest output fields onto the 14 dock receipt fields",
+      "Fourteen separate single-field extraction models so each field can be tuned and deployed independently"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A proprietary form with a stable layout, a fixed field list including a table and a presence flag, plus labelled examples available, is the textbook custom extraction case. One schema and one trained model cover all 14 fields, and the schema doubles as the contract for downstream systems.",
+      "The general document model returns text, layout and key-value pairs, not a company's declared field schema, so mapping its output onto 14 named fields becomes brittle application logic — especially for a signature-presence flag and a nested container table.",
+      "Invoice fields do not correspond to dock receipt semantics: container and seal numbers are not line items and a signature flag has no invoice analogue. Forcing an unrelated prebuilt schema onto the form yields values that are wrong in ways nobody can predict.",
+      "Fourteen models means fourteen labelling exercises, deployments and inference calls per document, with no shared understanding of the form's layout. Field extraction benefits from seeing the whole document once, in one schema."
+    ],
+    "principle": "proprietary forms need a declared field schema you train",
+    "relatedConcept": "Field extraction spans prebuilt models for common document classes and custom models or analyzers with declared schemas for organization-specific forms.",
+    "overallExplanation": "Build one custom extraction model with a declared schema for the 14 fields, trained on labelled historical dock receipts. Prebuilt invoice schemas do not map onto the form, and per-field models multiply cost and labelling with no shared layout understanding."
+  },
+  {
+    "id": 513,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "multi",
+    "question": "An agent must answer from 8,000 technical manuals. Feeding it raw OCR text loses headings and flattens specification tables, so answers omit table values, and reviewers cannot check an answer because nothing tells them which page it came from. Which two Content Understanding output choices most directly fix this? (Choose two.)",
+    "options": [
+      "Produce markdown output so headings, lists and tables survive and chunking can follow the document's own structure",
+      "Retain page numbers and bounding regions alongside the extracted content so each retrieved passage can cite its exact location",
+      "Emit one JSON object per manual whose single text property holds the entire document as one string",
+      "Drop tables from the extracted output so the prose that surrounds them retrieves more cleanly"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Markdown preserves the structural signal that raw OCR text destroys: heading levels give chunking natural boundaries, and pipe tables keep specification values associated with their row and column labels so the agent can read a value correctly.",
+      "Correct. Verifiability is a grounding requirement, and it is satisfied by carrying provenance through extraction: page numbers and bounding regions attached to the content let each cited passage point a reviewer at the exact place on the exact page.",
+      "One giant string per manual is the raw-text problem with extra packaging. It forces size-based chunking with no structural awareness and still carries no page-level provenance.",
+      "Discarding tables removes precisely the specification values users are asking about. Optimizing the retrieval of surrounding prose by deleting the data is the opposite of what a technical manual assistant needs."
+    ],
+    "principle": "grounded representations keep structure and keep provenance",
+    "relatedConcept": "Content Understanding produces clean grounded representations for agents and RAG, with markdown preserving document structure and retained page and region references supporting citation.",
+    "overallExplanation": "Choose markdown output so headings and tables survive into chunking, and retain page numbers and bounding regions so every passage can cite its location. A single flat text field or table-free output discards exactly what makes answers correct and checkable."
+  },
+  {
+    "id": 514,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "The analyzer now emits clean markdown for each manual, but the ingestion job chunks it at a fixed 1,000 characters. Specification tables are being split across two chunks so half the rows lose their header row, and headings routinely land at the end of one chunk while the section they introduce starts the next. How should chunking work?",
+    "options": [
+      "Chunk on the markdown structure — split at heading boundaries and keep whole tables intact — falling back to a size limit only inside sections that are too long",
+      "Keep fixed-size chunks but raise the overlap to 50% so any split table appears complete in one of the chunks",
+      "Convert the markdown to plain text before chunking so structural characters do not confuse the splitter",
+      "Chunk strictly one page per chunk so page boundaries and chunk boundaries always align"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The point of producing markdown is that chunking can respect the document's own structure: heading-aware splitting keeps a heading with its section, and treating a table as an atomic unit keeps every row with its header. A character limit remains as a fallback for unusually long sections rather than as the primary rule.",
+      "Fifty percent overlap inflates the index by half and only helps if a table happens to fit inside one window — a long specification table still spans multiple chunks in every offset. It buys expensive redundancy instead of structural awareness.",
+      "Flattening to plain text throws away the very structure that was just gained, returning the pipeline to the problem described in the previous step. The structural characters are the signal, not noise.",
+      "Page boundaries are a printing artefact and cut through sections and tables just as arbitrarily as a character count. A table spanning three pages is still split into three chunks."
+    ],
+    "principle": "chunk along the document's structure, not across it",
+    "relatedConcept": "Markdown output from an analyzer is valuable mainly because it makes structure-aware chunking possible, keeping headings with their sections and tables intact for downstream reasoning.",
+    "overallExplanation": "Split on markdown structure: heading boundaries define chunks, tables stay atomic, and a size limit applies only inside long sections. Overlap, plain-text conversion and page-aligned chunks all ignore the structure the analyzer just produced."
+  },
+  {
+    "id": 515,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "An accounts payable team wants straight-through processing, but auditors insist that any extracted value the system was unsure about is checked by a human before posting. Today all 20,000 monthly invoices are reviewed in full, and the review queue is three days behind. Extraction returns per-field confidence scores. How should the workflow use them?",
+    "options": [
+      "Post automatically when every critical field clears a threshold tuned per field, and route only the below-threshold fields to review with their location on the page highlighted",
+      "Review a random 10% sample of invoices and post the rest automatically, reporting the sampled error rate to auditors",
+      "Apply one global confidence threshold of 0.95 across all fields and send any invoice with a field below it for full review",
+      "Ask a language model to state how confident it is in each extracted value and review anything it describes as uncertain"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Per-field thresholds match the auditors' requirement exactly, because confidence distributions differ by field — a printed total scores differently from a handwritten reference — and business risk differs too. Routing only the uncertain fields rather than whole invoices, with the page region highlighted, is what actually clears the backlog.",
+      "Random sampling measures an error rate but does not catch the specific uncertain values auditors asked about, so 90% of low-confidence extractions post unreviewed. It answers a quality-assurance question rather than the control requirement.",
+      "A single global threshold is simultaneously too strict for fields that normally score lower and too lax for fields where a small error is costly, and escalating the whole invoice for one weak field keeps most of the current review burden.",
+      "Self-reported confidence in prose is unreliable and uncalibrated, and it discards the model's actual numeric confidence scores, which are the auditable signal already available."
+    ],
+    "principle": "gate on per-field confidence and review only what was uncertain",
+    "relatedConcept": "Field extraction returns per-field confidence, which is the control point for straight-through processing with targeted human review of low-confidence values.",
+    "overallExplanation": "Use per-field confidence thresholds to auto-post confident invoices and route only the uncertain fields to review with their page location highlighted. Random sampling misses the required control, and one global threshold ignores per-field confidence distributions."
+  },
+  {
+    "id": 516,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "Drivers photograph paper delivery notes with their phones. Printed supplier details extract reliably, but the handwritten quantity written into each line is frequently wrong, and the captured images are often skewed with a shadow across one side. Wrong quantities are causing real inventory discrepancies. What is the right extraction design?",
+    "options": [
+      "Use OCR that handles handwritten text and exposes per-word confidence, add capture-time guidance and de-skew, and route low-confidence handwritten values to review",
+      "Convert each photograph to greyscale and apply a hard threshold before extraction so the handwriting stands out",
+      "Train a custom extraction model to infer the likely quantity from the rest of the delivery note when the handwriting is unclear",
+      "Change the process so drivers type quantities into the app instead of writing them on the note"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Three separate causes need three responses: handwriting requires OCR that supports handwritten styles, capture quality requires guidance and de-skewing at the source, and residual uncertainty requires a confidence-driven review path. Per-word confidence is what makes the third step targeted rather than blanket.",
+      "Hard thresholding often destroys light pencil strokes and turns a shadowed region solid black, so it can make handwriting recognition worse. Mild preprocessing has a place, but it is not a substitute for handwriting-capable recognition.",
+      "Inferring a quantity from context is fabrication dressed up as extraction. In an inventory system a plausible invented number is more dangerous than an acknowledged low-confidence value, because nothing signals that it was guessed.",
+      "This is a legitimate process improvement and may well be the long-term answer, but it does not extract anything from the existing notes, does not help the backlog, and puts the burden on drivers rather than fixing the pipeline in scope."
+    ],
+    "principle": "handwriting needs handwriting-aware OCR plus confidence-driven review",
+    "relatedConcept": "OCR quality on real-world captures depends on both the recognizer's support for handwritten text and the capture conditions, with per-word confidence driving selective human verification.",
+    "overallExplanation": "Combine handwriting-capable OCR with per-word confidence, improve capture through guidance and de-skew, and review the low-confidence handwritten values. Aggressive thresholding can destroy strokes, and inferring quantities from context invents data."
+  },
+  {
+    "id": 517,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "multi",
+    "question": "A pharmaceutical team extracts study metadata from trial protocols: a start date, a numeric enrollment target, a study phase drawn from four permitted values, and a free-text primary objective. Downstream code currently parses strings and breaks whenever a date arrives as '12 May 2025' rather than 2025-05-12, or when the phase comes back as 'phase two'. Which two analyzer schema choices fix this? (Choose two.)",
+    "options": [
+      "Declare the start date with a date type and the enrollment target as a number so the analyzer returns normalized typed values instead of raw strings",
+      "Declare the study phase as a classification field limited to the four permitted values so the output cannot drift into other wordings",
+      "Declare all four as string fields and normalize dates, numbers and phase wording in downstream application code",
+      "Return a single generative field containing a JSON string that downstream code parses into the four values"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Typed fields shift normalization into the analyzer: a date field returns a canonical date regardless of how the protocol wrote it, and a number field returns a number rather than text that may include commas or units. Downstream code then consumes values instead of parsing prose.",
+      "Correct. A classification field with an enumerated value set makes 'phase two' and 'Phase II' resolve to the same permitted value, and makes any unexpected wording a schema-level outcome rather than a silent downstream defect.",
+      "Pushing normalization downstream is what is already failing: every new date format or phase phrasing becomes a code change and a production incident. The analyzer can express these constraints declaratively, so recreating them in code is duplicated and weaker.",
+      "A JSON string inside a generative field gives up every guarantee the schema could provide — no types, no enumerations, no per-field confidence — and reintroduces parsing as the integration point. It is structured output in appearance only."
+    ],
+    "principle": "let the schema type and constrain values so downstream code never parses",
+    "relatedConcept": "Content Understanding analyzers generate structured output whose fields carry types and, for classification fields, a permitted value set, which is what makes results safe for downstream reasoning.",
+    "overallExplanation": "Declare the date and enrollment fields with date and number types so values arrive normalized, and declare the phase as a classification field limited to the four permitted values. Normalizing in application code or wrapping everything in a generated JSON string gives up the schema's guarantees."
+  },
+  {
+    "id": 518,
+    "domain": "Implement information extraction solutions",
+    "objective": "Extract content from documents",
+    "type": "single",
+    "question": "A claims team must decide whether a submitted repair invoice is consistent with the customer's policy schedule and the adjuster's report — three separate documents — while also checking labour charges against a reference table of approved hourly rates. Single-document analyzers already extract each document accurately, but nothing reconciles them and adjusters do the comparison by hand. What should be implemented?",
+    "options": [
+      "A pro-mode analyzer given the three documents together with the approved rate table as reference material, so it reasons across the inputs and returns a grounded consistency finding",
+      "A single-document analyzer run over the three documents concatenated into one merged PDF",
+      "Three single-document analyzers whose extracted fields are compared by rules in application code",
+      "A generative model fine-tuned on past reconciled claims so it learns to spot inconsistencies"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Pro mode is the pipeline built for multi-document reasoning with reference data: all three documents plus the approved rate table are inputs, the analyzer performs the multi-step comparison, and the finding is grounded in the supplied content rather than asserted. That is exactly the reconciliation adjusters are performing manually.",
+      "Concatenation hides which document each value came from, so a finding cannot be traced back to the invoice or the schedule, and the approved rate table still has no place in the pipeline as reference material. Merging files is not the same as reasoning across them.",
+      "Extract-then-compare in code is the honest fallback and is not absurd, but every tolerance, unit variant and partial-coverage rule becomes bespoke logic that must be maintained as policies change. It also produces a boolean without an explanation an adjuster can review.",
+      "Fine-tuning teaches patterns from past cases but has no access to this claim's documents or to the current rate table, so it cannot check a specific labour rate. It also becomes stale the moment approved rates are updated."
+    ],
+    "principle": "cross-document reconciliation with reference data is a pro-mode job",
+    "relatedConcept": "Content Understanding pro mode accepts multiple related inputs plus reference material and performs multi-step reasoning to produce a grounded, explainable conclusion.",
+    "overallExplanation": "Use a pro-mode analyzer with all three documents and the approved rate table as reference material so it reasons across inputs and returns a grounded finding. Concatenation loses provenance, and rule-based comparison in code cannot keep up with changing policy."
+  }
+]

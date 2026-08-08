@@ -12,7 +12,7 @@ import RevisionDomain from './pages/RevisionDomain.jsx'
 import PracticeSetup from './pages/PracticeSetup.jsx'
 import Quiz from './pages/Quiz.jsx'
 import Results from './pages/Results.jsx'
-import { certRegistry, getCertData } from './data/loader.js'
+import { certByCode, certRegistry, getCertData, hasRevision, hasStudy } from './data/loader.js'
 import { migrateLegacyStorage } from './lib/storage.js'
 
 migrateLegacyStorage()
@@ -23,6 +23,17 @@ function defaultCert() {
   const saved = localStorage.getItem('selectedCert')
   if (saved && certRegistry.some((c) => c.code === saved)) return saved
   return certRegistry.some((c) => c.code === FALLBACK_CERT) ? FALLBACK_CERT : certRegistry[0]?.code
+}
+
+// Practice-only certs (blueprint cert.content) have no study/revision content, so those
+// routes bounce to practice. This lives on the ':certCode' child routes rather than the
+// legacy redirects below, so both a direct deep link and a legacy bookmark end up right.
+function requireContent(has) {
+  return ({ params }) => {
+    const cert = certByCode[params.certCode]
+    if (cert && !has(cert)) throw redirect(`/${params.certCode}/practice`)
+    return null
+  }
 }
 
 async function certLoader({ params }) {
@@ -48,10 +59,10 @@ const router = createBrowserRouter([
         loader: certLoader,
         children: [
           { index: true, element: <Home /> },
-          { path: 'study', element: <StudyIndex /> },
-          { path: 'study/:domainId', element: <StudyDomain /> },
-          { path: 'revision', element: <RevisionIndex /> },
-          { path: 'revision/:domainId', element: <RevisionDomain /> },
+          { path: 'study', loader: requireContent(hasStudy), element: <StudyIndex /> },
+          { path: 'study/:domainId', loader: requireContent(hasStudy), element: <StudyDomain /> },
+          { path: 'revision', loader: requireContent(hasRevision), element: <RevisionIndex /> },
+          { path: 'revision/:domainId', loader: requireContent(hasRevision), element: <RevisionDomain /> },
           { path: 'practice', element: <PracticeSetup /> },
           { path: 'quiz', element: <Quiz /> },
           { path: 'results/:attemptId', element: <Results /> },

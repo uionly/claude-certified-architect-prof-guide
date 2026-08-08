@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useCertData } from '../lib/cert.js'
-import { slugify } from '../data/loader.js'
+import { hasStudy, slugify } from '../data/loader.js'
 import { getAttempt } from '../lib/storage.js'
 import { formatClock, percent } from '../lib/quiz.js'
 import FeedbackPanel from '../components/FeedbackPanel.jsx'
@@ -59,6 +59,8 @@ export default function Results() {
   const { attemptId } = useParams()
   const { cert, domainByTitle, questionsById } = useCertData()
   const attempt = useMemo(() => getAttempt(cert.code, attemptId), [cert.code, attemptId])
+  // Practice-only certs have no study guide to link objectives back to.
+  const studyLinked = hasStudy(cert)
 
   if (!attempt) {
     return (
@@ -103,13 +105,18 @@ export default function Results() {
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">By objective</h2>
-        <p className="mt-1 text-xs text-stone-500">Each objective tag links to its study-guide section.</p>
+        {studyLinked && (
+          <p className="mt-1 text-xs text-stone-500">Each objective tag links to its study-guide section.</p>
+        )}
         <ul className="mt-3 space-y-3 rounded-lg border border-stone-200 bg-white p-4">
           {Object.entries(byObjective).map(([objective, s]) => {
             const domainId = domainByTitle[attempt.items.find((i) => i.objective === objective)?.domain]?.id
             return (
               <li key={objective}>
-                <Tag kind="objective" to={domainId ? `/${cert.code}/study/${domainId}#${slugify(objective)}` : undefined}>
+                <Tag
+                  kind="objective"
+                  to={studyLinked && domainId ? `/${cert.code}/study/${domainId}#${slugify(objective)}` : undefined}
+                >
                   {objective}
                 </Tag>
                 <Meter className="mt-1.5" correct={s.correct} attempted={s.attempted} />
@@ -133,9 +140,11 @@ export default function Results() {
         <Link to={`/${cert.code}/practice`} className="text-indigo-700 underline-offset-2 hover:underline">
           Practice again →
         </Link>
-        <Link to={`/${cert.code}/study`} className="text-indigo-700 underline-offset-2 hover:underline">
-          Back to the study guide
-        </Link>
+        {studyLinked && (
+          <Link to={`/${cert.code}/study`} className="text-indigo-700 underline-offset-2 hover:underline">
+            Back to the study guide
+          </Link>
+        )}
       </div>
     </div>
   )

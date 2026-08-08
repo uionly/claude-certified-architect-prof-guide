@@ -30,6 +30,15 @@ function examMinutes(cert) {
   return Math.round(cert.examQuestions * cert.examMinutesPerQuestion)
 }
 
+// Which content trees a cert ships. Practice-only certs declare
+// content: { study: false, revision: false } in their blueprint.
+// Written as `!== false` so a typo'd flag keeps the content visible and the
+// validator is the thing that complains — never the other way round.
+// Safe to call with either a certRegistry entry or useCertData().cert: both
+// carry the raw blueprint's `content` field.
+export const hasStudy = (cert) => cert?.content?.study !== false
+export const hasRevision = (cert) => cert?.content?.revision !== false
+
 export const certRegistry = Object.entries(blueprintModules)
   .map(([path, m]) => ({
     ...m.default.cert,

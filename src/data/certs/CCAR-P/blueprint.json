@@ -2,6 +2,7 @@
   "cert": {
     "name": "Claude Certified Architect – Professional",
     "code": "CCAR-P",
+    "vendor": "Anthropic",
     "level": "Professional",
     "audience": "Senior engineers, architects and technical leads preparing for advanced Claude work.",
     "examQuestions": 63,

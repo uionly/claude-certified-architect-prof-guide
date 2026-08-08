@@ -1,0 +1,531 @@
+[
+  {
+    "id": 401,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A claims intake service prompts a model to return an object with claim_id, incident_date, amount and parties for every inbound email. In production roughly 3% of responses arrive wrapped in a markdown code fence, and emails that never state a figure come back with the amount key missing entirely. The consumer's JSON parse throws and the message is dead-lettered. What is the durable fix?",
+    "options": [
+      "Switch the call to structured output mode with a JSON schema that declares all four keys and marks amount nullable, so responses conform to the schema rather than to prompt wording",
+      "Strip markdown fences with a regular expression before parsing and default any missing key to null in the consumer",
+      "Add an instruction to return only valid JSON with no markdown, and retry the call whenever parsing fails",
+      "Set temperature to zero so the model stops varying its output format between requests"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A JSON schema attached to the request constrains generation itself, so fences cannot appear and every declared key is present. Marking amount nullable is the important second half: the model then has a legal way to express 'not stated' instead of dropping the key, which is what caused the intermittent shape change.",
+      "Fence stripping and key defaulting are downstream repairs that leave the contract undefined, so the next unexpected shape — a wrapper object, a differently spelled key — dead-letters again. Defaulting also erases the difference between 'no amount stated' and 'model failed to extract the amount'.",
+      "Prompt instructions reduce the rate of malformed output but cannot guarantee it, which is exactly the 3% tail being observed. Blind retries also double cost on the hardest emails and can loop when the input reliably provokes the same formatting choice.",
+      "Temperature controls sampling variability, not output structure. A deterministic model can still deterministically emit a fenced block for a particular input, and it does nothing about the missing-key case, which is a schema question rather than a randomness question."
+    ],
+    "principle": "enforce output shape with a schema, not with polite instructions",
+    "relatedConcept": "Extracting structured JSON with generative prompting is only production-safe when a schema constrains decoding, including explicit nullability for fields the source may not contain.",
+    "overallExplanation": "Use structured output with a JSON schema declaring every key and marking optional fields nullable. Prompt wording, retries and temperature reduce malformed output but never eliminate it, and downstream repair hides the difference between missing and absent data."
+  },
+  {
+    "id": 402,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A bank must redact customer names, IBANs and phone numbers from four million archived chat transcripts. Auditors require the exact character offsets of every redacted span so the redaction can be replayed and verified, and the programme has a fixed per-transcript cost target. A generative prompt prototype identifies entities accurately but returns paraphrased spans that cannot be mapped back to the source text. What should the team use?",
+    "options": [
+      "The prebuilt PII detection capability in Foundry Tools, which returns typed entities with character offsets and confidence scores and can emit a redacted copy of the text",
+      "The same generative prompt, additionally instructed to return the start and end character index of each entity it finds",
+      "A fine-tuned generative model trained on a sample of already-redacted transcripts so it learns the bank's redaction style",
+      "A set of regular expressions per entity type, since IBANs, phone numbers and names all follow recognizable patterns"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Prebuilt PII detection is purpose-built for this shape of work: it emits each entity with its category, confidence and exact offsets into the original string, and can return a redacted rendering directly. That satisfies the audit requirement natively and prices predictably per character across four million documents.",
+      "Language models are notoriously unreliable at character arithmetic — they tokenize rather than index — so returned offsets drift, especially around multi-byte characters and repeated names. Auditable redaction cannot rest on indices the model estimated.",
+      "Fine-tuning teaches style and format, not verifiable span locations, and it still produces generated text rather than offsets into the source. It also adds training and lifecycle cost without addressing the auditability requirement at all.",
+      "Regular expressions handle strongly formatted values such as IBANs reasonably well, but personal names have no pattern and appear in ordinary prose, so recall collapses exactly where the privacy risk is highest. It also yields no confidence signal for review sampling."
+    ],
+    "principle": "when offsets must be auditable, use the tool that returns offsets",
+    "relatedConcept": "Foundry Tools includes prebuilt entity and PII recognizers that return typed, confidence-scored spans with source offsets — properties that generative extraction cannot guarantee.",
+    "overallExplanation": "Auditable redaction at scale calls for prebuilt PII detection, which returns typed entities with confidence scores and exact character offsets plus a redacted output. Generative extraction paraphrases and cannot be trusted to compute character indices."
+  },
+  {
+    "id": 403,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A regulator-facing team summarizes 200-page inspection reports. Because the summaries are filed as evidence, every sentence in a summary must be traceable to an identical sentence in the source report, and reviewers must be able to click a summary sentence and land on its origin. Paraphrase, however faithful, is not acceptable to the regulator. Which summarization approach fits?",
+    "options": [
+      "Extractive summarization, which returns the highest-ranked sentences verbatim from the source together with their positions",
+      "Abstractive summarization with a prompt instructing the model to quote source sentences verbatim rather than rewriting them",
+      "Abstractive summarization followed by a similarity search that maps each generated sentence to its closest source sentence",
+      "Query-focused abstractive summarization, using the reviewers' standard question list as the queries"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Extractive summarization selects and ranks sentences that already exist in the document and reports where they came from, so verbatim fidelity and click-through traceability are properties of the method rather than promises about model behaviour. That is precisely what an evidential filing requires.",
+      "An instruction to quote verbatim is unenforceable: abstractive models regularly normalize punctuation, merge clauses or drop a qualifier, and a single altered word breaks the evidential claim. There is also still no positional link back to the source.",
+      "Post-hoc similarity mapping produces an approximate and sometimes wrong alignment — a generated sentence may fuse two source sentences or match a superficially similar one elsewhere. Approximate provenance is exactly what the regulator is refusing to accept.",
+      "Query focusing changes which content is summarized, not whether the output is generated or extracted. The result is still paraphrase, so the traceability requirement is untouched."
+    ],
+    "principle": "verbatim traceability is a property of extraction, not of instructions",
+    "relatedConcept": "Foundry Tools offers both extractive summarization, which ranks and returns original sentences with offsets, and abstractive summarization, which composes new prose.",
+    "overallExplanation": "When summaries must be verbatim and clickable back to their source, use extractive summarization, which returns ranked original sentences with their positions. Abstractive output is paraphrase no matter how the prompt is worded."
+  },
+  {
+    "id": 404,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "multi",
+    "question": "A SaaS support organization wants a weekly report of the themes emerging across roughly 500,000 tickets, with volume trends per theme, and explicitly wants new themes to surface rather than being forced into last year's categories. The budget rules out sending every ticket through a large model each week. Which two steps produce a workable pipeline? (Choose two.)",
+    "options": [
+      "Extract key phrases per ticket with the prebuilt capability, embed them, and cluster the embeddings into themes, counting tickets per cluster each week",
+      "Have a language model name and describe each cluster once from a sample of its members, instead of labelling every ticket individually",
+      "Ask a model to assign every ticket to one of the twelve themes defined in last year's taxonomy so week-over-week counts stay comparable",
+      "Store each ticket's full text in a vector index and rely on nearest-neighbour search at read time to assemble the weekly report"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Cheap per-ticket enrichment plus embedding-based clustering is what makes discovery affordable at half a million documents: key phrase extraction prices per character rather than per generation, and clustering lets new themes emerge from the data instead of being imposed.",
+      "Correct. The expensive generative step is applied once per cluster rather than once per ticket, which reduces model calls by three or four orders of magnitude while still producing human-readable theme names and descriptions for the report.",
+      "Forcing tickets into a fixed year-old taxonomy directly contradicts the requirement that new themes surface, and it also puts a model call on every ticket, which is the cost the team is trying to avoid. Stable categories are being purchased with blindness to change.",
+      "A vector index answers similarity queries; it does not aggregate. Producing per-theme weekly volumes requires clustering and counting the whole corpus, and read-time nearest-neighbour lookups can only sample what someone already thought to search for."
+    ],
+    "principle": "enrich cheaply per document, reason expensively per cluster",
+    "relatedConcept": "Topic discovery combines prebuilt key phrase extraction with embedding clustering, reserving generative calls for naming and describing the small number of resulting groups.",
+    "overallExplanation": "Extract key phrases per ticket and cluster their embeddings so themes emerge and can be counted, then use a model once per cluster to name it. A fixed taxonomy blocks discovery, and vector search retrieves rather than aggregates."
+  },
+  {
+    "id": 405,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "Product management analyses 80,000 reviews. Sentences such as 'the battery is dreadful but the screen is gorgeous' come back scored as mixed at the document level, so the team can see that customers are conflicted but cannot tell which feature is driving churn. They need sentiment attached to the specific feature being discussed. What should they enable?",
+    "options": [
+      "Opinion mining, so each target such as battery or screen is returned with its own sentiment and the assessments that justify it",
+      "Sentence splitting followed by document-level sentiment analysis on each sentence in turn",
+      "Key phrase extraction, pairing every extracted phrase with the document-level sentiment label",
+      "A custom text classifier trained with labels such as battery-negative and screen-positive"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Opinion mining is aspect-based sentiment: it identifies the target being evaluated and the assessment applied to it, so 'battery/negative' and 'screen/positive' come out of one review as separate findings. That is exactly the feature-level signal the team is missing.",
+      "Sentence-level scoring helps when the contrast spans sentences, but the example holds both opinions inside one sentence, so it would still be labelled mixed. It also produces a sentiment per sentence with no link to which feature was discussed.",
+      "Pairing phrases with a document-level label misattributes sentiment wholesale: in this review both 'battery' and 'screen' would inherit the same mixed label, which is precisely the ambiguity being complained about.",
+      "Enumerating feature-sentiment combinations as classifier labels explodes combinatorially, needs labelled training data for every pairing, and must be retrained whenever a new product feature ships. Opinion mining delivers the same decomposition with no training."
+    ],
+    "principle": "feature-level insight needs aspect-based sentiment, not a document score",
+    "relatedConcept": "Sentiment analysis returns a document and sentence verdict, while opinion mining decomposes each sentence into evaluated targets and their assessments.",
+    "overallExplanation": "Enable opinion mining so each review yields targets with their own sentiment and supporting assessments. Sentence splitting and phrase-plus-document-label pairing both fail when contrasting opinions sit in a single sentence."
+  },
+  {
+    "id": 406,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "multi",
+    "question": "A gaming community platform must block sexual content involving minors and severe hate speech in posts, while still allowing the competitive trash talk its users expect and that moderators consider normal. It must also block 300 in-game terms that are innocuous in general English but function as slurs in this community. Which two configuration steps meet both needs? (Choose two.)",
+    "options": [
+      "Set severity thresholds per harm category so low-severity violence passes while hate and sexual categories block at a much lower severity",
+      "Attach a custom blocklist containing the 300 community-specific terms so they are flagged independently of the trained categories",
+      "Raise one global severity threshold across all categories until moderator complaints about false positives stop",
+      "Route every post to a language model and ask it whether the post violates the platform's code of conduct"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Content safety returns a severity per category, and the whole point of per-category thresholds is that a community's tolerance differs by harm type. Allowing mild violence while blocking hate and sexual content at low severity encodes the moderation policy the platform actually wants.",
+      "Correct. Trained categories generalize across language but cannot know that a particular in-game word is a slur in this community. A custom blocklist covers exactly that gap, matching terms deterministically and independently of the model's category scores.",
+      "A single global threshold forces one trade-off across all harms: set it high enough for trash talk and severe hate slips through, set it low enough for hate and normal banter is blocked. Tuning by complaint volume optimizes for the loudest users rather than for the policy.",
+      "Per-post generative moderation is expensive at community scale, non-deterministic between identical posts, and produces no severity or category record for appeals. It is a reasonable escalation layer for edge cases, not a replacement for classified categories plus blocklists."
+    ],
+    "principle": "tune thresholds per harm category, and cover local vocabulary with a blocklist",
+    "relatedConcept": "Safety detection returns per-category severities that applications threshold independently, with custom blocklists handling terms specific to a product or community.",
+    "overallExplanation": "Configure per-category severity thresholds so violence tolerance differs from hate and sexual content, and add a custom blocklist for the 300 community-specific slurs. One global threshold cannot express a per-harm policy."
+  },
+  {
+    "id": 407,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A hospital wants clinicians to ask a model questions about dictated notes. Compliance requires that patient identifiers never leave the note-processing boundary, but clinical detail such as diagnoses, medications and lab values must survive intact, because stripping them makes the answers clinically useless. What should the pre-processing step do?",
+    "options": [
+      "Run PII detection in its health domain configuration to redact identifiers such as names, medical record numbers and dates before the note text is sent to the model, leaving clinical entities in place",
+      "Redact every span the general PII detector flags, including all dates and all numeric values, to be safe",
+      "Send the full note but instruct the model in the system prompt to ignore and never repeat any patient identifiers it sees",
+      "Encrypt the note before sending it and have the model decrypt it in context using a key supplied in the same request"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The health domain configuration of PII detection is tuned for clinical text: it recognizes healthcare-specific identifier types such as medical record numbers while distinguishing them from clinical content, so identifiers are removed and diagnoses, medications and lab values survive. That is exactly the selective redaction the requirement describes.",
+      "Blanket redaction of every flagged span destroys the clinical signal — dosages, lab values and onset dates are numbers and dates too — so the assistant can no longer answer the questions it exists to answer. Over-redaction is a real failure mode, not a free safety margin.",
+      "An instruction is not a boundary. The identifiers have already crossed into the model call and into whatever logs and traces that call produces, so compliance is breached regardless of what the model chooses to repeat in its answer.",
+      "Models do not decrypt ciphertext, and shipping the key alongside the data would defeat the encryption anyway. This confuses transport-level protection with removing identifiers from the content itself."
+    ],
+    "principle": "redact identifiers, preserve meaning — precision matters in both directions",
+    "relatedConcept": "PII detection supports domain configurations, including a health-specific mode that recognizes clinical identifier types while leaving medical content intact.",
+    "overallExplanation": "Use PII detection in its health domain configuration to strip identifiers before the model call while preserving diagnoses, medications and lab values. Prompt instructions do not stop data from crossing the boundary, and blanket redaction destroys clinical utility."
+  },
+  {
+    "id": 408,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A commerce platform localizes two million product descriptions a month into 26 languages. Descriptions contain HTML markup that must survive translation untouched, the brand maintains a 4,000-term glossary that must be applied consistently, and the per-description latency budget is around 200 milliseconds at a tightly controlled cost. What should the localization service use?",
+    "options": [
+      "Azure Translator with the HTML text type so markup is preserved, plus a custom glossary so approved terminology translates consistently",
+      "An LLM translation flow with the 4,000-term glossary included in the system prompt on every request",
+      "Strip the HTML before translation and re-insert the tags by position in the translated string afterwards",
+      "Azure Translator followed by an LLM post-edit pass on every string to enforce glossary compliance"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is the high-volume, terminology-governed, markup-preserving case Translator is built for: declaring the content as HTML keeps tags and attributes intact while translating only the text nodes, and glossary support enforces approved terms. Per-character pricing and low latency match the two-million-a-month budget.",
+      "A 4,000-term glossary is tens of thousands of tokens resent on every one of two million calls, which blows both the cost and the 200-millisecond latency budget. It also gives no guarantee the model honours every term, so consistency remains best-effort.",
+      "Tag re-insertion by position assumes word order is preserved across languages, which is exactly what translation does not preserve. Emphasis and link markup end up wrapping the wrong words, and nested markup makes the mapping ambiguous.",
+      "Adding a generative post-edit to every string layers the LLM's cost and latency on top of Translator's for a problem the glossary already solves at source. It also introduces a second opportunity to alter markup that was previously correct."
+    ],
+    "principle": "high-volume governed translation belongs to Translator, not to a prompt",
+    "relatedConcept": "Azure Translator in Foundry Tools handles markup-aware, glossary-governed translation at scale, while LLM translation flows are chosen for adaptation, tone and reasoning about context.",
+    "overallExplanation": "Use Azure Translator with the HTML text type and a custom glossary: markup survives, terminology stays consistent, and cost and latency scale to two million strings a month. Prompt-resident glossaries and tag re-insertion both break at this scale."
+  },
+  {
+    "id": 409,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "The same brand now localizes 120 campaign taglines per launch. Machine translation output is literally accurate but flat, and the creative team needs idiomatic adaptation, an informal register for social channels, three alternative renderings per tagline, and a short note explaining the cultural connotation of each alternative so the local market lead can choose. Which approach fits?",
+    "options": [
+      "An LLM-powered translation flow with instructions covering register, audience and creative latitude, asked to return several alternatives with a rationale for each",
+      "Azure Translator with a custom model trained on the brand's previously approved campaign translations",
+      "Azure Translator, followed by a sentiment analysis pass over each output to select the version that scores as most informal",
+      "Round-trip translation through a pivot language so idiomatic phrasings surface in the intermediate output"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The deliverable is not a translation but a set of creative options with explanations, which requires reasoning about connotation, audience and register. That is generative work, and at 120 strings per launch the cost and latency arguments that favour Translator elsewhere simply do not bite.",
+      "Custom Translator adapts terminology and style to a domain corpus and is genuinely useful for consistent brand voice, but it still returns one translation per input with no alternatives and no rationale. It cannot produce the explanatory commentary the market lead needs.",
+      "Sentiment scores measure polarity, not register, so an informal tagline and a formal one about the same product score alike. Selecting among outputs by sentiment is measuring the wrong dimension entirely.",
+      "Round-tripping through a pivot language compounds errors and produces drift rather than deliberate adaptation, and any idiom that appears is an accident of the pivot rather than a choice made for the target audience."
+    ],
+    "principle": "choose LLM translation when the deliverable is judgement, not just equivalence",
+    "relatedConcept": "Translation flows split by requirement: Translator for scale, markup and governed terminology; LLM flows for transcreation, register control and explained alternatives.",
+    "overallExplanation": "Creative adaptation with register control, multiple options and cultural rationale is generative work, so use an LLM translation flow. Custom Translator gives consistent brand terminology but one unexplained output per input."
+  },
+  {
+    "id": 410,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A public-sector agency must translate 12,000 PDF and Word forms into five languages. Pagination, tables, headers and form field layout must be preserved so the translated documents remain legally usable, and the job has to run unattended overnight against documents already sitting in Blob Storage. What should the implementation use?",
+    "options": [
+      "The asynchronous document translation capability, pointed at source and target Blob Storage containers so whole documents are translated with their formatting preserved",
+      "OCR to extract text, the synchronous text translation API on each extracted string, and a rebuild step that reassembles the documents",
+      "The synchronous text translation API in a loop over each paragraph of each document, writing results back into copies of the originals",
+      "A multimodal model that reads each page as an image and emits the translated page as markdown"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Document translation is the batch, container-to-container capability designed for exactly this: it consumes native document formats, preserves layout and structure in the translated output, and runs asynchronously so a 12,000-document overnight job needs no request-level orchestration.",
+      "OCR-and-rebuild discards the document's native structure and forces the team to reconstruct pagination, tables and form fields by hand. For legally usable forms, an approximate reconstruction is the one outcome that cannot be accepted.",
+      "Paragraph-level synchronous calls give no layout preservation — text expansion in the target language reflows pages — and 12,000 documents times five languages produces millions of chained calls with no batch progress tracking or resumability.",
+      "Markdown cannot express the pagination and form layout the agency must preserve, and page-image transcription introduces reading-order and transcription errors into a legal document. It replaces a translation problem with a document-reconstruction problem."
+    ],
+    "principle": "translate documents as documents when layout is part of the deliverable",
+    "relatedConcept": "Azure Translator exposes synchronous text translation for strings and an asynchronous document translation flow that reads from and writes to Blob Storage while preserving document structure.",
+    "overallExplanation": "Use asynchronous document translation between Blob Storage containers so native formats keep their pagination, tables and form layout. String-level translation forces a lossy extract-and-rebuild that legal forms cannot tolerate."
+  },
+  {
+    "id": 411,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "An energy company must tag well identifiers, geological formation names and rig types in daily drilling reports, at several thousand reports a day, with a confidence score per tagged span so low-confidence tags can be reviewed. The prebuilt entity recognizer labels these spans as Organization or Location and misses the domain types entirely. The team has 1,800 historical reports and subject-matter experts available to label them. What should they build?",
+    "options": [
+      "A custom named entity recognition model trained on labelled examples of the three domain entity types, then deployed and called from the pipeline",
+      "A rule layer that maps prebuilt entity categories onto the three domain types based on which category each span received",
+      "A generative prompt containing definitions of the three entity types and a handful of few-shot examples",
+      "A generative model further trained on the raw unlabelled reports so it absorbs the domain vocabulary"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Custom NER exists for entity types that no prebuilt taxonomy covers, and the prerequisites are already met: labelled examples and expert labellers. A trained, deployed model returns the domain categories directly with per-entity confidence, which is what the review workflow needs, at predictable per-document cost.",
+      "Category remapping cannot invent a distinction the prebuilt model never made: formation names and rig types both land in overlapping categories, and many domain spans are not recognized as entities at all. The rules would be guessing from an already-wrong label.",
+      "Few-shot prompting is a legitimate prototype and may reach usable accuracy, but it returns no calibrated confidence per span, drifts as the model version changes, and prices per generation on several thousand documents a day. The confidence requirement is what decides against it here.",
+      "Continued training on unlabelled text can adapt vocabulary but produces no span labels, because nothing in the corpus tells the model where a formation name starts and ends. Entity recognition is a supervised task and needs labelled examples."
+    ],
+    "principle": "domain entity types that no taxonomy covers need labelled training data",
+    "relatedConcept": "Customizing text analysis for a domain runs from prompt-level few-shot extraction through to training and deploying a custom entity recognition model with its own labelled schema.",
+    "overallExplanation": "Train and deploy a custom NER model on the labelled historical reports: it returns the three domain entity types with per-span confidence at predictable cost. Prebuilt category remapping cannot recover a distinction the prebuilt model never drew."
+  },
+  {
+    "id": 412,
+    "domain": "Implement text analysis solutions",
+    "objective": "Apply language model text analysis",
+    "type": "single",
+    "question": "A bank must produce an incident summary for each operational failure with four fixed sections — root cause, customer impact, remediation, regulatory notification — and every remediation step must cite the internal policy clause that mandates it. Current free-form prompting produces well-written prose that occasionally cites clause numbers which do not exist in the policy manual. What should the team implement?",
+    "options": [
+      "Constrain the output to the four sections with a schema, ground the remediation section on retrieved policy clause text passed in the request, and run a groundedness evaluation before the summary is released",
+      "Fine-tune the model on 500 past incident summaries so it learns the bank's clause numbering conventions",
+      "Add an instruction forbidding invented clause numbers and increase the frequency and presence penalty parameters",
+      "Have a second model review each summary and delete any statement it cannot verify from its own knowledge"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Fabricated citations are a grounding failure, so the fix is to put the actual clause text in the model's context rather than relying on recall, constrain the shape so the compliance template is guaranteed, and verify with a groundedness evaluator before release. Structure, grounding and evaluation each address a different part of the requirement.",
+      "Fine-tuning teaches format and tone, not current facts. The model would become fluent at producing plausible-looking clause numbers, and every policy revision would silently invalidate what it learned — arguably making the fabrications more convincing.",
+      "Sampling penalties discourage repetition; they have no relationship to factual accuracy, and the instruction competes with the model's tendency to complete a citation pattern. Neither gives the model the clause text it would need to cite correctly.",
+      "A reviewer model without the policy manual is checking one set of recollections against another, so it can neither confirm a real clause nor reliably catch a fabricated one. Verification requires the source, which is what grounding supplies."
+    ],
+    "principle": "citations must come from retrieved text, not from model memory",
+    "relatedConcept": "Domain customization for compliance summarization combines a fixed output schema, retrieval grounding for anything cited, and groundedness evaluation as a release gate.",
+    "overallExplanation": "Fix the section shape with a schema, ground remediation on retrieved policy clause text in the request, and gate release on a groundedness evaluation. Fine-tuning and sampling penalties address style, not factual citation."
+  },
+  {
+    "id": 413,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "A voice ordering assistant must begin formulating its reply while the caller is still speaking, and the agent console must show interim words within a few hundred milliseconds so human supervisors can follow live calls. Today the app records each complete utterance to a WAV file and calls the transcription API on the finished file, adding two to four seconds. What should it do instead?",
+    "options": [
+      "Stream the audio to real-time speech recognition and consume the interim recognizing events, treating the recognized event as the final transcript",
+      "Keep whole-file transcription but cut the audio into 500-millisecond files so each call returns faster",
+      "Use batch transcription with a high concurrency setting so many utterances are transcribed in parallel",
+      "Play a short filler phrase while the file uploads so the caller perceives less delay"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Real-time recognition over a streaming connection emits partial hypotheses as audio arrives and a final result at the end of the utterance, which is precisely the interim-then-final pattern the console and the agent both need. Nothing waits for a completed file, so latency collapses to the model's streaming lag.",
+      "Half-second files chop words across boundaries, deny the recognizer the acoustic context it uses to disambiguate, and multiply per-request overhead. It approximates streaming badly while making accuracy noticeably worse.",
+      "Batch transcription is designed for large archives of stored audio and is asynchronous by nature; concurrency improves throughput across many files but does nothing for the latency of a single live conversation.",
+      "A filler phrase masks the delay without reducing it, and the supervisor console still has no interim text. It is a UX plaster over a pipeline that is structurally the wrong shape for live interaction."
+    ],
+    "principle": "live conversation needs streaming recognition with interim results",
+    "relatedConcept": "Speech to text offers real-time streaming recognition for interactive scenarios and batch transcription for stored archives, and the two differ in interaction model rather than in accuracy.",
+    "overallExplanation": "Stream audio to real-time recognition and use the interim recognizing events for the live console, finalizing on the recognized event. Whole-file and batch transcription are built for stored audio, not live turns."
+  },
+  {
+    "id": 414,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "A support agent's spoken replies average about 60 words. Callers hear nothing for roughly 1.5 seconds after the agent finishes reasoning, because the app waits for the complete synthesized audio file before starting playback. Replies are generated fresh each time and cannot be pre-recorded. What is the most effective change?",
+    "options": [
+      "Stream the synthesized audio and start playback on the first chunk, synthesizing the opening sentence as soon as the model has produced it",
+      "Pre-generate audio for the 200 most common replies and serve those from a cache",
+      "Switch to a lower-quality voice at a reduced sample rate so synthesis finishes sooner",
+      "Increase the audio bitrate so the client can decode and start the stream faster"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Two serial waits are being paid — full text generation, then full synthesis — and streaming removes both: synthesis starts on the first completed sentence and playback starts on the first audio chunk. Time to first audio becomes roughly the cost of one sentence rather than sixty words.",
+      "Caching is excellent for fixed prompts and disclaimers, but the stem says replies are generated fresh, so the cache would miss on essentially every turn. It solves a different problem than the one described.",
+      "Voice quality and sample rate have a modest effect on synthesis time and a direct negative effect on how the agent sounds, which matters in a support context. It trades perceived quality for a fraction of the latency streaming removes outright.",
+      "Higher bitrate means more bytes to transfer and decode, so if anything it slightly increases time to first audio. This mistakes encoding density for pipeline concurrency."
+    ],
+    "principle": "stream synthesis so the first sentence plays while the rest is produced",
+    "relatedConcept": "Text to speech for agentic interactions is latency-sensitive, and streaming both the generated text and the synthesized audio is the standard way to cut time to first audio.",
+    "overallExplanation": "Stream synthesis and begin playback on the first audio chunk, synthesizing sentence by sentence as the reply is generated. Caching only helps fixed replies, and lowering voice quality trades audio fidelity for a much smaller gain."
+  },
+  {
+    "id": 415,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "multi",
+    "question": "An airline's voice agent mis-recognizes airport codes and fare-class names: 'YYZ' is transcribed as ordinary words and internal fare names are unrecognized, while general conversation transcribes well. The team holds 40 hours of recorded calls with human-verified transcripts and a maintained list of 3,000 domain terms. Which two actions should they take? (Choose two.)",
+    "options": [
+      "Train and deploy a custom speech model from the recorded audio plus its human transcripts so the acoustic and language patterns of these calls are learned",
+      "Supply a phrase list of the domain terms with each recognition request to bias decoding towards them without any training",
+      "Add a post-processing language model that rewrites obviously mis-heard words in the finished transcript",
+      "Raise the recognition confidence threshold and ask the caller to repeat whenever a result falls below it"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Matched audio with verified transcripts is exactly the training data a custom speech model needs, and it addresses both halves of the problem: acoustic adaptation to the call channel and language adaptation to airline vocabulary. It is the durable fix for persistent domain mis-recognition.",
+      "Correct. A phrase list biases the recognizer towards known terms at request time with no training cycle, so it delivers improvement on airport codes and fare names immediately and continues to cover new terms added to the list between model retrainings.",
+      "Post-correction can repair some obvious errors, but the acoustic detail that would distinguish one fare name from another is already gone by the time the text exists, so the rewriter is guessing. It also adds a generative call and its latency to every turn.",
+      "A higher confidence threshold converts recognition errors into repeated re-prompts, which is a poor experience and does not make the second attempt any more likely to be recognized. It manages the symptom while the vocabulary gap remains."
+    ],
+    "principle": "adapt the recognizer to the domain — by training, by phrase lists, or both",
+    "relatedConcept": "Custom speech models adapt recognition using matched audio and transcripts, while phrase lists provide lightweight request-time biasing towards known vocabulary.",
+    "overallExplanation": "Train a custom speech model from the 40 hours of audio and verified transcripts, and use a phrase list of domain terms for immediate request-time biasing. Text-level post-correction and re-prompting only work around lost acoustic detail."
+  },
+  {
+    "id": 416,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "Callers frequently interrupt the voice agent mid-answer to correct a misunderstood order, but the agent talks over them and only processes the interruption after playback finishes, by which point the caller has repeated themselves twice and is audibly frustrated. What should the implementation change?",
+    "options": [
+      "Keep recognition active during playback and stop synthesis immediately when speech start is detected, then process the caller's turn from that point",
+      "Cap every spoken reply at eight seconds so there is less time in which a caller can interrupt",
+      "Move to a push-to-talk interaction where the caller presses a key before speaking",
+      "Increase the end-of-speech silence timeout so the recognizer waits longer before finalizing the caller's turn"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Barge-in requires the microphone and recognizer to remain live while the agent speaks, with a speech-start detection that cancels playback and hands the turn to the caller. Doing this reliably also means cancelling the queued audio rather than letting it drain, and applying echo cancellation so the agent's own voice does not trigger the detector.",
+      "Shorter replies reduce the window in which interruptions occur but do not handle the interruptions that still happen, and they degrade answers that genuinely need explanation. It is mitigation by truncation.",
+      "Push-to-talk removes the problem by removing natural conversation, which is the product. It is a defensible fallback for very noisy environments but not the fix for a telephone support agent.",
+      "A longer silence timeout makes the agent slower to act on what the caller says, so the frustrating gap grows. This confuses end-of-turn detection with start-of-speech detection, which are opposite ends of the turn."
+    ],
+    "principle": "a voice agent must listen while it speaks and yield the turn on barge-in",
+    "relatedConcept": "Integrating speech as an agent modality means managing full-duplex turn taking: continuous recognition during playback, speech-start detection, playback cancellation and echo cancellation.",
+    "overallExplanation": "Support barge-in by keeping recognition running during playback and cancelling synthesis the moment speech starts, with echo cancellation so the agent does not interrupt itself. Shorter replies and longer silence timeouts do not address turn taking."
+  },
+  {
+    "id": 417,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "A collections team must flag calls where the customer sounds distressed, and note when background sound suggests the customer is driving so the agent can offer to call back. The current pipeline transcribes to text and runs sentiment on the transcript, which almost never flags anything because the customers' words stay polite even when their voices do not. What should change?",
+    "options": [
+      "Send the audio itself to a model that accepts audio input, so tone, pace, hesitation and background sound are available to the reasoning step as evidence",
+      "Add prosody features emitted by the speech recognizer to the existing text sentiment call",
+      "Run opinion mining on the transcript so distress is attributed to the specific topic being discussed",
+      "Train a custom speech model on recordings of distressed callers so those calls are recognized differently"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Everything the team wants to detect — vocal tone, pacing, hesitation, road noise — is carried by the audio signal and destroyed by transcription. A model that takes audio directly reasons over the waveform alongside the words, which is the only route to paralinguistic and environmental evidence.",
+      "Speech to text emits words, timings and confidence, not a prosody feature set for downstream sentiment. This assumes an output the recognizer does not produce, and even if it did, background sound would still be unrepresented.",
+      "Opinion mining decomposes text into targets and assessments; it is still text analysis over polite words. Better attribution of a signal that is not present in the transcript does not create the signal.",
+      "Custom speech models improve transcription accuracy for a domain or acoustic condition. They change what words come out, not whether emotion or ambient context is surfaced, so the pipeline would still be scoring polite text."
+    ],
+    "principle": "if the signal lives in the audio, do not reason over the transcript",
+    "relatedConcept": "Multimodal reasoning from audio inputs lets a model interpret tone, pace and ambient sound directly, which transcription-then-text-analysis pipelines discard by construction.",
+    "overallExplanation": "Feed the audio to an audio-capable model so tone, pacing and background sound become evidence. Transcription throws away exactly the paralinguistic signal the collections team needs, and no amount of text analysis recovers it."
+  },
+  {
+    "id": 418,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "A support line connects Spanish-speaking callers with English-speaking agents. The prototype chains speech to text, then text translation, then text to speech, and end-to-end latency sits around four seconds per turn while recognition errors propagate into visibly wrong translations. Conversations feel stilted and agents are abandoning the feature. What should the team use?",
+    "options": [
+      "The speech translation capability, which recognizes and translates within one streaming pipeline and emits continuous translated text and optionally synthesized speech",
+      "The same three-stage chain, with the three service calls issued in parallel to remove the serial latency",
+      "The same chain, batching audio into ten-second windows so each stage is invoked less often",
+      "Translation of only the agent's side, leaving the caller's Spanish transcribed but untranslated for the agent to interpret"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Speech translation collapses recognition and translation into a single streaming operation, so translated text appears while the caller is still speaking and only one hop's latency is paid. Keeping the stages joined also avoids re-interpreting an already-degraded intermediate transcript.",
+      "The stages are strictly sequential — translation cannot start before there is text, and synthesis cannot start before there is a translation — so they cannot be parallelized across a single utterance. This misreads a data dependency as an orchestration inefficiency.",
+      "Ten-second batching adds up to ten seconds of buffering before anything is produced, making the conversational latency substantially worse. Fewer, larger calls optimize throughput at the direct expense of the interactivity being complained about.",
+      "Leaving the caller's speech untranslated abandons the requirement: the English-speaking agent cannot act on a Spanish transcript. It removes the cost by removing the feature."
+    ],
+    "principle": "translate speech in one streaming pipeline rather than three serial hops",
+    "relatedConcept": "Speech translation performs recognition and translation together over a streaming connection, avoiding the latency and error compounding of chaining separate speech, translation and synthesis calls.",
+    "overallExplanation": "Use speech translation so recognition and translation happen in one streaming pipeline with continuous output. The three-stage chain is inherently serial, so it cannot be parallelized, and batching only adds buffering delay."
+  },
+  {
+    "id": 419,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "multi",
+    "question": "An enterprise records about 400 hours of internal meetings a month. Legal needs a searchable transcript that shows who said what, and a reviewer clicking a search hit must land on the exact second the phrase was spoken in the recording. A turnaround of a few hours after each meeting is entirely acceptable. Which two capabilities should the pipeline use? (Choose two.)",
+    "options": [
+      "Batch transcription for the archive volume, with speaker diarization enabled so each utterance is attributed to a distinct speaker",
+      "Word-level timestamps in the transcription output so a search hit maps to an exact playback offset in the recording",
+      "Real-time streaming recognition attached to every meeting so transcripts exist the moment the meeting ends",
+      "A custom speech model trained on the organization's meeting recordings to improve who-said-what attribution"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Batch transcription is built for exactly this profile — large volumes of stored audio with a relaxed turnaround — and diarization is the feature that attributes each utterance to a speaker, which is the who-said-what half of the requirement.",
+      "Correct. Utterance-level timing is too coarse for clicking a search hit and landing on the phrase, so word-level timestamps are what turn a text match into a precise playback offset. Requesting them is an explicit output option rather than a default.",
+      "Streaming recognition adds live infrastructure, per-meeting session management and cost for a requirement the stem explicitly relaxes to a few hours. It buys immediacy nobody asked for and complicates the archive pipeline.",
+      "Custom speech models improve recognition accuracy for domain vocabulary and acoustics; they do not perform speaker attribution, which is what diarization does. This conflates transcription quality with speaker separation."
+    ],
+    "principle": "match the transcription mode to turnaround, then request the metadata you need",
+    "relatedConcept": "Batch transcription handles stored archives asynchronously and exposes options such as speaker diarization and word-level timestamps that interactive recognition sessions do not need.",
+    "overallExplanation": "Use batch transcription with diarization for the archive and request word-level timestamps so search hits map to an exact offset. Real-time recognition is unnecessary at this turnaround, and custom models do not attribute speakers."
+  },
+  {
+    "id": 420,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "A community helpline serves callers in English, Spanish, Vietnamese and Tagalog, and families frequently switch language mid-call when a relative takes over the phone. The recognizer is currently pinned to en-US, so non-English speech produces nonsense transcripts that the agent assistant then reasons over. What should the team configure?",
+    "options": [
+      "Language identification with a candidate locale list covering the four languages, in continuous mode so recognition can switch locale during the call",
+      "Four recognizers running in parallel on the same stream, keeping whichever result reports the highest confidence",
+      "An IVR menu at the start of the call in which the caller selects a language, pinning the recognizer to that locale for the session",
+      "Automatic detection with every supported locale enabled, so no language can ever be missed"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Language identification with a bounded candidate list is designed for exactly this: continuous mode re-evaluates the spoken language as the call proceeds, so a mid-call handover to another language is picked up rather than transcribed as nonsense. The candidate list keeps accuracy high by constraining the decision to the languages the helpline actually serves.",
+      "Running four recognizers quadruples cost and produces confidently wrong results from the mismatched ones, since a recognizer pinned to the wrong locale still emits high-confidence words. Confidence across different locales is not directly comparable.",
+      "An IVR selection is a reasonable fallback and fixes the caller who knows their language at the start, but it fails the exact scenario in the stem — a relative taking over mid-call — because the locale is fixed for the session.",
+      "Language identification is bounded to a small candidate list precisely because accuracy falls as the candidate set grows. Enabling every locale is not supported and would make the four languages that matter harder to distinguish."
+    ],
+    "principle": "constrain language identification to the locales you actually serve",
+    "relatedConcept": "Speech to text supports language identification with a candidate locale list, in at-start or continuous mode, so multilingual conversations can be recognized without pinning a single locale.",
+    "overallExplanation": "Enable continuous language identification with a candidate list of the four served locales so recognition adapts when speakers change mid-call. Parallel recognizers are costly and non-comparable, and a session-level IVR choice cannot handle a handover."
+  },
+  {
+    "id": 421,
+    "domain": "Implement text analysis solutions",
+    "objective": "Implement speech solutions",
+    "type": "single",
+    "question": "The agent's replies read correctly in the chat transcript but sound wrong when spoken: part numbers such as 'SKU A-1029' are pronounced as a word, dates written as 2026-04-16 are read as a run of digits, and markdown bullet characters and asterisks are read aloud. The same reply text feeds both channels today. What should the implementation do?",
+    "options": [
+      "Produce a separate spoken rendering of each reply, strip markup from it, and mark it up with SSML using say-as for identifiers and dates before synthesis",
+      "Instruct the model to write replies that are easy to speak aloud so the same text works in both channels",
+      "Add a custom lexicon entry for every SKU so the synthesizer learns each part number's pronunciation",
+      "Reduce the global speaking rate so listeners have more time to interpret identifiers and dates"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Display text and spoken text are different artefacts with different requirements, and SSML is the deterministic control for the difference: say-as tells the synthesizer to read a value as characters, a date or digits, and stripping markdown removes symbols that only ever made sense visually. Generating the spoken form separately makes that transformation explicit and testable.",
+      "Prompting for speakable phrasing improves the odds but gives no guarantee for any specific value, and it degrades the chat channel by forbidding the formatting that makes text readable. One string cannot be optimal for both channels.",
+      "Lexicons are made for a bounded vocabulary such as brand names and clinical terms; a SKU catalogue is open-ended and changes constantly, so entries would have to be generated forever. The say-as approach handles all identifiers structurally, with no per-value entry.",
+      "Slowing the whole voice makes every reply tedious while still mispronouncing the identifier. It reduces the speed of the error rather than correcting it."
+    ],
+    "principle": "spoken output is its own artefact — mark it up rather than reusing display text",
+    "relatedConcept": "Text to speech in an agent pipeline uses SSML to control pronunciation, interpretation of dates and identifiers, pacing and emphasis, which requires a spoken rendering distinct from the display text.",
+    "overallExplanation": "Generate a separate spoken rendering, strip display markup, and use SSML say-as for identifiers and dates. Prompting for speakable text is non-deterministic, and lexicons do not scale to an open-ended SKU catalogue."
+  }
+]

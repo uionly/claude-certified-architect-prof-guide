@@ -2,6 +2,7 @@
   "cert": {
     "name": "Claude Certified Developer – Foundations",
     "code": "CCDV-F",
+    "vendor": "Anthropic",
     "level": "Developer",
     "audience": "Backend, full-stack and AI engineers building Claude-powered applications.",
     "examQuestions": 53,

@@ -1,0 +1,909 @@
+[
+  {
+    "id": 401,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A Python service running in Azure Container Apps reads an Azure OpenAI key and a storage connection string from environment variables that were populated during deployment. A security review flags that both values sit in the deployment pipeline, in the container app's configuration, and in three engineers' local .env files. What is the strongest remediation?",
+    "options": [
+      "Enable a managed identity on the container app, grant it the required data-plane roles, and authenticate with DefaultAzureCredential so no key exists to leak",
+      "Move both values into Key Vault and inject them into the same environment variables at container start, keeping the code unchanged",
+      "Rotate both credentials every 30 days and add a pipeline check that fails the build if a secret value appears in source control",
+      "Encrypt the values with a symmetric key at deployment time and decrypt them in application startup code before use"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A managed identity removes the credential entirely: the platform issues short-lived tokens to the workload, DefaultAzureCredential picks them up with no configuration, and authorization is expressed as role assignments that can be audited and revoked centrally. There is nothing left to copy into a pipeline variable or a laptop .env file.",
+      "Centralizing the secrets in Key Vault is a genuine improvement in storage and auditability, but the value still materializes as an environment variable in the running container and still has to be distributed for local development. A stored secret is a weaker control than no secret at all.",
+      "Rotation and secret scanning shorten the window a leaked key is useful and catch the most obvious mistakes, but they are detective and time-bound controls layered over a design that still requires long-lived shared keys to exist and travel. They reduce exposure rather than eliminating the credential.",
+      "Application-side encryption just relocates the problem to the decryption key, which must itself be present wherever the app runs and therefore faces exactly the same distribution and leakage questions. It also adds custom cryptographic code where the platform already offers a keyless option."
+    ],
+    "principle": "prefer managed identity over any stored credential",
+    "relatedConcept": "Identity-based access replaces long-lived keys with short-lived platform-issued tokens, making authorization a revocable role assignment rather than a distributed secret.",
+    "overallExplanation": "Use a managed identity with DefaultAzureCredential and least-privilege role assignments so no key exists to distribute or leak. Key Vault, rotation, and encryption all improve handling of a secret that would be better not to have."
+  },
+  {
+    "id": 402,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A container app authenticates with its managed identity and DefaultAzureCredential. Traces show a token is acquired successfully in about 40 milliseconds, and the very next call, secret_client.get_secret(\"model-api-key\"), returns 403 with a message that the caller is not authorized to perform action Microsoft.KeyVault/vaults/secrets/getSecret. The identity already holds Contributor on the vault's resource group. What is the cause?",
+    "options": [
+      "The identity has no data-plane role on the vault, such as Key Vault Secrets User, which is separate from any control-plane role it holds",
+      "The token was issued for the wrong audience, so the vault rejected it and returned 403 rather than 401",
+      "The vault's firewall is blocking the container app's outbound address, which surfaces as a 403 on the data-plane call",
+      "The managed identity has not finished propagating, and the 403 will resolve itself once directory replication completes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A successful token acquisition proves authentication worked; a 403 on the very next call is an authorization decision made by the resource. Contributor is a control-plane role that permits managing the vault resource, not reading secrets inside it, so the identity needs a data-plane role such as Key Vault Secrets User scoped to the vault.",
+      "A wrong-audience token is an authentication failure and surfaces as 401 with a credential or token error, not as a 403 naming the exact data action being denied. The error text here identifies the permission the caller lacks, which is the signature of a role-assignment gap.",
+      "Network denials do not present as an authorization decision naming a data action; a blocked call typically fails as a connection or DNS error, and vault firewall rejections are reported as a forbidden network rule rather than a missing permission on getSecret. Diagnosing this as a network problem sends the team to the wrong control plane entirely.",
+      "Role assignments can take a short time to take effect, but this identity has no relevant assignment to propagate — it holds only Contributor. Waiting for replication of a permission that was never granted means the 403 never resolves."
+    ],
+    "principle": "a 403 after a successful token means missing data-plane RBAC",
+    "relatedConcept": "Control-plane roles govern managing a resource; data-plane roles govern reading and writing the data inside it, and they are granted separately.",
+    "overallExplanation": "Token acquired then 403 is the classic missing data-plane role: Contributor manages the vault but does not read secrets, so assign Key Vault Secrets User at the vault scope. Authentication succeeded; authorization did not."
+  },
+  {
+    "id": 403,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "multi",
+    "question": "A retrieval service calls get_secret on every request to fetch a downstream API key. Under load the vault starts returning 429s, and when the key was rotated last month the service kept sending the old value for hours because a previous fix had pinned the call to a specific secret version. Which two changes address both problems? (Choose two.)",
+    "options": [
+      "Cache the secret in memory with a bounded time to live so steady-state traffic does not call the vault on every request",
+      "Request the secret without a version so the vault returns the current version, and refresh the cached value on expiry or on an authentication failure from the downstream API",
+      "Copy the secret into an application setting at deployment time so the running service never calls the vault at all",
+      "Increase the vault's request quota so per-request retrieval can be sustained at the service's peak throughput"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Key Vault enforces per-vault transaction limits, so a per-request fetch turns a fixed-cost lookup into a throughput ceiling and eventually a 429. An in-memory cache with a bounded TTL collapses steady-state traffic to a handful of vault calls while keeping the value refreshable, and the TTL is what bounds how stale a rotated secret can be.",
+      "Correct. Pinning to an explicit version is exactly why rotation had no effect — the service kept asking for the old version by name. Requesting the secret without a version returns whatever is current, and refreshing on TTL expiry or on a 401 from the downstream API makes the service pick up a rotated value quickly rather than at the next deployment.",
+      "Baking the secret into an application setting makes rotation a redeploy: the running service can never pick up a new value, and the old value now lives in configuration where it is harder to audit and revoke. It removes the 429s by removing the ability to rotate at all.",
+      "Per-vault limits are platform limits and are not raised on request, so this is not an available remedy. Even if throughput were unlimited, a network round trip per request adds latency and an availability dependency on every single call for a value that changes a few times a year."
+    ],
+    "principle": "cache secrets with a bounded TTL and always resolve the current version",
+    "relatedConcept": "Secret retrieval and rotation are one design: caching keeps you inside vault limits, and the TTL plus a refresh-on-failure path bounds how long a rotated secret goes unnoticed.",
+    "overallExplanation": "Cache the secret in memory with a bounded TTL and request it without a version so the current value is always resolved, refreshing on expiry or on a downstream 401. Version pinning breaks rotation, and baking secrets into settings makes rotation a redeploy."
+  },
+  {
+    "id": 404,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A platform team wants rotation of a partner API credential to be handled without a human in the loop. The credential is stored in Key Vault with an expiry date, and the partner exposes an endpoint that mints a replacement. The team wants rotation to begin automatically ahead of expiry rather than on a fixed calendar job that may drift from the actual dates. What should they build?",
+    "options": [
+      "Subscribe to the vault's SecretNearExpiry event through Event Grid and trigger a function that mints a new credential and adds it as a new secret version",
+      "Run a nightly timer function that lists every secret in the vault, parses expiry attributes, and rotates any secret expiring within seven days",
+      "Set a shorter expiry on the secret so the application's failure to read it signals that a rotation is due",
+      "Store the rotation date in application configuration and have the service rotate the credential the first time it starts after that date"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Key Vault emits lifecycle events, and SecretNearExpiry fires ahead of a secret's expiry date based on the secret's own attributes. Routing it through Event Grid to a rotation function makes the vault's state the trigger, so the automation stays correct even if expiry dates are changed, and each rotation simply adds a new version under the same secret name.",
+      "A nightly scan works but reimplements the vault's own notification: the team maintains listing logic, expiry parsing, and a threshold that must be kept consistent with every secret. It also rotates on the job's schedule rather than on the secret's, which is precisely the drift the team wants to avoid.",
+      "Using application failure as a rotation signal means the first indication that rotation is due is an outage. Expiry is a control that should trigger action before it takes effect, not a tripwire that breaks production to remind someone.",
+      "Duplicating the rotation date into application configuration creates two sources of truth that will diverge the first time either is edited, and it ties rotation to a restart that may not happen for weeks. Rotation also becomes the responsibility of every service instance rather than of one controlled automation."
+    ],
+    "principle": "let the vault's own lifecycle events drive rotation",
+    "relatedConcept": "Key Vault publishes secret lifecycle events to Event Grid, which is how rotation automation becomes reactive to the secret's real state instead of a parallel schedule.",
+    "overallExplanation": "React to the vault's SecretNearExpiry event via Event Grid and rotate by adding a new secret version. Calendar jobs and duplicated dates drift from the vault's actual attributes, and letting expiry break the app makes an outage the notification."
+  },
+  {
+    "id": 405,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A service reads about forty settings at startup: model deployment names, chunk sizes, retry limits, a feature toggle, and two credentials. Today all forty are container app environment variables edited by hand per environment. The team wants one place to manage non-secret settings while keeping secrets in Key Vault and avoiding two different retrieval code paths. What design meets this?",
+    "options": [
+      "Store the non-secret settings in App Configuration and represent the two credentials as Key Vault references, so the provider resolves both kinds through a single load",
+      "Store all forty values in Key Vault as secrets so there is exactly one store and one retrieval API to learn",
+      "Store all forty values in App Configuration, marking the two credentials with a naming convention that signals they are sensitive",
+      "Keep the environment variables but generate them from a checked-in per-environment file so at least the values are reviewable in pull requests"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This is exactly the division of labour the two services are designed for: App Configuration holds non-secret settings with labels, versioning, and dynamic refresh, while Key Vault holds the material that needs hardened storage and access control. A Key Vault reference stored in App Configuration is resolved by the provider using the app's credential, so application code performs one load and gets both.",
+      "Key Vault is designed for secret material, not for forty routine settings: every read is a data-plane call against per-vault limits, there is no label or feature-flag concept, and non-secret settings inherit access controls and rotation semantics they do not need. It also makes routine configuration changes look like secret operations in audit logs.",
+      "A naming convention is documentation, not a control: the credentials would sit in a store without Key Vault's access model, and anyone with App Configuration read access could read them. Convention-based sensitivity is exactly the pattern that leads to secrets appearing in exports and logs.",
+      "Reviewable files improve change traceability but leave forty values duplicated per environment, secrets in source control, and every change requiring a redeploy. It addresses review, not the actual requirements of a single management plane and separated secret handling."
+    ],
+    "principle": "app settings in App Configuration, secrets in Key Vault, one resolution path",
+    "relatedConcept": "App Configuration centralizes non-secret settings and can hold Key Vault references, so applications resolve both classes of configuration through one provider.",
+    "overallExplanation": "Put non-secret settings in App Configuration and store credentials as Key Vault references so one provider load resolves everything. Key Vault is not a general settings store, and marking secrets by naming convention gives no real protection."
+  },
+  {
+    "id": 406,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A team wants to route 5 percent of production traffic to a new model deployment, watch quality metrics for a day, then raise the share — without redeploying and without a change touching every service instance at a different moment. The rollout must also be instantly reversible if quality drops. What should they implement?",
+    "options": [
+      "Define a feature flag in App Configuration with a percentage filter and evaluate it at request time through the feature manager",
+      "Add a MODEL_ROLLOUT_PERCENT application setting and redeploy the app each time the percentage changes",
+      "Deploy a second copy of the service configured for the new model and shift traffic with a weighted routing rule at the ingress",
+      "Hash each request id in application code and send requests whose hash falls below a compiled-in threshold to the new deployment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Feature flags with a percentage filter are precisely this control: the rollout share is data in App Configuration, the feature manager evaluates it per request, and refresh propagates changes to running instances without a deployment. Reverting is setting the flag back, which takes effect on the next refresh across every instance.",
+      "A setting change that requires a redeploy makes every percentage adjustment a release, with build time, rollout time, and risk attached — and rollback is another release. It also means instances pick up the new value only as they are replaced, which is the staggered behaviour the team wants to avoid.",
+      "Weighted ingress routing can split traffic, but it doubles the deployed footprint, splits telemetry across two apps, and moves a per-request product decision into infrastructure. It is a reasonable technique for whole-service canaries and a heavy one for toggling which model a code path calls.",
+      "Compiling the threshold into code means every adjustment is a code change and a deployment, which is the same problem as the setting with extra bespoke logic. Hand-rolled hashing also has to reproduce stickiness and targeting semantics that the feature manager's filters already provide."
+    ],
+    "principle": "feature flags make rollout percentage configuration, not code",
+    "relatedConcept": "App Configuration feature management separates the decision to expose behaviour from the deployment that ships it, so rollout and rollback are configuration changes.",
+    "overallExplanation": "Use an App Configuration feature flag with a percentage filter evaluated by the feature manager: rollout share becomes refreshable configuration and rollback is instant. Settings that require redeploys and compiled-in thresholds both turn a rollout dial into a release."
+  },
+  {
+    "id": 407,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "multi",
+    "question": "Three environments share one App Configuration store. Development, staging, and production each need a different value for a handful of keys, and the team wants a configuration change to reach running production instances within about a minute without restarting them, in a single consistent batch rather than key by key. Which two techniques deliver this? (Choose two.)",
+    "options": [
+      "Use labels to hold environment-specific values under the same key names, selecting the appropriate label when the provider loads configuration",
+      "Register a sentinel key for refresh, update all changed keys first and the sentinel last, so instances pick up a complete batch when the sentinel changes",
+      "Prefix every key with its environment name and have each service filter the full key set after loading everything",
+      "Set a very short refresh interval so the provider re-reads every key every few seconds and changes are noticed almost immediately"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Labels are the built-in dimension for environment variants: the same key name carries a value per label, and the provider selects the label at load time. Application code and key names stay identical across environments, which is what keeps promotion between them from becoming a rename exercise.",
+      "Correct. A sentinel key is the standard way to make a multi-key change atomic from the consumer's point of view. The provider watches only the sentinel, so instances refresh once, after every dependent key has already been updated — avoiding the window where an instance has half the new configuration.",
+      "Environment-prefixed keys work, but they triple the key count, put the environment into every key name, and force each service to filter after loading configuration it should not be able to see. Labels express the same variation without duplicating the key space.",
+      "Polling every key every few seconds multiplies request volume against the store and still gives no atomicity: an instance can easily observe a partially updated set, which is exactly the inconsistency the sentinel pattern exists to prevent."
+    ],
+    "principle": "labels for environment variants, a sentinel key for atomic refresh",
+    "relatedConcept": "App Configuration's label and refresh model lets one store serve many environments while giving running instances consistent, restart-free updates.",
+    "overallExplanation": "Use labels so one key name carries per-environment values, and watch a sentinel key that you update last so refresh delivers a complete batch. Key prefixes duplicate the key space and short polling intervals give volume without consistency."
+  },
+  {
+    "id": 408,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "After a private endpoint is created for a Key Vault and public network access is disabled, a container app inside the VNet fails to reach the vault. From a debug container, the vault host name resolves to a public IP address, and connections to it time out. The private endpoint shows a healthy connection state and a private IP. What is the most likely cause?",
+    "options": [
+      "The privatelink private DNS zone for Key Vault is not linked to the VNet, so the vault name still resolves to its public address instead of the private endpoint",
+      "The private endpoint's network security group is blocking outbound traffic from the container app's subnet on port 443",
+      "The container app's managed identity lacks the Key Vault Secrets User role, which prevents the private endpoint from accepting connections",
+      "The vault requires its firewall to list the container app's public outbound IP address before private endpoint traffic is accepted"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A private endpoint only changes connectivity if name resolution points at it, and that comes from the privatelink DNS zone being linked to the VNet with a record for the vault. Resolving to a public IP is the diagnostic signature: the endpoint exists and is healthy, but clients are never sent to it, so traffic goes out to an address that public access has now disabled.",
+      "A network security group blocking 443 would produce a failure too, but it would not change what the name resolves to — the client would still see the private IP. The observed public-IP resolution is the piece of evidence that points squarely at DNS rather than filtering.",
+      "Role assignments are evaluated by the resource after a connection is established and produce a 403, not a timeout. Authorization has no influence on whether a TCP connection can be made or on how a host name resolves.",
+      "Firewall allowlists apply to traffic arriving over the public endpoint, which has been disabled here. Private endpoint traffic arrives on the private IP and is not evaluated against public IP allow rules, so adding one would not restore connectivity."
+    ],
+    "principle": "a private endpoint is only useful if private DNS resolves to it",
+    "relatedConcept": "Private connectivity is two parts — a private endpoint in the VNet and a linked privatelink DNS zone — and the second is where most failures live.",
+    "overallExplanation": "Resolving the resource host name to a public IP from inside the VNet means the privatelink private DNS zone is not linked, so clients never reach the healthy private endpoint. Authorization failures give 403s and network rules do not change name resolution."
+  },
+  {
+    "id": 409,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A worker needs to read two secrets from one Key Vault. During onboarding an engineer assigned the workload's managed identity the Key Vault Administrator role at the subscription scope so that nothing would be blocked. A reviewer asks for the least-privilege equivalent that still lets the worker do its job. What should be assigned?",
+    "options": [
+      "Key Vault Secrets User, scoped to the single vault the worker reads from",
+      "Key Vault Reader, scoped to the single vault, since the worker only needs to read",
+      "Key Vault Secrets Officer, scoped to the resource group containing the vault",
+      "Key Vault Administrator, scoped to the resource group instead of the subscription"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Least privilege constrains both the permission set and the scope. Key Vault Secrets User grants exactly the ability to read secret values and nothing else, and scoping it to the one vault means a future vault in the same subscription is not silently in reach of this workload.",
+      "Key Vault Reader sounds like the read role but grants metadata access — listing vaults and secret properties — without permitting retrieval of secret values. Assigning it produces a 403 on get_secret, which is the trap in reasoning that reading implies the Reader role.",
+      "Secrets Officer adds write and delete over secrets, which the worker never needs, and resource-group scope extends that power to every vault created there later. It is closer than Administrator but still grants a destructive capability for a read-only workload.",
+      "Narrowing the scope while keeping Administrator leaves the identity able to manage access policies, purge secrets, and grant itself more — the permissions with the largest blast radius. Scope reduction alone does not make an over-powerful role appropriate."
+    ],
+    "principle": "least privilege constrains the role and the scope together",
+    "relatedConcept": "Key Vault data-plane roles are deliberately granular, and the distinction between metadata roles and value-reading roles is a common source of unexpected 403s.",
+    "overallExplanation": "Assign Key Vault Secrets User at the individual vault scope: it reads secret values and nothing more. Key Vault Reader only exposes metadata, and narrowing an Administrator assignment still leaves destructive permissions in place."
+  },
+  {
+    "id": 410,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "An older vault still uses the access policy permission model. The team wants secret access to be granted through role assignments so it can be reviewed with the same tooling and inherited scopes as the rest of their subscription, and so that access reviews cover it. During the switch, several workloads must not lose access. How should they proceed?",
+    "options": [
+      "Create the equivalent role assignments first, then switch the vault to the Azure RBAC permission model, verifying each workload after the change",
+      "Switch the vault to the Azure RBAC permission model first, then create role assignments once the existing access policies have been cleared",
+      "Keep the access policy model and add role assignments alongside it, since the vault evaluates both and grants access if either allows it",
+      "Recreate the vault with the RBAC permission model and repoint every workload at the new vault name"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The permission model is a vault-level switch, so the moment it flips, access policies stop being honoured and only role assignments apply. Creating the assignments beforehand means the authorization path is already in place when the switch happens, making the change a cutover with no gap, and per-workload verification catches anything that was missed.",
+      "Flipping the model before the assignments exist creates exactly the outage the team wants to avoid: between the switch and the last assignment, every workload's data-plane call returns 403. It also inverts the usual safe order of granting new access before removing old.",
+      "The two models are alternatives selected by a vault-level setting, not layers that combine — a vault on the RBAC model does not consult access policies, and vice versa. Believing they are additive is what leads teams to make the switch without preparing assignments.",
+      "Recreating the vault forces every workload, reference, and private endpoint to be repointed at a new name, and secret names must be re-established under soft-delete constraints. It is a large, risky migration to change a setting that can be switched in place."
+    ],
+    "principle": "grant the new authorization path before switching off the old one",
+    "relatedConcept": "Key Vault authorizes through either access policies or Azure RBAC, chosen per vault, so migrating between them is a cutover rather than a merge.",
+    "overallExplanation": "Create the equivalent RBAC assignments first, then flip the vault's permission model and verify each workload. The models are alternatives rather than additive layers, so switching first guarantees a 403 window for every caller."
+  },
+  {
+    "id": 411,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "multi",
+    "question": "Five container apps and two function apps all need identical read access to the same vault and storage account, and the platform team wants one identity to grant and review rather than seven. They also need each workload to select that identity unambiguously at runtime. Which two statements are correct? (Choose two.)",
+    "options": [
+      "A user-assigned managed identity can be attached to all seven workloads, so the required role assignments are made once against a single principal",
+      "When a workload has more than one identity attached, DefaultAzureCredential must be told which client id to use, for example via the AZURE_CLIENT_ID setting or the managed identity client id parameter",
+      "A system-assigned managed identity can be shared across workloads by assigning the same principal id to each of them during deployment",
+      "User-assigned identities cannot be used from Azure Functions, so the function apps must keep system-assigned identities and separate role assignments"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. A user-assigned identity is a standalone resource with its own lifecycle, so it can be attached to many workloads and the role assignments are made once against that one principal. That is precisely the case it exists for: a fleet of services sharing an access profile, reviewed as a single grant.",
+      "Correct. With multiple identities attached, the platform cannot infer which one to request a token for, and the credential chain will fail or pick unpredictably unless the client id is supplied. Setting AZURE_CLIENT_ID or passing the managed identity client id makes the selection explicit and deterministic.",
+      "A system-assigned identity is created with, and tied to, exactly one resource, and it is deleted when that resource is deleted — it cannot be attached elsewhere. Sharing an access profile across workloads is the defining reason to choose a user-assigned identity instead.",
+      "Function apps support user-assigned managed identities, including for identity-based trigger connections, so there is no need to split the fleet. Believing otherwise would fragment the grant the team is explicitly trying to consolidate."
+    ],
+    "principle": "user-assigned identity for a shared access profile, with an explicit client id",
+    "relatedConcept": "Identity choice determines how many principals appear in access reviews; multiple attached identities make explicit selection mandatory in the credential chain.",
+    "overallExplanation": "Attach one user-assigned managed identity to all seven workloads so the role assignments are made once, and set AZURE_CLIENT_ID (or pass the managed identity client id) so DefaultAzureCredential selects it unambiguously. System-assigned identities are bound to a single resource."
+  },
+  {
+    "id": 412,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "An engineer's Python service authenticates perfectly on their laptop through DefaultAzureCredential after an az login, but the same image in Azure Container Apps fails at startup with a credential-unavailable error naming every attempted source. The app has a managed identity assigned and the code is byte-identical between environments. What should the engineer check first?",
+    "options": [
+      "Whether the managed identity is actually available to the running revision and, if more than one is attached, whether the client id is specified for the credential to select",
+      "Whether the container image includes the Azure CLI, since DefaultAzureCredential relies on the CLI's cached token in every environment",
+      "Whether the code should be changed to a hard-coded client secret credential, since DefaultAzureCredential is intended only for local development",
+      "Whether the laptop's subscription differs from the container app's subscription, since the credential resolves a subscription before requesting a token"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. DefaultAzureCredential walks a chain of sources and succeeds locally on the developer's CLI login; in Azure it expects the managed identity source to answer. A credential-unavailable error listing every source means no source produced a token, so the first checks are that the identity is genuinely attached to the running revision and that an ambiguous multi-identity setup is resolved by supplying the client id.",
+      "The CLI credential is one link in the chain and is the one that works on a laptop; shipping the CLI into a container to reproduce it is an anti-pattern that would require baking in a signed-in user's tokens. The managed identity link is the one meant to answer in Azure.",
+      "DefaultAzureCredential is designed precisely so the same code path works locally and in Azure — that portability is the reason to use it. Replacing it with a hard-coded secret reintroduces the credential the managed identity exists to eliminate.",
+      "Token acquisition is scoped to a resource audience, not to a subscription, so a subscription mismatch does not make the credential chain report every source unavailable. It could explain a later authorization failure, but not this startup error."
+    ],
+    "principle": "works locally, fails in Azure means the managed identity link never answered",
+    "relatedConcept": "DefaultAzureCredential's value is one code path across environments, but each environment satisfies a different link in its chain.",
+    "overallExplanation": "A credential-unavailable error in Azure with success locally means the managed identity source did not answer: confirm the identity is attached to the revision and specify the client id when several are attached. The CLI link is meant to serve local development only."
+  },
+  {
+    "id": 413,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A service currently calls an Azure OpenAI deployment with an account key held in Key Vault, fetched at startup. Compliance now requires that every call to the model be attributable to a workload identity and that access be revocable in seconds without a redeploy or a key rotation across consumers. What should the team change?",
+    "options": [
+      "Authenticate to the model endpoint with the workload's managed identity through a token credential and grant it the Cognitive Services OpenAI User role",
+      "Keep the account key but shorten its rotation interval to daily so a revoked consumer loses access within twenty-four hours",
+      "Keep the account key and put an API gateway in front of the model endpoint that records which consumer made each call",
+      "Move the account key from Key Vault into App Configuration so access to it can be controlled with App Configuration roles"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Token-based access with a managed identity makes every call carry the workload's identity, so attribution is intrinsic rather than reconstructed, and revocation is removing a role assignment — no key rotation, no coordination with other consumers, no redeploy. Cognitive Services OpenAI User is the data-plane role that permits inference without granting management rights.",
+      "Account keys are shared and anonymous: two consumers holding the same key are indistinguishable, so daily rotation improves the exposure window but never provides attribution. Rotation also forces every legitimate consumer to be updated in lockstep, which is the coordination cost the requirement rules out.",
+      "A gateway can log which client presented which gateway credential, but the model endpoint still sees one shared key, so attribution exists only if every caller is forced through the gateway and never obtains the key. It adds a component and a bypass risk instead of removing the shared secret.",
+      "Relocating a key to a store designed for non-secret configuration weakens its handling rather than improving it, and it changes nothing about attribution or revocation because the key remains a shared anonymous credential. The requirement is about identity, not about where the secret is filed."
+    ],
+    "principle": "identity-based access gives attribution and instant revocation; keys give neither",
+    "relatedConcept": "Azure AI services accept Entra tokens as well as account keys, and only the token path carries a caller identity that RBAC can revoke.",
+    "overallExplanation": "Call the model with the workload's managed identity and the Cognitive Services OpenAI User role, so each call is attributable and revocation is a role removal. Shared account keys are anonymous, and rotating or relocating them does not change that."
+  },
+  {
+    "id": 414,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "During a cleanup an engineer deleted a secret named partner-api-key from a vault, then tried to recreate it with a fresh value. The create call fails with a conflict indicating that a secret with that name is currently in a deleted state, and the vault has purge protection enabled. What is the correct way to restore service?",
+    "options": [
+      "Recover the soft-deleted secret and then add a new version with the fresh value under the same name",
+      "Purge the soft-deleted secret and then create the secret again with the fresh value",
+      "Create the secret under a slightly different name and update every consumer's configuration to the new name",
+      "Disable soft delete on the vault so the deleted secret is removed and the original name becomes available"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Soft delete keeps the name reserved during the retention period, which is why the create call conflicts. Recovering the secret restores the name and its version history, and setting a new version then puts the fresh value in place — consumers that resolve the current version pick it up without any configuration change.",
+      "Purge protection exists specifically to prevent permanent deletion during the retention period, so the purge operation is rejected on this vault. Reaching for purge is the common instinct here and it is exactly the action the protection is designed to block.",
+      "Renaming trades a five-minute recovery for a change to every consumer's configuration, plus a permanent inconsistency between the secret's name and its purpose. It also leaves the original name unusable and the confusion documented only in tribal knowledge.",
+      "Soft delete cannot be turned off once enabled, and disabling protections to work around an operational mistake is the wrong instinct regardless — those protections are what would let the team recover from a genuinely accidental deletion."
+    ],
+    "principle": "recover soft-deleted secrets; purge protection means you cannot delete your way out",
+    "relatedConcept": "Soft delete and purge protection reserve secret names through the retention period so deletions are recoverable and cannot be made permanent early.",
+    "overallExplanation": "Recover the soft-deleted secret and add a new version with the fresh value — the name stays reserved during retention, and purge protection blocks purging. Renaming or disabling protections are workarounds for a recoverable state."
+  },
+  {
+    "id": 415,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "multi",
+    "question": "A regulated customer requires that a storage account holding source documents be unreachable from the public internet, while a VNet-integrated container app and a data-loading pipeline both continue to work. The team must also be able to prove the restriction rather than assert it. Which two measures achieve this? (Choose two.)",
+    "options": [
+      "Disable public network access on the storage account and create a private endpoint reachable from the workload's VNet",
+      "Configure diagnostic settings to send storage resource logs to a Log Analytics workspace so allowed and denied access attempts are queryable evidence",
+      "Leave public access enabled and add an IP allowlist containing the workload's current outbound addresses",
+      "Rely on the storage account's account keys being held only in Key Vault, since an attacker without the key cannot read the data"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Disabling public network access removes the internet-facing data path entirely rather than filtering it, and the private endpoint gives the VNet a private IP to reach the account through. Together they satisfy 'unreachable from the public internet' as a property of the resource rather than as a rule someone must maintain.",
+      "Correct. The requirement includes proving the restriction, which needs evidence: routing resource logs to a workspace makes every data-plane access attempt, its network path, and its outcome queryable. Without that, the team can describe its configuration but cannot demonstrate what actually happened.",
+      "An IP allowlist keeps the public endpoint live and makes correctness depend on a list of addresses that change when the workload scales, is redeployed, or moves. It is filtering rather than removal, so the account remains reachable from the internet by definition.",
+      "Key custody is authentication, not network reachability: the public endpoint would still accept connections, and any credential compromise or shared access signature would be usable from anywhere. It also says nothing about the ability to demonstrate the restriction."
+    ],
+    "principle": "remove the public path, then produce evidence it is gone",
+    "relatedConcept": "Network isolation and diagnostic logging are complementary: one enforces the boundary, the other proves what crossed it.",
+    "overallExplanation": "Disable public network access and add a private endpoint so the public data path no longer exists, and route resource logs to Log Analytics so access attempts are queryable evidence. IP allowlists filter a live endpoint and key custody is not a network control."
+  },
+  {
+    "id": 416,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A team's App Configuration store is read at startup by six services. Today each service holds a connection string for the store in an environment variable, and one of those strings was recently found in a support ticket attachment. The team wants reads to stop depending on a shared string while keeping configuration centralized. What should they do?",
+    "options": [
+      "Have each service load configuration with its managed identity and assign that identity the App Configuration Data Reader role on the store",
+      "Rotate the App Configuration connection string and distribute the new value to the six services through the deployment pipeline",
+      "Move the App Configuration connection string into Key Vault and have each service read it from there at startup",
+      "Replace App Configuration with environment variables managed per service so there is no shared connection string to leak"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The App Configuration provider accepts a token credential, so each service can authenticate with its own managed identity and no connection string needs to exist. App Configuration Data Reader grants read access to key-values without permitting modification, and access becomes a per-service role assignment that can be revoked individually.",
+      "Rotation invalidates the leaked value but recreates the same shared secret under a new value, so the next accidental disclosure has identical impact. It also cannot tell you which of the six services a leaked string came from, because they all hold the same one.",
+      "Storing the connection string in Key Vault improves where it lives but leaves a bootstrap credential problem: each service still needs a way to authenticate to Key Vault, and if that way is a managed identity, the same identity could have read App Configuration directly. The connection string becomes an unnecessary hop.",
+      "Abandoning centralized configuration to avoid one credential gives up labels, refresh, and feature flags, and returns the team to editing six sets of environment variables by hand. It solves the leak by removing the capability rather than by fixing the authentication model."
+    ],
+    "principle": "authenticate to the configuration store with identity, not a shared string",
+    "relatedConcept": "App Configuration supports Entra authentication with data-plane roles, so centralized settings do not require distributing a store-wide connection string.",
+    "overallExplanation": "Load App Configuration with each service's managed identity and grant App Configuration Data Reader, removing the shared connection string entirely. Rotating or relocating that string keeps a store-wide credential that no role assignment can scope per service."
+  },
+  {
+    "id": 417,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "Rotating a downstream partner credential currently causes a two-minute window of authentication failures: the automation mints a new credential, writes it to Key Vault, and the old one is invalidated before every cached instance has refreshed. The partner allows two credentials to be valid at once. How should the rotation be redesigned?",
+    "options": [
+      "Adopt a two-credential rotation: mint the new credential and publish it while the previous one remains valid, then invalidate the old one only after every consumer has refreshed",
+      "Shorten the client-side cache time to live to a few seconds so instances converge on the new credential almost immediately after it is written",
+      "Have the rotation automation restart every consuming service immediately after writing the new credential so no stale cache remains",
+      "Have consumers retry on authentication failure with exponential backoff until the new credential is picked up"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The outage exists because there is a moment when the only valid credential is one that consumers have not yet seen. Overlapping two valid credentials removes that moment entirely: consumers refresh at their own pace while both work, and the old one is retired only once nobody is using it — which is exactly the capability the partner already offers.",
+      "A very short TTL narrows the window without closing it, and it does so by multiplying vault traffic for every instance permanently. Any instance that happens to be mid-request or briefly unable to refresh still fails, so the design still depends on timing rather than on overlap.",
+      "Restarting every consumer to propagate a credential turns a routine rotation into a fleet-wide disruption, with cold starts and in-flight request loss. It also does not generalize: some consumers are not restartable on demand, and the partner's own overlap feature makes the disruption unnecessary.",
+      "Retrying against a credential that is genuinely invalid simply repeats the failure and can trigger lockout or throttling at the partner. Backoff hides a brief outage behind added latency; it does not make the old credential work again."
+    ],
+    "principle": "overlap two valid credentials so rotation never has a gap",
+    "relatedConcept": "Zero-downtime rotation depends on the issuer supporting two concurrently valid credentials, letting publish and retire be separate steps.",
+    "overallExplanation": "Use two-credential rotation: publish the new credential while the old remains valid, then retire the old one after consumers have refreshed. Shorter TTLs and retries only narrow or mask a gap that overlap removes."
+  },
+  {
+    "id": 418,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Implement secure Azure solutions",
+    "type": "single",
+    "question": "A configuration change set the wrong model deployment name in App Configuration and production began calling a deployment that does not exist. The team wants to answer two questions quickly for the incident review: what the value was before the change, and how to get back to it without hunting through a chat log. What capability should they use?",
+    "options": [
+      "App Configuration's key-value history, which retains previous revisions so the earlier value can be inspected and restored",
+      "The Key Vault version history for the same key, since App Configuration values are versioned in the linked vault",
+      "The deployment pipeline's run logs, which contain the values that were applied at each release",
+      "Application Insights telemetry, which records the configuration value in use on each instance at startup"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. App Configuration retains a history of key-value revisions with timestamps, so both questions are answered from the store itself: what the value was before the change, and a restore back to that revision. Treating configuration as versioned data is what turns a configuration incident into a lookup rather than an archaeology exercise.",
+      "Key Vault versions apply only to secrets stored in the vault, and this is a non-secret setting held in App Configuration; there is no linked vault version for it. Reaching for the vault here reflects a mistaken assumption that App Configuration delegates versioning to Key Vault.",
+      "Pipeline logs only show values that the pipeline applied, and the entire point of centralized configuration is that values can change without a deployment. A change made directly in the store leaves no trace in any pipeline run.",
+      "Telemetry can record configuration in use if the application deliberately emits it, but that is an application choice, not a platform capability, and it gives no restore path. It might confirm which value each instance loaded without telling you what preceded it."
+    ],
+    "principle": "configuration is versioned data, so history is the recovery path",
+    "relatedConcept": "App Configuration keeps key-value revision history, which makes configuration changes auditable and reversible independently of deployments.",
+    "overallExplanation": "Use App Configuration's key-value history to see the previous revision and restore it. Pipeline logs miss changes made directly in the store, and Key Vault versioning covers secrets rather than App Configuration key-values."
+  },
+  {
+    "id": 419,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A Python retrieval service on Container Apps writes its own structured log lines around each HTTP call, database query, and model request, and engineers reconstruct request flow by grepping. The team wants automatic spans for outbound HTTP, database, and Azure SDK calls, correlated per request, landing in Application Insights with minimal code. What should they do?",
+    "options": [
+      "Add the Azure Monitor OpenTelemetry distro and call configure_azure_monitor with the workspace's connection string so supported libraries are instrumented automatically",
+      "Keep the hand-written logs but add a request id field to every line, then reconstruct traces by grouping on that field at query time",
+      "Create spans manually with the OpenTelemetry API around each outbound call and export them with a custom exporter the team writes",
+      "Enable container console log collection so all standard output from the service is stored and searchable centrally"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The distro wires up the OpenTelemetry SDK, the Azure Monitor exporter, and instrumentation for common libraries in a single call, so outbound HTTP, database, and Azure SDK operations produce spans with parent-child relationships and no per-call code. That is the shortest path from grep-based debugging to a real distributed trace.",
+      "A correlation id makes grouping possible but leaves the team building its own tracing model: no span durations or parent-child structure, no automatic capture of calls made inside libraries, and no way to see a waterfall. It is the manual approximation that instrumentation replaces.",
+      "Hand-written spans are appropriate for the team's own domain operations, but writing them for every outbound call duplicates what library instrumentation already provides, and writing a custom exporter re-implements a supported one. It is far more code for a strictly smaller amount of coverage.",
+      "Console log collection centralizes text without adding structure, durations, or correlation. It makes the same grep-based workflow available in a different place, which does not answer where time was spent within a request."
+    ],
+    "principle": "instrument with the distro before writing tracing code by hand",
+    "relatedConcept": "OpenTelemetry auto-instrumentation turns library calls into correlated spans, which is the foundation every later latency or failure investigation depends on.",
+    "overallExplanation": "Add the Azure Monitor OpenTelemetry distro and call configure_azure_monitor: supported libraries emit correlated spans with durations automatically. Correlation ids in log text and hand-written spans give a fraction of the coverage for much more code."
+  },
+  {
+    "id": 420,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "An API enqueues an embedding job to Service Bus and a worker consumes it. Both are instrumented, but the trace for the API request ends at the send, and the worker's processing appears as a separate root trace with no parent. Engineers cannot see end-to-end latency for one document. What must the team ensure?",
+    "options": [
+      "That trace context is propagated with the message — injected into the message's application properties on send and extracted on receive so the worker's span links to the producer's trace",
+      "That both services send telemetry to the same Application Insights resource, which is what joins spans into a single trace",
+      "That the worker names its span identically to the producer's span so the backend can match them by name",
+      "That the producer and consumer use the same sampling ratio, since mismatched sampling is what splits a trace in two"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A trace stays whole only if the trace and span identifiers travel with the work. Across a broker there is no ambient context, so the producer must inject the W3C trace context into the message's application properties and the consumer must extract it and use it as the parent for its processing span — that is what makes the worker's activity a child of the original request.",
+      "A shared telemetry destination is necessary for the spans to be queried together, but it does not create the parent-child relationship. Two roots in one resource are still two roots; correlation comes from propagated identifiers, not from co-location of data.",
+      "Span names are descriptive labels and are not used to stitch traces; many spans legitimately share a name within one trace. Matching by name would be ambiguous and is not part of how trace context works.",
+      "Sampling decisions ride along with propagated context, which is precisely why consistent sampling matters — but only once context is being propagated at all. With no context on the message, identical sampling ratios still produce two unrelated roots."
+    ],
+    "principle": "propagate trace context across the message boundary or the trace splits",
+    "relatedConcept": "Distributed tracing across asynchronous boundaries depends on carrying the trace context in the message itself, since there is no shared call stack.",
+    "overallExplanation": "Inject W3C trace context into the message's application properties on send and extract it on receive so the consumer span parents to the producer's trace. Shared telemetry resources, span names, and sampling settings do not create that link."
+  },
+  {
+    "id": 421,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "An end-to-end trace for one slow request shows: HTTP server span 4,180 ms; child spans auth check 22 ms, embed query 190 ms, vector search 240 ms, chat completion 3,510 ms, response serialization 14 ms. Product wants perceived latency roughly halved. Which change targets the dominant stage?",
+    "options": [
+      "Stream the chat completion so the user sees tokens as they are produced, and reduce the generated output length that dominates that 3,510 ms span",
+      "Cache embedding results so repeated queries skip the 190 ms embed step",
+      "Tune the vector index to bring the 240 ms search span down toward 100 ms",
+      "Parallelize the auth check with the embed query so the 22 ms authorization span overlaps other work"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The chat completion accounts for about 84 percent of the 4,180 ms span, so it is the only stage where a large change is possible — and since generation time scales with output tokens, shortening the response and streaming the first tokens both attack it directly. Streaming also improves perceived latency even before total time falls.",
+      "Removing the embed step entirely could save at most 190 ms, under 5 percent of the request, so it cannot approach a halving. Caching is a reasonable efficiency win but optimizing a small stage while an 84 percent stage stands is the classic misreading of a span breakdown.",
+      "Even a very successful index tuning saves about 140 ms here, roughly 3 percent of the request. The vector search is the second-largest span, which makes it tempting, but second-largest is nowhere near dominant in this breakdown.",
+      "Twenty-two milliseconds is the smallest span in the trace, so overlapping it is a rounding error against a 4,180 ms request. Parallelizing work is a sound technique applied to the wrong stage, and it adds concurrency complexity to the authorization path for no measurable gain."
+    ],
+    "principle": "optimize the stage that dominates the span breakdown",
+    "relatedConcept": "A span waterfall exists to make the distribution of time explicit, so improvement targets are chosen by share of total rather than by intuition.",
+    "overallExplanation": "Read the breakdown and attack the dominant stage: the 3,510 ms completion is roughly 84 percent of the request, so streaming and shorter output are the only changes that can approach a halving. Optimizing the 190 ms or 240 ms stages caps out at a few percent."
+  },
+  {
+    "id": 422,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "multi",
+    "question": "An SRE must report, for the last 24 hours, the median and 95th percentile duration of each outbound dependency in a service, worst offender first. Their first attempt was dependencies | summarize avg(duration) by name. Which two changes produce the report as specified? (Choose two.)",
+    "options": [
+      "Replace the aggregation with summarize percentiles(duration, 50, 95) by name so the median and 95th percentile are computed per dependency",
+      "Add a time filter such as where timestamp > ago(24h) so the query covers exactly the reporting window",
+      "Add | order by name asc so the output is deterministic and the worst offender can be located by scanning the list",
+      "Replace summarize with distinct name, duration so no aggregation smooths out the individual slow calls"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. An average hides the tail that the report is about — a dependency with a slow 5 percent can have an unremarkable mean. percentiles(duration, 50, 95) produces both requested statistics in one summarize, grouped by dependency name exactly as the report requires.",
+      "Correct. Without an explicit time predicate the query runs over whatever default range applies rather than the stated 24 hours, so the numbers are not the ones being reported. Filtering early with where timestamp > ago(24h) also reduces the data scanned before aggregation.",
+      "Sorting alphabetically by name does not put the worst offender first; the requirement is ordering by the computed latency, for example order by percentile_duration_95 desc. Choosing the wrong sort key is what turns a ranked report into a list someone has to eyeball.",
+      "distinct returns every unique name-and-duration pair, which for a busy service is a huge result set and no statistics at all. The report asks for aggregated percentiles per dependency, which is precisely what summarize provides."
+    ],
+    "principle": "filter the window, summarize percentiles, then sort by the metric",
+    "relatedConcept": "KQL analysis follows a shape — filter, summarize, order — and percentile statistics are what make latency reports meaningful rather than averaged away.",
+    "overallExplanation": "Filter with where timestamp > ago(24h) and aggregate with summarize percentiles(duration, 50, 95) by name, then order by the 95th percentile descending. Averages hide the tail and sorting by name does not rank anything."
+  },
+  {
+    "id": 423,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "Support reports intermittent failures on a serverless API but cannot say when or with what status. An engineer needs a five-minute-resolution view of failed request counts broken out by status code over the last six hours, so a spike can be matched against a deployment time. Which KQL query produces that?",
+    "options": [
+      "requests | where timestamp > ago(6h) and success == false | summarize count() by resultCode, bin(timestamp, 5m) | render timechart",
+      "requests | where timestamp > ago(6h) | summarize count() by resultCode | render barchart",
+      "requests | where timestamp > ago(6h) and success == false | summarize count() by resultCode | order by count_ desc",
+      "exceptions | where timestamp > ago(6h) | summarize count() by type, bin(timestamp, 5m) | render timechart"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This filters to the window and to failures, groups by both status code and a five-minute time bucket, and renders the result as a time series — which is exactly what lets a spike be lined up against a deployment timestamp. bin(timestamp, 5m) is what supplies the requested resolution.",
+      "Dropping the failure filter mixes successes into the counts, and summarizing without a time bucket collapses six hours into one number per status code. The result cannot show when anything happened, which is the specific question being asked.",
+      "This correctly isolates failures but produces one total per status code with no time dimension, so it identifies which codes occur without revealing any spike. Ordering by count is useful for a leaderboard, not for correlating with a deployment time.",
+      "The exceptions table records thrown exceptions rather than request outcomes, so it misses failures that never raised one — such as a handled 503 returned to the caller. It also groups by exception type rather than by the status code the engineer needs."
+    ],
+    "principle": "bin the timestamp when the question is when, not just how many",
+    "relatedConcept": "Choosing the right telemetry table and adding a time bucket is what turns a count into a signal you can correlate with a change.",
+    "overallExplanation": "Filter requests to the window and success == false, then summarize count() by resultCode and bin(timestamp, 5m) and render a timechart. Without the time bucket there is no spike to see, and exceptions covers thrown errors rather than request outcomes."
+  },
+  {
+    "id": 424,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A team wants to answer questions such as which tenant and which model deployment account for the slowest requests. A developer proposes attaching the tenant id, model deployment name, prompt token count, and the full prompt text as attributes on each span. What should a reviewer advise?",
+    "options": [
+      "Attach the tenant id, deployment name, and token counts as span attributes, but keep the prompt text out of telemetry because it may contain customer data",
+      "Attach all four, since span attributes are stored in the same workspace as other telemetry and inherit its access controls",
+      "Attach none of them and instead encode the values into the span name so they can be filtered without adding attributes",
+      "Attach all four but only when a request is slow, so the volume of prompt text remains manageable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Low-cardinality, non-sensitive dimensions such as tenant id, deployment name, and token counts are exactly what makes a trace sliceable, and they are what the team's questions need. Prompt text is user content that can carry personal or regulated data, so it does not belong in telemetry that has broad read access and long retention.",
+      "Workspace access controls are real but far coarser than the handling customer content requires: anyone who can query telemetry could read prompts, and retention keeps them long after the request. Treating a telemetry store as an appropriate home for user content is how prompt data ends up in unexpected places.",
+      "Encoding values into span names creates unbounded cardinality — one distinct name per tenant and deployment combination — which degrades aggregation and makes queries awkward. Attributes exist precisely so dimensions can vary without multiplying span names.",
+      "Conditioning on slowness reduces volume but not exposure: the prompts that do get recorded are still customer content sitting in a queryable store. It also biases the data, since attributes present only on slow requests cannot be compared against fast ones."
+    ],
+    "principle": "span attributes carry dimensions, not customer content",
+    "relatedConcept": "Custom span attributes make traces sliceable by business dimension, which is why choosing low-cardinality, non-sensitive fields matters.",
+    "overallExplanation": "Add tenant id, deployment name, and token counts as span attributes and keep prompt text out of telemetry. Span names must stay low cardinality, and conditioning content capture on slowness limits volume without limiting exposure."
+  },
+  {
+    "id": 425,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "Telemetry ingestion cost for a high-volume service has become a budget concern, and the team decides to keep roughly one in ten traces. An engineer worries that reducing volume will leave traces with missing middle spans, making waterfalls unreadable. What should the team implement?",
+    "options": [
+      "Configure a fixed-rate sampler so the sampling decision is made once at the root and propagated, meaning a sampled trace retains all of its spans",
+      "Have each service independently drop 90 percent of its own spans, which reaches the same overall volume reduction",
+      "Keep every span but shorten telemetry retention so the stored volume falls by a comparable amount",
+      "Sample only spans longer than a fixed duration threshold, so the fast spans that make up most of the volume are discarded"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Head sampling decides at the start of a trace and carries that decision in the propagated trace context, so every service downstream honours it. The result is complete traces for the sampled fraction and nothing at all for the rest — which is what keeps waterfalls readable while cutting volume roughly tenfold.",
+      "Independent per-service dropping is exactly the failure the engineer fears: each service makes its own uncorrelated decision, so a trace keeps a random subset of its spans and gaps appear in the middle of nearly every waterfall. The volume target is met while the data becomes much harder to use.",
+      "Shortening retention reduces stored volume but not ingestion, so it may not address the cost driver, and it trades away the ability to investigate anything older than the new window. It is a different lever aimed at a different problem.",
+      "Keeping only long spans destroys the context that makes a long span interpretable — you see the slow child with no parent, no siblings, and no baseline of fast requests to compare against. It also makes it impossible to compute meaningful percentiles, since the fast population has been thrown away."
+    ],
+    "principle": "sample whole traces at the root, never spans independently",
+    "relatedConcept": "Sampling is a trace-level decision propagated with the trace context, which is what preserves complete waterfalls at reduced volume.",
+    "overallExplanation": "Use a fixed-rate sampler whose decision is made at the root and propagated, so sampled traces keep every span. Per-service dropping produces gap-ridden waterfalls, and duration-threshold sampling removes the context and the baseline population."
+  },
+  {
+    "id": 426,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "multi",
+    "question": "A worker calls a model endpoint that intermittently returns 503 for a few seconds. The current code retries immediately up to twenty times with no delay and no overall deadline, and during an incident all sixty worker instances retried in lockstep, extending the outage. Which two changes make the retry behaviour safe? (Choose two.)",
+    "options": [
+      "Use bounded exponential backoff with random jitter so retries are spaced out and the sixty instances stop retrying in lockstep",
+      "Apply a per-attempt timeout and an overall deadline for the operation so a request cannot retry past the point where its result is still useful",
+      "Raise the retry limit from twenty to one hundred so the worker keeps trying until the endpoint recovers",
+      "Retry only on 503 and remove all retries for 429, since a throttling response means the request should be abandoned"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Immediate retries turn a brief fault into a self-inflicted load spike, and identical backoff schedules across sixty instances produce synchronized waves that keep the endpoint saturated. Exponential growth spaces attempts as failures persist, and jitter decorrelates the instances so recovery capacity is not consumed by a thundering herd.",
+      "Correct. Retry without a deadline lets a single logical operation consume unbounded time, holding connections, locks, and concurrency slots while the caller has usually given up. A per-attempt timeout bounds each try and an overall deadline bounds the operation, which is what converts retry from a hazard into a budgeted policy.",
+      "More attempts against a saturated dependency adds load precisely when it has none to spare, extending the outage rather than surviving it. The problem is the absence of spacing and bounds, not an insufficient number of attempts.",
+      "This inverts standard handling: 429 is the response most clearly worth retrying, because it signals a temporary capacity limit and usually carries a Retry-After hint telling the client exactly how long to wait. Abandoning throttled requests sheds work that would have succeeded shortly."
+    ],
+    "principle": "bounded exponential backoff with jitter, under a total time budget",
+    "relatedConcept": "Retry is a load amplifier unless it is spaced, decorrelated, and bounded by timeouts and an overall deadline.",
+    "overallExplanation": "Add bounded exponential backoff with jitter so instances stop retrying in lockstep, and enforce per-attempt timeouts plus an overall deadline. Raising the attempt count amplifies load, and 429 responses are the ones most worth retrying, guided by Retry-After."
+  },
+  {
+    "id": 427,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "Telemetry for a model-calling service shows 429 responses with a Retry-After header of 18 seconds, while the client's own retry policy waits 200 milliseconds, then 400, then 800, and gives up. Successful calls have fallen sharply and the 429 rate keeps climbing. What is the correct client behaviour?",
+    "options": [
+      "Honour the Retry-After value when the server supplies one, falling back to computed backoff only when the header is absent",
+      "Keep the computed backoff but increase the number of attempts so the cumulative wait eventually exceeds 18 seconds",
+      "Treat the 429 as a permanent failure and surface an error to the caller immediately so no retry load is added",
+      "Reduce the initial backoff further so the client can slip a request in during a gap between throttling windows"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Retry-After is the server telling the client exactly when capacity is expected to be available, so it is strictly better information than any client-side guess. Waiting the indicated 18 seconds turns three doomed retries inside 1.4 seconds into one attempt that can actually succeed, and it stops the client from adding load during the throttling window.",
+      "Reaching 18 seconds by accumulating doubling waits means many additional attempts, nearly all of which arrive while the service is still throttling and each of which adds load. It gets to the right total delay by making the problem worse along the way.",
+      "A 429 is explicitly a temporary condition, so failing immediately discards work that would succeed moments later and pushes retry responsibility onto callers who have even less information. It removes the retry load by removing the successful outcome too.",
+      "Retrying sooner is the opposite of what a throttling signal asks for: it increases request rate exactly when the service is shedding load, which is why the 429 rate keeps climbing. There is no gap to exploit — the limit applies to the window the header describes."
+    ],
+    "principle": "when the server says how long to wait, wait that long",
+    "relatedConcept": "Throttling responses carry authoritative timing information, which should take precedence over any client-computed backoff schedule.",
+    "overallExplanation": "Honour Retry-After when present and use computed backoff only as a fallback: the server knows when capacity returns. Accumulating doubling waits, failing fast, or retrying sooner all ignore information the response already provided."
+  },
+  {
+    "id": 428,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "An engineer investigating a customer complaint knows the failing operation called Cosmos DB and a model endpoint. They query the traces table for the outbound calls and find only their own log messages, with no durations or result codes for the two dependencies. Which table holds what they are looking for?",
+    "options": [
+      "dependencies, which records outbound calls with target, duration, and success, correlated to the request by operation_Id",
+      "requests, which records every call the service makes including outbound ones, with duration and result code",
+      "customMetrics, which stores the durations of outbound calls as aggregated metric values",
+      "exceptions, which records outbound call details whenever a dependency returns an error"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Outbound calls land in the dependencies table with the target, the call type, duration, and success flag, and they share operation_Id with the inbound request that caused them. The traces table holds log messages, which is exactly why the engineer's query returned only their own log lines.",
+      "The requests table records inbound operations served by the application, not calls it makes to others. Confusing the two is the most common reason a dependency investigation starts in the wrong place and appears to show no data.",
+      "customMetrics holds explicitly emitted metric values, typically pre-aggregated, so it neither captures per-call dependency detail automatically nor identifies which request a given call belonged to. It complements dependency telemetry rather than containing it.",
+      "exceptions records thrown exceptions, so it would show a failure only when a dependency error surfaced as one — and never a successful but slow call. Since the engineer needs durations and result codes for both dependencies regardless of outcome, this table cannot answer the question."
+    ],
+    "principle": "outbound calls are dependencies, inbound are requests, log lines are traces",
+    "relatedConcept": "Application Insights splits telemetry into tables by signal type, and correlation across them is done on operation_Id.",
+    "overallExplanation": "Query the dependencies table for outbound calls with target, duration, and success, joined to the request by operation_Id. traces holds log messages, requests holds inbound operations, and exceptions only appears when something is thrown."
+  },
+  {
+    "id": 429,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "For the ten slowest inbound requests in the last hour, an engineer needs each request's URL and duration alongside every outbound call that request made, with each call's target and duration. Both signals are in Application Insights. Which approach produces that combined result?",
+    "options": [
+      "Take the top ten requests by duration, then join the dependencies table on operation_Id so each dependency row is attached to its parent request",
+      "Union the requests and dependencies tables and sort the combined rows by duration descending, taking the top rows",
+      "Query the dependencies table alone and sort by duration, since the slowest dependencies necessarily belong to the slowest requests",
+      "Query the requests table alone and read the outbound call detail from the request row's custom dimensions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. operation_Id is the correlation key shared by a request and every dependency recorded under it, so joining on it is how per-request breakdowns are assembled. Selecting the ten slowest requests first keeps the join small and makes the result exactly the ten waterfalls the engineer asked for.",
+      "A union stacks rows from both tables without relating them, so the output is an interleaved list of requests and dependencies with no indication of which belongs to which. Sorting it by duration mixes two different kinds of measurement into one meaningless ranking.",
+      "The slowest individual dependencies are often not the ones driving the slowest requests — a request can be slow because of many moderate calls, and a single slow call may occur in an otherwise fast request. It also cannot supply the request URL that was asked for.",
+      "Request rows do not carry a nested list of the outbound calls made during them; that detail lives as separate dependency rows correlated by operation_Id. Expecting it in custom dimensions is what leads engineers to conclude the data is missing."
+    ],
+    "principle": "join telemetry tables on operation_Id to rebuild a request's breakdown",
+    "relatedConcept": "Per-request latency breakdowns come from correlating request and dependency telemetry, which is what makes the trace waterfall reproducible in a query.",
+    "overallExplanation": "Select the ten slowest requests, then join dependencies on operation_Id to attach each outbound call. A union relates nothing, the slowest dependencies are not necessarily in the slowest requests, and request rows do not embed dependency detail."
+  },
+  {
+    "id": 430,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "multi",
+    "question": "A request flows through an HTTP-triggered function, a Service Bus queue, and a container app. Traces from the function and the container app appear in the same workspace, but the container app's spans have an empty parent and a different operation_Id, so no end-to-end view exists. Which two things must be true for correlation to work? (Choose two.)",
+    "options": [
+      "The trace context must be carried on the Service Bus message and used by the container app as the parent of its processing span",
+      "The container app's spans must retain a parent identifier that links to the upstream span, so operation_ParentId is populated rather than empty",
+      "The two services must emit their telemetry within the same short time window, since correlation is inferred from timestamp proximity",
+      "The two services must use the same service name so the backend can infer that their spans belong to one operation"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. There is no ambient context across a broker, so the trace and span identifiers have to travel on the message itself and be adopted as the parent when the consumer starts processing. Without that, the consumer legitimately starts a brand-new trace, which is exactly the different operation_Id being observed.",
+      "Correct. An empty parent is the direct symptom: it means the consumer span was created as a root rather than as a child. Correlation is only possible when the propagated parent span identifier is preserved and recorded, which is what fills operation_ParentId and lets the two halves be joined.",
+      "Timestamp proximity is not a correlation mechanism — thousands of unrelated operations overlap in any given second, and a queued message may be processed minutes later. Correlation is identifier-based precisely because time cannot distinguish concurrent work.",
+      "A shared service name would only make the two halves harder to tell apart; distinct names are useful for identifying which component a span came from. Service naming is a labelling concern and plays no part in stitching a trace together."
+    ],
+    "principle": "correlation is identifier propagation, not co-location in time",
+    "relatedConcept": "End-to-end traces across asynchronous hops depend on the trace id and parent span id surviving the boundary and being recorded on the downstream span.",
+    "overallExplanation": "Carry trace context on the Service Bus message and adopt it as the parent of the consumer's span so operation_ParentId is populated. An empty parent plus a new operation_Id is the signature of a dropped context; timestamps and service names correlate nothing."
+  },
+  {
+    "id": 431,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A team wants to be paged when a retrieval API's failure rate exceeds two percent of requests over ten minutes, rather than when any single request fails. Traffic is low overnight, so a handful of failures should not page anyone during quiet hours. What monitoring configuration fits?",
+    "options": [
+      "A scheduled log alert rule running a KQL query that computes the failure ratio over a ten-minute window and also requires a minimum request count before firing",
+      "A metric alert that fires whenever the count of failed requests in five minutes is greater than zero",
+      "A dashboard tile showing the failure rate that an on-call engineer checks at the start of each shift",
+      "A scheduled log alert rule that fires whenever any request row in the last ten minutes has success == false"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The condition being monitored is a ratio over a window, which is a query-shaped question rather than a single metric threshold, so a scheduled log alert running KQL is the right instrument. Adding a minimum request count guards the ratio against small-denominator noise, which is what keeps two failures out of twenty overnight requests from paging anyone.",
+      "A threshold of greater than zero pages on individual failures, which is exactly what the team said they do not want, and it ignores traffic volume entirely. Alerts that fire on every error train responders to ignore them, which is worse than not having them.",
+      "A dashboard is a review tool, not a notification: nobody is paged, and a failure spike at 02:00 is discovered at the start of the next shift. It complements alerting but cannot satisfy a requirement to be paged.",
+      "This is the any-failure condition wearing a log-alert costume: it evaluates row existence rather than a ratio, so it fires on the first error regardless of volume. It also has no minimum-denominator guard, so quiet hours would be the noisiest time."
+    ],
+    "principle": "alert on rates over a window with a volume floor, not on single events",
+    "relatedConcept": "Scheduled log alerts let a KQL expression define the alert condition, which is what makes ratio-based and denominator-guarded alerting possible.",
+    "overallExplanation": "Use a scheduled log alert whose KQL computes a failure ratio over ten minutes and requires a minimum request count, so low overnight traffic cannot page on a couple of errors. Greater-than-zero conditions alert on single events and dashboards page no one."
+  },
+  {
+    "id": 432,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A worker catches every exception from its enrichment step, writes a log line at warning level, and returns a partial result. Traces show these operations as successful spans with normal durations, and a persistent failure went unnoticed for two days because success rates looked healthy. What should the team change?",
+    "options": [
+      "Record the exception on the span and set the span status to error when the step fails, so the failure is visible in telemetry even though the operation returns a partial result",
+      "Re-raise every caught exception so the operation fails outright and the failure becomes visible in the success rate",
+      "Raise the log level of the existing warning message to error so the entries stand out when someone reads the logs",
+      "Add a custom metric counting partial results and review it during weekly operational reviews"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. A span's status is what telemetry aggregations count as failure, so a caught exception with an untouched span status is invisible to every failure-rate query — which is precisely how this went unnoticed. Recording the exception on the span and marking its status as error preserves the graceful degradation while making the failure a first-class, queryable signal.",
+      "Re-raising converts a deliberate degradation strategy into an outage: users lose the partial result that the design intended to keep serving. Visibility is a telemetry problem and should not be bought by changing the product's failure behaviour.",
+      "A higher log level changes text severity but leaves the span successful, so failure-rate queries, alerts, and dashboards still see nothing wrong. It only helps if a human happens to be reading logs, which is the workflow that already failed for two days.",
+      "A custom metric is a reasonable supplementary signal, but reviewing it weekly guarantees a multi-day detection gap — the same gap the team just experienced. It also leaves the span status wrong, so the primary failure signals remain misleading."
+    ],
+    "principle": "mark the span as failed even when the request degrades gracefully",
+    "relatedConcept": "Span status and recorded exceptions are the structured failure signals that alerts and failure-rate queries consume; swallowed exceptions make healthy dashboards lie.",
+    "overallExplanation": "Record the exception on the span and set span status to error while still returning the partial result, so failure-rate queries and alerts see it. Log-level changes leave the span successful, and re-raising trades observability for an outage."
+  },
+  {
+    "id": 433,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "After a release at 14:05, users report the retrieval API feels slower, but overall average duration moved from 620 ms to 690 ms and nobody is convinced. An engineer wants a chart that would settle whether tail latency changed at the release boundary. Which query is most useful?",
+    "options": [
+      "requests | where timestamp between (ago(3h) .. now()) | summarize percentiles(duration, 50, 95, 99) by bin(timestamp, 5m) | render timechart",
+      "requests | where timestamp > ago(3h) | summarize avg(duration) by bin(timestamp, 1h) | render timechart",
+      "requests | where timestamp > ago(3h) | summarize count() by bin(timestamp, 5m) | render timechart",
+      "requests | where timestamp > ago(3h) and duration > 2000 | project timestamp, name, duration | order by duration desc"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The dispute is about tail latency, which averages hide, so the chart needs percentiles — and it needs enough time resolution to show a step at 14:05 rather than smearing it. Percentiles per five-minute bucket rendered as a time series makes a p95 or p99 shift at the release boundary immediately visible.",
+      "Hourly averages are the worst possible resolution for this question: a change at 14:05 is diluted across the 14:00 bucket, and the average is the statistic that already failed to convince anyone. It reproduces the ambiguity the engineer is trying to resolve.",
+      "Request counts describe traffic volume, not latency. A throughput chart is worth having alongside a latency chart, but on its own it cannot say whether requests got slower.",
+      "Listing individual slow requests shows examples without showing whether their rate or magnitude changed at the boundary. There is no time series and no baseline, so it cannot distinguish a new problem from slow requests that always existed."
+    ],
+    "principle": "compare percentiles over time buckets to see a latency shift",
+    "relatedConcept": "Averages mask tail regressions, so release comparisons rely on percentile time series at a resolution fine enough to expose the change point.",
+    "overallExplanation": "Chart percentiles(duration, 50, 95, 99) by bin(timestamp, 5m) as a timechart so a tail-latency step at the release boundary is visible. Hourly averages smear the change, counts measure traffic, and sample rows offer no baseline."
+  },
+  {
+    "id": 434,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A downstream scoring service is saturated: its p95 latency has risen from 300 ms to 9 s, it returns 503 for about 40 percent of calls, and the caller's Service Bus backlog is growing. Retries with backoff and jitter are already in place, and adding attempts has made things worse. What should the caller add?",
+    "options": [
+      "A circuit breaker that opens after a failure threshold, fails fast while open, and probes with a limited number of trial calls before closing again",
+      "A larger connection pool so more requests can be in flight and fewer wait for a connection",
+      "A longer per-attempt timeout so slow-but-eventually-successful calls are not abandoned prematurely",
+      "More consumer instances so the growing backlog is drained faster"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Once a dependency is saturated, correctly spaced retries still add load, so the caller needs to stop sending for a while. A circuit breaker does exactly that: it opens on a failure threshold, fails fast so callers are not blocked for nine seconds, and probes with a small number of trial calls so it can close again once health returns — giving the dependency room to recover.",
+      "A larger pool lets the caller push more concurrent requests at a service that is already failing 40 percent of them, which deepens the saturation. It is the right fix when the caller is connection-starved and the dependency is healthy, which is the opposite of this situation.",
+      "Longer timeouts mean each doomed call occupies a worker and a concurrency slot for longer, so throughput falls and the backlog grows faster. It also increases the load the dependency must carry concurrently, which is what saturation is.",
+      "Scaling consumers multiplies the request rate against the saturated dependency, so the failure rate rises and the backlog keeps growing. Adding consumer capacity only helps when the constraint is consumer-side, and here every signal points downstream."
+    ],
+    "principle": "when a dependency is saturated, shed load rather than push harder",
+    "relatedConcept": "Circuit breaking complements retry: retry handles isolated transient faults, while breaking handles a dependency that needs relief to recover.",
+    "overallExplanation": "Add a circuit breaker that opens on a failure threshold, fails fast, and probes before closing, so the saturated dependency gets relief. Bigger pools, longer timeouts, and more consumers all increase pressure on the stage that is already the constraint."
+  },
+  {
+    "id": 435,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "Before a performance review an engineer must show where the service's time actually goes: which dependency targets consume the largest share of total time across all requests in the last day, not merely which individual calls were slowest. Which aggregation answers that question?",
+    "options": [
+      "dependencies | where timestamp > ago(1d) | summarize total = sum(duration), calls = count() by target | order by total desc",
+      "dependencies | where timestamp > ago(1d) | summarize max(duration) by target | order by max_duration desc",
+      "dependencies | where timestamp > ago(1d) | top 100 by duration desc | project target, duration",
+      "dependencies | where timestamp > ago(1d) | summarize dcount(operation_Id) by target | order by dcount_operation_Id desc"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Share of total time is frequency multiplied by duration, which is exactly what sum(duration) per target computes, and carrying count() alongside shows whether a target dominates because it is slow or because it is called constantly. That distinction is what turns the chart into an actionable optimization list.",
+      "The maximum surfaces the single worst call per target, which is dominated by outliers and says nothing about aggregate cost. A target with one pathological 30-second call can outrank one consuming hours of cumulative time.",
+      "A top-100 listing shows the slowest individual calls, which is the comparison the engineer explicitly wants to move beyond. A dependency called two million times at 40 ms each never appears in that list yet may be the largest consumer of time in the service.",
+      "Counting distinct operations per target measures how many requests touch a dependency, which is a useful reach metric but not a time metric. A target touched by every request could still contribute a negligible share of total duration."
+    ],
+    "principle": "total time is frequency times duration, so sum before you rank",
+    "relatedConcept": "Aggregate cost analysis ranks by summed duration rather than by peak duration, which is how frequently-called fast dependencies get their due weight.",
+    "overallExplanation": "Rank by sum(duration) per target with count() alongside so both slow calls and very frequent ones are weighted correctly. Maximums and top-N listings surface outliers, and distinct counts measure reach rather than time."
+  },
+  {
+    "id": 436,
+    "domain": "Secure, monitor, troubleshoot Azure solutions",
+    "objective": "Monitor and troubleshoot Azure solutions",
+    "type": "single",
+    "question": "A synchronous endpoint must answer within 5 seconds or an upstream gateway abandons the connection. Its model call has a 10-second per-attempt timeout and retries up to three times with backoff, so a failing request can occupy about 35 seconds. Traces show requests still running long after the gateway gave up. How should the timeout design change?",
+    "options": [
+      "Set an overall deadline below the gateway's 5 seconds and derive per-attempt timeouts and the attempt count from the time remaining in that budget",
+      "Raise the gateway's timeout to 40 seconds so the endpoint's existing retry sequence can complete",
+      "Keep the timeouts as they are but cancel the retries when the client disconnects, since a disconnected client no longer needs the result",
+      "Reduce the per-attempt timeout to 5 seconds so no single attempt can exceed the gateway's limit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Timeouts must be budgeted from the outside in: the caller's deadline is the constraint, and everything inside — attempt timeouts, backoff waits, and how many attempts are even worth starting — has to fit inside what remains of it. Deriving inner timeouts from the remaining budget also means the last attempt is never started when there is no time for it to finish.",
+      "Stretching the upstream contract to accommodate an internal retry policy imposes a 40-second worst case on every caller, which for a synchronous endpoint is indistinguishable from a hang. It also inverts the dependency: internal implementation detail should fit the published latency contract, not redefine it.",
+      "Cancelling on disconnect is genuinely worth doing to reclaim capacity, but it is a mitigation rather than a fix: the request still consumes resources up to the moment of disconnection, and the endpoint still has no design that lets it answer within its own contract. The budget violation remains.",
+      "Equal per-attempt and overall limits leave no room for backoff waits or for a second attempt, so the first slow call consumes the entire budget and the retry policy becomes decorative. A per-attempt timeout must be a fraction of the overall deadline for retries to mean anything."
+    ],
+    "principle": "budget timeouts from the caller's deadline inward",
+    "relatedConcept": "Retries multiply latency, so per-attempt timeouts and attempt counts are only correct relative to an overall deadline inherited from the caller.",
+    "overallExplanation": "Set an overall deadline inside the gateway's 5 seconds and derive per-attempt timeouts and attempt counts from the time remaining. Raising the upstream timeout hides the design flaw, and equal inner and outer timeouts leave no room for retries."
+  }
+]
