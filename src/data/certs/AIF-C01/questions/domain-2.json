@@ -6,23 +6,24 @@
     "type": "single",
     "question": "A support assistant sends a 12,000-token conversation to a foundation model on every turn, even though only the latest question and a short summary matter. Which change most directly lowers inference cost?",
     "options": [
-      "Send only relevant context and a compact history summary",
-      "Raise temperature to shorten billing",
+      "Raise temperature to shorten billing (without testing the required input and output behavior)",
+      "Pre-train a new model for each conversation",
       "Convert embeddings back into full documents",
-      "Pre-train a new model for each conversation"
+      "Send only relevant context and a compact history summary"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: token pricing makes unnecessary input context a direct recurring cost.",
-      "Incorrect. Choosing Raise temperature to shorten billing confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost.",
-      "Incorrect. Choosing Convert embeddings back into full documents confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost.",
-      "Incorrect. Choosing Pre-train a new model for each conversation confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost."
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: token pricing makes unnecessary input context a direct recurring cost. Context selection affects both model focus and token consumption.",
+      "Incorrect. “Pre-train a new model for each conversation” does not satisfy the scenario's controlling constraint. Context selection affects both model focus and token consumption. The required response follows from this rule: token pricing makes unnecessary input context a direct recurring cost.",
+      "Incorrect. “Convert embeddings back into full documents” does not satisfy the scenario's controlling constraint. Context selection affects both model focus and token consumption. The required response follows from this rule: token pricing makes unnecessary input context a direct recurring cost.",
+      "Correct. This response fits because token pricing makes unnecessary input context a direct recurring cost. Context selection affects both model focus and token consumption."
     ],
     "principle": "token pricing makes unnecessary input context a direct recurring cost",
     "relatedConcept": "Context selection affects both model focus and token consumption.",
-    "overallExplanation": "The decisive rule is that token pricing makes unnecessary input context a direct recurring cost. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Send only relevant context and a compact history summary is the best response because token pricing makes unnecessary input context a direct recurring cost. Context selection affects both model focus and token consumption.",
+    "set": 2
   },
   {
     "id": 202,
@@ -32,22 +33,23 @@
     "question": "A knowledge search system splits manuals into passages, converts each passage into a numeric representation, and compares a query representation by semantic similarity. What are those numeric representations?",
     "options": [
       "Embeddings stored as vectors",
-      "Prompt templates stored as tokens",
       "Diffusion steps stored as pixels",
+      "Prompt templates stored as tokens",
       "Labels used for supervised regression"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: embeddings encode semantic meaning as vectors.",
-      "Incorrect. Choosing Prompt templates stored as tokens confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors.",
-      "Incorrect. Choosing Diffusion steps stored as pixels confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors.",
-      "Incorrect. Choosing Labels used for supervised regression confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors."
+      "Correct. This response fits because embeddings encode semantic meaning as vectors. Vector similarity enables semantic retrieval beyond exact keyword matching.",
+      "Incorrect. “Diffusion steps stored as pixels” does not satisfy the scenario's controlling constraint. Vector similarity enables semantic retrieval beyond exact keyword matching. The required response follows from this rule: embeddings encode semantic meaning as vectors.",
+      "Incorrect. “Prompt templates stored as tokens” does not satisfy the scenario's controlling constraint. Vector similarity enables semantic retrieval beyond exact keyword matching. The required response follows from this rule: embeddings encode semantic meaning as vectors.",
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: embeddings encode semantic meaning as vectors. Vector similarity enables semantic retrieval beyond exact keyword matching."
     ],
     "principle": "embeddings encode semantic meaning as vectors",
     "relatedConcept": "Vector similarity enables semantic retrieval beyond exact keyword matching.",
-    "overallExplanation": "The decisive rule is that embeddings encode semantic meaning as vectors. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Embeddings stored as vectors is the best response because embeddings encode semantic meaning as vectors. Vector similarity enables semantic retrieval beyond exact keyword matching.",
+    "set": 2
   },
   {
     "id": 203,
@@ -56,23 +58,24 @@
     "type": "single",
     "question": "A RAG assistant retrieves entire 400-page manuals for every question and often misses the relevant sentence because the context is noisy and exceeds model limits. Which preparation change helps most?",
     "options": [
-      "Chunk documents into coherent smaller passages before embedding",
       "Increase temperature to make retrieval more creative",
+      "Chunk documents into coherent smaller passages before embedding",
       "Translate every manual before indexing",
-      "Use reinforcement rewards at inference time"
+      "Use reinforcement rewards at inference time (while deferring operating constraints until deployment)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: chunking creates retrievable units that fit useful context windows.",
-      "Incorrect. Choosing Increase temperature to make retrieval more creative confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows.",
-      "Incorrect. Choosing Translate every manual before indexing confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows.",
-      "Incorrect. Choosing Use reinforcement rewards at inference time confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows."
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: chunking creates retrievable units that fit useful context windows. Document segmentation strongly affects retrieval precision and context quality.",
+      "Correct. This response fits because chunking creates retrievable units that fit useful context windows. Document segmentation strongly affects retrieval precision and context quality.",
+      "Incorrect. “Translate every manual before indexing” does not satisfy the scenario's controlling constraint. Document segmentation strongly affects retrieval precision and context quality. The required response follows from this rule: chunking creates retrievable units that fit useful context windows.",
+      "Incorrect. “Use reinforcement rewards at inference time (while deferring operating constraints until deployment)” does not satisfy the scenario's controlling constraint. Document segmentation strongly affects retrieval precision and context quality. The required response follows from this rule: chunking creates retrievable units that fit useful context windows."
     ],
     "principle": "chunking creates retrievable units that fit useful context windows",
     "relatedConcept": "Document segmentation strongly affects retrieval precision and context quality.",
-    "overallExplanation": "The decisive rule is that chunking creates retrievable units that fit useful context windows. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Chunk documents into coherent smaller passages before embedding is the best response because chunking creates retrievable units that fit useful context windows. Document segmentation strongly affects retrieval precision and context quality.",
+    "set": 3
   },
   {
     "id": 204,
@@ -81,48 +84,55 @@
     "type": "single",
     "question": "A design studio needs text instructions to produce original product concept images rather than classify existing photographs. Which model category best matches?",
     "options": [
+      "A clustering algorithm (based on a single headline metric)",
+      "A time-series forecaster",
       "A diffusion-based generative model",
-      "A binary classifier",
-      "A clustering algorithm",
-      "A time-series forecaster"
+      "A binary classifier"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: diffusion models are commonly used for image generation.",
-      "Incorrect. Choosing A binary classifier confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation.",
-      "Incorrect. Choosing A clustering algorithm confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation.",
-      "Incorrect. Choosing A time-series forecaster confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation."
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: diffusion models are commonly used for image generation. Generative model families are selected according to the modality being created.",
+      "Incorrect. “A time-series forecaster” does not satisfy the scenario's controlling constraint. Generative model families are selected according to the modality being created. The required response follows from this rule: diffusion models are commonly used for image generation.",
+      "Correct. This response fits because diffusion models are commonly used for image generation. Generative model families are selected according to the modality being created.",
+      "Incorrect. “A binary classifier” does not satisfy the scenario's controlling constraint. Generative model families are selected according to the modality being created. The required response follows from this rule: diffusion models are commonly used for image generation."
     ],
     "principle": "diffusion models are commonly used for image generation",
     "relatedConcept": "Generative model families are selected according to the modality being created.",
-    "overallExplanation": "The decisive rule is that diffusion models are commonly used for image generation. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "A diffusion-based generative model is the best response because diffusion models are commonly used for image generation. Generative model families are selected according to the modality being created.",
+    "set": 1
   },
   {
     "id": 205,
     "domain": "Fundamentals of GenAI",
     "objective": "Explain the basic concepts of generative AI (GenAI).",
-    "type": "single",
-    "question": "A team begins an FM project by choosing data and a model, then plans customization, evaluation, deployment, and feedback collection. Which lifecycle statement is correct?",
+    "type": "ordering",
+    "question": "A product team is creating a foundation-model application and wants evaluation and feedback built into the lifecycle. Place these stages in the correct order.",
     "options": [
-      "Evaluation should occur before deployment and continue with production feedback",
-      "Deployment should precede model selection",
-      "Feedback eliminates the need for evaluation",
-      "Pre-training must be repeated for every application"
+      "Define the use case and prepare relevant data",
+      "Select a suitable model and customize the application as needed",
+      "Deploy the default model before defining evaluation criteria",
+      "Monitor production feedback and iterate",
+      "Evaluate the application, approve it, and deploy the release"
     ],
     "correct": [
-      0
+      0,
+      1,
+      4,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: the FM lifecycle validates before release and learns from feedback afterward.",
-      "Incorrect. Choosing Deployment should precede model selection confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward.",
-      "Incorrect. Choosing Feedback eliminates the need for evaluation confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward.",
-      "Incorrect. Choosing Pre-training must be repeated for every application confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward."
+      "The lifecycle starts by defining the business use case, success measures, constraints, and relevant data. These requirements determine which model and adaptation approach are suitable.",
+      "Model selection and measured customization follow the requirements definition. The team screens candidates against workload constraints and makes the least invasive change that closes a demonstrated gap.",
+      "Deploying a default model before defining and applying evaluation criteria bypasses the release gate. Model availability alone does not establish task quality, safety, or business fit.",
+      "Production monitoring comes after release. Real feedback, safety signals, quality drift, latency, cost, and business outcomes inform the next controlled iteration.",
+      "Evaluation, approval, and controlled deployment follow customization. The candidate application must meet task, safety, operational, and business criteria before production release."
     ],
-    "principle": "the FM lifecycle validates before release and learns from feedback afterward",
-    "relatedConcept": "Foundation models move through selection, customization, evaluation, deployment, and feedback.",
-    "overallExplanation": "The decisive rule is that the FM lifecycle validates before release and learns from feedback afterward. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "principle": "foundation-model applications are evaluated before release and improved from production feedback",
+    "relatedConcept": "FM development proceeds from requirements and selection through measured customization, release, and iteration.",
+    "overallExplanation": "Start with the use case and data, select and customize the application against those requirements, evaluate before approval and deployment, and then monitor production feedback. Deploying a default model without acceptance criteria skips the essential evaluation gate.",
+    "set": 1
   },
   {
     "id": 206,
@@ -131,23 +141,24 @@
     "type": "single",
     "question": "A meeting assistant accepts audio plus presentation screenshots and produces a text summary with referenced slide content. What capability is required?",
     "options": [
-      "A multimodal model that handles audio, images, and text",
-      "A text-only regression model",
       "An unsupervised tabular clusterer",
-      "A diffusion model limited to image creation"
+      "A text-only regression model",
+      "A diffusion model limited to image creation (based on a single headline metric)",
+      "A multimodal model that handles audio, images, and text"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: multimodal models reason across more than one input modality.",
-      "Incorrect. Choosing A text-only regression model confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality.",
-      "Incorrect. Choosing An unsupervised tabular clusterer confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality.",
-      "Incorrect. Choosing A diffusion model limited to image creation confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality."
+      "Incorrect. “An unsupervised tabular clusterer” does not satisfy the scenario's controlling constraint. The model must support every modality the application supplies. The required response follows from this rule: multimodal models reason across more than one input modality.",
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: multimodal models reason across more than one input modality. The model must support every modality the application supplies.",
+      "Incorrect. “A diffusion model limited to image creation (based on a single headline metric)” does not satisfy the scenario's controlling constraint. The model must support every modality the application supplies. The required response follows from this rule: multimodal models reason across more than one input modality.",
+      "Correct. This response fits because multimodal models reason across more than one input modality. The model must support every modality the application supplies."
     ],
     "principle": "multimodal models reason across more than one input modality",
     "relatedConcept": "The model must support every modality the application supplies.",
-    "overallExplanation": "The decisive rule is that multimodal models reason across more than one input modality. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "A multimodal model that handles audio, images, and text is the best response because multimodal models reason across more than one input modality. The model must support every modality the application supplies.",
+    "set": 3
   },
   {
     "id": 207,
@@ -156,24 +167,27 @@
     "type": "multi",
     "question": "A travel assistant plans a trip, calls flight and hotel systems, remembers constraints, recovers when a booking fails, and asks for approval before purchase. Which two capabilities distinguish this agentic design from a one-shot text response? (Choose two.)",
     "options": [
+      "Image diffusion for every intermediate decision",
+      "Increase the context window and send every available record on each request",
       "Goal-directed workflow orchestration across multiple steps",
       "Tool use combined with memory of task state",
-      "Image diffusion for every intermediate decision",
       "A batch classifier that returns one fixed label"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. The assistant pursues a goal through a sequence of decisions and recovery steps instead of producing only one generated response.",
-      "Correct. Calling external systems and retaining constraints and prior results are core tool-use and memory capabilities in agentic workflows.",
-      "Incorrect. Diffusion is a generative modeling approach commonly associated with media; it is not what creates planning or controlled tool use.",
-      "Incorrect. A batch classifier can label accumulated records, but it does not plan, maintain task state, or sequence external actions toward a goal."
+      "Incorrect. “Image diffusion for every intermediate decision” does not satisfy the scenario's controlling constraint. Agents extend generation into controlled multi-step action. The required response follows from this rule: agentic AI combines goal-directed planning with tools and state.",
+      "Incorrect. More context increases cost and noise; context engineering selects the information that is relevant to the current task. For this scenario, agentic AI combines goal-directed planning with tools and state. Agents extend generation into controlled multi-step action.",
+      "Correct. This response fits because agentic AI combines goal-directed planning with tools and state. Agents extend generation into controlled multi-step action.",
+      "Correct. This response fits because agentic AI combines goal-directed planning with tools and state. Agents extend generation into controlled multi-step action.",
+      "Incorrect. “A batch classifier that returns one fixed label” does not satisfy the scenario's controlling constraint. Agents extend generation into controlled multi-step action. The required response follows from this rule: agentic AI combines goal-directed planning with tools and state."
     ],
     "principle": "agentic AI combines goal-directed planning with tools and state",
     "relatedConcept": "Agents extend generation into controlled multi-step action.",
-    "overallExplanation": "The decisive rule is that agentic AI combines goal-directed planning with tools and state. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Goal-directed workflow orchestration across multiple steps and Tool use combined with memory of task state are the best responses because agentic AI combines goal-directed planning with tools and state. Agents extend generation into controlled multi-step action.",
+    "set": 1
   },
   {
     "id": 208,
@@ -182,24 +196,27 @@
     "type": "multi",
     "question": "Two specialized agents must exchange structured task context while connecting to external calendars and inventory systems through a standard interface. Which two concepts are relevant? (Choose two.)",
     "options": [
-      "Multi-agent communication patterns",
-      "Model Context Protocol connections to external systems",
       "Higher temperature for deterministic tool calls",
+      "Fine-tune the largest model before testing a prompt or retrieval baseline",
+      "Model Context Protocol connections to external systems",
+      "Multi-agent communication patterns",
       "Image diffusion for workflow state"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: multi-agent coordination and MCP address collaboration and external-system access.",
-      "Correct. This option follows the decisive rule: multi-agent coordination and MCP address collaboration and external-system access.",
-      "Incorrect. Choosing Higher temperature for deterministic tool calls confuses a related capability with the actual requirement. It does not satisfy the scenario because multi-agent coordination and MCP address collaboration and external-system access.",
-      "Incorrect. Choosing Image diffusion for workflow state confuses a related capability with the actual requirement. It does not satisfy the scenario because multi-agent coordination and MCP address collaboration and external-system access."
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: multi-agent coordination and MCP address collaboration and external-system access. Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: multi-agent coordination and MCP address collaboration and external-system access. Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+      "Correct. This response fits because multi-agent coordination and MCP address collaboration and external-system access. Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+      "Correct. This response fits because multi-agent coordination and MCP address collaboration and external-system access. Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+      "Incorrect. “Image diffusion for workflow state” does not satisfy the scenario's controlling constraint. Agentic architecture includes communication, tools, memory, and workflow orchestration. The required response follows from this rule: multi-agent coordination and MCP address collaboration and external-system access."
     ],
     "principle": "multi-agent coordination and MCP address collaboration and external-system access",
     "relatedConcept": "Agentic architecture includes communication, tools, memory, and workflow orchestration.",
-    "overallExplanation": "The decisive rule is that multi-agent coordination and MCP address collaboration and external-system access. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Multi-agent communication patterns and Model Context Protocol connections to external systems are the best responses because multi-agent coordination and MCP address collaboration and external-system access. Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+    "set": 2
   },
   {
     "id": 209,
@@ -209,22 +226,23 @@
     "question": "An assistant has a 200-page policy library, the user's role, conversation history, and current case facts. Sending everything reduces answer quality. What does context engineering emphasize?",
     "options": [
       "Selecting and structuring the most relevant information for each model call",
+      "Replacing retrieval with a longer system prompt",
       "Training a new foundation model from raw internet data",
-      "Increasing output tokens regardless of task",
-      "Replacing retrieval with a longer system prompt"
+      "Increasing output tokens regardless of task (based on a single headline metric)"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: context engineering deliberately assembles useful information within constraints.",
-      "Incorrect. Choosing Training a new foundation model from raw internet data confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints.",
-      "Incorrect. Choosing Increasing output tokens regardless of task confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints.",
-      "Incorrect. Choosing Replacing retrieval with a longer system prompt confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints."
+      "Correct. This response fits because context engineering deliberately assembles useful information within constraints. Good context is curated and structured rather than merely maximized.",
+      "Incorrect. “Replacing retrieval with a longer system prompt” does not satisfy the scenario's controlling constraint. Good context is curated and structured rather than merely maximized. The required response follows from this rule: context engineering deliberately assembles useful information within constraints.",
+      "Incorrect. “Training a new foundation model from raw internet data” does not satisfy the scenario's controlling constraint. Good context is curated and structured rather than merely maximized. The required response follows from this rule: context engineering deliberately assembles useful information within constraints.",
+      "Incorrect. “Increasing output tokens regardless of task (based on a single headline metric)” does not satisfy the scenario's controlling constraint. Good context is curated and structured rather than merely maximized. The required response follows from this rule: context engineering deliberately assembles useful information within constraints."
     ],
     "principle": "context engineering deliberately assembles useful information within constraints",
     "relatedConcept": "Good context is curated and structured rather than merely maximized.",
-    "overallExplanation": "The decisive rule is that context engineering deliberately assembles useful information within constraints. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Selecting and structuring the most relevant information for each model call is the best response because context engineering deliberately assembles useful information within constraints. Good context is curated and structured rather than merely maximized.",
+    "set": 3
   },
   {
     "id": 210,
@@ -233,23 +251,24 @@
     "type": "single",
     "question": "A finance team compares two models with equal answer quality. Model A averages 900 input and 200 output tokens; Model B averages 2,000 input and 400 output tokens at similar rates. Which statement is most accurate?",
     "options": [
+      "Token counts affect latency but never price",
       "Model A should have lower per-request token cost",
       "Model B is cheaper because larger prompts are always cached",
-      "Token counts affect latency but never price",
       "Only training data size determines inference cost"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: both input and output token volumes influence token-based inference cost.",
-      "Incorrect. Choosing Model B is cheaper because larger prompts are always cached confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost.",
-      "Incorrect. Choosing Token counts affect latency but never price confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost.",
-      "Incorrect. Choosing Only training data size determines inference cost confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost."
+      "Incorrect. “Token counts affect latency but never price” does not satisfy the scenario's controlling constraint. Cost comparisons must use real request sizes as well as published rates. The required response follows from this rule: both input and output token volumes influence token-based inference cost.",
+      "Correct. This response fits because both input and output token volumes influence token-based inference cost. Cost comparisons must use real request sizes as well as published rates.",
+      "Incorrect. “Model B is cheaper because larger prompts are always cached” does not satisfy the scenario's controlling constraint. Cost comparisons must use real request sizes as well as published rates. The required response follows from this rule: both input and output token volumes influence token-based inference cost.",
+      "Incorrect. “Only training data size determines inference cost” does not satisfy the scenario's controlling constraint. Cost comparisons must use real request sizes as well as published rates. The required response follows from this rule: both input and output token volumes influence token-based inference cost."
     ],
     "principle": "both input and output token volumes influence token-based inference cost",
     "relatedConcept": "Cost comparisons must use real request sizes as well as published rates.",
-    "overallExplanation": "The decisive rule is that both input and output token volumes influence token-based inference cost. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Model A should have lower per-request token cost is the best response because both input and output token volumes influence token-based inference cost. Cost comparisons must use real request sizes as well as published rates.",
+    "set": 1
   },
   {
     "id": 211,
@@ -259,23 +278,26 @@
     "question": "A retailer wants an assistant to create text descriptions from product images and also answer questions about those images. Which two requirements should guide model selection? (Choose two.)",
     "options": [
       "Support for image input and text output",
-      "A context window large enough for the supplied content",
+      "Fine-tune the largest model before testing a prompt or retrieval baseline",
       "A regression loss exposed to end users",
+      "A context window large enough for the supplied content",
       "A reward signal for every inference"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: modality support and context capacity are necessary application constraints.",
-      "Correct. This option follows the decisive rule: modality support and context capacity are necessary application constraints.",
-      "Incorrect. Choosing A regression loss exposed to end users confuses a related capability with the actual requirement. It does not satisfy the scenario because modality support and context capacity are necessary application constraints.",
-      "Incorrect. Choosing A reward signal for every inference confuses a related capability with the actual requirement. It does not satisfy the scenario because modality support and context capacity are necessary application constraints."
+      "Correct. This response fits because modality support and context capacity are necessary application constraints. Model capabilities must match input types and expected output.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: modality support and context capacity are necessary application constraints. Model capabilities must match input types and expected output.",
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: modality support and context capacity are necessary application constraints. Model capabilities must match input types and expected output.",
+      "Correct. This response fits because modality support and context capacity are necessary application constraints. Model capabilities must match input types and expected output.",
+      "Incorrect. “A reward signal for every inference” does not satisfy the scenario's controlling constraint. Model capabilities must match input types and expected output. The required response follows from this rule: modality support and context capacity are necessary application constraints."
     ],
     "principle": "modality support and context capacity are necessary application constraints",
     "relatedConcept": "Model capabilities must match input types and expected output.",
-    "overallExplanation": "The decisive rule is that modality support and context capacity are necessary application constraints. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Support for image input and text output and A context window large enough for the supplied content are the best responses because modality support and context capacity are necessary application constraints. Model capabilities must match input types and expected output.",
+    "set": 2
   },
   {
     "id": 212,
@@ -284,23 +306,24 @@
     "type": "single",
     "question": "A company connects an agent to a CRM using MCP but assumes the protocol will automatically decide which customer record an employee may view. What is the correct interpretation?",
     "options": [
-      "MCP standardizes context and tool connections; authorization still needs enforcement",
-      "MCP grants universal least-privilege access by default",
+      "MCP replaces workflow orchestration and agent memory",
       "MCP is a model-training algorithm that removes access control",
-      "MCP replaces workflow orchestration and agent memory"
+      "MCP standardizes context and tool connections; authorization still needs enforcement",
+      "MCP grants universal least-privilege access by default (because it is simpler to explain to stakeholders)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: a connection protocol does not replace identity and authorization controls.",
-      "Incorrect. Choosing MCP grants universal least-privilege access by default confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls.",
-      "Incorrect. Choosing MCP is a model-training algorithm that removes access control confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls.",
-      "Incorrect. Choosing MCP replaces workflow orchestration and agent memory confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls."
+      "Incorrect. “MCP replaces workflow orchestration and agent memory” does not satisfy the scenario's controlling constraint. Agent tools remain subject to the security boundaries of external systems. The required response follows from this rule: a connection protocol does not replace identity and authorization controls.",
+      "Incorrect. “MCP is a model-training algorithm that removes access control” does not satisfy the scenario's controlling constraint. Agent tools remain subject to the security boundaries of external systems. The required response follows from this rule: a connection protocol does not replace identity and authorization controls.",
+      "Correct. This response fits because a connection protocol does not replace identity and authorization controls. Agent tools remain subject to the security boundaries of external systems.",
+      "Incorrect. “MCP grants universal least-privilege access by default (because it is simpler to explain to stakeholders)” does not satisfy the scenario's controlling constraint. Agent tools remain subject to the security boundaries of external systems. The required response follows from this rule: a connection protocol does not replace identity and authorization controls."
     ],
     "principle": "a connection protocol does not replace identity and authorization controls",
     "relatedConcept": "Agent tools remain subject to the security boundaries of external systems.",
-    "overallExplanation": "The decisive rule is that a connection protocol does not replace identity and authorization controls. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "MCP standardizes context and tool connections; authorization still needs enforcement is the best response because a connection protocol does not replace identity and authorization controls. Agent tools remain subject to the security boundaries of external systems.",
+    "set": 3
   },
   {
     "id": 213,
@@ -309,23 +332,24 @@
     "type": "single",
     "question": "A communications team needs rapid first drafts for dozens of audiences and wants editors to refine them rather than write every version from scratch. Which GenAI advantage is most relevant?",
     "options": [
-      "Adaptable content generation from natural-language instructions",
       "Guaranteed factual correctness without review",
       "Perfect deterministic output on every run",
-      "Automatic legal approval of generated claims"
+      "Automatic legal approval of generated claims",
+      "Adaptable content generation from natural-language instructions"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: GenAI accelerates varied content creation but does not guarantee truth or approval.",
-      "Incorrect. Choosing Guaranteed factual correctness without review confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval.",
-      "Incorrect. Choosing Perfect deterministic output on every run confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval.",
-      "Incorrect. Choosing Automatic legal approval of generated claims confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval."
+      "Incorrect. “Guaranteed factual correctness without review” does not satisfy the scenario's controlling constraint. Business value comes from pairing versatile generation with suitable oversight. The required response follows from this rule: GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Incorrect. “Perfect deterministic output on every run” does not satisfy the scenario's controlling constraint. Business value comes from pairing versatile generation with suitable oversight. The required response follows from this rule: GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Incorrect. “Automatic legal approval of generated claims” does not satisfy the scenario's controlling constraint. Business value comes from pairing versatile generation with suitable oversight. The required response follows from this rule: GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Correct. This response fits because GenAI accelerates varied content creation but does not guarantee truth or approval. Business value comes from pairing versatile generation with suitable oversight."
     ],
     "principle": "GenAI accelerates varied content creation but does not guarantee truth or approval",
     "relatedConcept": "Business value comes from pairing versatile generation with suitable oversight.",
-    "overallExplanation": "The decisive rule is that GenAI accelerates varied content creation but does not guarantee truth or approval. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Adaptable content generation from natural-language instructions is the best response because GenAI accelerates varied content creation but does not guarantee truth or approval. Business value comes from pairing versatile generation with suitable oversight.",
+    "set": 1
   },
   {
     "id": 214,
@@ -343,14 +367,15 @@
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: hallucination is plausible but unsupported generated content.",
-      "Incorrect. Choosing Clustering confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content.",
-      "Incorrect. Choosing Tokenization confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content.",
-      "Incorrect. Choosing Deterministic rule execution confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content."
+      "Correct. This response fits because hallucination is plausible but unsupported generated content. Fluency is not evidence that a generated statement is grounded or accurate.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: hallucination is plausible but unsupported generated content. Fluency is not evidence that a generated statement is grounded or accurate.",
+      "Incorrect. “Tokenization” does not satisfy the scenario's controlling constraint. Fluency is not evidence that a generated statement is grounded or accurate. The required response follows from this rule: hallucination is plausible but unsupported generated content.",
+      "Incorrect. “Deterministic rule execution” does not satisfy the scenario's controlling constraint. Fluency is not evidence that a generated statement is grounded or accurate. The required response follows from this rule: hallucination is plausible but unsupported generated content."
     ],
     "principle": "hallucination is plausible but unsupported generated content",
     "relatedConcept": "Fluency is not evidence that a generated statement is grounded or accurate.",
-    "overallExplanation": "The decisive rule is that hallucination is plausible but unsupported generated content. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Hallucination is the best response because hallucination is plausible but unsupported generated content. Fluency is not evidence that a generated statement is grounded or accurate.",
+    "set": 2
   },
   {
     "id": 215,
@@ -359,23 +384,24 @@
     "type": "single",
     "question": "A regulated lender compares FMs for a multilingual assistant. It needs low latency, regional availability, documented licensing, and a strict monthly budget. Which factors must be evaluated?",
     "options": [
+      "Only benchmark popularity",
       "Capability, latency, compliance, regional coverage, and cost",
       "Only parameter count",
-      "Only benchmark popularity",
-      "Only the longest available output"
+      "Only the longest available output (while deferring operating constraints until deployment)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: model selection is a multi-constraint business and technical decision.",
-      "Incorrect. Choosing Only parameter count confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision.",
-      "Incorrect. Choosing Only benchmark popularity confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision.",
-      "Incorrect. Choosing Only the longest available output confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision."
+      "Incorrect. “Only benchmark popularity” does not satisfy the scenario's controlling constraint. The best model is the smallest viable fit across quality, risk, latency, and cost. The required response follows from this rule: model selection is a multi-constraint business and technical decision.",
+      "Correct. This response fits because model selection is a multi-constraint business and technical decision. The best model is the smallest viable fit across quality, risk, latency, and cost.",
+      "Incorrect. “Only parameter count” does not satisfy the scenario's controlling constraint. The best model is the smallest viable fit across quality, risk, latency, and cost. The required response follows from this rule: model selection is a multi-constraint business and technical decision.",
+      "Incorrect. “Only the longest available output (while deferring operating constraints until deployment)” does not satisfy the scenario's controlling constraint. The best model is the smallest viable fit across quality, risk, latency, and cost. The required response follows from this rule: model selection is a multi-constraint business and technical decision."
     ],
     "principle": "model selection is a multi-constraint business and technical decision",
     "relatedConcept": "The best model is the smallest viable fit across quality, risk, latency, and cost.",
-    "overallExplanation": "The decisive rule is that model selection is a multi-constraint business and technical decision. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Capability, latency, compliance, regional coverage, and cost is the best response because model selection is a multi-constraint business and technical decision. The best model is the smallest viable fit across quality, risk, latency, and cost.",
+    "set": 3
   },
   {
     "id": 216,
@@ -384,23 +410,24 @@
     "type": "single",
     "question": "A chatbot gives slightly different wording to the same request on repeated calls, even though the application has not changed. Which limitation does this illustrate?",
     "options": [
+      "Supervised-label leakage (based on a single headline metric)",
+      "Vector database corruption",
       "Nondeterminism in generated outputs",
-      "Data residency failure",
-      "Supervised-label leakage",
-      "Vector database corruption"
+      "Data residency failure"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: probabilistic generation can vary across otherwise similar calls.",
-      "Incorrect. Choosing Data residency failure confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls.",
-      "Incorrect. Choosing Supervised-label leakage confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls.",
-      "Incorrect. Choosing Vector database corruption confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls."
+      "Incorrect. “Supervised-label leakage (based on a single headline metric)” does not satisfy the scenario's controlling constraint. Applications must design evaluation and controls around variable outputs. The required response follows from this rule: probabilistic generation can vary across otherwise similar calls.",
+      "Incorrect. “Vector database corruption” does not satisfy the scenario's controlling constraint. Applications must design evaluation and controls around variable outputs. The required response follows from this rule: probabilistic generation can vary across otherwise similar calls.",
+      "Correct. This response fits because probabilistic generation can vary across otherwise similar calls. Applications must design evaluation and controls around variable outputs.",
+      "Incorrect. “Data residency failure” does not satisfy the scenario's controlling constraint. Applications must design evaluation and controls around variable outputs. The required response follows from this rule: probabilistic generation can vary across otherwise similar calls."
     ],
     "principle": "probabilistic generation can vary across otherwise similar calls",
     "relatedConcept": "Applications must design evaluation and controls around variable outputs.",
-    "overallExplanation": "The decisive rule is that probabilistic generation can vary across otherwise similar calls. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Nondeterminism in generated outputs is the best response because probabilistic generation can vary across otherwise similar calls. Applications must design evaluation and controls around variable outputs.",
+    "set": 1
   },
   {
     "id": 217,
@@ -409,23 +436,24 @@
     "type": "single",
     "question": "A sales assistant cuts average proposal preparation from four hours to one hour but increases review time by twenty minutes. Which metric best captures the direct productivity value?",
     "options": [
-      "Net staff time saved per completed proposal",
+      "Size of the pre-training corpus",
+      "Number of prompt words (while deferring operating constraints until deployment)",
       "Total model parameter count",
-      "Number of prompt words",
-      "Size of the pre-training corpus"
+      "Net staff time saved per completed proposal"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: business value should measure the workflow outcome changed by the application.",
-      "Incorrect. Choosing Total model parameter count confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application.",
-      "Incorrect. Choosing Number of prompt words confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application.",
-      "Incorrect. Choosing Size of the pre-training corpus confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application."
+      "Incorrect. “Size of the pre-training corpus” does not satisfy the scenario's controlling constraint. GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes. The required response follows from this rule: business value should measure the workflow outcome changed by the application.",
+      "Incorrect. “Number of prompt words (while deferring operating constraints until deployment)” does not satisfy the scenario's controlling constraint. GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes. The required response follows from this rule: business value should measure the workflow outcome changed by the application.",
+      "Incorrect. “Total model parameter count” does not satisfy the scenario's controlling constraint. GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes. The required response follows from this rule: business value should measure the workflow outcome changed by the application.",
+      "Correct. This response fits because business value should measure the workflow outcome changed by the application. GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes."
     ],
     "principle": "business value should measure the workflow outcome changed by the application",
     "relatedConcept": "GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes.",
-    "overallExplanation": "The decisive rule is that business value should measure the workflow outcome changed by the application. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Net staff time saved per completed proposal is the best response because business value should measure the workflow outcome changed by the application. GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes.",
+    "set": 2
   },
   {
     "id": 218,
@@ -437,20 +465,21 @@
       "Evaluate ROI; the conversion lift alone does not prove business value",
       "Launch because any conversion increase justifies any cost",
       "Measure only model latency",
-      "Increase model size before calculating cost"
+      "Increase model size before calculating cost (without testing the required input and output behavior)"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: business value requires benefits to exceed full operating costs.",
-      "Incorrect. Choosing Launch because any conversion increase justifies any cost confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs.",
-      "Incorrect. Choosing Measure only model latency confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs.",
-      "Incorrect. Choosing Increase model size before calculating cost confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs."
+      "Correct. This response fits because business value requires benefits to exceed full operating costs. Outcome metrics and economics matter more than impressive model behavior.",
+      "Incorrect. “Launch because any conversion increase justifies any cost” does not satisfy the scenario's controlling constraint. Outcome metrics and economics matter more than impressive model behavior. The required response follows from this rule: business value requires benefits to exceed full operating costs.",
+      "Incorrect. “Measure only model latency” does not satisfy the scenario's controlling constraint. Outcome metrics and economics matter more than impressive model behavior. The required response follows from this rule: business value requires benefits to exceed full operating costs.",
+      "Incorrect. “Increase model size before calculating cost (without testing the required input and output behavior)” does not satisfy the scenario's controlling constraint. Outcome metrics and economics matter more than impressive model behavior. The required response follows from this rule: business value requires benefits to exceed full operating costs."
     ],
     "principle": "business value requires benefits to exceed full operating costs",
     "relatedConcept": "Outcome metrics and economics matter more than impressive model behavior.",
-    "overallExplanation": "The decisive rule is that business value requires benefits to exceed full operating costs. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Evaluate ROI; the conversion lift alone does not prove business value is the best response because business value requires benefits to exceed full operating costs. Outcome metrics and economics matter more than impressive model behavior.",
+    "set": 3
   },
   {
     "id": 219,
@@ -460,23 +489,26 @@
     "question": "A legal assistant is highly fluent but cannot cite its claims, and repeated evaluation shows occasional fabricated precedents. Which two limitations require controls? (Choose two.)",
     "options": [
       "Hallucination and inaccuracy",
+      "Increase the context window and send every available record on each request",
+      "Deterministic outputs that never vary",
       "Limited interpretability of how answers were produced",
-      "Excess labeled tabular data",
-      "Deterministic outputs that never vary"
+      "Excess labeled tabular data"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: unsupported claims and limited interpretability are central GenAI risks.",
-      "Correct. This option follows the decisive rule: unsupported claims and limited interpretability are central GenAI risks.",
-      "Incorrect. Choosing Excess labeled tabular data confuses a related capability with the actual requirement. It does not satisfy the scenario because unsupported claims and limited interpretability are central GenAI risks.",
-      "Incorrect. Choosing Deterministic outputs that never vary confuses a related capability with the actual requirement. It does not satisfy the scenario because unsupported claims and limited interpretability are central GenAI risks."
+      "Correct. This response fits because unsupported claims and limited interpretability are central GenAI risks. High-stakes GenAI needs grounding, evaluation, and human review.",
+      "Incorrect. More context increases cost and noise; context engineering selects the information that is relevant to the current task. For this scenario, unsupported claims and limited interpretability are central GenAI risks. High-stakes GenAI needs grounding, evaluation, and human review.",
+      "Incorrect. “Deterministic outputs that never vary” does not satisfy the scenario's controlling constraint. High-stakes GenAI needs grounding, evaluation, and human review. The required response follows from this rule: unsupported claims and limited interpretability are central GenAI risks.",
+      "Correct. This response fits because unsupported claims and limited interpretability are central GenAI risks. High-stakes GenAI needs grounding, evaluation, and human review.",
+      "Incorrect. “Excess labeled tabular data” does not satisfy the scenario's controlling constraint. High-stakes GenAI needs grounding, evaluation, and human review. The required response follows from this rule: unsupported claims and limited interpretability are central GenAI risks."
     ],
     "principle": "unsupported claims and limited interpretability are central GenAI risks",
     "relatedConcept": "High-stakes GenAI needs grounding, evaluation, and human review.",
-    "overallExplanation": "The decisive rule is that unsupported claims and limited interpretability are central GenAI risks. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Hallucination and inaccuracy and Limited interpretability of how answers were produced are the best responses because unsupported claims and limited interpretability are central GenAI risks. High-stakes GenAI needs grounding, evaluation, and human review.",
+    "set": 1
   },
   {
     "id": 220,
@@ -485,23 +517,24 @@
     "type": "single",
     "question": "A mobile help feature needs responses under 300 milliseconds, while the most capable model regularly takes three seconds and its extra quality is not visible to users. Which choice is best?",
     "options": [
-      "Select a smaller model that meets quality and latency requirements",
-      "Always select the largest model available",
       "Ignore latency because capability is the only criterion",
-      "Fine-tune the slow model without measuring serving time"
+      "Select a smaller model that meets quality and latency requirements",
+      "Fine-tune the slow model without measuring serving time (while deferring operating constraints until deployment)",
+      "Always select the largest model available"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: the best model satisfies the actual performance envelope rather than maximizing size.",
-      "Incorrect. Choosing Always select the largest model available confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size.",
-      "Incorrect. Choosing Ignore latency because capability is the only criterion confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size.",
-      "Incorrect. Choosing Fine-tune the slow model without measuring serving time confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size."
+      "Incorrect. “Ignore latency because capability is the only criterion” does not satisfy the scenario's controlling constraint. Model complexity, quality, latency, and cost involve tradeoffs. The required response follows from this rule: the best model satisfies the actual performance envelope rather than maximizing size.",
+      "Correct. This response fits because the best model satisfies the actual performance envelope rather than maximizing size. Model complexity, quality, latency, and cost involve tradeoffs.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: the best model satisfies the actual performance envelope rather than maximizing size. Model complexity, quality, latency, and cost involve tradeoffs.",
+      "Incorrect. “Always select the largest model available” does not satisfy the scenario's controlling constraint. Model complexity, quality, latency, and cost involve tradeoffs. The required response follows from this rule: the best model satisfies the actual performance envelope rather than maximizing size."
     ],
     "principle": "the best model satisfies the actual performance envelope rather than maximizing size",
     "relatedConcept": "Model complexity, quality, latency, and cost involve tradeoffs.",
-    "overallExplanation": "The decisive rule is that the best model satisfies the actual performance envelope rather than maximizing size. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Select a smaller model that meets quality and latency requirements is the best response because the best model satisfies the actual performance envelope rather than maximizing size. Model complexity, quality, latency, and cost involve tradeoffs.",
+    "set": 2
   },
   {
     "id": 221,
@@ -510,23 +543,24 @@
     "type": "single",
     "question": "A team asks a GenAI model to calculate a safety-critical dosage where an exact approved formula already exists. Which limitation drives the right design?",
     "options": [
-      "Nondeterministic generation is unsuitable for an exact deterministic calculation",
       "Conversational ability makes formulas unnecessary",
-      "More tokens guarantee exact arithmetic",
-      "A broader model removes the need for validation"
+      "A broader model removes the need for validation",
+      "Nondeterministic generation is unsuitable for an exact deterministic calculation",
+      "More tokens guarantee exact arithmetic (based on a single headline metric)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: exact safety rules should be implemented and validated deterministically.",
-      "Incorrect. Choosing Conversational ability makes formulas unnecessary confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically.",
-      "Incorrect. Choosing More tokens guarantee exact arithmetic confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically.",
-      "Incorrect. Choosing A broader model removes the need for validation confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically."
+      "Incorrect. “Conversational ability makes formulas unnecessary” does not satisfy the scenario's controlling constraint. GenAI is not automatically appropriate for every language-shaped interface. The required response follows from this rule: exact safety rules should be implemented and validated deterministically.",
+      "Incorrect. “A broader model removes the need for validation” does not satisfy the scenario's controlling constraint. GenAI is not automatically appropriate for every language-shaped interface. The required response follows from this rule: exact safety rules should be implemented and validated deterministically.",
+      "Correct. This response fits because exact safety rules should be implemented and validated deterministically. GenAI is not automatically appropriate for every language-shaped interface.",
+      "Incorrect. “More tokens guarantee exact arithmetic (based on a single headline metric)” does not satisfy the scenario's controlling constraint. GenAI is not automatically appropriate for every language-shaped interface. The required response follows from this rule: exact safety rules should be implemented and validated deterministically."
     ],
     "principle": "exact safety rules should be implemented and validated deterministically",
     "relatedConcept": "GenAI is not automatically appropriate for every language-shaped interface.",
-    "overallExplanation": "The decisive rule is that exact safety rules should be implemented and validated deterministically. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Nondeterministic generation is unsuitable for an exact deterministic calculation is the best response because exact safety rules should be implemented and validated deterministically. GenAI is not automatically appropriate for every language-shaped interface.",
+    "set": 3
   },
   {
     "id": 222,
@@ -535,23 +569,24 @@
     "type": "single",
     "question": "A support pilot answers 90% of questions but frequently fails on one high-value enterprise product line. Which evaluation view is most useful?",
     "options": [
-      "Measure performance by product segment as well as aggregate accuracy",
-      "Use only the overall 90% score",
+      "Replace customer outcomes with model size (while deferring operating constraints until deployment)",
       "Count output tokens as the success metric",
-      "Replace customer outcomes with model size"
+      "Use only the overall 90% score",
+      "Measure performance by product segment as well as aggregate accuracy"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: cross-domain and subgroup performance can reveal hidden business failures.",
-      "Incorrect. Choosing Use only the overall 90% score confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures.",
-      "Incorrect. Choosing Count output tokens as the success metric confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures.",
-      "Incorrect. Choosing Replace customer outcomes with model size confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures."
+      "Incorrect. “Replace customer outcomes with model size (while deferring operating constraints until deployment)” does not satisfy the scenario's controlling constraint. Aggregate quality can conceal poor performance where value or risk is concentrated. The required response follows from this rule: cross-domain and subgroup performance can reveal hidden business failures.",
+      "Incorrect. “Count output tokens as the success metric” does not satisfy the scenario's controlling constraint. Aggregate quality can conceal poor performance where value or risk is concentrated. The required response follows from this rule: cross-domain and subgroup performance can reveal hidden business failures.",
+      "Incorrect. “Use only the overall 90% score” does not satisfy the scenario's controlling constraint. Aggregate quality can conceal poor performance where value or risk is concentrated. The required response follows from this rule: cross-domain and subgroup performance can reveal hidden business failures.",
+      "Correct. This response fits because cross-domain and subgroup performance can reveal hidden business failures. Aggregate quality can conceal poor performance where value or risk is concentrated."
     ],
     "principle": "cross-domain and subgroup performance can reveal hidden business failures",
     "relatedConcept": "Aggregate quality can conceal poor performance where value or risk is concentrated.",
-    "overallExplanation": "The decisive rule is that cross-domain and subgroup performance can reveal hidden business failures. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Measure performance by product segment as well as aggregate accuracy is the best response because cross-domain and subgroup performance can reveal hidden business failures. Aggregate quality can conceal poor performance where value or risk is concentrated.",
+    "set": 1
   },
   {
     "id": 223,
@@ -561,22 +596,23 @@
     "question": "A creative-writing tool is expected to propose diverse slogans, while a policy-answering bot must remain consistent and grounded. Which statement is correct?",
     "options": [
       "Different use cases require different tolerance for variability and risk",
-      "Both should maximize temperature and novelty",
-      "Both should eliminate all human review",
-      "One universal quality metric is sufficient"
+      "One universal quality metric is sufficient",
+      "Both should eliminate all human review (without testing the required input and output behavior)",
+      "Both should maximize temperature and novelty"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: application purpose determines acceptable creativity, consistency, and oversight.",
-      "Incorrect. Choosing Both should maximize temperature and novelty confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight.",
-      "Incorrect. Choosing Both should eliminate all human review confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight.",
-      "Incorrect. Choosing One universal quality metric is sufficient confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight."
+      "Correct. This response fits because application purpose determines acceptable creativity, consistency, and oversight. GenAI capabilities and limitations must be judged in the business context.",
+      "Incorrect. “One universal quality metric is sufficient” does not satisfy the scenario's controlling constraint. GenAI capabilities and limitations must be judged in the business context. The required response follows from this rule: application purpose determines acceptable creativity, consistency, and oversight.",
+      "Incorrect. “Both should eliminate all human review (without testing the required input and output behavior)” does not satisfy the scenario's controlling constraint. GenAI capabilities and limitations must be judged in the business context. The required response follows from this rule: application purpose determines acceptable creativity, consistency, and oversight.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: application purpose determines acceptable creativity, consistency, and oversight. GenAI capabilities and limitations must be judged in the business context."
     ],
     "principle": "application purpose determines acceptable creativity, consistency, and oversight",
     "relatedConcept": "GenAI capabilities and limitations must be judged in the business context.",
-    "overallExplanation": "The decisive rule is that application purpose determines acceptable creativity, consistency, and oversight. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Different use cases require different tolerance for variability and risk is the best response because application purpose determines acceptable creativity, consistency, and oversight. GenAI capabilities and limitations must be judged in the business context.",
+    "set": 2
   },
   {
     "id": 224,
@@ -585,49 +621,62 @@
     "type": "multi",
     "question": "A procurement team compares an inexpensive text-only model with a costlier multimodal model for summarizing text contracts only. Which two selection criteria favor the text model? (Choose two.)",
     "options": [
-      "The required modality is text only",
+      "Treat an agent connection protocol as the authorization boundary",
+      "Greater complexity is always safer for compliance",
       "Lower cost matters when quality is sufficient",
-      "Unused image capability automatically improves summaries",
-      "Greater complexity is always safer for compliance"
+      "The required modality is text only",
+      "Unused image capability automatically improves summaries"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: pay only for capabilities needed to meet measured requirements.",
-      "Correct. This option follows the decisive rule: pay only for capabilities needed to meet measured requirements.",
-      "Incorrect. Choosing Unused image capability automatically improves summaries confuses a related capability with the actual requirement. It does not satisfy the scenario because pay only for capabilities needed to meet measured requirements.",
-      "Incorrect. Choosing Greater complexity is always safer for compliance confuses a related capability with the actual requirement. It does not satisfy the scenario because pay only for capabilities needed to meet measured requirements."
+      "Incorrect. Protocols can standardize connections, but verified identity and authorization still require enforceable controls. For this scenario, pay only for capabilities needed to meet measured requirements. Model selection should avoid complexity that adds cost without business value.",
+      "Incorrect. “Greater complexity is always safer for compliance” does not satisfy the scenario's controlling constraint. Model selection should avoid complexity that adds cost without business value. The required response follows from this rule: pay only for capabilities needed to meet measured requirements.",
+      "Correct. This response fits because pay only for capabilities needed to meet measured requirements. Model selection should avoid complexity that adds cost without business value.",
+      "Correct. This response fits because pay only for capabilities needed to meet measured requirements. Model selection should avoid complexity that adds cost without business value.",
+      "Incorrect. “Unused image capability automatically improves summaries” does not satisfy the scenario's controlling constraint. Model selection should avoid complexity that adds cost without business value. The required response follows from this rule: pay only for capabilities needed to meet measured requirements."
     ],
     "principle": "pay only for capabilities needed to meet measured requirements",
     "relatedConcept": "Model selection should avoid complexity that adds cost without business value.",
-    "overallExplanation": "The decisive rule is that pay only for capabilities needed to meet measured requirements. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "The required modality is text only and Lower cost matters when quality is sufficient are the best responses because pay only for capabilities needed to meet measured requirements. Model selection should avoid complexity that adds cost without business value.",
+    "set": 3
   },
   {
     "id": 225,
     "domain": "Fundamentals of GenAI",
     "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
-    "type": "single",
-    "question": "A startup wants to access several managed foundation models through one AWS service without operating model-serving infrastructure. Which service is the primary fit?",
+    "type": "matching",
+    "question": "A cloud team is choosing among AWS platforms and managed AI capabilities. Match each requirement with the AWS offering that most directly addresses it.",
     "options": [
-      "Amazon Bedrock",
-      "Amazon SageMaker AI training jobs",
-      "Amazon Transcribe",
-      "AWS Glue DataBrew"
+      "Amazon SageMaker AI",
+      "SageMaker JumpStart",
+      "Amazon Quick",
+      "Amazon Bedrock"
     ],
     "correct": [
-      0
+      3,
+      0,
+      1,
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Bedrock provides managed access to foundation models for GenAI applications.",
-      "Incorrect. Choosing Amazon SageMaker AI training jobs confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications.",
-      "Incorrect. Choosing Amazon Transcribe confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications.",
-      "Incorrect. Choosing AWS Glue DataBrew confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications."
+      "Amazon SageMaker AI supports teams that need to develop, train, deploy, and operate custom ML models. It provides greater ownership of the model lifecycle than a managed foundation-model API.",
+      "SageMaker JumpStart helps teams discover and start from pretrained models and solution templates within SageMaker AI. It reduces the work required to begin a common ML or GenAI solution.",
+      "Amazon Quick supports AI-assisted work with governed enterprise knowledge, business data, and analytics. It fits the requirement to ask questions of approved business information and dashboards.",
+      "Amazon Bedrock provides managed access to foundation models and GenAI capabilities without requiring the application team to operate the underlying model-serving infrastructure."
     ],
-    "principle": "Amazon Bedrock provides managed access to foundation models for GenAI applications",
-    "relatedConcept": "Managed FM access lowers the infrastructure barrier to application development.",
-    "overallExplanation": "The decisive rule is that Amazon Bedrock provides managed access to foundation models for GenAI applications. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "principle": "AWS AI offerings should be selected according to the required level of model ownership and application capability",
+    "relatedConcept": "Bedrock, SageMaker AI, JumpStart, and Quick solve different managed AI and analytics needs.",
+    "overallExplanation": "Use Bedrock for managed foundation-model access, SageMaker AI for custom model lifecycle ownership, JumpStart for pretrained models and solution templates, and Amazon Quick for AI-assisted work with governed business information.",
+    "prompts": [
+      "Invoke managed foundation models without operating serving infrastructure",
+      "Develop, train, deploy, and monitor custom models",
+      "Discover pretrained models and solution templates inside SageMaker AI",
+      "Query governed business data and dashboards with AI assistance"
+    ],
+    "set": 1
   },
   {
     "id": 226,
@@ -636,48 +685,59 @@
     "type": "single",
     "question": "A research team needs deep control over training code, custom algorithms, experiments, and model hosting rather than only invoking managed FMs. Which service is the better fit?",
     "options": [
-      "Amazon SageMaker AI",
-      "Amazon Polly",
       "Amazon Quick",
+      "Amazon SageMaker AI",
+      "Amazon Polly (based on a single headline metric)",
       "AWS Artifact"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: SageMaker AI supports custom model development training and deployment.",
-      "Incorrect. Choosing Amazon Polly confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment.",
-      "Incorrect. Choosing Amazon Quick confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment.",
-      "Incorrect. Choosing AWS Artifact confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment."
+      "Incorrect. “Amazon Quick” does not satisfy the scenario's controlling constraint. Bedrock and SageMaker AI serve overlapping but distinct levels of customization. The required response follows from this rule: SageMaker AI supports custom model development training and deployment.",
+      "Correct. Amazon SageMaker AI supports custom model development, deployment, and operations. This response fits because SageMaker AI supports custom model development training and deployment. Bedrock and SageMaker AI serve overlapping but distinct levels of customization.",
+      "Incorrect. Amazon Polly (based on a single headline metric) synthesizes speech from text. That capability does not meet the controlling requirement here: SageMaker AI supports custom model development training and deployment. Bedrock and SageMaker AI serve overlapping but distinct levels of customization.",
+      "Incorrect. AWS Artifact provides AWS compliance reports and agreements. That capability does not meet the controlling requirement here: SageMaker AI supports custom model development training and deployment. Bedrock and SageMaker AI serve overlapping but distinct levels of customization."
     ],
     "principle": "SageMaker AI supports custom model development training and deployment",
     "relatedConcept": "Bedrock and SageMaker AI serve overlapping but distinct levels of customization.",
-    "overallExplanation": "The decisive rule is that SageMaker AI supports custom model development training and deployment. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Amazon SageMaker AI is the best response because SageMaker AI supports custom model development training and deployment. Bedrock and SageMaker AI serve overlapping but distinct levels of customization.",
+    "set": 2
   },
   {
     "id": 227,
     "domain": "Fundamentals of GenAI",
     "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
-    "type": "single",
-    "question": "A developer wants to discover and deploy a pre-trained model from a curated model hub within the SageMaker AI environment. Which feature best fits?",
+    "type": "matching",
+    "question": "A development organization is selecting current AWS AI development offerings for four different responsibilities. Match each responsibility with the closest offering.",
     "options": [
+      "Amazon Bedrock AgentCore",
       "SageMaker JumpStart",
-      "Amazon Bedrock Guardrails",
-      "Amazon Macie",
-      "AWS Cost Explorer"
+      "Kiro",
+      "Strands Agents"
     ],
     "correct": [
+      1,
+      2,
+      3,
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: SageMaker JumpStart provides pre-trained models and solution templates.",
-      "Incorrect. Choosing Amazon Bedrock Guardrails confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates.",
-      "Incorrect. Choosing Amazon Macie confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates.",
-      "Incorrect. Choosing AWS Cost Explorer confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates."
+      "Amazon Bedrock AgentCore provides managed services for operating production agents, including capabilities for runtime, identity, memory, gateways, observability, and policy enforcement.",
+      "SageMaker JumpStart is the closest match for discovering pretrained models and solution templates in SageMaker AI. It accelerates the starting point for model-based solutions.",
+      "Kiro is an AI development environment that can turn application requirements and specifications into an implementation workflow. It addresses software development rather than agent hosting.",
+      "Strands Agents is an open-source SDK for constructing code-based agents and connecting models with tools. The application team owns the agent design while using the framework primitives."
     ],
-    "principle": "SageMaker JumpStart provides pre-trained models and solution templates",
-    "relatedConcept": "Model hubs accelerate experimentation without requiring pre-training from scratch.",
-    "overallExplanation": "The decisive rule is that SageMaker JumpStart provides pre-trained models and solution templates. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "principle": "model discovery, application development, agent construction, and production agent operation require different tools",
+    "relatedConcept": "Current AWS developer and agent offerings occupy distinct points in the GenAI delivery lifecycle.",
+    "overallExplanation": "JumpStart supports model and template discovery, Kiro supports AI-assisted application development, Strands Agents supports code-based agent construction, and AgentCore supplies managed capabilities for operating agents in production.",
+    "prompts": [
+      "Find a pretrained model or solution template in SageMaker AI",
+      "Turn application requirements into code in an AI development environment",
+      "Build code-based agents with an open-source SDK",
+      "Operate production agents with managed identity, memory, policy, and runtime services"
+    ],
+    "set": 3
   },
   {
     "id": 228,
@@ -686,23 +746,24 @@
     "type": "single",
     "question": "A business analyst wants natural-language assistance over governed business data and dashboards, rather than building a custom model endpoint. Which current in-scope AWS offering is most relevant?",
     "options": [
-      "Amazon Quick",
-      "Amazon EC2 Auto Scaling",
       "Amazon Inspector",
-      "Amazon S3 Glacier"
+      "Amazon S3 Glacier",
+      "Amazon Quick",
+      "Amazon EC2 Auto Scaling"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
-      "Incorrect. Choosing Amazon EC2 Auto Scaling confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
-      "Incorrect. Choosing Amazon Inspector confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
-      "Incorrect. Choosing Amazon S3 Glacier confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences."
+      "Incorrect. Amazon Inspector produces vulnerability findings for supported workloads. That capability does not meet the controlling requirement here: Amazon Quick provides business intelligence and AI-assisted analytics experiences. Service selection starts with the user's workflow and required level of development.",
+      "Incorrect. Amazon S3 Glacier storage classes are designed for archival data. That capability does not meet the controlling requirement here: Amazon Quick provides business intelligence and AI-assisted analytics experiences. Service selection starts with the user's workflow and required level of development.",
+      "Correct. This response fits because Amazon Quick provides business intelligence and AI-assisted analytics experiences. Service selection starts with the user's workflow and required level of development.",
+      "Incorrect. “Amazon EC2 Auto Scaling” does not satisfy the scenario's controlling constraint. Service selection starts with the user's workflow and required level of development. The required response follows from this rule: Amazon Quick provides business intelligence and AI-assisted analytics experiences."
     ],
     "principle": "Amazon Quick provides business intelligence and AI-assisted analytics experiences",
     "relatedConcept": "Service selection starts with the user's workflow and required level of development.",
-    "overallExplanation": "The decisive rule is that Amazon Quick provides business intelligence and AI-assisted analytics experiences. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Amazon Quick is the best response because Amazon Quick provides business intelligence and AI-assisted analytics experiences. Service selection starts with the user's workflow and required level of development.",
+    "set": 1
   },
   {
     "id": 229,
@@ -711,23 +772,24 @@
     "type": "single",
     "question": "A developer wants an AI-powered development environment to help turn requirements into code and iterate on an application. Which in-scope developer tool is the closest match?",
     "options": [
-      "Kiro",
       "Amazon Textract",
+      "Amazon Personalize",
       "AWS Audit Manager",
-      "Amazon Personalize"
+      "Kiro"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Kiro is an AI development tool rather than a managed document or recommendation API.",
-      "Incorrect. Choosing Amazon Textract confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API.",
-      "Incorrect. Choosing AWS Audit Manager confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API.",
-      "Incorrect. Choosing Amazon Personalize confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API."
+      "Incorrect. Amazon Textract extracts text, forms, and tables from documents. That capability does not meet the controlling requirement here: Kiro is an AI development tool rather than a managed document or recommendation API. AWS GenAI tooling includes developer experiences as well as model services.",
+      "Incorrect. Amazon Personalize builds recommendations and personalized rankings. That capability does not meet the controlling requirement here: Kiro is an AI development tool rather than a managed document or recommendation API. AWS GenAI tooling includes developer experiences as well as model services.",
+      "Incorrect. AWS Audit Manager helps collect evidence for assessments. That capability does not meet the controlling requirement here: Kiro is an AI development tool rather than a managed document or recommendation API. AWS GenAI tooling includes developer experiences as well as model services.",
+      "Correct. This response fits because Kiro is an AI development tool rather than a managed document or recommendation API. AWS GenAI tooling includes developer experiences as well as model services."
     ],
     "principle": "Kiro is an AI development tool rather than a managed document or recommendation API",
     "relatedConcept": "AWS GenAI tooling includes developer experiences as well as model services.",
-    "overallExplanation": "The decisive rule is that Kiro is an AI development tool rather than a managed document or recommendation API. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Kiro is the best response because Kiro is an AI development tool rather than a managed document or recommendation API. AWS GenAI tooling includes developer experiences as well as model services.",
+    "set": 2
   },
   {
     "id": 230,
@@ -737,22 +799,23 @@
     "question": "A team is building agents in code and wants an open-source SDK for model-driven workflows and tool use. Which offering aligns with that goal?",
     "options": [
       "Strands Agents",
-      "Amazon Translate",
       "AWS Budgets",
+      "Amazon Translate",
       "Amazon RDS"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Strands Agents supports code-based agent development and tool orchestration.",
-      "Incorrect. Choosing Amazon Translate confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration.",
-      "Incorrect. Choosing AWS Budgets confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration.",
-      "Incorrect. Choosing Amazon RDS confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration."
+      "Correct. This response fits because Strands Agents supports code-based agent development and tool orchestration. Agent frameworks help structure model tool use without becoming the authorization boundary.",
+      "Incorrect. AWS Budgets tracks spending or usage against configured thresholds. That capability does not meet the controlling requirement here: Strands Agents supports code-based agent development and tool orchestration. Agent frameworks help structure model tool use without becoming the authorization boundary.",
+      "Incorrect. Amazon Translate translates text between supported languages. That capability does not meet the controlling requirement here: Strands Agents supports code-based agent development and tool orchestration. Agent frameworks help structure model tool use without becoming the authorization boundary.",
+      "Incorrect. “Amazon RDS” does not satisfy the scenario's controlling constraint. Agent frameworks help structure model tool use without becoming the authorization boundary. The required response follows from this rule: Strands Agents supports code-based agent development and tool orchestration."
     ],
     "principle": "Strands Agents supports code-based agent development and tool orchestration",
     "relatedConcept": "Agent frameworks help structure model tool use without becoming the authorization boundary.",
-    "overallExplanation": "The decisive rule is that Strands Agents supports code-based agent development and tool orchestration. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Strands Agents is the best response because Strands Agents supports code-based agent development and tool orchestration. Agent frameworks help structure model tool use without becoming the authorization boundary.",
+    "set": 3
   },
   {
     "id": 231,
@@ -761,23 +824,24 @@
     "type": "single",
     "question": "A production agent needs managed runtime capabilities for identity, policy, memory, tool access, and operational controls. Which offering most directly fits?",
     "options": [
-      "Amazon Bedrock AgentCore",
       "SageMaker Data Wrangler",
-      "Amazon Comprehend",
-      "AWS Glue DataBrew"
+      "Amazon Bedrock AgentCore",
+      "AWS Glue DataBrew",
+      "Amazon Comprehend"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Bedrock AgentCore provides infrastructure services for production agents.",
-      "Incorrect. Choosing SageMaker Data Wrangler confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents.",
-      "Incorrect. Choosing Amazon Comprehend confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents.",
-      "Incorrect. Choosing AWS Glue DataBrew confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents."
+      "Incorrect. “SageMaker Data Wrangler” does not satisfy the scenario's controlling constraint. Production agent infrastructure extends beyond the foundation-model invocation itself. The required response follows from this rule: Amazon Bedrock AgentCore provides infrastructure services for production agents.",
+      "Correct. Amazon Bedrock AgentCore provides managed infrastructure for production agents. This response fits because Amazon Bedrock AgentCore provides infrastructure services for production agents. Production agent infrastructure extends beyond the foundation-model invocation itself.",
+      "Incorrect. “AWS Glue DataBrew” does not satisfy the scenario's controlling constraint. Production agent infrastructure extends beyond the foundation-model invocation itself. The required response follows from this rule: Amazon Bedrock AgentCore provides infrastructure services for production agents.",
+      "Incorrect. “Amazon Comprehend” does not satisfy the scenario's controlling constraint. Production agent infrastructure extends beyond the foundation-model invocation itself. The required response follows from this rule: Amazon Bedrock AgentCore provides infrastructure services for production agents."
     ],
     "principle": "Amazon Bedrock AgentCore provides infrastructure services for production agents",
     "relatedConcept": "Production agent infrastructure extends beyond the foundation-model invocation itself.",
-    "overallExplanation": "The decisive rule is that Amazon Bedrock AgentCore provides infrastructure services for production agents. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Amazon Bedrock AgentCore is the best response because Amazon Bedrock AgentCore provides infrastructure services for production agents. Production agent infrastructure extends beyond the foundation-model invocation itself.",
+    "set": 1
   },
   {
     "id": 232,
@@ -786,23 +850,24 @@
     "type": "single",
     "question": "A healthcare company wants to use managed GenAI while retaining encryption, IAM controls, auditability, and regional service choices. Which AWS infrastructure benefits are relevant?",
     "options": [
-      "Security and compliance controls integrated with AWS services",
-      "A guarantee that every generated answer is correct",
+      "Removal of the customer side of shared responsibility",
       "Automatic exemption from healthcare obligations",
-      "Removal of the customer side of shared responsibility"
+      "Security and compliance controls integrated with AWS services",
+      "A guarantee that every generated answer is correct"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: managed infrastructure supplies controls but does not transfer all responsibility.",
-      "Incorrect. Choosing A guarantee that every generated answer is correct confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility.",
-      "Incorrect. Choosing Automatic exemption from healthcare obligations confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility.",
-      "Incorrect. Choosing Removal of the customer side of shared responsibility confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility."
+      "Incorrect. “Removal of the customer side of shared responsibility” does not satisfy the scenario's controlling constraint. Cloud security capabilities support, rather than replace, responsible application governance. The required response follows from this rule: managed infrastructure supplies controls but does not transfer all responsibility.",
+      "Incorrect. “Automatic exemption from healthcare obligations” does not satisfy the scenario's controlling constraint. Cloud security capabilities support, rather than replace, responsible application governance. The required response follows from this rule: managed infrastructure supplies controls but does not transfer all responsibility.",
+      "Correct. This response fits because managed infrastructure supplies controls but does not transfer all responsibility. Cloud security capabilities support, rather than replace, responsible application governance.",
+      "Incorrect. “A guarantee that every generated answer is correct” does not satisfy the scenario's controlling constraint. Cloud security capabilities support, rather than replace, responsible application governance. The required response follows from this rule: managed infrastructure supplies controls but does not transfer all responsibility."
     ],
     "principle": "managed infrastructure supplies controls but does not transfer all responsibility",
     "relatedConcept": "Cloud security capabilities support, rather than replace, responsible application governance.",
-    "overallExplanation": "The decisive rule is that managed infrastructure supplies controls but does not transfer all responsibility. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Security and compliance controls integrated with AWS services is the best response because managed infrastructure supplies controls but does not transfer all responsibility. Cloud security capabilities support, rather than replace, responsible application governance.",
+    "set": 2
   },
   {
     "id": 233,
@@ -811,23 +876,24 @@
     "type": "single",
     "question": "An application has predictable high sustained demand. The team compares on-demand token billing with provisioned throughput. Which tradeoff should be analyzed?",
     "options": [
-      "Commitment and utilization versus predictable capacity and price",
       "Whether provisioned throughput removes all token limits forever",
       "Whether on-demand requires pre-training a custom FM",
-      "Whether redundancy eliminates regional availability needs"
+      "Whether redundancy eliminates regional availability needs",
+      "Commitment and utilization versus predictable capacity and price"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: capacity commitment is valuable only when utilization and service requirements justify it.",
-      "Incorrect. Choosing Whether provisioned throughput removes all token limits forever confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it.",
-      "Incorrect. Choosing Whether on-demand requires pre-training a custom FM confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it.",
-      "Incorrect. Choosing Whether redundancy eliminates regional availability needs confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it."
+      "Incorrect. “Whether provisioned throughput removes all token limits forever” does not satisfy the scenario's controlling constraint. GenAI cost options trade flexibility against predictable performance. The required response follows from this rule: capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Incorrect. “Whether on-demand requires pre-training a custom FM” does not satisfy the scenario's controlling constraint. GenAI cost options trade flexibility against predictable performance. The required response follows from this rule: capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Incorrect. “Whether redundancy eliminates regional availability needs” does not satisfy the scenario's controlling constraint. GenAI cost options trade flexibility against predictable performance. The required response follows from this rule: capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Correct. This response fits because capacity commitment is valuable only when utilization and service requirements justify it. GenAI cost options trade flexibility against predictable performance."
     ],
     "principle": "capacity commitment is valuable only when utilization and service requirements justify it",
     "relatedConcept": "GenAI cost options trade flexibility against predictable performance.",
-    "overallExplanation": "The decisive rule is that capacity commitment is valuable only when utilization and service requirements justify it. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Commitment and utilization versus predictable capacity and price is the best response because capacity commitment is valuable only when utilization and service requirements justify it. GenAI cost options trade flexibility against predictable performance.",
+    "set": 3
   },
   {
     "id": 234,
@@ -845,14 +911,15 @@
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: model availability and data constraints are region specific.",
-      "Incorrect. Choosing Assume every Bedrock model is available in every region confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific.",
-      "Incorrect. Choosing Copy model weights between regions without authorization confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific.",
-      "Incorrect. Choosing Ignore residency because managed services remove it confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific."
+      "Correct. This response fits because model availability and data constraints are region specific. Regional coverage is a real model-selection and resilience constraint.",
+      "Incorrect. “Assume every Bedrock model is available in every region” does not satisfy the scenario's controlling constraint. Regional coverage is a real model-selection and resilience constraint. The required response follows from this rule: model availability and data constraints are region specific.",
+      "Incorrect. “Copy model weights between regions without authorization” does not satisfy the scenario's controlling constraint. Regional coverage is a real model-selection and resilience constraint. The required response follows from this rule: model availability and data constraints are region specific.",
+      "Incorrect. “Ignore residency because managed services remove it” does not satisfy the scenario's controlling constraint. Regional coverage is a real model-selection and resilience constraint. The required response follows from this rule: model availability and data constraints are region specific."
     ],
     "principle": "model availability and data constraints are region specific",
     "relatedConcept": "Regional coverage is a real model-selection and resilience constraint.",
-    "overallExplanation": "The decisive rule is that model availability and data constraints are region specific. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Model regional coverage, compliance constraints, and fallback choices is the best response because model availability and data constraints are region specific. Regional coverage is a real model-selection and resilience constraint.",
+    "set": 1
   },
   {
     "id": 235,
@@ -862,23 +929,26 @@
     "question": "A small team needs the fastest route to a proof of concept, while another team needs custom training and fine-grained model control. Which two mappings are reasonable? (Choose two.)",
     "options": [
       "Use Amazon Bedrock for managed FM experimentation",
-      "Use SageMaker AI for custom training and hosting",
       "Use AWS Artifact to train the custom model",
-      "Use Amazon Polly as a general multi-model platform"
+      "Use Amazon Polly as a general multi-model platform",
+      "Fine-tune the largest model before testing a prompt or retrieval baseline",
+      "Use SageMaker AI for custom training and hosting"
     ],
     "correct": [
       0,
-      1
+      4
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: managed FM access and custom ML platforms solve different development needs.",
-      "Correct. This option follows the decisive rule: managed FM access and custom ML platforms solve different development needs.",
-      "Incorrect. Choosing Use AWS Artifact to train the custom model confuses a related capability with the actual requirement. It does not satisfy the scenario because managed FM access and custom ML platforms solve different development needs.",
-      "Incorrect. Choosing Use Amazon Polly as a general multi-model platform confuses a related capability with the actual requirement. It does not satisfy the scenario because managed FM access and custom ML platforms solve different development needs."
+      "Correct. Amazon Bedrock provides managed access to foundation models and GenAI capabilities. This response fits because managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack.",
+      "Incorrect. AWS Artifact provides AWS compliance reports and agreements. That capability does not meet the controlling requirement here: managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack.",
+      "Correct. This response fits because managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack."
     ],
     "principle": "managed FM access and custom ML platforms solve different development needs",
     "relatedConcept": "AWS services lower barriers at different layers of the GenAI stack.",
-    "overallExplanation": "The decisive rule is that managed FM access and custom ML platforms solve different development needs. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Use Amazon Bedrock for managed FM experimentation and Use SageMaker AI for custom training and hosting are the best responses because managed FM access and custom ML platforms solve different development needs. AWS services lower barriers at different layers of the GenAI stack.",
+    "set": 2
   },
   {
     "id": 236,
@@ -887,22 +957,23 @@
     "type": "single",
     "question": "A finance app chooses a larger custom model that costs six times more but improves a low-risk summarization score by only 0.3%. Which recommendation is best?",
     "options": [
-      "Use the lowest-cost model that meets measured business requirements",
-      "Choose the largest model because complexity always improves ROI",
       "Provision maximum throughput before measuring demand",
-      "Add multi-region redundancy solely to improve summary style"
+      "Use the lowest-cost model that meets measured business requirements",
+      "Add multi-region redundancy solely to improve summary style",
+      "Choose the largest model because complexity always improves ROI"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: cost effectiveness means paying for measurable business value.",
-      "Incorrect. Choosing Choose the largest model because complexity always improves ROI confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value.",
-      "Incorrect. Choosing Provision maximum throughput before measuring demand confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value.",
-      "Incorrect. Choosing Add multi-region redundancy solely to improve summary style confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value."
+      "Incorrect. “Provision maximum throughput before measuring demand” does not satisfy the scenario's controlling constraint. Customization, capacity, redundancy, and model size all need an explicit benefit. The required response follows from this rule: cost effectiveness means paying for measurable business value.",
+      "Correct. This response fits because cost effectiveness means paying for measurable business value. Customization, capacity, redundancy, and model size all need an explicit benefit.",
+      "Incorrect. “Add multi-region redundancy solely to improve summary style” does not satisfy the scenario's controlling constraint. Customization, capacity, redundancy, and model size all need an explicit benefit. The required response follows from this rule: cost effectiveness means paying for measurable business value.",
+      "Incorrect. “Choose the largest model because complexity always improves ROI” does not satisfy the scenario's controlling constraint. Customization, capacity, redundancy, and model size all need an explicit benefit. The required response follows from this rule: cost effectiveness means paying for measurable business value."
     ],
     "principle": "cost effectiveness means paying for measurable business value",
     "relatedConcept": "Customization, capacity, redundancy, and model size all need an explicit benefit.",
-    "overallExplanation": "The decisive rule is that cost effectiveness means paying for measurable business value. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+    "overallExplanation": "Use the lowest-cost model that meets measured business requirements is the best response because cost effectiveness means paying for measurable business value. Customization, capacity, redundancy, and model size all need an explicit benefit.",
+    "set": 3
   }
 ]

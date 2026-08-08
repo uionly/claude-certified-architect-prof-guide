@@ -2,9 +2,9 @@ import { useState } from 'react'
 import Tag from './Tag.jsx'
 import { hasStudy, slugify } from '../data/loader.js'
 import { useCertData } from '../lib/cert.js'
-import { isCorrectSelection } from '../lib/quiz.js'
+import { isAnswered, isCorrectSelection } from '../lib/quiz.js'
 
-const LETTERS = ['A', 'B', 'C', 'D']
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
 function ExplanationBlock({ label, indices, question, tone }) {
   const tones = {
@@ -30,13 +30,51 @@ function ExplanationBlock({ label, indices, question, tone }) {
   )
 }
 
+function StructuredAnswer({ question, answer, label, tone = 'incorrect' }) {
+  const toneClass = tone === 'correct' ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'
+
+  if (question.type === 'matching') {
+    return (
+      <div className={`rounded-md border p-3 ${toneClass}`}>
+        <div className="text-xs font-semibold uppercase tracking-wide text-stone-700">{label}</div>
+        <dl className="mt-2 space-y-2">
+          {question.prompts.map((prompt, index) => {
+            const optionIndex = answer[index]
+            return (
+              <div key={prompt}>
+                <dt className="text-sm font-medium text-stone-900">{prompt}</dt>
+                <dd className="text-sm text-stone-700">{Number.isInteger(optionIndex) ? question.options[optionIndex] : 'No response'}</dd>
+              </div>
+            )
+          })}
+        </dl>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`rounded-md border p-3 ${toneClass}`}>
+      <div className="text-xs font-semibold uppercase tracking-wide text-stone-700">{label}</div>
+      <ol className="mt-2 space-y-1">
+        {answer.map((optionIndex, position) => (
+          <li key={`${optionIndex}-${position}`} className="text-sm text-stone-800">
+            <span className="font-semibold">{position + 1}.</span> {question.options[optionIndex]}
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
 // The visual centerpiece of practice mode: shown immediately after every
 // answer in learn mode and per question in the post-exam review.
 export default function FeedbackPanel({ question, selected }) {
   const { cert, domainIdForQuestion } = useCertData()
   const [goDeeper, setGoDeeper] = useState(false)
-  const answered = selected.length > 0
+  const answered = isAnswered(question, selected)
+  const attempted = Array.isArray(selected) && selected.some(Number.isInteger)
   const correct = answered && isCorrectSelection(question, selected)
+  const structured = question.type === 'ordering' || question.type === 'matching'
   const correctSet = new Set(question.correct)
   const wrongPicks = selected.filter((i) => !correctSet.has(i))
   const domainId = domainIdForQuestion(question)
@@ -51,13 +89,32 @@ export default function FeedbackPanel({ question, selected }) {
             correct ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
           }`}
         >
-          {answered ? (correct ? 'Correct' : 'Incorrect') : 'Not answered'}
+          {answered ? (correct ? 'Correct' : 'Incorrect') : attempted ? 'Incomplete' : 'Not answered'}
         </span>
         <Tag kind="principle">{question.principle}</Tag>
       </div>
 
       <div className="mt-4 space-y-3">
-        {answered && correct ? (
+        {structured ? (
+          <>
+            {attempted && (
+              <StructuredAnswer
+                question={question}
+                answer={selected}
+                label={correct ? 'Your answer — correct' : answered ? 'Your answer' : 'Your incomplete answer'}
+                tone={correct ? 'correct' : 'incorrect'}
+              />
+            )}
+            {(!answered || !correct) && (
+              <StructuredAnswer
+                question={question}
+                answer={question.correct}
+                label={answered || attempted ? 'Correct answer' : 'Correct answer (you left this blank)'}
+                tone="correct"
+              />
+            )}
+          </>
+        ) : answered && correct ? (
           <ExplanationBlock label="Your answer — correct" indices={selected} question={question} tone="correct" />
         ) : (
           <>
@@ -97,20 +154,21 @@ export default function FeedbackPanel({ question, selected }) {
         onClick={() => setGoDeeper((v) => !v)}
         className="mt-4 text-sm font-medium text-indigo-700 underline-offset-2 hover:underline"
       >
-        {goDeeper ? 'Hide option-by-option reasoning ▲' : 'Go deeper: reasoning for all four options ▼'}
+        {goDeeper ? 'Hide response-by-response reasoning ▲' : `Go deeper: reasoning for all ${question.options.length} responses ▼`}
       </button>
 
       {goDeeper && (
         <ol className="mt-3 space-y-2">
           {question.options.map((opt, i) => {
-            const isRight = correctSet.has(i)
-            const picked = selected.includes(i)
+            const isRight = !structured && correctSet.has(i)
+            const picked = !structured && selected.includes(i)
             return (
               <li key={i} className={`rounded-md border p-3 ${isRight ? 'border-emerald-200' : 'border-stone-200'}`}>
                 <p className="text-sm font-medium text-stone-900">
                   {LETTERS[i]}. {opt}
                   <span className="ml-2 space-x-1 text-xs font-semibold">
                     {isRight && <span className="text-emerald-700">✓ correct</span>}
+                    {structured && <span className="text-indigo-700">response</span>}
                     {picked && <span className="text-stone-500">(your pick)</span>}
                   </span>
                 </p>

@@ -35,6 +35,13 @@ for (const certCode of certCodes) {
   // bank must contain that distribution × practiceSets.
   const sets = blueprint.cert?.practiceSets ?? 1;
   const errors = [];
+  const globalIds = new Set();
+  const normalizedStems = new Set();
+  const seenQuestionTypes = new Set();
+  const storedSinglePositions = [];
+  const storedMultiPatterns = [];
+  let uniqueLongestCorrect = 0;
+  let singleQuestionCount = 0;
 
   // ---- cert metadata ----
   const cert = blueprint.cert ?? {};
@@ -133,23 +140,47 @@ for (const certCode of certCodes) {
       if (typeof q.id !== 'number') errors.push(`${tag}: id must be a number`);
       if (seenIds.has(q.id)) errors.push(`${tag}: duplicate id`);
       seenIds.add(q.id);
+      if (globalIds.has(q.id)) errors.push(`${tag}: id duplicates a question in another domain`);
+      globalIds.add(q.id);
       if (q.id < domain.idStart || q.id >= domain.idStart + 100)
         errors.push(`${tag}: id outside range ${domain.idStart}-${domain.idStart + 99}`);
       if (q.domain !== domain.title) errors.push(`${tag}: domain must be "${domain.title}"`);
       if (!validObjectives.has(q.objective)) errors.push(`${tag}: objective not in blueprint: "${q.objective}"`);
       perObjective[q.objective] = (perObjective[q.objective] || 0) + 1;
-      if (q.type !== 'single' && q.type !== 'multi') errors.push(`${tag}: type must be "single"|"multi"`);
+      const supportedTypes = new Set(['single', 'multi', 'ordering', 'matching']);
+      if (!supportedTypes.has(q.type)) errors.push(`${tag}: unsupported question type "${q.type}"`);
+      seenQuestionTypes.add(q.type);
       if (typeof q.question !== 'string' || q.question.length < 120)
         errors.push(`${tag}: question stem missing or too short for a scenario (<120 chars)`);
-      if (!Array.isArray(q.options) || q.options.length !== 4) errors.push(`${tag}: must have exactly 4 options`);
+      const normalizedStem = typeof q.question === 'string' ? q.question.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() : '';
+      if (normalizedStems.has(normalizedStem)) errors.push(`${tag}: duplicate normalized question stem`);
+      normalizedStems.add(normalizedStem);
+      if (!Array.isArray(q.options)) errors.push(`${tag}: options must be an array`);
+      else {
+        if (q.type === 'single' && q.options.length !== 4) errors.push(`${tag}: single questions must have exactly 4 options`);
+        if (q.type === 'multi' && q.options.length < (cert.multipleResponseOptionsMin ?? 4))
+          errors.push(`${tag}: multi questions must have at least ${cert.multipleResponseOptionsMin ?? 4} options`);
+        if (q.type === 'ordering' && (q.options.length < 3 || q.options.length > 5))
+          errors.push(`${tag}: ordering questions must have 3-5 responses`);
+        if (q.type === 'matching' && (q.options.length < 3 || q.options.length > 7))
+          errors.push(`${tag}: matching questions must have 3-7 responses`);
+      }
+      if (q.type === 'matching' && (!Array.isArray(q.prompts) || q.prompts.length < 3 || q.prompts.length > 7))
+        errors.push(`${tag}: matching questions must have 3-7 prompts`);
       if (!Array.isArray(q.correct) || q.correct.length < 1) errors.push(`${tag}: correct must be a non-empty array`);
       else {
         if (q.type === 'single' && q.correct.length !== 1) errors.push(`${tag}: single type must have exactly 1 correct index`);
         if (q.type === 'multi' && q.correct.length < 2) errors.push(`${tag}: multi type must have >=2 correct indices`);
-        for (const c of q.correct) if (!Number.isInteger(c) || c < 0 || c > 3) errors.push(`${tag}: correct index ${c} out of range`);
+        if (q.type === 'ordering' && (q.correct.length < 2 || q.correct.length > (q.options?.length ?? 0)))
+          errors.push(`${tag}: ordering correct answer must contain 2-${q.options?.length ?? 0} responses`);
+        if (q.type === 'matching' && q.correct.length !== q.prompts?.length)
+          errors.push(`${tag}: matching correct answer must contain one response for every prompt`);
+        if ((q.type === 'ordering' || q.type === 'matching') && new Set(q.correct).size !== q.correct.length)
+          errors.push(`${tag}: structured correct answers must not repeat response indices`);
+        for (const c of q.correct) if (!Number.isInteger(c) || c < 0 || c >= (q.options?.length ?? 0)) errors.push(`${tag}: correct index ${c} out of range`);
       }
-      if (!Array.isArray(q.optionExplanations) || q.optionExplanations.length !== 4)
-        errors.push(`${tag}: must have exactly 4 optionExplanations`);
+      if (!Array.isArray(q.optionExplanations) || q.optionExplanations.length !== q.options?.length)
+        errors.push(`${tag}: optionExplanations must match the option count`);
       else q.optionExplanations.forEach((ex, j) => {
         if (typeof ex !== 'string' || ex.length < 80) errors.push(`${tag}: optionExplanations[${j}] too short (<80 chars)`);
       });
@@ -159,12 +190,41 @@ for (const certCode of certCodes) {
         errors.push(`${tag}: missing/too short overallExplanation`);
       const all = JSON.stringify(q);
       if (PLACEHOLDER.test(all)) errors.push(`${tag}: contains placeholder text (TODO/TBD/...)`);
+
+      if (cert.explicitSets) {
+        if (!Number.isInteger(q.set) || q.set < 1 || q.set > sets)
+          errors.push(`${tag}: set must be an integer from 1 to ${sets}`);
+        if (/confuses a related|addresses a related concern but misses|The decisive production principle/i.test(all))
+          errors.push(`${tag}: contains a retired boilerplate explanation`);
+      }
+      if (q.type === 'single' && q.correct?.length === 1 && Array.isArray(q.options)) {
+        singleQuestionCount += 1;
+        storedSinglePositions.push(q.correct[0]);
+        const lengths = q.options.map((option) => option.trim().split(/\s+/).length);
+        const longest = Math.max(...lengths);
+        if (lengths[q.correct[0]] === longest && lengths.filter((length) => length === longest).length === 1)
+          uniqueLongestCorrect += 1;
+      }
+      if (q.type === 'multi') storedMultiPatterns.push(q.correct.join(','));
     });
 
     for (const o of domain.objectives) {
       const n = perObjective[o.objective] || 0;
       if (n !== o.questions * sets)
         errors.push(`D${domain.id}: objective "${o.objective}" expected ${o.questions * sets} questions (${o.questions} per set × ${sets}), found ${n}`);
+    }
+
+    if (cert.explicitSets) {
+      for (let setNumber = 1; setNumber <= sets; setNumber += 1) {
+        const setQuestions = questions.filter((question) => question.set === setNumber);
+        if (setQuestions.length !== domain.questionCount)
+          errors.push(`D${domain.id} set ${setNumber}: expected ${domain.questionCount} questions, found ${setQuestions.length}`);
+        for (const objective of domain.objectives) {
+          const count = setQuestions.filter((question) => question.objective === objective.objective).length;
+          if (count !== objective.questions)
+            errors.push(`D${domain.id} set ${setNumber}: objective "${objective.objective}" expected ${objective.questions}, found ${count}`);
+        }
+      }
     }
 
     // ---- study guide ----
@@ -248,6 +308,30 @@ for (const certCode of certCodes) {
       if (PLACEHOLDER.test(JSON.stringify(r))) errors.push(`${tag}: contains placeholder text`);
     });
   }
+
+  if (!onlyDomain && Array.isArray(cert.questionTypes)) {
+    for (const type of cert.questionTypes) {
+      if (!seenQuestionTypes.has(type)) errors.push(`cert.questionTypes requires at least one "${type}" question`);
+    }
+  }
+  if (!onlyDomain && cert.explicitSets && Array.isArray(cert.questionTypesPerSet)) {
+    for (let setNumber = 1; setNumber <= sets; setNumber += 1) {
+      for (const type of cert.questionTypesPerSet) {
+        const found = blueprint.domains.some((domain) => {
+          const qPath = join(certDir, `questions/domain-${domain.id}.json`);
+          const questions = JSON.parse(readFileSync(qPath, 'utf8'));
+          return questions.some((question) => question.set === setNumber && question.type === type);
+        });
+        if (!found) errors.push(`practice set ${setNumber} must contain at least one "${type}" question`);
+      }
+    }
+  }
+  if (!onlyDomain && cert.explicitSets && storedSinglePositions.length >= 20 && new Set(storedSinglePositions).size < 3)
+    errors.push('stored single-answer positions must use at least 3 different positions');
+  if (!onlyDomain && cert.explicitSets && storedMultiPatterns.length >= 10 && new Set(storedMultiPatterns).size < 3)
+    errors.push('stored multi-response answers must use at least 3 different position patterns');
+  if (!onlyDomain && cert.explicitSets && singleQuestionCount > 0 && uniqueLongestCorrect / singleQuestionCount > 0.4)
+    errors.push(`correct answer is uniquely longest in ${uniqueLongestCorrect}/${singleQuestionCount} single-answer questions (>40%)`);
 
   if (errors.length) {
     console.error(`FAIL — ${certCode}: ${errors.length} error(s):`);

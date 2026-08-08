@@ -88,7 +88,9 @@ function StartHere({ cert }) {
       title: 'Simulate the exam',
       body: hasRevision(cert)
         ? 'Timed run with feedback held until you submit, then review every question. Revision gives you a fast final pass.'
-        : 'Timed run at the real exam pace with feedback held until you submit, then review every question and its reasoning.',
+        : cert.explicitSets
+          ? `Choose one of ${cert.practiceSets} blueprint-balanced sets. The full simulation mixes ${cert.scoredQuestions} scored-style and ${cert.unscoredQuestions} unidentified trial items into the official ${cert.examTimeMinutes}-minute limit.`
+          : 'Timed run at the real exam pace with feedback held until you submit, then review every question and its reasoning.',
       to: hasRevision(cert) ? `/${cert.code}/revision` : `/${cert.code}/practice`,
       cta: hasRevision(cert) ? 'Open revision' : 'Set up an exam run',
     },
@@ -163,10 +165,11 @@ export default function Home() {
             </>
           ) : (
             <>
-              A reasoning-based question bank built around the official exam blueprint:{' '}
-              {cert.practiceSets ?? 1} practice sets of {cert.questionsPerSet ?? cert.examQuestions} questions, each one
-              a scenario tagged to the exact blueprint objective, with a full explanation of why every option is right
-              or wrong.
+              A reasoning-based bank built around the official exam blueprint.{' '}
+              {cert.explicitSets
+                ? `${cert.practiceSets} explicit, non-overlapping scored-question sets power full ${cert.examQuestions}-question simulations with unidentified trial items.`
+                : `${cert.practiceSets ?? 1} practice sets cover every weighted objective.`}{' '}
+              Questions include response-specific explanations and stable per-session option randomization.
             </>
           )}
         </p>
@@ -227,7 +230,7 @@ export default function Home() {
             <StatTile
               label="Question bank"
               value={allQuestions.length}
-              detail={`scenario questions across ${domains.length} domains`}
+              detail={`questions across ${domains.length} domains`}
             />
           </div>
         </section>

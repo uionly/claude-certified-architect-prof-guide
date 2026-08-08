@@ -19,6 +19,10 @@
     "examGuideUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html",
     "examGuideVersion": "1.1 (published April 30, 2026)",
     "practiceSets": 3,
+    "explicitSets": true,
+    "questionTypes": ["single", "multi", "ordering", "matching"],
+    "questionTypesPerSet": ["ordering", "matching"],
+    "multipleResponseOptionsMin": 5,
     "content": { "study": false, "revision": false }
   },
   "domains": [

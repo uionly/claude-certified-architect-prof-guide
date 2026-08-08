@@ -36,7 +36,12 @@ const HEADER = [
   'Domain',
 ];
 
-const TYPE_MAP = { single: 'multiple-choice', multi: 'multi-select' };
+const TYPE_MAP = {
+  single: 'multiple-choice',
+  multi: 'multi-select',
+  ordering: 'ordering',
+  matching: 'matching',
+};
 
 function csvField(value) {
   const s = value == null ? '' : String(value);
@@ -47,8 +52,11 @@ function toRow(q) {
   const options = [0, 1, 2, 3, 4, 5].map((i) => q.options[i] ?? '');
   const explanations = [0, 1, 2, 3, 4, 5].map((i) => q.optionExplanations[i] ?? '');
   const correctAnswers = q.correct.map((i) => i + 1).join(',');
+  const questionText = q.type === 'matching'
+    ? `${q.question}\n${q.prompts.map((prompt, index) => `${index + 1}. ${prompt}`).join('\n')}`
+    : q.question;
   return [
-    q.question,
+    questionText,
     TYPE_MAP[q.type],
     options[0], explanations[0],
     options[1], explanations[1],
@@ -82,12 +90,15 @@ for (const certCode of certCodes) {
     const qPath = join(certDir, `questions/domain-${domain.id}.json`);
     const questions = JSON.parse(readFileSync(qPath, 'utf8'));
     if (setCount) {
-      // The bank holds practiceSets × the official exam distribution, so a
-      // per-objective round-robin yields non-overlapping sets that each match
-      // the real exam's domain/objective distribution and question count.
-      for (const obj of domain.objectives) {
-        const qs = questions.filter((q) => q.objective === obj.objective).sort((a, b) => a.id - b.id);
-        qs.forEach((q, i) => sets[i % setCount].push(q));
+      if (blueprint.cert.explicitSets) {
+        for (const question of questions) sets[question.set - 1].push(question);
+      } else {
+        // Banks without explicit assignments are split per objective so each
+        // export preserves the declared blueprint distribution.
+        for (const obj of domain.objectives) {
+          const qs = questions.filter((q) => q.objective === obj.objective).sort((a, b) => a.id - b.id);
+          qs.forEach((q, i) => sets[i % setCount].push(q));
+        }
       }
     } else {
       // Legacy split for banks without practiceSets: thirds per domain.

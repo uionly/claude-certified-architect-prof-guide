@@ -6,23 +6,24 @@
     "type": "single",
     "question": "A support assistant sends the full 40,000-token history on every turn, although recent messages and a durable summary contain all relevant context. Which optimization has the greatest direct impact?",
     "options": [
-      "Prune irrelevant turns and send a compact validated summary",
       "Increase output token limits",
-      "Use a larger model for every request",
-      "Disable token metering"
+      "Disable token metering",
+      "Prune irrelevant turns and send a compact validated summary",
+      "Use a larger model for every request (to use one operating strategy for every request)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: context pruning reduces recurring token cost and often improves focus.",
-      "Incorrect. Choosing Increase output token limits addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus.",
-      "Incorrect. Choosing Use a larger model for every request addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus.",
-      "Incorrect. Choosing Disable token metering addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus."
+      "Incorrect. “Increase output token limits” does not satisfy the scenario's controlling constraint. Token efficiency starts with measuring and removing context that does not help. The required response follows from this rule: context pruning reduces recurring token cost and often improves focus.",
+      "Incorrect. “Disable token metering” does not satisfy the scenario's controlling constraint. Token efficiency starts with measuring and removing context that does not help. The required response follows from this rule: context pruning reduces recurring token cost and often improves focus.",
+      "Correct. This response fits because context pruning reduces recurring token cost and often improves focus. Token efficiency starts with measuring and removing context that does not help.",
+      "Incorrect. “Use a larger model for every request (to use one operating strategy for every request)” does not satisfy the scenario's controlling constraint. Token efficiency starts with measuring and removing context that does not help. The required response follows from this rule: context pruning reduces recurring token cost and often improves focus."
     ],
     "principle": "context pruning reduces recurring token cost and often improves focus",
     "relatedConcept": "Token efficiency starts with measuring and removing context that does not help.",
-    "overallExplanation": "The decisive production principle is that context pruning reduces recurring token cost and often improves focus. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Prune irrelevant turns and send a compact validated summary is the best response because context pruning reduces recurring token cost and often improves focus. Token efficiency starts with measuring and removing context that does not help.",
+    "set": 1
   },
   {
     "id": 402,
@@ -31,23 +32,24 @@
     "type": "single",
     "question": "Eighty percent of requests are simple classifications, while twenty percent require complex generation. Which architecture is most cost effective?",
     "options": [
-      "Route simple cases to a smaller model and escalate complex cases by policy",
+      "Invoke both models for all traffic (to avoid workload-aware routing and capacity decisions)",
+      "Choose a model randomly",
       "Send every request to the largest model",
-      "Invoke both models for all traffic",
-      "Choose a model randomly"
+      "Route simple cases to a smaller model and escalate complex cases by policy"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: tiered model selection aligns capability cost with request complexity.",
-      "Incorrect. Choosing Send every request to the largest model addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity.",
-      "Incorrect. Choosing Invoke both models for all traffic addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity.",
-      "Incorrect. Choosing Choose a model randomly addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity."
+      "Incorrect. “Invoke both models for all traffic (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Model routing must preserve measured quality while reducing unnecessary spend. The required response follows from this rule: tiered model selection aligns capability cost with request complexity.",
+      "Incorrect. “Choose a model randomly” does not satisfy the scenario's controlling constraint. Model routing must preserve measured quality while reducing unnecessary spend. The required response follows from this rule: tiered model selection aligns capability cost with request complexity.",
+      "Incorrect. “Send every request to the largest model” does not satisfy the scenario's controlling constraint. Model routing must preserve measured quality while reducing unnecessary spend. The required response follows from this rule: tiered model selection aligns capability cost with request complexity.",
+      "Correct. This response fits because tiered model selection aligns capability cost with request complexity. Model routing must preserve measured quality while reducing unnecessary spend."
     ],
     "principle": "tiered model selection aligns capability cost with request complexity",
     "relatedConcept": "Model routing must preserve measured quality while reducing unnecessary spend.",
-    "overallExplanation": "The decisive production principle is that tiered model selection aligns capability cost with request complexity. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Route simple cases to a smaller model and escalate complex cases by policy is the best response because tiered model selection aligns capability cost with request complexity. Model routing must preserve measured quality while reducing unnecessary spend.",
+    "set": 2
   },
   {
     "id": 403,
@@ -57,22 +59,23 @@
     "question": "A workload has steady high utilization and predictable token demand. On-demand pricing is higher and occasional throttling violates the SLA. What should be evaluated?",
     "options": [
       "Provisioned throughput sized from measured utilization",
+      "Batching unrelated interactive sessions",
       "More immediate retries",
-      "A larger response cache with stale data",
-      "Batching unrelated interactive sessions"
+      "A larger response cache with stale data"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: predictable sustained demand can justify committed capacity.",
-      "Incorrect. Choosing More immediate retries addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity.",
-      "Incorrect. Choosing A larger response cache with stale data addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity.",
-      "Incorrect. Choosing Batching unrelated interactive sessions addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity."
+      "Correct. This response fits because predictable sustained demand can justify committed capacity. Capacity economics depend on utilization and service requirements.",
+      "Incorrect. “Batching unrelated interactive sessions” does not satisfy the scenario's controlling constraint. Capacity economics depend on utilization and service requirements. The required response follows from this rule: predictable sustained demand can justify committed capacity.",
+      "Incorrect. “More immediate retries” does not satisfy the scenario's controlling constraint. Capacity economics depend on utilization and service requirements. The required response follows from this rule: predictable sustained demand can justify committed capacity.",
+      "Incorrect. “A larger response cache with stale data” does not satisfy the scenario's controlling constraint. Capacity economics depend on utilization and service requirements. The required response follows from this rule: predictable sustained demand can justify committed capacity."
     ],
     "principle": "predictable sustained demand can justify committed capacity",
     "relatedConcept": "Capacity economics depend on utilization and service requirements.",
-    "overallExplanation": "The decisive production principle is that predictable sustained demand can justify committed capacity. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Provisioned throughput sized from measured utilization is the best response because predictable sustained demand can justify committed capacity. Capacity economics depend on utilization and service requirements.",
+    "set": 3
   },
   {
     "id": 404,
@@ -81,48 +84,50 @@
     "type": "single",
     "question": "A prompt contains a stable 8,000-token policy prefix reused across millions of calls, and the selected model supports prompt caching. What should the team do?",
     "options": [
-      "Enable and measure prompt caching for the reusable prefix",
       "Duplicate the prefix in user messages",
+      "Enable and measure prompt caching for the reusable prefix",
       "Fine-tune after every policy request",
-      "Disable cache metrics"
+      "Disable cache metrics (using peak capacity as the default target)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: prompt caching avoids repeated processing of identical stable context.",
-      "Incorrect. Choosing Duplicate the prefix in user messages addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context.",
-      "Incorrect. Choosing Fine-tune after every policy request addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context.",
-      "Incorrect. Choosing Disable cache metrics addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context."
+      "Incorrect. “Duplicate the prefix in user messages” does not satisfy the scenario's controlling constraint. Caching helps only when content reuse and invalidation are understood. The required response follows from this rule: prompt caching avoids repeated processing of identical stable context.",
+      "Correct. This response fits because prompt caching avoids repeated processing of identical stable context. Caching helps only when content reuse and invalidation are understood.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: prompt caching avoids repeated processing of identical stable context. Caching helps only when content reuse and invalidation are understood.",
+      "Incorrect. “Disable cache metrics (using peak capacity as the default target)” does not satisfy the scenario's controlling constraint. Caching helps only when content reuse and invalidation are understood. The required response follows from this rule: prompt caching avoids repeated processing of identical stable context."
     ],
     "principle": "prompt caching avoids repeated processing of identical stable context",
     "relatedConcept": "Caching helps only when content reuse and invalidation are understood.",
-    "overallExplanation": "The decisive production principle is that prompt caching avoids repeated processing of identical stable context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Enable and measure prompt caching for the reusable prefix is the best response because prompt caching avoids repeated processing of identical stable context. Caching helps only when content reuse and invalidation are understood.",
+    "set": 1
   },
   {
     "id": 405,
     "domain": "Operational Efficiency and Optimization for GenAI Applications",
     "objective": "Implement cost optimization and resource efficiency strategies.",
     "type": "single",
-    "question": "A semantic cache returns a prior answer for two similar questions whose customer entitlements differ. What is wrong? Select the option that best satisfies the stated production requirements.",
+    "question": "A semantic cache reuses a prior answer for a similar query submitted by a customer with different document entitlements, exposing information that customer cannot access. Which cache design defect caused this?",
     "options": [
+      "The model temperature is too low (without first measuring the component-level bottleneck)",
+      "The vector index has too many shards",
       "The cache key omitted authorization and material context dimensions",
-      "Semantic caching can never be used",
-      "The model temperature is too low",
-      "The vector index has too many shards"
+      "Semantic caching can never be used"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: cache equivalence must include security and business context.",
-      "Incorrect. Choosing Semantic caching can never be used addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context.",
-      "Incorrect. Choosing The model temperature is too low addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context.",
-      "Incorrect. Choosing The vector index has too many shards addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context."
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: cache equivalence must include security and business context. Cost savings cannot cross authorization or correctness boundaries.",
+      "Incorrect. “The vector index has too many shards” does not satisfy the scenario's controlling constraint. Cost savings cannot cross authorization or correctness boundaries. The required response follows from this rule: cache equivalence must include security and business context.",
+      "Correct. This response fits because cache equivalence must include security and business context. Cost savings cannot cross authorization or correctness boundaries.",
+      "Incorrect. “Semantic caching can never be used” does not satisfy the scenario's controlling constraint. Cost savings cannot cross authorization or correctness boundaries. The required response follows from this rule: cache equivalence must include security and business context."
     ],
     "principle": "cache equivalence must include security and business context",
     "relatedConcept": "Cost savings cannot cross authorization or correctness boundaries.",
-    "overallExplanation": "The decisive production principle is that cache equivalence must include security and business context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "The cache key omitted authorization and material context dimensions is the best response because cache equivalence must include security and business context. Cost savings cannot cross authorization or correctness boundaries.",
+    "set": 2
   },
   {
     "id": 406,
@@ -131,24 +136,27 @@
     "type": "multi",
     "question": "A batch content-generation job submits one request at a time and leaves provisioned capacity mostly idle. Which two changes can improve utilization? (Choose two.)",
     "options": [
-      "Batch compatible work where the API and use case allow it",
-      "Control concurrency from measured token throughput",
       "Increase idle provisioned capacity",
+      "Cache responses without including identity, policy, or source-version dimensions in the key",
+      "Control concurrency from measured token throughput",
+      "Batch compatible work where the API and use case allow it",
       "Retry successful requests"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: batching and controlled concurrency improve throughput utilization.",
-      "Correct. This choice applies the key production rule: batching and controlled concurrency improve throughput utilization.",
-      "Incorrect. Choosing Increase idle provisioned capacity addresses a related concern but misses the decisive constraint. The required design follows the rule that batching and controlled concurrency improve throughput utilization.",
-      "Incorrect. Choosing Retry successful requests addresses a related concern but misses the decisive constraint. The required design follows the rule that batching and controlled concurrency improve throughput utilization."
+      "Incorrect. “Increase idle provisioned capacity” does not satisfy the scenario's controlling constraint. GenAI capacity is constrained by tokens and concurrency not only request count. The required response follows from this rule: batching and controlled concurrency improve throughput utilization.",
+      "Incorrect. A cache that omits material authorization and freshness context can return unsafe or stale answers. For this scenario, batching and controlled concurrency improve throughput utilization. GenAI capacity is constrained by tokens and concurrency not only request count.",
+      "Correct. This response fits because batching and controlled concurrency improve throughput utilization. GenAI capacity is constrained by tokens and concurrency not only request count.",
+      "Correct. This response fits because batching and controlled concurrency improve throughput utilization. GenAI capacity is constrained by tokens and concurrency not only request count.",
+      "Incorrect. “Retry successful requests” does not satisfy the scenario's controlling constraint. GenAI capacity is constrained by tokens and concurrency not only request count. The required response follows from this rule: batching and controlled concurrency improve throughput utilization."
     ],
     "principle": "batching and controlled concurrency improve throughput utilization",
     "relatedConcept": "GenAI capacity is constrained by tokens and concurrency not only request count.",
-    "overallExplanation": "The decisive production principle is that batching and controlled concurrency improve throughput utilization. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Batch compatible work where the API and use case allow it and Control concurrency from measured token throughput are the best responses because batching and controlled concurrency improve throughput utilization. GenAI capacity is constrained by tokens and concurrency not only request count.",
+    "set": 3
   },
   {
     "id": 407,
@@ -157,23 +165,24 @@
     "type": "single",
     "question": "Output responses average 3,000 tokens although users read only the first 400 and task success is unchanged at 500. Which control should be implemented?",
     "options": [
-      "Set response limits and concise output contracts",
       "Increase context window",
-      "Use the largest model",
-      "Remove user-success measurement"
+      "Remove user-success measurement",
+      "Use the largest model (without first measuring the component-level bottleneck)",
+      "Set response limits and concise output contracts"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: response limits reduce completion cost when longer output adds no value.",
-      "Incorrect. Choosing Increase context window addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value.",
-      "Incorrect. Choosing Use the largest model addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value.",
-      "Incorrect. Choosing Remove user-success measurement addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value."
+      "Incorrect. “Increase context window” does not satisfy the scenario's controlling constraint. Token optimization should be validated against task success. The required response follows from this rule: response limits reduce completion cost when longer output adds no value.",
+      "Incorrect. “Remove user-success measurement” does not satisfy the scenario's controlling constraint. Token optimization should be validated against task success. The required response follows from this rule: response limits reduce completion cost when longer output adds no value.",
+      "Incorrect. “Use the largest model (without first measuring the component-level bottleneck)” does not satisfy the scenario's controlling constraint. Token optimization should be validated against task success. The required response follows from this rule: response limits reduce completion cost when longer output adds no value.",
+      "Correct. This response fits because response limits reduce completion cost when longer output adds no value. Token optimization should be validated against task success."
     ],
     "principle": "response limits reduce completion cost when longer output adds no value",
     "relatedConcept": "Token optimization should be validated against task success.",
-    "overallExplanation": "The decisive production principle is that response limits reduce completion cost when longer output adds no value. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Set response limits and concise output contracts is the best response because response limits reduce completion cost when longer output adds no value. Token optimization should be validated against task success.",
+    "set": 1
   },
   {
     "id": 408,
@@ -183,22 +192,23 @@
     "question": "A team caches every model response indefinitely, including answers grounded in hourly changing inventory. What must be added?",
     "options": [
       "Freshness-aware TTLs and invalidation tied to source changes",
+      "Removal of source version metadata (without first measuring the component-level bottleneck)",
       "Longer cache retention",
-      "Removal of source version metadata",
       "Higher temperature for cached responses"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: cache lifetime must reflect source volatility and correctness risk.",
-      "Incorrect. Choosing Longer cache retention addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk.",
-      "Incorrect. Choosing Removal of source version metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk.",
-      "Incorrect. Choosing Higher temperature for cached responses addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk."
+      "Correct. This response fits because cache lifetime must reflect source volatility and correctness risk. Caching is a data lifecycle system not merely a storage switch.",
+      "Incorrect. “Removal of source version metadata (without first measuring the component-level bottleneck)” does not satisfy the scenario's controlling constraint. Caching is a data lifecycle system not merely a storage switch. The required response follows from this rule: cache lifetime must reflect source volatility and correctness risk.",
+      "Incorrect. “Longer cache retention” does not satisfy the scenario's controlling constraint. Caching is a data lifecycle system not merely a storage switch. The required response follows from this rule: cache lifetime must reflect source volatility and correctness risk.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: cache lifetime must reflect source volatility and correctness risk. Caching is a data lifecycle system not merely a storage switch."
     ],
     "principle": "cache lifetime must reflect source volatility and correctness risk",
     "relatedConcept": "Caching is a data lifecycle system not merely a storage switch.",
-    "overallExplanation": "The decisive production principle is that cache lifetime must reflect source volatility and correctness risk. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Freshness-aware TTLs and invalidation tied to source changes is the best response because cache lifetime must reflect source volatility and correctness risk. Caching is a data lifecycle system not merely a storage switch.",
+    "set": 2
   },
   {
     "id": 409,
@@ -207,23 +217,24 @@
     "type": "single",
     "question": "A model is six times more expensive and improves a low-risk drafting score by 0.4%, with no measurable business lift. What is the best recommendation?",
     "options": [
-      "Use the cheaper model that meets the business threshold",
       "Select the costliest model for prestige",
-      "Increase provisioned capacity first",
+      "Use the cheaper model that meets the business threshold",
+      "Increase provisioned capacity first (using peak capacity as the default target)",
       "Measure only benchmark score"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: price-to-performance decisions require measurable business benefit.",
-      "Incorrect. Choosing Select the costliest model for prestige addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit.",
-      "Incorrect. Choosing Increase provisioned capacity first addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit.",
-      "Incorrect. Choosing Measure only benchmark score addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit."
+      "Incorrect. “Select the costliest model for prestige” does not satisfy the scenario's controlling constraint. Model capability beyond the requirement is unnecessary operating cost. The required response follows from this rule: price-to-performance decisions require measurable business benefit.",
+      "Correct. This response fits because price-to-performance decisions require measurable business benefit. Model capability beyond the requirement is unnecessary operating cost.",
+      "Incorrect. “Increase provisioned capacity first (using peak capacity as the default target)” does not satisfy the scenario's controlling constraint. Model capability beyond the requirement is unnecessary operating cost. The required response follows from this rule: price-to-performance decisions require measurable business benefit.",
+      "Incorrect. “Measure only benchmark score” does not satisfy the scenario's controlling constraint. Model capability beyond the requirement is unnecessary operating cost. The required response follows from this rule: price-to-performance decisions require measurable business benefit."
     ],
     "principle": "price-to-performance decisions require measurable business benefit",
     "relatedConcept": "Model capability beyond the requirement is unnecessary operating cost.",
-    "overallExplanation": "The decisive production principle is that price-to-performance decisions require measurable business benefit. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Use the cheaper model that meets the business threshold is the best response because price-to-performance decisions require measurable business benefit. Model capability beyond the requirement is unnecessary operating cost.",
+    "set": 3
   },
   {
     "id": 410,
@@ -232,23 +243,24 @@
     "type": "single",
     "question": "Users wait four seconds before seeing any text, although total generation takes five seconds and the client supports incremental rendering. Which change improves perceived latency?",
     "options": [
-      "Stream tokens end to end",
-      "Increase maximum output length",
+      "Disable connection reuse",
       "Run retrieval after generation",
-      "Disable connection reuse"
+      "Stream tokens end to end",
+      "Increase maximum output length (without first measuring the component-level bottleneck)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: response streaming reduces time to first useful output.",
-      "Incorrect. Choosing Increase maximum output length addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output.",
-      "Incorrect. Choosing Run retrieval after generation addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output.",
-      "Incorrect. Choosing Disable connection reuse addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output."
+      "Incorrect. “Disable connection reuse” does not satisfy the scenario's controlling constraint. User-perceived latency differs from total completion time. The required response follows from this rule: response streaming reduces time to first useful output.",
+      "Incorrect. “Run retrieval after generation” does not satisfy the scenario's controlling constraint. User-perceived latency differs from total completion time. The required response follows from this rule: response streaming reduces time to first useful output.",
+      "Correct. This response fits because response streaming reduces time to first useful output. User-perceived latency differs from total completion time.",
+      "Incorrect. “Increase maximum output length (without first measuring the component-level bottleneck)” does not satisfy the scenario's controlling constraint. User-perceived latency differs from total completion time. The required response follows from this rule: response streaming reduces time to first useful output."
     ],
     "principle": "response streaming reduces time to first useful output",
     "relatedConcept": "User-perceived latency differs from total completion time.",
-    "overallExplanation": "The decisive production principle is that response streaming reduces time to first useful output. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Stream tokens end to end is the best response because response streaming reduces time to first useful output. User-perceived latency differs from total completion time.",
+    "set": 1
   },
   {
     "id": 411,
@@ -257,23 +269,24 @@
     "type": "single",
     "question": "A workflow makes independent retrieval, policy, and personalization calls sequentially, adding 1.8 seconds. Which optimization should be evaluated?",
     "options": [
-      "Run independent operations in parallel with bounded timeouts",
-      "Add arbitrary sleeps for ordering",
+      "Add arbitrary sleeps for ordering (using peak capacity as the default target)",
       "Combine every operation into the model prompt",
-      "Retry all stages twice"
+      "Retry all stages twice",
+      "Run independent operations in parallel with bounded timeouts"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: independent work can be parallelized to reduce critical-path latency.",
-      "Incorrect. Choosing Add arbitrary sleeps for ordering addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency.",
-      "Incorrect. Choosing Combine every operation into the model prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency.",
-      "Incorrect. Choosing Retry all stages twice addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency."
+      "Incorrect. “Add arbitrary sleeps for ordering (using peak capacity as the default target)” does not satisfy the scenario's controlling constraint. Workflow structure often dominates model latency. The required response follows from this rule: independent work can be parallelized to reduce critical-path latency.",
+      "Incorrect. “Combine every operation into the model prompt” does not satisfy the scenario's controlling constraint. Workflow structure often dominates model latency. The required response follows from this rule: independent work can be parallelized to reduce critical-path latency.",
+      "Incorrect. “Retry all stages twice” does not satisfy the scenario's controlling constraint. Workflow structure often dominates model latency. The required response follows from this rule: independent work can be parallelized to reduce critical-path latency.",
+      "Correct. This response fits because independent work can be parallelized to reduce critical-path latency. Workflow structure often dominates model latency."
     ],
     "principle": "independent work can be parallelized to reduce critical-path latency",
     "relatedConcept": "Workflow structure often dominates model latency.",
-    "overallExplanation": "The decisive production principle is that independent work can be parallelized to reduce critical-path latency. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Run independent operations in parallel with bounded timeouts is the best response because independent work can be parallelized to reduce critical-path latency. Workflow structure often dominates model latency.",
+    "set": 2
   },
   {
     "id": 412,
@@ -284,21 +297,22 @@
     "options": [
       "Index topology query filters and scoring execution",
       "FM temperature",
-      "Prompt approval metadata",
+      "Prompt approval metadata (to avoid workload-aware routing and capacity decisions)",
       "Model output length only"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: retrieval performance requires vector and lexical query optimization.",
-      "Incorrect. Choosing FM temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization.",
-      "Incorrect. Choosing Prompt approval metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization.",
-      "Incorrect. Choosing Model output length only addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization."
+      "Correct. This response fits because retrieval performance requires vector and lexical query optimization. RAG latency should be diagnosed by component.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: retrieval performance requires vector and lexical query optimization. RAG latency should be diagnosed by component.",
+      "Incorrect. “Prompt approval metadata (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. RAG latency should be diagnosed by component. The required response follows from this rule: retrieval performance requires vector and lexical query optimization.",
+      "Incorrect. “Model output length only” does not satisfy the scenario's controlling constraint. RAG latency should be diagnosed by component. The required response follows from this rule: retrieval performance requires vector and lexical query optimization."
     ],
     "principle": "retrieval performance requires vector and lexical query optimization",
     "relatedConcept": "RAG latency should be diagnosed by component.",
-    "overallExplanation": "The decisive production principle is that retrieval performance requires vector and lexical query optimization. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Index topology query filters and scoring execution is the best response because retrieval performance requires vector and lexical query optimization. RAG latency should be diagnosed by component.",
+    "set": 3
   },
   {
     "id": 413,
@@ -307,23 +321,24 @@
     "type": "single",
     "question": "A model produces deterministic product-code extraction, yet temperature is 0.9 and output varies across retries. What should be changed?",
     "options": [
+      "Use longer creative examples",
       "Lower randomness parameters and enforce structured validation",
       "Increase top-p",
-      "Use longer creative examples",
-      "Remove schema checks"
+      "Remove schema checks (to use one operating strategy for every request)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: deterministic extraction benefits from low randomness and output contracts.",
-      "Incorrect. Choosing Increase top-p addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts.",
-      "Incorrect. Choosing Use longer creative examples addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts.",
-      "Incorrect. Choosing Remove schema checks addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts."
+      "Incorrect. “Use longer creative examples” does not satisfy the scenario's controlling constraint. Inference parameters should match the application's creativity tolerance. The required response follows from this rule: deterministic extraction benefits from low randomness and output contracts.",
+      "Correct. This response fits because deterministic extraction benefits from low randomness and output contracts. Inference parameters should match the application's creativity tolerance.",
+      "Incorrect. “Increase top-p” does not satisfy the scenario's controlling constraint. Inference parameters should match the application's creativity tolerance. The required response follows from this rule: deterministic extraction benefits from low randomness and output contracts.",
+      "Incorrect. “Remove schema checks (to use one operating strategy for every request)” does not satisfy the scenario's controlling constraint. Inference parameters should match the application's creativity tolerance. The required response follows from this rule: deterministic extraction benefits from low randomness and output contracts."
     ],
     "principle": "deterministic extraction benefits from low randomness and output contracts",
     "relatedConcept": "Inference parameters should match the application's creativity tolerance.",
-    "overallExplanation": "The decisive production principle is that deterministic extraction benefits from low randomness and output contracts. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Lower randomness parameters and enforce structured validation is the best response because deterministic extraction benefits from low randomness and output contracts. Inference parameters should match the application's creativity tolerance.",
+    "set": 1
   },
   {
     "id": 414,
@@ -332,23 +347,24 @@
     "type": "single",
     "question": "Traffic varies from 20 to 2,000 concurrent sessions. Scaling uses HTTP request count, but long prompts consume far more capacity. Which metric is better?",
     "options": [
+      "Only prompt version number (to avoid workload-aware routing and capacity decisions)",
+      "Only vector dimension",
       "Token throughput and concurrency-aware utilization",
-      "Only total daily users",
-      "Only prompt version number",
-      "Only vector dimension"
+      "Only total daily users"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: FM autoscaling must reflect token-processing workload.",
-      "Incorrect. Choosing Only total daily users addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload.",
-      "Incorrect. Choosing Only prompt version number addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload.",
-      "Incorrect. Choosing Only vector dimension addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload."
+      "Incorrect. “Only prompt version number (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Request counts can hide large differences in compute demand. The required response follows from this rule: FM autoscaling must reflect token-processing workload.",
+      "Incorrect. “Only vector dimension” does not satisfy the scenario's controlling constraint. Request counts can hide large differences in compute demand. The required response follows from this rule: FM autoscaling must reflect token-processing workload.",
+      "Correct. This response fits because FM autoscaling must reflect token-processing workload. Request counts can hide large differences in compute demand.",
+      "Incorrect. “Only total daily users” does not satisfy the scenario's controlling constraint. Request counts can hide large differences in compute demand. The required response follows from this rule: FM autoscaling must reflect token-processing workload."
     ],
     "principle": "FM autoscaling must reflect token-processing workload",
     "relatedConcept": "Request counts can hide large differences in compute demand.",
-    "overallExplanation": "The decisive production principle is that FM autoscaling must reflect token-processing workload. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Token throughput and concurrency-aware utilization is the best response because FM autoscaling must reflect token-processing workload. Request counts can hide large differences in compute demand.",
+    "set": 2
   },
   {
     "id": 415,
@@ -358,23 +374,26 @@
     "question": "A long workflow invokes the same slow model for classification, extraction, and final composition. Which two optimizations should be evaluated? (Choose two.)",
     "options": [
       "Use smaller specialized models for simple stages",
+      "Cache responses without including identity, policy, or source-version dimensions in the key",
       "Profile stages and remove redundant model calls",
-      "Increase every stage's output limit",
-      "Serialize all independent stages"
+      "Serialize all independent stages",
+      "Increase every stage's output limit"
     ],
     "correct": [
       0,
-      1
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: workflow profiling and task-appropriate models reduce cost and latency.",
-      "Correct. This choice applies the key production rule: workflow profiling and task-appropriate models reduce cost and latency.",
-      "Incorrect. Choosing Increase every stage's output limit addresses a related concern but misses the decisive constraint. The required design follows the rule that workflow profiling and task-appropriate models reduce cost and latency.",
-      "Incorrect. Choosing Serialize all independent stages addresses a related concern but misses the decisive constraint. The required design follows the rule that workflow profiling and task-appropriate models reduce cost and latency."
+      "Correct. This response fits because workflow profiling and task-appropriate models reduce cost and latency. Complex pipelines should not default every stage to the most capable model.",
+      "Incorrect. A cache that omits material authorization and freshness context can return unsafe or stale answers. For this scenario, workflow profiling and task-appropriate models reduce cost and latency. Complex pipelines should not default every stage to the most capable model.",
+      "Correct. This response fits because workflow profiling and task-appropriate models reduce cost and latency. Complex pipelines should not default every stage to the most capable model.",
+      "Incorrect. “Serialize all independent stages” does not satisfy the scenario's controlling constraint. Complex pipelines should not default every stage to the most capable model. The required response follows from this rule: workflow profiling and task-appropriate models reduce cost and latency.",
+      "Incorrect. “Increase every stage's output limit” does not satisfy the scenario's controlling constraint. Complex pipelines should not default every stage to the most capable model. The required response follows from this rule: workflow profiling and task-appropriate models reduce cost and latency."
     ],
     "principle": "workflow profiling and task-appropriate models reduce cost and latency",
     "relatedConcept": "Complex pipelines should not default every stage to the most capable model.",
-    "overallExplanation": "The decisive production principle is that workflow profiling and task-appropriate models reduce cost and latency. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Use smaller specialized models for simple stages and Profile stages and remove redundant model calls are the best responses because workflow profiling and task-appropriate models reduce cost and latency. Complex pipelines should not default every stage to the most capable model.",
+    "set": 3
   },
   {
     "id": 416,
@@ -383,23 +402,24 @@
     "type": "single",
     "question": "A customer assistant repeatedly computes answers for immutable public FAQs but personalization is added only in the final sentence. Which design can reduce latency safely?",
     "options": [
-      "Precompute or cache the stable FAQ portion and generate only personalized content",
+      "Remove authorization checks",
       "Cache the full personalized answer for all users",
-      "Always invoke the largest model twice",
-      "Remove authorization checks"
+      "Always invoke the largest model twice (to avoid workload-aware routing and capacity decisions)",
+      "Precompute or cache the stable FAQ portion and generate only personalized content"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: separate stable reusable work from user-specific generation.",
-      "Incorrect. Choosing Cache the full personalized answer for all users addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation.",
-      "Incorrect. Choosing Always invoke the largest model twice addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation.",
-      "Incorrect. Choosing Remove authorization checks addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation."
+      "Incorrect. “Remove authorization checks” does not satisfy the scenario's controlling constraint. Precomputation is safe only for content whose context is truly invariant. The required response follows from this rule: separate stable reusable work from user-specific generation.",
+      "Incorrect. “Cache the full personalized answer for all users” does not satisfy the scenario's controlling constraint. Precomputation is safe only for content whose context is truly invariant. The required response follows from this rule: separate stable reusable work from user-specific generation.",
+      "Incorrect. “Always invoke the largest model twice (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Precomputation is safe only for content whose context is truly invariant. The required response follows from this rule: separate stable reusable work from user-specific generation.",
+      "Correct. This response fits because separate stable reusable work from user-specific generation. Precomputation is safe only for content whose context is truly invariant."
     ],
     "principle": "separate stable reusable work from user-specific generation",
     "relatedConcept": "Precomputation is safe only for content whose context is truly invariant.",
-    "overallExplanation": "The decisive production principle is that separate stable reusable work from user-specific generation. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Precompute or cache the stable FAQ portion and generate only personalized content is the best response because separate stable reusable work from user-specific generation. Precomputation is safe only for content whose context is truly invariant.",
+    "set": 1
   },
   {
     "id": 417,
@@ -409,22 +429,23 @@
     "question": "p95 model latency is healthy, but service time is high because each call opens new network connections and serializes oversized JSON. What should the team optimize?",
     "options": [
       "Connection reuse payload size and service communication",
-      "Model weights",
-      "Embedding dimensions",
-      "Prompt governance approvals"
+      "Embedding dimensions (to avoid workload-aware routing and capacity decisions)",
+      "Prompt governance approvals",
+      "Model weights"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: end-to-end latency includes network and serialization overhead.",
-      "Incorrect. Choosing Model weights addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead.",
-      "Incorrect. Choosing Embedding dimensions addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead.",
-      "Incorrect. Choosing Prompt governance approvals addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead."
+      "Correct. This response fits because end-to-end latency includes network and serialization overhead. Application performance is broader than FM inference time.",
+      "Incorrect. “Embedding dimensions (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Application performance is broader than FM inference time. The required response follows from this rule: end-to-end latency includes network and serialization overhead.",
+      "Incorrect. “Prompt governance approvals” does not satisfy the scenario's controlling constraint. Application performance is broader than FM inference time. The required response follows from this rule: end-to-end latency includes network and serialization overhead.",
+      "Incorrect. “Model weights” does not satisfy the scenario's controlling constraint. Application performance is broader than FM inference time. The required response follows from this rule: end-to-end latency includes network and serialization overhead."
     ],
     "principle": "end-to-end latency includes network and serialization overhead",
     "relatedConcept": "Application performance is broader than FM inference time.",
-    "overallExplanation": "The decisive production principle is that end-to-end latency includes network and serialization overhead. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Connection reuse payload size and service communication is the best response because end-to-end latency includes network and serialization overhead. Application performance is broader than FM inference time.",
+    "set": 2
   },
   {
     "id": 418,
@@ -433,23 +454,24 @@
     "type": "single",
     "question": "A throughput test uses short prompts, while production prompts are ten times longer and capacity immediately saturates. What was wrong with the test?",
     "options": [
-      "It did not model representative prompt and completion token distributions",
-      "It used too many business metrics",
       "It should have ignored tokens",
-      "It needed only more test users with the same short prompt"
+      "It did not model representative prompt and completion token distributions",
+      "It needed only more test users with the same short prompt",
+      "It used too many business metrics"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: performance benchmarks must reflect production token shapes.",
-      "Incorrect. Choosing It used too many business metrics addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes.",
-      "Incorrect. Choosing It should have ignored tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes.",
-      "Incorrect. Choosing It needed only more test users with the same short prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes."
+      "Incorrect. “It should have ignored tokens” does not satisfy the scenario's controlling constraint. Capacity planning based on unrealistic inputs produces false limits. The required response follows from this rule: performance benchmarks must reflect production token shapes.",
+      "Correct. This response fits because performance benchmarks must reflect production token shapes. Capacity planning based on unrealistic inputs produces false limits.",
+      "Incorrect. “It needed only more test users with the same short prompt” does not satisfy the scenario's controlling constraint. Capacity planning based on unrealistic inputs produces false limits. The required response follows from this rule: performance benchmarks must reflect production token shapes.",
+      "Incorrect. “It used too many business metrics” does not satisfy the scenario's controlling constraint. Capacity planning based on unrealistic inputs produces false limits. The required response follows from this rule: performance benchmarks must reflect production token shapes."
     ],
     "principle": "performance benchmarks must reflect production token shapes",
     "relatedConcept": "Capacity planning based on unrealistic inputs produces false limits.",
-    "overallExplanation": "The decisive production principle is that performance benchmarks must reflect production token shapes. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "It did not model representative prompt and completion token distributions is the best response because performance benchmarks must reflect production token shapes. Capacity planning based on unrealistic inputs produces false limits.",
+    "set": 3
   },
   {
     "id": 419,
@@ -458,23 +480,24 @@
     "type": "single",
     "question": "Executives see cost and uptime, while engineers cannot trace prompt version, model route, retrieval latency, or tool failures for one request. What should observability add?",
     "options": [
-      "Correlated end-to-end traces with GenAI-specific dimensions",
       "Only more aggregate CPU dashboards",
-      "Raw prompts in public logs",
-      "A weekly manual incident summary"
+      "A weekly manual incident summary",
+      "Correlated end-to-end traces with GenAI-specific dimensions",
+      "Raw prompts in public logs (to avoid workload-aware routing and capacity decisions)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: GenAI observability needs request-level model retrieval prompt and tool context.",
-      "Incorrect. Choosing Only more aggregate CPU dashboards addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context.",
-      "Incorrect. Choosing Raw prompts in public logs addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context.",
-      "Incorrect. Choosing A weekly manual incident summary addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context."
+      "Incorrect. “Only more aggregate CPU dashboards” does not satisfy the scenario's controlling constraint. Aggregate infrastructure metrics cannot isolate application failure modes. The required response follows from this rule: GenAI observability needs request-level model retrieval prompt and tool context.",
+      "Incorrect. “A weekly manual incident summary” does not satisfy the scenario's controlling constraint. Aggregate infrastructure metrics cannot isolate application failure modes. The required response follows from this rule: GenAI observability needs request-level model retrieval prompt and tool context.",
+      "Correct. This response fits because GenAI observability needs request-level model retrieval prompt and tool context. Aggregate infrastructure metrics cannot isolate application failure modes.",
+      "Incorrect. “Raw prompts in public logs (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Aggregate infrastructure metrics cannot isolate application failure modes. The required response follows from this rule: GenAI observability needs request-level model retrieval prompt and tool context."
     ],
     "principle": "GenAI observability needs request-level model retrieval prompt and tool context",
     "relatedConcept": "Aggregate infrastructure metrics cannot isolate application failure modes.",
-    "overallExplanation": "The decisive production principle is that GenAI observability needs request-level model retrieval prompt and tool context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Correlated end-to-end traces with GenAI-specific dimensions is the best response because GenAI observability needs request-level model retrieval prompt and tool context. Aggregate infrastructure metrics cannot isolate application failure modes.",
+    "set": 1
   },
   {
     "id": 420,
@@ -483,24 +506,27 @@
     "type": "multi",
     "question": "Token usage triples overnight with no traffic increase. Most growth comes from one prompt version. Which two detections help? (Choose two.)",
     "options": [
+      "Removal of version tags",
       "Token-usage anomaly alarms by prompt version",
       "Cost anomaly detection tied to deployment metadata",
-      "Only endpoint availability alarms",
-      "Removal of version tags"
+      "Optimize average model latency without measuring tail latency, tool behavior, or task completion",
+      "Only endpoint availability alarms"
     ],
     "correct": [
-      0,
-      1
+      1,
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: cost anomalies require dimensional usage metrics and release correlation.",
-      "Correct. This choice applies the key production rule: cost anomalies require dimensional usage metrics and release correlation.",
-      "Incorrect. Choosing Only endpoint availability alarms addresses a related concern but misses the decisive constraint. The required design follows the rule that cost anomalies require dimensional usage metrics and release correlation.",
-      "Incorrect. Choosing Removal of version tags addresses a related concern but misses the decisive constraint. The required design follows the rule that cost anomalies require dimensional usage metrics and release correlation."
+      "Incorrect. “Removal of version tags” does not satisfy the scenario's controlling constraint. GenAI monitoring should connect token behavior to deployable artifacts. The required response follows from this rule: cost anomalies require dimensional usage metrics and release correlation.",
+      "Correct. This response fits because cost anomalies require dimensional usage metrics and release correlation. GenAI monitoring should connect token behavior to deployable artifacts.",
+      "Correct. This response fits because cost anomalies require dimensional usage metrics and release correlation. GenAI monitoring should connect token behavior to deployable artifacts.",
+      "Incorrect. End-to-end user outcomes can degrade even when an isolated average model metric looks healthy. For this scenario, cost anomalies require dimensional usage metrics and release correlation. GenAI monitoring should connect token behavior to deployable artifacts.",
+      "Incorrect. “Only endpoint availability alarms” does not satisfy the scenario's controlling constraint. GenAI monitoring should connect token behavior to deployable artifacts. The required response follows from this rule: cost anomalies require dimensional usage metrics and release correlation."
     ],
     "principle": "cost anomalies require dimensional usage metrics and release correlation",
     "relatedConcept": "GenAI monitoring should connect token behavior to deployable artifacts.",
-    "overallExplanation": "The decisive production principle is that cost anomalies require dimensional usage metrics and release correlation. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Token-usage anomaly alarms by prompt version and Cost anomaly detection tied to deployment metadata are the best responses because cost anomalies require dimensional usage metrics and release correlation. GenAI monitoring should connect token behavior to deployable artifacts.",
+    "set": 2
   },
   {
     "id": 421,
@@ -509,48 +535,50 @@
     "type": "single",
     "question": "An agent's average response time is stable, but task completion falls because a tool now returns partial records. What should be monitored?",
     "options": [
-      "Tool success semantics and task completion, not latency alone",
       "Only total tokens",
+      "Only cache hit ratio (to avoid workload-aware routing and capacity decisions)",
       "Only model availability",
-      "Only cache hit ratio"
+      "Tool success semantics and task completion, not latency alone"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: agent monitoring must measure tool correctness and business outcome.",
-      "Incorrect. Choosing Only total tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome.",
-      "Incorrect. Choosing Only model availability addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome.",
-      "Incorrect. Choosing Only cache hit ratio addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome."
+      "Incorrect. “Only total tokens” does not satisfy the scenario's controlling constraint. Operationally healthy components can still produce failed workflows. The required response follows from this rule: agent monitoring must measure tool correctness and business outcome.",
+      "Incorrect. “Only cache hit ratio (to avoid workload-aware routing and capacity decisions)” does not satisfy the scenario's controlling constraint. Operationally healthy components can still produce failed workflows. The required response follows from this rule: agent monitoring must measure tool correctness and business outcome.",
+      "Incorrect. “Only model availability” does not satisfy the scenario's controlling constraint. Operationally healthy components can still produce failed workflows. The required response follows from this rule: agent monitoring must measure tool correctness and business outcome.",
+      "Correct. This response fits because agent monitoring must measure tool correctness and business outcome. Operationally healthy components can still produce failed workflows."
     ],
     "principle": "agent monitoring must measure tool correctness and business outcome",
     "relatedConcept": "Operationally healthy components can still produce failed workflows.",
-    "overallExplanation": "The decisive production principle is that agent monitoring must measure tool correctness and business outcome. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Tool success semantics and task completion, not latency alone is the best response because agent monitoring must measure tool correctness and business outcome. Operationally healthy components can still produce failed workflows.",
+    "set": 3
   },
   {
     "id": 422,
     "domain": "Operational Efficiency and Optimization for GenAI Applications",
     "objective": "Implement monitoring systems for GenAI applications.",
     "type": "single",
-    "question": "A vector store remains available but retrieval recall falls after a source-format change. Which monitoring is missing? Select the option that best satisfies the stated production requirements.",
+    "question": "A vector store remains available after a source-format change, but retrieval recall quietly falls and grounded answers omit relevant passages. Which monitoring addition would detect this failure?",
     "options": [
       "Data quality and retrieval effectiveness checks using golden queries",
-      "Only cluster CPU monitoring",
+      "Only AWS billing alarms",
       "Only model temperature logs",
-      "Only AWS billing alarms"
+      "Only cluster CPU monitoring (without first measuring the component-level bottleneck)"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: vector operations require quality monitoring as well as infrastructure health.",
-      "Incorrect. Choosing Only cluster CPU monitoring addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health.",
-      "Incorrect. Choosing Only model temperature logs addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health.",
-      "Incorrect. Choosing Only AWS billing alarms addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health."
+      "Correct. This response fits because vector operations require quality monitoring as well as infrastructure health. Availability does not prove useful retrieval.",
+      "Incorrect. “Only AWS billing alarms” does not satisfy the scenario's controlling constraint. Availability does not prove useful retrieval. The required response follows from this rule: vector operations require quality monitoring as well as infrastructure health.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: vector operations require quality monitoring as well as infrastructure health. Availability does not prove useful retrieval.",
+      "Incorrect. “Only cluster CPU monitoring (without first measuring the component-level bottleneck)” does not satisfy the scenario's controlling constraint. Availability does not prove useful retrieval. The required response follows from this rule: vector operations require quality monitoring as well as infrastructure health."
     ],
     "principle": "vector operations require quality monitoring as well as infrastructure health",
     "relatedConcept": "Availability does not prove useful retrieval.",
-    "overallExplanation": "The decisive production principle is that vector operations require quality monitoring as well as infrastructure health. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Data quality and retrieval effectiveness checks using golden queries is the best response because vector operations require quality monitoring as well as infrastructure health. Availability does not prove useful retrieval.",
+    "set": 1
   },
   {
     "id": 423,
@@ -559,23 +587,24 @@
     "type": "single",
     "question": "Invocation logs are enabled with full inputs and outputs, but the workload contains sensitive customer data. Which design is required?",
     "options": [
+      "No correlation identifiers (using peak capacity as the default target)",
       "Redaction access control encryption and retention around invocation logs",
       "Public access for easier troubleshooting",
-      "Indefinite raw retention",
-      "No correlation identifiers"
+      "Indefinite raw retention"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: detailed model logs must be governed as sensitive production data.",
-      "Incorrect. Choosing Public access for easier troubleshooting addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data.",
-      "Incorrect. Choosing Indefinite raw retention addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data.",
-      "Incorrect. Choosing No correlation identifiers addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data."
+      "Incorrect. “No correlation identifiers (using peak capacity as the default target)” does not satisfy the scenario's controlling constraint. Observability depth must be balanced with privacy and compliance. The required response follows from this rule: detailed model logs must be governed as sensitive production data.",
+      "Correct. This response fits because detailed model logs must be governed as sensitive production data. Observability depth must be balanced with privacy and compliance.",
+      "Incorrect. “Public access for easier troubleshooting” does not satisfy the scenario's controlling constraint. Observability depth must be balanced with privacy and compliance. The required response follows from this rule: detailed model logs must be governed as sensitive production data.",
+      "Incorrect. “Indefinite raw retention” does not satisfy the scenario's controlling constraint. Observability depth must be balanced with privacy and compliance. The required response follows from this rule: detailed model logs must be governed as sensitive production data."
     ],
     "principle": "detailed model logs must be governed as sensitive production data",
     "relatedConcept": "Observability depth must be balanced with privacy and compliance.",
-    "overallExplanation": "The decisive production principle is that detailed model logs must be governed as sensitive production data. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Redaction access control encryption and retention around invocation logs is the best response because detailed model logs must be governed as sensitive production data. Observability depth must be balanced with privacy and compliance.",
+    "set": 2
   },
   {
     "id": 424,
@@ -584,24 +613,26 @@
     "type": "multi",
     "question": "A multi-agent workflow intermittently loops. Final-response logs do not show the intermediate routing decisions. Which two telemetry sources help? (Choose two.)",
     "options": [
+      "Only endpoint instance type",
       "Per-agent state transitions and coordination traces",
       "Tool-call counts and stopping-condition events",
-      "Only final answer length",
-      "Only endpoint instance type"
+      "Cache responses without including identity, policy, or source-version dimensions in the key",
+      "Only final answer length"
     ],
     "correct": [
-      0,
-      1
+      1,
+      2
     ],
     "optionExplanations": [
-      "Correct. This choice applies the key production rule: agent troubleshooting requires visibility into coordination and termination behavior.",
-      "Correct. This choice applies the key production rule: agent troubleshooting requires visibility into coordination and termination behavior.",
-      "Incorrect. Choosing Only final answer length addresses a related concern but misses the decisive constraint. The required design follows the rule that agent troubleshooting requires visibility into coordination and termination behavior.",
-      "Incorrect. Choosing Only endpoint instance type addresses a related concern but misses the decisive constraint. The required design follows the rule that agent troubleshooting requires visibility into coordination and termination behavior."
+      "Incorrect. “Only endpoint instance type” does not satisfy the scenario's controlling constraint. Workflow-specific telemetry exposes failures hidden by final outputs. The required response follows from this rule: agent troubleshooting requires visibility into coordination and termination behavior.",
+      "Correct. This response fits because agent troubleshooting requires visibility into coordination and termination behavior. Workflow-specific telemetry exposes failures hidden by final outputs.",
+      "Correct. This response fits because agent troubleshooting requires visibility into coordination and termination behavior. Workflow-specific telemetry exposes failures hidden by final outputs.",
+      "Incorrect. A cache that omits material authorization and freshness context can return unsafe or stale answers. For this scenario, agent troubleshooting requires visibility into coordination and termination behavior. Workflow-specific telemetry exposes failures hidden by final outputs.",
+      "Incorrect. “Only final answer length” does not satisfy the scenario's controlling constraint. Workflow-specific telemetry exposes failures hidden by final outputs. The required response follows from this rule: agent troubleshooting requires visibility into coordination and termination behavior."
     ],
     "principle": "agent troubleshooting requires visibility into coordination and termination behavior",
     "relatedConcept": "Workflow-specific telemetry exposes failures hidden by final outputs.",
-    "overallExplanation": "The decisive production principle is that agent troubleshooting requires visibility into coordination and termination behavior. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+    "overallExplanation": "Per-agent state transitions and coordination traces and Tool-call counts and stopping-condition events are the best responses because agent troubleshooting requires visibility into coordination and termination behavior. Workflow-specific telemetry exposes failures hidden by final outputs.",
+    "set": 3
   }
 ]
-

@@ -45,9 +45,9 @@ Three transcription notes:
 | AIF-C01 | AWS Certified AI Practitioner | ✅ practice only (150 questions = 3 × 50 scored-question sets) |
 | AIP-C01 | AWS Certified Generative AI Developer - Professional | ✅ practice only (195 questions = 3 × 65 scored-question sets) |
 
-The blueprint is transcribed from the official [AWS Certified AI Practitioner exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html), **version 1.1, published April 30, 2026**. AWS lists 65 questions on the live exam: the guide identifies 50 scored questions and 15 unscored questions. Each practice set models the 50 scored questions and preserves the official 20/24/28/14/14 domain weighting exactly. The bank includes the version 1.1 additions covering agentic AI, context engineering, prompt management, business-alignment metrics, and hallucination grounding.
+The blueprint is transcribed from the official [AWS Certified AI Practitioner exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html), **version 1.1, published April 30, 2026**. AWS lists 65 questions on the live exam: the guide identifies 50 scored questions and 15 unscored questions. The bank contains three explicit, non-overlapping 50-question scored sets, each preserving the official 20/24/28/14/14 domain weighting and every objective allocation exactly. Full exam simulation adds 15 trial items from the other sets, withholds their status during the exam, and excludes them from the result. The bank includes the version 1.1 additions covering agentic AI, context engineering, prompt management, business-alignment metrics, and hallucination grounding.
 
-AIP-C01 is transcribed from the current official [AWS Certified Generative AI Developer - Professional exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01.html), checked August 2026. The live exam contains 75 questions: 65 scored and 10 unscored. Each practice set models the 65 scored questions using a 20/17/13/8/7 allocation, the closest integer realization of AWS's published 31/26/20/12/11 domain weighting. AWS does not publish a revision/version label for the current guide, so the blueprint records that field as `null` rather than inventing one.
+AIP-C01 is transcribed from the current official [AWS Certified Generative AI Developer - Professional exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01.html), checked August 2026. The live exam contains 75 questions: 65 scored and 10 unscored. The bank contains three explicit, non-overlapping 65-question scored sets using a 20/17/13/8/7 allocation, the closest integer realization of AWS's published 31/26/20/12/11 domain weighting. Full exam simulation adds 10 trial items from the other sets and excludes them from scoring. AWS does not publish a revision/version label for the current guide, so the blueprint records that field as `null` rather than inventing one.
 
 The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification grouped by vendor with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice, minus whatever that cert doesn't ship) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
 
@@ -60,6 +60,7 @@ npm install
 npm run dev        # dev server
 npm run build      # production build → dist/
 npm run preview    # serve the production build
+npm test           # exercise quiz scoring, randomization, and AWS set integrity
 npm run validate   # validate all certs' question/study/revision content against their blueprints
 ```
 
@@ -79,13 +80,13 @@ Or connect the GitHub repo in the [Vercel dashboard](https://vercel.com/new): no
 ## How it works
 
 - `src/data/certs/<CODE>/blueprint.json` — single source of truth per cert: domains, weights, exact objective strings, per-objective question counts, question id ranges.
-- `src/data/certs/<CODE>/questions/domain-N.json` — one array of questions per domain.
+- `src/data/certs/<CODE>/questions/domain-N.json` — one array of questions per domain. Banks with `cert.explicitSets: true` assign every question a stable `set` number.
 - `src/data/certs/<CODE>/study/domain-N.json` — study guide content per domain.
 - `src/data/certs/<CODE>/revision/domain-N.json` — revision recaps + one high-yield question per objective, per domain.
 - `src/data/loader.js` — `certRegistry` / `certByCode` (cheap, eager — every cert's `blueprint.json` plus derived `bankQuestions`, `examMinutes` and `domainCount`, used by the landing page and switcher) and `getCertData(certCode)` (async, code-split per cert — merges that cert's blueprint + question files + study files + revision files, discovered via `import.meta.glob`). Add a new cert directory under `src/data/certs/` and it's picked up automatically — no manual registration needed, beyond adding it to the switcher's data (also automatic, since the switcher reads `certRegistry`).
 - URL scheme: `/<certCode>/...` (e.g. `/CCAR-P/study`, `/CCAR-P/revision/3`, `/CCAR-P/quiz`). `/` redirects to the last-used cert (or CCAR-P by default). Pre-existing un-prefixed bookmarks (`/study`, `/revision`, `/practice`, `/quiz`, `/results/:id`) redirect the same way.
 - Progress storage is cert-scoped (`cert.<CODE>.attempts.v1` / `cert.<CODE>.active.v1` in `localStorage`); a one-time migration preserves history from the original single-cert version of this app (which used unscoped `ccarp.*` keys) into `cert.CCAR-P.*`.
-- `scripts/validate-content.mjs` — checks every cert's content files against its blueprint (counts per objective, schema fields, exact objective strings, explanation lengths, no placeholder text). Run it after any content change.
+- `scripts/validate-content.mjs` — checks every cert's content files against its blueprint, including exact per-set domain/objective distributions, global ID/stem uniqueness, supported question formats, minimum option counts, answer-position and answer-length leakage, explanation quality guards, and placeholder text. Run it after any content change.
 
 ### Revision
 
@@ -95,8 +96,11 @@ Each card shows the objective's key points, a "Watch for" callout, and one quest
 
 ### Modes
 
-- **Learn mode** — untimed; full reasoning shown immediately after every answer, right or wrong. The feedback panel shows your answer + its explanation, the correct answer + its explanation, the principle tag, the related concept, and a "go deeper" toggle with all four option explanations.
-- **Exam mode** — timed at the cert's minutes-per-question rate; feedback withheld until submission, then full per-question review.
+- **Learn mode** — untimed; full reasoning shown immediately after every answer, right or wrong. The feedback panel shows your answer + its explanation, the correct answer + its explanation, the principle tag, the related concept, and a "go deeper" toggle with every response explanation.
+- **Exam mode** — timed; feedback and blueprint tags are withheld until submission, then full per-question review is available.
+- **AWS full exam simulation** — selects one explicit scored set, mixes in the official number of trial-style items from the reserve sets, uses the official total time, and reports performance only on scored items. Trial status is disclosed after submission.
+
+Answer choices are shuffled once when a session starts and the resulting order is stored with the active attempt. Navigation and result review therefore preserve the same order while removing bank-wide answer-position cues.
 
 Performance is tracked **per objective tag** (not just per domain) across all attempts, and surfaced on the results screen, the study guide domain pages, and each objective section.
 
@@ -171,13 +175,13 @@ AIF-C01 and AIP-C01 facts come from the official AWS certification pages and exa
 | Validity | 36 months | 36 months |
 | Question types | multiple choice, multiple response, ordering, matching | multiple choice, multiple response |
 
-For AIF-C01, `questionsPerSet: 50` deliberately models only the scored blueprint while `examQuestions: 65` remains the independently sourced live-exam total. For AIP-C01 those values are 65 and 75. Each `examMinutesPerQuestion` is derived from the corresponding live pace (90 ÷ 65 and 180 ÷ 75) for Exam mode.
+For AIF-C01, `questionsPerSet: 50` deliberately models the scored blueprint while `examQuestions: 65` remains the independently sourced live-exam total. For AIP-C01 those values are 65 and 75. The full-mock builder fills the remaining 15 or 10 positions with trial-style reserve items; they mimic exam delivery but are not claimed to reproduce AWS's undisclosed trial questions.
 
 Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — vendors don't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
 
 Validation rules: when `practiceSets` is declared, the per-set question count must equal the sum of per-domain `questionCount`, so bank size can never be mistaken for set size. An explicit **`questionsPerSet`** takes precedence when a bank models scored content rather than unscored exam items, or when a vendor does not publish an item count; otherwise the validator uses `examQuestions`. One of the two must be present. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
 
-`examQuestions` describes the real exam total. `questionCount` and per-objective `questions` describe one practice set: normally a full exam, or the scored blueprint when unscored items have no published distribution. The optional `practiceSets` (default 1) says how many distinct sets the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into non-overlapping CSVs with the declared distribution.
+`examQuestions` describes the real exam total. `questionCount` and per-objective `questions` describe one practice set: normally a full exam, or the scored blueprint when unscored items have no published distribution. The optional `practiceSets` (default 1) says how many distinct sets the bank holds. With `explicitSets: true`, every question must carry a `set` value and the validator checks the full domain/objective allocation inside each set; otherwise the exporter distributes items per objective by ID.
 
 `npm run export:csv [certCode] [--force]`. The exporter **skips any cert that has more `PracticeSet*.csv` files on disk than it generates**, because those extra files were added by hand and rewriting sets 1..n would pull their questions into the earlier sets while the extra file still holds them — silently duplicating questions across published tests. This currently applies to **CCAR-P**: sets 1–3 hold its original 200 questions and a hand-added set 4 holds the 83 added later (verified zero overlap, 283 total). Since 283 is prime it can't be partitioned into equal exam-sized sets, so decide the intended partition before running with `--force`.
 
@@ -188,6 +192,7 @@ Validation rules: when `practiceSets` is declared, the per-set question count mu
 ```json
 {
   "id": 301,
+  "set": 1,
   "domain": "Integration",
   "objective": "Analyze authentication and authorization requirements to identify security gaps",
   "type": "single",
@@ -203,8 +208,10 @@ Validation rules: when `practiceSets` is declared, the per-set question count mu
 
 - `id`: unique; domain N uses the range `N*100 + 1` … (e.g. Domain 3 → 301+).
 - `objective` / `domain`: must match that cert's `blueprint.json` **character-for-character** — this is what powers study-guide cross-linking and per-objective stats.
-- `type`: `"single"` (1 correct index) or `"multi"` (≥2 correct indices; stem ends with "(Choose two.)").
-- `correct`: 0-based indices into `options`.
+- `set`: required when the blueprint enables `cert.explicitSets`; it identifies the stable scored practice set.
+- `type`: `"single"` (one answer), `"multi"` (two or more answers), `"ordering"` (select the valid responses and put them in sequence), or `"matching"` (map each `prompts` entry to a response). AIP-C01 uses the two formats in its guide; AIF-C01 uses all four.
+- `options`: single questions use four options. AWS multiple-response questions use at least five; ordering/matching responses follow the limits enforced by the validator.
+- `correct`: 0-based response indices. For ordering it is the complete correct sequence; for matching its entries correspond to `prompts` in order.
 
 ## Revision schema
 
@@ -242,7 +249,7 @@ Validation rules: when `practiceSets` is declared, the per-set question count mu
 Follow these when adding questions for any cert so new items match the existing depth (the validator enforces the mechanical parts):
 
 1. **Scenario-based stem** — a realistic situation with a decision to make, not trivia. A named role at a company in a specific industry faces a concrete choice. Vary industries (fintech, healthcare, retail, public sector, SaaS) and difficulty (straightforward application vs. multi-factor trade-off judgment) within each objective.
-2. **4 options, all plausible** — each option should be pickable by a competent-but-imperfect practitioner. No joke options, no "all of the above", and the correct option must not be recognizably longer or more detailed than the others.
+2. **Plausible responses** — each response should be pickable by a competent-but-imperfect practitioner. No joke options, no "all of the above", and the correct answer must not be recognizably longer or more detailed than the distractors. Use the certification's officially listed formats and its blueprint-specific option minimums.
 3. **Per-option explanations (2–4 sentences each)** — for the correct option, name the underlying principle; for each wrong option, explain why it's tempting **and** the specific reasoning error (wrong trade-off, treats symptom not cause, violates a named principle, over-engineering, …).
 4. **`principle` tag** — short phrase capturing the rule, e.g. `"least privilege > detective controls"`.
 5. **`objective` tag** — the exact blueprint bullet (copy it from that cert's `blueprint.json`).
@@ -250,7 +257,7 @@ Follow these when adding questions for any cert so new items match the existing 
 7. **Distribute evenly** — roughly 5–6 questions per objective bullet so every objective gets meaningful coverage.
 8. **No stubs** — never commit TODO/placeholder text; the validator rejects it.
 9. Ground content in real, current product behaviour for that cert's vendor — for Claude certs: model tiers, prompt caching, MCP, Claude Code, the workflow/agent pattern taxonomy; for the Azure certs: Microsoft Foundry, Azure AI Search, Content Understanding, Container Apps/AKS/ACR, Cosmos DB, PostgreSQL + pgvector, Managed Redis, Service Bus/Event Grid/Functions, Key Vault, App Configuration, OpenTelemetry and KQL. Don't invent product features, SDK methods or topics outside the blueprint, and match technical depth to the cert's level (Foundations-level certs should be more conceptual than CCAR-P's Professional-level architecture scenarios).
-10. **Watch the practice-set split.** `export-practice-sets.mjs` round-robins each objective's items by id, so within an objective the 1st/2nd/3rd item land in sets 1/2/3. Author each group of three at comparable difficulty and on distinct topics, or set 1 ends up systematically easier and the sets read as near-duplicates.
+10. **Watch the practice-set split.** For an explicit-set bank, author and validate each `set` as a complete blueprint-balanced form. Other banks are round-robined per objective by ID. In either case, keep corresponding items comparable in difficulty and distinct in topic so one set is not systematically easier or repetitive.
 
 Study guide sections follow the same spirit: plain-language explanation, why it matters in production, 1–2 worked examples, 3–5 pitfalls, documentation tone (no marketing copy). Schema is in any `src/data/certs/<CODE>/study/domain-N.json`.
 

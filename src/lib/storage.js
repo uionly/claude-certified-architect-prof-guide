@@ -68,6 +68,7 @@ export function objectiveStats(certCode, attempts = loadAttempts(certCode)) {
   const stats = {}
   for (const attempt of attempts) {
     for (const item of attempt.items) {
+      if (item.scored === false) continue
       const s = (stats[item.objective] ||= { attempted: 0, correct: 0 })
       s.attempted += 1
       if (item.isCorrect) s.correct += 1
@@ -81,6 +82,7 @@ export function domainStats(certCode, attempts = loadAttempts(certCode)) {
   const stats = {}
   for (const attempt of attempts) {
     for (const item of attempt.items) {
+      if (item.scored === false) continue
       const s = (stats[item.domain] ||= { attempted: 0, correct: 0 })
       s.attempted += 1
       if (item.isCorrect) s.correct += 1
@@ -95,9 +97,10 @@ export function overallStats(certCode, attempts = loadAttempts(certCode)) {
   const seen = new Set()
   for (const attempt of attempts) {
     for (const item of attempt.items) {
+      seen.add(item.qid)
+      if (item.scored === false) continue
       attempted += 1
       if (item.isCorrect) correct += 1
-      seen.add(item.qid)
     }
   }
   return { attempted, correct, uniqueQuestions: seen.size, attemptCount: attempts.length }

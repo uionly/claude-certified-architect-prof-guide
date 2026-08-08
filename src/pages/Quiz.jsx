@@ -2,24 +2,28 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCertData } from '../lib/cert.js'
 import { clearActiveQuiz, loadActiveQuiz, saveActiveQuiz, saveAttempt } from '../lib/storage.js'
-import { formatClock, isCorrectSelection } from '../lib/quiz.js'
+import { applyOptionOrder, formatClock, isAnswered, isCorrectSelection } from '../lib/quiz.js'
 import FeedbackPanel from '../components/FeedbackPanel.jsx'
 import Tag from '../components/Tag.jsx'
 
-const LETTERS = ['A', 'B', 'C', 'D']
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
 function buildAttempt(questionsById, state, { onlyAnswered = false } = {}) {
+  const unscored = new Set(state.unscoredIds || [])
   const items = state.order
     .map((qid) => {
-      const q = questionsById.get(qid)
+      const baseQuestion = questionsById.get(qid)
+      const q = applyOptionOrder(baseQuestion, state.optionOrders?.[qid])
       const selected = state.answers[qid] || []
-      if (!q || (onlyAnswered && selected.length === 0)) return null
+      if (!q || (onlyAnswered && !isAnswered(q, selected))) return null
       return {
         qid,
         domain: q.domain,
         objective: q.objective,
         selected,
         isCorrect: isCorrectSelection(q, selected),
+        scored: !unscored.has(qid),
+        optionOrder: state.optionOrders?.[qid] || null,
       }
     })
     .filter(Boolean)
@@ -27,6 +31,8 @@ function buildAttempt(questionsById, state, { onlyAnswered = false } = {}) {
     id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     ts: Date.now(),
     mode: state.mode,
+    sessionKind: state.sessionKind,
+    setNumber: state.setNumber,
     timeLimitSec: state.timeLimitSec,
     elapsedSec: Math.round((Date.now() - state.startedAt) / 1000),
     items,
@@ -41,7 +47,8 @@ export default function Quiz() {
   const [checked, setChecked] = useState(false)
   const [now, setNow] = useState(Date.now())
 
-  const question = state ? questionsById.get(state.order[state.index]) : null
+  const baseQuestion = state ? questionsById.get(state.order[state.index]) : null
+  const question = state ? applyOptionOrder(baseQuestion, state.optionOrders?.[baseQuestion?.id]) : null
 
   useEffect(() => {
     if (!state || state.mode !== 'exam') return
@@ -74,8 +81,12 @@ export default function Quiz() {
   }, [remainingSec])
 
   const answeredCount = useMemo(
-    () => (state ? state.order.filter((qid) => (state.answers[qid] || []).length > 0).length : 0),
-    [state],
+    () => (state ? state.order.filter((qid) => {
+      const base = questionsById.get(qid)
+      const prepared = applyOptionOrder(base, state.optionOrders?.[qid])
+      return prepared && isAnswered(prepared, state.answers[qid] || [])
+    }).length : 0),
+    [state, questionsById],
   )
 
   if (!state || !question) {
@@ -104,6 +115,18 @@ export default function Quiz() {
     } else {
       next = [i]
     }
+    update({ ...state, answers: { ...state.answers, [question.id]: next } })
+  }
+
+  function updateOrdering(nextSelected) {
+    if (isLearn && checked) return
+    update({ ...state, answers: { ...state.answers, [question.id]: nextSelected } })
+  }
+
+  function setMatch(promptIndex, value) {
+    if (isLearn && checked) return
+    const next = Array.from({ length: question.prompts.length }, (_, index) => selected[index] ?? null)
+    next[promptIndex] = value === '' ? null : Number(value)
     update({ ...state, answers: { ...state.answers, [question.id]: next } })
   }
 
@@ -158,29 +181,80 @@ export default function Quiz() {
       </div>
 
       <div className="mt-4 rounded-lg border border-stone-200 bg-white p-4 sm:p-6">
-        <div className="flex flex-wrap gap-2">
-          <Tag kind="domain">{question.domain}</Tag>
-          <Tag kind="objective">{question.objective}</Tag>
-        </div>
+        {isLearn && (
+          <div className="flex flex-wrap gap-2">
+            <Tag kind="domain">{question.domain}</Tag>
+            <Tag kind="objective">{question.objective}</Tag>
+          </div>
+        )}
         <p className="mt-4 leading-relaxed text-stone-900">{question.question}</p>
         {question.type === 'multi' && (
-          <p className="mt-2 text-xs font-medium text-stone-500">Select all that apply.</p>
+          <p className="mt-2 text-xs font-medium text-stone-500">Select exactly {question.correct.length} responses.</p>
+        )}
+        {question.type === 'ordering' && (
+          <p className="mt-2 text-xs font-medium text-stone-500">Select exactly {question.correct.length} responses in the correct order.</p>
+        )}
+        {question.type === 'matching' && (
+          <p className="mt-2 text-xs font-medium text-stone-500">Choose the response that matches each prompt.</p>
         )}
 
-        <div className="mt-5 space-y-2">
-          {question.options.map((opt, i) => (
-            <button key={i} type="button" onClick={() => toggleOption(i)} className={optionClasses(i)}>
-              <span
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
-                  selected.includes(i) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-stone-300 text-stone-500'
-                }`}
-              >
-                {LETTERS[i]}
-              </span>
-              <span className="text-stone-800">{opt}</span>
-            </button>
-          ))}
-        </div>
+        {(question.type === 'single' || question.type === 'multi') && (
+          <div className="mt-5 space-y-2">
+            {question.options.map((opt, i) => (
+              <button key={i} type="button" onClick={() => toggleOption(i)} className={optionClasses(i)}>
+                <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${selected.includes(i) ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-stone-300 text-stone-500'}`}>
+                  {LETTERS[i]}
+                </span>
+                <span className="text-stone-800">{opt}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {question.type === 'ordering' && (
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-500">Your order</h2>
+              <ol className="mt-2 space-y-2">
+                {selected.map((optionIndex, position) => (
+                  <li key={optionIndex} className="flex items-start gap-2 rounded-md border border-indigo-300 bg-indigo-50 p-3 text-sm">
+                    <span className="font-bold text-indigo-800">{position + 1}.</span>
+                    <span className="flex-1 text-stone-800">{question.options[optionIndex]}</span>
+                    <button type="button" onClick={() => updateOrdering(selected.filter((_, index) => index !== position))} className="text-xs text-stone-500 underline">remove</button>
+                  </li>
+                ))}
+                {selected.length === 0 && <li className="rounded-md border border-dashed border-stone-300 p-3 text-sm text-stone-500">Choose the first step from the available responses.</li>}
+              </ol>
+            </div>
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-stone-500">Available responses</h2>
+              <div className="mt-2 space-y-2">
+                {question.options.map((option, optionIndex) => selected.includes(optionIndex) || selected.length >= question.correct.length ? null : (
+                  <button key={optionIndex} type="button" onClick={() => updateOrdering([...selected, optionIndex])} className="w-full rounded-md border border-stone-300 bg-white p-3 text-left text-sm text-stone-800 hover:border-indigo-400">
+                    Add next: {option}
+                  </button>
+                ))}
+                {selected.length >= question.correct.length && (
+                  <p className="rounded-md border border-dashed border-stone-300 p-3 text-sm text-stone-500">Required responses selected. Remove a response to change the sequence.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {question.type === 'matching' && (
+          <div className="mt-5 space-y-3">
+            {question.prompts.map((prompt, promptIndex) => (
+              <label key={prompt} className="block rounded-md border border-stone-200 bg-stone-50 p-3">
+                <span className="block text-sm font-medium text-stone-900">{prompt}</span>
+                <select value={Number.isInteger(selected[promptIndex]) ? selected[promptIndex] : ''} onChange={(event) => setMatch(promptIndex, event.target.value)} className="mt-2 w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm">
+                  <option value="">Select a response…</option>
+                  {question.options.map((option, optionIndex) => <option key={optionIndex} value={optionIndex}>{option}</option>)}
+                </select>
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       {isLearn && checked && (
@@ -195,7 +269,7 @@ export default function Quiz() {
             <>
               <button
                 type="button"
-                disabled={selected.length === 0}
+                disabled={!isAnswered(question, selected)}
                 onClick={() => setChecked(true)}
                 className="rounded-md bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-stone-300"
               >
@@ -273,7 +347,9 @@ export default function Quiz() {
           <div className="text-xs font-semibold uppercase tracking-wide text-stone-500">Navigator</div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {state.order.map((qid, i) => {
-              const answered = (state.answers[qid] || []).length > 0
+              const base = questionsById.get(qid)
+              const prepared = applyOptionOrder(base, state.optionOrders?.[qid])
+              const answered = prepared && isAnswered(prepared, state.answers[qid] || [])
               const current = i === state.index
               return (
                 <button

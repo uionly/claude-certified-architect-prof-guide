@@ -7,22 +7,23 @@
     "question": "A retailer has 80,000 past orders labeled `returned` or `kept` and wants to predict whether each new order will be returned before shipment. Which learning approach fits the available data and target?",
     "options": [
       "Supervised classification",
-      "Unsupervised clustering",
+      "Generative image modeling",
       "Reinforcement learning",
-      "Generative image modeling"
+      "Unsupervised clustering"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: labeled examples and a discrete target call for supervised classification.",
-      "Incorrect. Choosing Unsupervised clustering confuses a related concept with the actual requirement. It does not satisfy the scenario because labeled examples and a discrete target call for supervised classification.",
-      "Incorrect. Choosing Reinforcement learning confuses a related concept with the actual requirement. It does not satisfy the scenario because labeled examples and a discrete target call for supervised classification.",
-      "Incorrect. Choosing Generative image modeling confuses a related concept with the actual requirement. It does not satisfy the scenario because labeled examples and a discrete target call for supervised classification."
+      "Correct. Classification predicts a discrete class from the available signals. This response fits because labeled examples and a discrete target call for supervised classification. Learning type follows the available training signal and required output.",
+      "Incorrect. “Generative image modeling” does not satisfy the scenario's controlling constraint. Learning type follows the available training signal and required output. The required response follows from this rule: labeled examples and a discrete target call for supervised classification.",
+      "Incorrect. “Reinforcement learning” does not satisfy the scenario's controlling constraint. Learning type follows the available training signal and required output. The required response follows from this rule: labeled examples and a discrete target call for supervised classification.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: labeled examples and a discrete target call for supervised classification. Learning type follows the available training signal and required output."
     ],
     "principle": "labeled examples and a discrete target call for supervised classification",
     "relatedConcept": "Learning type follows the available training signal and required output.",
-    "overallExplanation": "The decisive rule is that labeled examples and a discrete target call for supervised classification. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Supervised classification is the best response because labeled examples and a discrete target call for supervised classification. Learning type follows the available training signal and required output.",
+    "set": 1
   },
   {
     "id": 102,
@@ -31,23 +32,24 @@
     "type": "single",
     "question": "A hospital accumulates 300,000 radiology studies overnight. Results may be available the next morning, and efficient throughput matters more than an immediate response for each image. Which inference pattern best fits?",
     "options": [
-      "Batch inference",
       "Real-time inference",
-      "Reinforcement learning",
-      "Continuous fine-tuning"
+      "Batch inference",
+      "Continuous fine-tuning",
+      "Reinforcement learning"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: latency needs and workload shape determine the inference pattern.",
-      "Incorrect. Choosing Real-time inference confuses a related concept with the actual requirement. It does not satisfy the scenario because latency needs and workload shape determine the inference pattern.",
-      "Incorrect. Choosing Reinforcement learning confuses a related concept with the actual requirement. It does not satisfy the scenario because latency needs and workload shape determine the inference pattern.",
-      "Incorrect. Choosing Continuous fine-tuning confuses a related concept with the actual requirement. It does not satisfy the scenario because latency needs and workload shape determine the inference pattern."
+      "Incorrect. “Real-time inference” does not satisfy the scenario's controlling constraint. Batch, real-time, asynchronous, and serverless inference serve different needs. The required response follows from this rule: latency needs and workload shape determine the inference pattern.",
+      "Correct. This response fits because latency needs and workload shape determine the inference pattern. Batch, real-time, asynchronous, and serverless inference serve different needs.",
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: latency needs and workload shape determine the inference pattern. Batch, real-time, asynchronous, and serverless inference serve different needs.",
+      "Incorrect. “Reinforcement learning” does not satisfy the scenario's controlling constraint. Batch, real-time, asynchronous, and serverless inference serve different needs. The required response follows from this rule: latency needs and workload shape determine the inference pattern."
     ],
     "principle": "latency needs and workload shape determine the inference pattern",
     "relatedConcept": "Batch, real-time, asynchronous, and serverless inference serve different needs.",
-    "overallExplanation": "The decisive rule is that latency needs and workload shape determine the inference pattern. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Batch inference is the best response because latency needs and workload shape determine the inference pattern. Batch, real-time, asynchronous, and serverless inference serve different needs.",
+    "set": 2
   },
   {
     "id": 103,
@@ -56,23 +58,24 @@
     "type": "single",
     "question": "A manufacturer has millions of timestamped sensor readings but no failure labels. Engineers want to discover natural operating regimes before experts name them. Which description is accurate?",
     "options": [
-      "Unlabeled time-series data with unsupervised clustering",
       "Labeled tabular data with supervised regression",
       "Unstructured images with computer vision",
+      "Unlabeled time-series data with unsupervised clustering",
       "Reward data with reinforcement learning"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: unlabeled observations can be grouped with unsupervised learning.",
-      "Incorrect. Choosing Labeled tabular data with supervised regression confuses a related concept with the actual requirement. It does not satisfy the scenario because unlabeled observations can be grouped with unsupervised learning.",
-      "Incorrect. Choosing Unstructured images with computer vision confuses a related concept with the actual requirement. It does not satisfy the scenario because unlabeled observations can be grouped with unsupervised learning.",
-      "Incorrect. Choosing Reward data with reinforcement learning confuses a related concept with the actual requirement. It does not satisfy the scenario because unlabeled observations can be grouped with unsupervised learning."
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: unlabeled observations can be grouped with unsupervised learning. Correctly identifying data type prevents choosing a method that expects missing supervision.",
+      "Incorrect. “Unstructured images with computer vision” does not satisfy the scenario's controlling constraint. Correctly identifying data type prevents choosing a method that expects missing supervision. The required response follows from this rule: unlabeled observations can be grouped with unsupervised learning.",
+      "Correct. Clustering groups observations without using labeled targets. This response fits because unlabeled observations can be grouped with unsupervised learning. Correctly identifying data type prevents choosing a method that expects missing supervision.",
+      "Incorrect. “Reward data with reinforcement learning” does not satisfy the scenario's controlling constraint. Correctly identifying data type prevents choosing a method that expects missing supervision. The required response follows from this rule: unlabeled observations can be grouped with unsupervised learning."
     ],
     "principle": "unlabeled observations can be grouped with unsupervised learning",
     "relatedConcept": "Correctly identifying data type prevents choosing a method that expects missing supervision.",
-    "overallExplanation": "The decisive rule is that unlabeled observations can be grouped with unsupervised learning. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Unlabeled time-series data with unsupervised clustering is the best response because unlabeled observations can be grouped with unsupervised learning. Correctly identifying data type prevents choosing a method that expects missing supervision.",
+    "set": 3
   },
   {
     "id": 104,
@@ -81,23 +84,24 @@
     "type": "single",
     "question": "A product manager calls an application agentic because an LLM produces fluent answers. It returns one response and cannot call tools, retain state, or choose follow-up actions. Which description corrects this?",
     "options": [
-      "It is GenAI, not an agentic workflow that plans and uses tools",
       "It is deep learning only when the prompt has examples",
-      "It is reinforcement learning because temperature changes answers",
-      "It is traditional ML because it performs one inference"
+      "It is traditional ML because it performs one inference",
+      "It is reinforcement learning because temperature changes answers (without comparing against a simpler baseline)",
+      "It is GenAI, not an agentic workflow that plans and uses tools"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: generation alone does not make a workflow agentic.",
-      "Incorrect. Choosing It is deep learning only when the prompt has examples confuses a related concept with the actual requirement. It does not satisfy the scenario because generation alone does not make a workflow agentic.",
-      "Incorrect. Choosing It is reinforcement learning because temperature changes answers confuses a related concept with the actual requirement. It does not satisfy the scenario because generation alone does not make a workflow agentic.",
-      "Incorrect. Choosing It is traditional ML because it performs one inference confuses a related concept with the actual requirement. It does not satisfy the scenario because generation alone does not make a workflow agentic."
+      "Incorrect. “It is deep learning only when the prompt has examples” does not satisfy the scenario's controlling constraint. Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action. The required response follows from this rule: generation alone does not make a workflow agentic.",
+      "Incorrect. “It is traditional ML because it performs one inference” does not satisfy the scenario's controlling constraint. Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action. The required response follows from this rule: generation alone does not make a workflow agentic.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: generation alone does not make a workflow agentic. Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action.",
+      "Correct. This response fits because generation alone does not make a workflow agentic. Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action."
     ],
     "principle": "generation alone does not make a workflow agentic",
     "relatedConcept": "Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action.",
-    "overallExplanation": "The decisive rule is that generation alone does not make a workflow agentic. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "It is GenAI, not an agentic workflow that plans and uses tools is the best response because generation alone does not make a workflow agentic. Agentic AI adds goal-directed orchestration, tools, memory, or multi-step action.",
+    "set": 1
   },
   {
     "id": 105,
@@ -107,22 +111,23 @@
     "question": "A credit team must predict the dollar amount of expected loss for each approved account, rather than merely whether an account will default. Which technique matches the output?",
     "options": [
       "Regression",
-      "Binary classification",
+      "Image segmentation",
       "Clustering",
-      "Image segmentation"
+      "Binary classification"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: continuous numeric targets call for regression.",
-      "Incorrect. Choosing Binary classification confuses a related concept with the actual requirement. It does not satisfy the scenario because continuous numeric targets call for regression.",
-      "Incorrect. Choosing Clustering confuses a related concept with the actual requirement. It does not satisfy the scenario because continuous numeric targets call for regression.",
-      "Incorrect. Choosing Image segmentation confuses a related concept with the actual requirement. It does not satisfy the scenario because continuous numeric targets call for regression."
+      "Correct. Regression predicts a continuous numeric value. This response fits because continuous numeric targets call for regression. The required prediction shape distinguishes regression from classification and clustering.",
+      "Incorrect. “Image segmentation” does not satisfy the scenario's controlling constraint. The required prediction shape distinguishes regression from classification and clustering. The required response follows from this rule: continuous numeric targets call for regression.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: continuous numeric targets call for regression. The required prediction shape distinguishes regression from classification and clustering.",
+      "Incorrect. Classification predicts a discrete class from the available signals. That capability does not meet the controlling requirement here: continuous numeric targets call for regression. The required prediction shape distinguishes regression from classification and clustering."
     ],
     "principle": "continuous numeric targets call for regression",
     "relatedConcept": "The required prediction shape distinguishes regression from classification and clustering.",
-    "overallExplanation": "The decisive rule is that continuous numeric targets call for regression. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Regression is the best response because continuous numeric targets call for regression. The required prediction shape distinguishes regression from classification and clustering.",
+    "set": 2
   },
   {
     "id": 106,
@@ -131,23 +136,24 @@
     "type": "single",
     "question": "A warehouse robot repeatedly chooses routes, receives positive rewards for safe fast delivery and penalties for collisions, and improves its action policy from those outcomes. Which learning method is this?",
     "options": [
-      "Reinforcement learning",
       "Supervised classification",
-      "Unsupervised reduction",
-      "Batch inference"
+      "Reinforcement learning",
+      "Batch inference",
+      "Unsupervised reduction"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: rewards and sequential actions indicate reinforcement learning.",
-      "Incorrect. Choosing Supervised classification confuses a related concept with the actual requirement. It does not satisfy the scenario because rewards and sequential actions indicate reinforcement learning.",
-      "Incorrect. Choosing Unsupervised reduction confuses a related concept with the actual requirement. It does not satisfy the scenario because rewards and sequential actions indicate reinforcement learning.",
-      "Incorrect. Choosing Batch inference confuses a related concept with the actual requirement. It does not satisfy the scenario because rewards and sequential actions indicate reinforcement learning."
+      "Incorrect. Classification predicts a discrete class from the available signals. That capability does not meet the controlling requirement here: rewards and sequential actions indicate reinforcement learning. The training signal separates reinforcement learning from other learning methods.",
+      "Correct. This response fits because rewards and sequential actions indicate reinforcement learning. The training signal separates reinforcement learning from other learning methods.",
+      "Incorrect. “Batch inference” does not satisfy the scenario's controlling constraint. The training signal separates reinforcement learning from other learning methods. The required response follows from this rule: rewards and sequential actions indicate reinforcement learning.",
+      "Incorrect. “Unsupervised reduction” does not satisfy the scenario's controlling constraint. The training signal separates reinforcement learning from other learning methods. The required response follows from this rule: rewards and sequential actions indicate reinforcement learning."
     ],
     "principle": "rewards and sequential actions indicate reinforcement learning",
     "relatedConcept": "The training signal separates reinforcement learning from other learning methods.",
-    "overallExplanation": "The decisive rule is that rewards and sequential actions indicate reinforcement learning. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Reinforcement learning is the best response because rewards and sequential actions indicate reinforcement learning. The training signal separates reinforcement learning from other learning methods.",
+    "set": 3
   },
   {
     "id": 107,
@@ -156,24 +162,27 @@
     "type": "multi",
     "question": "A fraud classifier reports 99% accuracy, but only 1% of transactions are fraudulent and it predicts `not fraud` for every transaction. Which two interpretations are correct? (Choose two.)",
     "options": [
-      "Overall accuracy is misleading on this imbalanced dataset",
       "The classifier's recall for fraud is zero",
       "The task requires clustering because labels are imbalanced",
+      "Choose the most complex model available and measure value after deployment",
+      "Overall accuracy is misleading on this imbalanced dataset",
       "Higher temperature will create better fraud predictions"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. A trivial majority prediction looks 99% accurate because the positive class is rare, so aggregate accuracy hides the failure that matters.",
-      "Correct. The model detects none of the actual fraudulent transactions, making true positives zero and recall for the fraud class zero.",
-      "Incorrect. Choosing The task requires clustering because labels are imbalanced confuses a related concept with the actual requirement. It does not satisfy the scenario because class imbalance requires precision recall and F1 alongside accuracy.",
-      "Incorrect. Choosing Higher temperature will create better fraud predictions confuses a related concept with the actual requirement. It does not satisfy the scenario because class imbalance requires precision recall and F1 alongside accuracy."
+      "Correct. This response fits because class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness.",
+      "Incorrect. Model complexity is not a substitute for a justified use case, suitable training signal, or measurable business value. For this scenario, class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness.",
+      "Correct. This response fits because class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness."
     ],
     "principle": "class imbalance requires precision recall and F1 alongside accuracy",
     "relatedConcept": "Metrics must reflect the costly error rather than only overall correctness.",
-    "overallExplanation": "The decisive rule is that class imbalance requires precision recall and F1 alongside accuracy. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Overall accuracy is misleading on this imbalanced dataset and The classifier's recall for fraud is zero are the best responses because class imbalance requires precision recall and F1 alongside accuracy. Metrics must reflect the costly error rather than only overall correctness.",
+    "set": 1
   },
   {
     "id": 108,
@@ -182,23 +191,24 @@
     "type": "single",
     "question": "An insurance assistant reads a claim, identifies missing records, calls approved policy and document tools, remembers prior results, and routes unusual cases to a human. What most clearly makes it agentic?",
     "options": [
+      "It receives claim context in a prompt (before validating data quality and business fit)",
+      "It runs inference through an API",
       "It selects and sequences tool actions toward a goal",
-      "It uses a neural network to generate language",
-      "It receives claim context in a prompt",
-      "It runs inference through an API"
+      "It uses a neural network to generate language"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: agency comes from goal-directed action and tool use.",
-      "Incorrect. Choosing It uses a neural network to generate language confuses a related concept with the actual requirement. It does not satisfy the scenario because agency comes from goal-directed action and tool use.",
-      "Incorrect. Choosing It receives claim context in a prompt confuses a related concept with the actual requirement. It does not satisfy the scenario because agency comes from goal-directed action and tool use.",
-      "Incorrect. Choosing It runs inference through an API confuses a related concept with the actual requirement. It does not satisfy the scenario because agency comes from goal-directed action and tool use."
+      "Incorrect. “It receives claim context in a prompt (before validating data quality and business fit)” does not satisfy the scenario's controlling constraint. Agentic systems combine models with tools, memory, and workflows. The required response follows from this rule: agency comes from goal-directed action and tool use.",
+      "Incorrect. “It runs inference through an API” does not satisfy the scenario's controlling constraint. Agentic systems combine models with tools, memory, and workflows. The required response follows from this rule: agency comes from goal-directed action and tool use.",
+      "Correct. This response fits because agency comes from goal-directed action and tool use. Agentic systems combine models with tools, memory, and workflows.",
+      "Incorrect. “It uses a neural network to generate language” does not satisfy the scenario's controlling constraint. Agentic systems combine models with tools, memory, and workflows. The required response follows from this rule: agency comes from goal-directed action and tool use."
     ],
     "principle": "agency comes from goal-directed action and tool use",
     "relatedConcept": "Agentic systems combine models with tools, memory, and workflows.",
-    "overallExplanation": "The decisive rule is that agency comes from goal-directed action and tool use. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "It selects and sequences tool actions toward a goal is the best response because agency comes from goal-directed action and tool use. Agentic systems combine models with tools, memory, and workflows.",
+    "set": 2
   },
   {
     "id": 109,
@@ -207,24 +217,27 @@
     "type": "multi",
     "question": "A media company must detect logos in video frames and separately determine sentiment from written viewer comments. The two inputs have different modalities and outputs. Which two AI areas map to the work? (Choose two.)",
     "options": [
-      "Computer vision for video frames",
       "Natural language processing for comments",
+      "Judge the solution only by aggregate accuracy across all records",
+      "Computer vision for video frames",
       "Regression for every logo pixel",
       "Reinforcement learning for sentiment"
     ],
     "correct": [
       0,
-      1
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: match each input modality to its appropriate AI capability.",
-      "Correct. This option follows the decisive rule: match each input modality to its appropriate AI capability.",
-      "Incorrect. Choosing Regression for every logo pixel confuses a related concept with the actual requirement. It does not satisfy the scenario because match each input modality to its appropriate AI capability.",
-      "Incorrect. Choosing Reinforcement learning for sentiment confuses a related concept with the actual requirement. It does not satisfy the scenario because match each input modality to its appropriate AI capability."
+      "Correct. This response fits because match each input modality to its appropriate AI capability. Multi-modal solutions often combine specialized vision and language functions.",
+      "Incorrect. Aggregate accuracy can hide costly errors, subgroup failures, drift, and weak business outcomes. For this scenario, match each input modality to its appropriate AI capability. Multi-modal solutions often combine specialized vision and language functions.",
+      "Correct. This response fits because match each input modality to its appropriate AI capability. Multi-modal solutions often combine specialized vision and language functions.",
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: match each input modality to its appropriate AI capability. Multi-modal solutions often combine specialized vision and language functions.",
+      "Incorrect. “Reinforcement learning for sentiment” does not satisfy the scenario's controlling constraint. Multi-modal solutions often combine specialized vision and language functions. The required response follows from this rule: match each input modality to its appropriate AI capability."
     ],
     "principle": "match each input modality to its appropriate AI capability",
     "relatedConcept": "Multi-modal solutions often combine specialized vision and language functions.",
-    "overallExplanation": "The decisive rule is that match each input modality to its appropriate AI capability. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Computer vision for video frames and Natural language processing for comments are the best responses because match each input modality to its appropriate AI capability. Multi-modal solutions often combine specialized vision and language functions.",
+    "set": 3
   },
   {
     "id": 110,
@@ -233,48 +246,59 @@
     "type": "single",
     "question": "A payroll system applies a statutory tax table whose inputs always produce one legally defined amount. Management proposes a model trained on last year's calculations. What is the best recommendation?",
     "options": [
-      "Implement deterministic rules in conventional code",
       "Train regression to approximate the tax",
+      "Prompt a foundation model to calculate the tax",
       "Use clustering to discover brackets",
-      "Prompt a foundation model to calculate the tax"
+      "Implement deterministic rules in conventional code"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: exact published rules should remain deterministic.",
-      "Incorrect. Choosing Train regression to approximate the tax confuses a related concept with the actual requirement. It does not satisfy the scenario because exact published rules should remain deterministic.",
-      "Incorrect. Choosing Use clustering to discover brackets confuses a related concept with the actual requirement. It does not satisfy the scenario because exact published rules should remain deterministic.",
-      "Incorrect. Choosing Prompt a foundation model to calculate the tax confuses a related concept with the actual requirement. It does not satisfy the scenario because exact published rules should remain deterministic."
+      "Incorrect. Regression predicts a continuous numeric value. That capability does not meet the controlling requirement here: exact published rules should remain deterministic. AI is useful for uncertainty and patterns, not as a substitute for exact business logic.",
+      "Incorrect. “Prompt a foundation model to calculate the tax” does not satisfy the scenario's controlling constraint. AI is useful for uncertainty and patterns, not as a substitute for exact business logic. The required response follows from this rule: exact published rules should remain deterministic.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: exact published rules should remain deterministic. AI is useful for uncertainty and patterns, not as a substitute for exact business logic.",
+      "Correct. This response fits because exact published rules should remain deterministic. AI is useful for uncertainty and patterns, not as a substitute for exact business logic."
     ],
     "principle": "exact published rules should remain deterministic",
     "relatedConcept": "AI is useful for uncertainty and patterns, not as a substitute for exact business logic.",
-    "overallExplanation": "The decisive rule is that exact published rules should remain deterministic. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Implement deterministic rules in conventional code is the best response because exact published rules should remain deterministic. AI is useful for uncertainty and patterns, not as a substitute for exact business logic.",
+    "set": 1
   },
   {
     "id": 111,
     "domain": "Fundamentals of AI and ML",
     "objective": "Identify practical use cases for AI.",
-    "type": "single",
-    "question": "A telecom has support-call recordings and wants searchable transcripts before running its own issue classifier on the resulting text. Which AWS service performs the first step?",
+    "type": "matching",
+    "question": "A company is mapping four common AI workloads to purpose-built AWS services. Match each workload with the service that directly provides the required capability.",
     "options": [
       "Amazon Transcribe",
-      "Amazon Polly",
-      "Amazon Translate",
-      "Amazon Rekognition"
+      "Amazon Textract",
+      "Amazon Personalize",
+      "Amazon Translate"
     ],
     "correct": [
-      0
+      0,
+      3,
+      1,
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Transcribe converts speech audio into text.",
-      "Incorrect. Choosing Amazon Polly confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Transcribe converts speech audio into text.",
-      "Incorrect. Choosing Amazon Translate confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Transcribe converts speech audio into text.",
-      "Incorrect. Choosing Amazon Rekognition confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Transcribe converts speech audio into text."
+      "Correct match. Amazon Transcribe converts speech audio into text. This response fits because purpose-built AI services should be matched to the input modality and required output. Speech transcription, translation, document extraction, and recommendations are distinct managed capabilities.",
+      "Correct match. Amazon Textract extracts text, forms, and tables from documents. This response fits because purpose-built AI services should be matched to the input modality and required output. Speech transcription, translation, document extraction, and recommendations are distinct managed capabilities.",
+      "Correct match. Amazon Personalize builds recommendations and personalized rankings. This response fits because purpose-built AI services should be matched to the input modality and required output. Speech transcription, translation, document extraction, and recommendations are distinct managed capabilities.",
+      "Correct match. Amazon Translate translates text between supported languages. This response fits because purpose-built AI services should be matched to the input modality and required output. Speech transcription, translation, document extraction, and recommendations are distinct managed capabilities."
     ],
-    "principle": "Amazon Transcribe converts speech audio into text",
-    "relatedConcept": "Managed AI services expose specialized capabilities for particular input modalities.",
-    "overallExplanation": "The decisive rule is that Amazon Transcribe converts speech audio into text. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "principle": "purpose-built AI services should be matched to the input modality and required output",
+    "relatedConcept": "Speech transcription, translation, document extraction, and recommendations are distinct managed capabilities.",
+    "overallExplanation": "Match the workload's input and desired output to the managed capability: Transcribe handles speech-to-text, Translate handles language translation, Textract extracts document content, and Personalize produces recommendations.",
+    "prompts": [
+      "Convert recorded support calls into searchable text",
+      "Translate existing text tickets into other languages",
+      "Extract text, tables, and form fields from scanned documents",
+      "Generate personalized rankings from behavior and item data"
+    ],
+    "set": 2
   },
   {
     "id": 112,
@@ -284,22 +308,23 @@
     "question": "A global support team already has English text tickets and needs French and Japanese versions while preserving its existing ticket workflow. Which AWS service directly fits?",
     "options": [
       "Amazon Translate",
-      "Amazon Comprehend",
       "Amazon Lex",
-      "Amazon Polly"
+      "Amazon Polly",
+      "Amazon Comprehend"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Translate converts text between supported languages.",
-      "Incorrect. Choosing Amazon Comprehend confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Translate converts text between supported languages.",
-      "Incorrect. Choosing Amazon Lex confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Translate converts text between supported languages.",
-      "Incorrect. Choosing Amazon Polly confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Translate converts text between supported languages."
+      "Correct. Amazon Translate translates text between supported languages. This response fits because Amazon Translate converts text between supported languages. Choosing the narrow managed service avoids unnecessary model development.",
+      "Incorrect. Amazon Lex provides intent-based conversational interfaces. That capability does not meet the controlling requirement here: Amazon Translate converts text between supported languages. Choosing the narrow managed service avoids unnecessary model development.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: Amazon Translate converts text between supported languages. Choosing the narrow managed service avoids unnecessary model development.",
+      "Incorrect. “Amazon Comprehend” does not satisfy the scenario's controlling constraint. Choosing the narrow managed service avoids unnecessary model development. The required response follows from this rule: Amazon Translate converts text between supported languages."
     ],
     "principle": "Amazon Translate converts text between supported languages",
     "relatedConcept": "Choosing the narrow managed service avoids unnecessary model development.",
-    "overallExplanation": "The decisive rule is that Amazon Translate converts text between supported languages. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Amazon Translate is the best response because Amazon Translate converts text between supported languages. Choosing the narrow managed service avoids unnecessary model development.",
+    "set": 3
   },
   {
     "id": 113,
@@ -308,23 +333,24 @@
     "type": "single",
     "question": "A bank assigns each structured transaction to `fraud` or `legitimate`. Auditors require stable feature importance, and years of labeled examples are available. Which approach is most suitable?",
     "options": [
-      "A supervised traditional classifier with explainability analysis",
-      "A general-purpose FM prompted with transaction rows",
       "Unsupervised clusters as final decisions",
-      "A diffusion model trained on account histories"
+      "A supervised traditional classifier with explainability analysis",
+      "A diffusion model trained on account histories",
+      "A general-purpose FM prompted with transaction rows"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: focused traditional ML fits labeled structured targets and explainability needs.",
-      "Incorrect. Choosing A general-purpose FM prompted with transaction rows confuses a related concept with the actual requirement. It does not satisfy the scenario because focused traditional ML fits labeled structured targets and explainability needs.",
-      "Incorrect. Choosing Unsupervised clusters as final decisions confuses a related concept with the actual requirement. It does not satisfy the scenario because focused traditional ML fits labeled structured targets and explainability needs.",
-      "Incorrect. Choosing A diffusion model trained on account histories confuses a related concept with the actual requirement. It does not satisfy the scenario because focused traditional ML fits labeled structured targets and explainability needs."
+      "Incorrect. “Unsupervised clusters as final decisions” does not satisfy the scenario's controlling constraint. Model choice follows the task, data, controls, and operational constraints. The required response follows from this rule: focused traditional ML fits labeled structured targets and explainability needs.",
+      "Correct. This response fits because focused traditional ML fits labeled structured targets and explainability needs. Model choice follows the task, data, controls, and operational constraints.",
+      "Incorrect. “A diffusion model trained on account histories” does not satisfy the scenario's controlling constraint. Model choice follows the task, data, controls, and operational constraints. The required response follows from this rule: focused traditional ML fits labeled structured targets and explainability needs.",
+      "Incorrect. “A general-purpose FM prompted with transaction rows” does not satisfy the scenario's controlling constraint. Model choice follows the task, data, controls, and operational constraints. The required response follows from this rule: focused traditional ML fits labeled structured targets and explainability needs."
     ],
     "principle": "focused traditional ML fits labeled structured targets and explainability needs",
     "relatedConcept": "Model choice follows the task, data, controls, and operational constraints.",
-    "overallExplanation": "The decisive rule is that focused traditional ML fits labeled structured targets and explainability needs. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "A supervised traditional classifier with explainability analysis is the best response because focused traditional ML fits labeled structured targets and explainability needs. Model choice follows the task, data, controls, and operational constraints.",
+    "set": 1
   },
   {
     "id": 114,
@@ -333,23 +359,24 @@
     "type": "single",
     "question": "A contact center wants a conversational bot that recognizes caller intent, collects slots, maintains dialog state, and invokes fulfillment functions. Which AWS service is designed for this?",
     "options": [
-      "Amazon Lex",
       "Amazon Comprehend",
-      "Amazon Personalize",
-      "Amazon Textract"
+      "Amazon Textract",
+      "Amazon Lex",
+      "Amazon Personalize"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Lex builds intent-based voice and text conversational interfaces.",
-      "Incorrect. Choosing Amazon Comprehend confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Lex builds intent-based voice and text conversational interfaces.",
-      "Incorrect. Choosing Amazon Personalize confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Lex builds intent-based voice and text conversational interfaces.",
-      "Incorrect. Choosing Amazon Textract confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Lex builds intent-based voice and text conversational interfaces."
+      "Incorrect. “Amazon Comprehend” does not satisfy the scenario's controlling constraint. Managed services align to common modalities and interaction patterns. The required response follows from this rule: Amazon Lex builds intent-based voice and text conversational interfaces.",
+      "Incorrect. Amazon Textract extracts text, forms, and tables from documents. That capability does not meet the controlling requirement here: Amazon Lex builds intent-based voice and text conversational interfaces. Managed services align to common modalities and interaction patterns.",
+      "Correct. Amazon Lex provides intent-based conversational interfaces. This response fits because Amazon Lex builds intent-based voice and text conversational interfaces. Managed services align to common modalities and interaction patterns.",
+      "Incorrect. Amazon Personalize builds recommendations and personalized rankings. That capability does not meet the controlling requirement here: Amazon Lex builds intent-based voice and text conversational interfaces. Managed services align to common modalities and interaction patterns."
     ],
     "principle": "Amazon Lex builds intent-based voice and text conversational interfaces",
     "relatedConcept": "Managed services align to common modalities and interaction patterns.",
-    "overallExplanation": "The decisive rule is that Amazon Lex builds intent-based voice and text conversational interfaces. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Amazon Lex is the best response because Amazon Lex builds intent-based voice and text conversational interfaces. Managed services align to common modalities and interaction patterns.",
+    "set": 2
   },
   {
     "id": 115,
@@ -358,24 +385,27 @@
     "type": "multi",
     "question": "A publisher has scanned invoices and must extract printed text, tables, and form fields into structured records while reviewing uncertain financial values. Which two elements fit? (Choose two.)",
     "options": [
-      "Use Amazon Textract for document structure",
       "Route low-confidence fields for human review",
-      "Use Amazon Polly to extract tables",
-      "Use Amazon Personalize to rank fields"
+      "Use Amazon Personalize to rank fields",
+      "Judge the solution only by aggregate accuracy across all records",
+      "Use Amazon Textract for document structure",
+      "Use Amazon Polly to extract tables"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: managed extraction plus human review controls consequential uncertainty.",
-      "Correct. This option follows the decisive rule: managed extraction plus human review controls consequential uncertainty.",
-      "Incorrect. Choosing Use Amazon Polly to extract tables confuses a related concept with the actual requirement. It does not satisfy the scenario because managed extraction plus human review controls consequential uncertainty.",
-      "Incorrect. Choosing Use Amazon Personalize to rank fields confuses a related concept with the actual requirement. It does not satisfy the scenario because managed extraction plus human review controls consequential uncertainty."
+      "Correct. This response fits because managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors.",
+      "Incorrect. Amazon Personalize builds recommendations and personalized rankings. That capability does not meet the controlling requirement here: managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors.",
+      "Incorrect. Aggregate accuracy can hide costly errors, subgroup failures, drift, and weak business outcomes. For this scenario, managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors.",
+      "Correct. Amazon Textract extracts text, forms, and tables from documents. This response fits because managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors."
     ],
     "principle": "managed extraction plus human review controls consequential uncertainty",
     "relatedConcept": "Practical AI designs include a model capability and a fallback for risky errors.",
-    "overallExplanation": "The decisive rule is that managed extraction plus human review controls consequential uncertainty. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Use Amazon Textract for document structure and Route low-confidence fields for human review are the best responses because managed extraction plus human review controls consequential uncertainty. Practical AI designs include a model capability and a fallback for risky errors.",
+    "set": 3
   },
   {
     "id": 116,
@@ -384,23 +414,24 @@
     "type": "single",
     "question": "A streaming service wants personalized movie rankings based on viewing behavior and item metadata, without building recommendation algorithms from scratch. Which service best fits?",
     "options": [
-      "Amazon Personalize",
       "Amazon Comprehend",
+      "Amazon Forecast",
       "Amazon Transcribe",
-      "Amazon Forecast"
+      "Amazon Personalize"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Personalize provides managed recommendations and personalized ranking.",
-      "Incorrect. Choosing Amazon Comprehend confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Personalize provides managed recommendations and personalized ranking.",
-      "Incorrect. Choosing Amazon Transcribe confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Personalize provides managed recommendations and personalized ranking.",
-      "Incorrect. Choosing Amazon Forecast confuses a related concept with the actual requirement. It does not satisfy the scenario because Amazon Personalize provides managed recommendations and personalized ranking."
+      "Incorrect. “Amazon Comprehend” does not satisfy the scenario's controlling constraint. The best service follows the desired business output rather than a broad AI label. The required response follows from this rule: Amazon Personalize provides managed recommendations and personalized ranking.",
+      "Incorrect. “Amazon Forecast” does not satisfy the scenario's controlling constraint. The best service follows the desired business output rather than a broad AI label. The required response follows from this rule: Amazon Personalize provides managed recommendations and personalized ranking.",
+      "Incorrect. Amazon Transcribe converts speech audio into text. That capability does not meet the controlling requirement here: Amazon Personalize provides managed recommendations and personalized ranking. The best service follows the desired business output rather than a broad AI label.",
+      "Correct. Amazon Personalize builds recommendations and personalized rankings. This response fits because Amazon Personalize provides managed recommendations and personalized ranking. The best service follows the desired business output rather than a broad AI label."
     ],
     "principle": "Amazon Personalize provides managed recommendations and personalized ranking",
     "relatedConcept": "The best service follows the desired business output rather than a broad AI label.",
-    "overallExplanation": "The decisive rule is that Amazon Personalize provides managed recommendations and personalized ranking. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Amazon Personalize is the best response because Amazon Personalize provides managed recommendations and personalized ranking. The best service follows the desired business output rather than a broad AI label.",
+    "set": 1
   },
   {
     "id": 117,
@@ -410,22 +441,23 @@
     "question": "A legal team drafts and summarizes varied contracts, while a risk team predicts one fixed numeric loss from structured account features. Which pairing is appropriate?",
     "options": [
       "An FM for language work and regression for loss",
-      "Clustering for contracts and an FM for every loss",
+      "Templates for every contract and vision for loss",
       "A diffusion model for contracts and RL for loss",
-      "Templates for every contract and vision for loss"
+      "Clustering for contracts and an FM for every loss"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: different task shapes deserve different model families.",
-      "Incorrect. Choosing Clustering for contracts and an FM for every loss confuses a related concept with the actual requirement. It does not satisfy the scenario because different task shapes deserve different model families.",
-      "Incorrect. Choosing A diffusion model for contracts and RL for loss confuses a related concept with the actual requirement. It does not satisfy the scenario because different task shapes deserve different model families.",
-      "Incorrect. Choosing Templates for every contract and vision for loss confuses a related concept with the actual requirement. It does not satisfy the scenario because different task shapes deserve different model families."
+      "Correct. Regression predicts a continuous numeric value. This response fits because different task shapes deserve different model families. A solution should not force unrelated business problems through one AI technique.",
+      "Incorrect. “Templates for every contract and vision for loss” does not satisfy the scenario's controlling constraint. A solution should not force unrelated business problems through one AI technique. The required response follows from this rule: different task shapes deserve different model families.",
+      "Incorrect. “A diffusion model for contracts and RL for loss” does not satisfy the scenario's controlling constraint. A solution should not force unrelated business problems through one AI technique. The required response follows from this rule: different task shapes deserve different model families.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: different task shapes deserve different model families. A solution should not force unrelated business problems through one AI technique."
     ],
     "principle": "different task shapes deserve different model families",
     "relatedConcept": "A solution should not force unrelated business problems through one AI technique.",
-    "overallExplanation": "The decisive rule is that different task shapes deserve different model families. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "An FM for language work and regression for loss is the best response because different task shapes deserve different model families. A solution should not force unrelated business problems through one AI technique.",
+    "set": 2
   },
   {
     "id": 118,
@@ -434,23 +466,24 @@
     "type": "single",
     "question": "A factory wants to forecast hourly energy consumption from three years of timestamped readings and weather variables. Which description fits?",
     "options": [
+      "A conversational bot in Amazon Lex",
       "Time-series forecasting on structured historical data",
       "Image classification on pixels",
-      "Clustering with no target",
-      "A conversational bot in Amazon Lex"
+      "Clustering with no target"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: forecasting uses ordered history to estimate future numeric values.",
-      "Incorrect. Choosing Image classification on pixels confuses a related concept with the actual requirement. It does not satisfy the scenario because forecasting uses ordered history to estimate future numeric values.",
-      "Incorrect. Choosing Clustering with no target confuses a related concept with the actual requirement. It does not satisfy the scenario because forecasting uses ordered history to estimate future numeric values.",
-      "Incorrect. Choosing A conversational bot in Amazon Lex confuses a related concept with the actual requirement. It does not satisfy the scenario because forecasting uses ordered history to estimate future numeric values."
+      "Incorrect. Amazon Lex provides intent-based conversational interfaces. That capability does not meet the controlling requirement here: forecasting uses ordered history to estimate future numeric values. Recognizing the output and modality leads to the right technique.",
+      "Correct. This response fits because forecasting uses ordered history to estimate future numeric values. Recognizing the output and modality leads to the right technique.",
+      "Incorrect. Classification predicts a discrete class from the available signals. That capability does not meet the controlling requirement here: forecasting uses ordered history to estimate future numeric values. Recognizing the output and modality leads to the right technique.",
+      "Incorrect. Clustering groups observations without using labeled targets. That capability does not meet the controlling requirement here: forecasting uses ordered history to estimate future numeric values. Recognizing the output and modality leads to the right technique."
     ],
     "principle": "forecasting uses ordered history to estimate future numeric values",
     "relatedConcept": "Recognizing the output and modality leads to the right technique.",
-    "overallExplanation": "The decisive rule is that forecasting uses ordered history to estimate future numeric values. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Time-series forecasting on structured historical data is the best response because forecasting uses ordered history to estimate future numeric values. Recognizing the output and modality leads to the right technique.",
+    "set": 3
   },
   {
     "id": 119,
@@ -459,24 +492,27 @@
     "type": "multi",
     "question": "A marketing team must summarize documents, draft campaign variants, and answer open-ended questions across changing topics. Which two traits favor an FM? (Choose two.)",
     "options": [
-      "Several natural-language generation tasks are required",
+      "Choose the most complex model available and measure value after deployment",
+      "Only one fixed label from a table is needed",
       "New instructions should work without retraining",
-      "Every output must be mathematically identical",
-      "Only one fixed label from a table is needed"
+      "Several natural-language generation tasks are required",
+      "Every output must be mathematically identical"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: breadth and instruction adaptability favor foundation models.",
-      "Correct. This option follows the decisive rule: breadth and instruction adaptability favor foundation models.",
-      "Incorrect. Choosing Every output must be mathematically identical confuses a related concept with the actual requirement. It does not satisfy the scenario because breadth and instruction adaptability favor foundation models.",
-      "Incorrect. Choosing Only one fixed label from a table is needed confuses a related concept with the actual requirement. It does not satisfy the scenario because breadth and instruction adaptability favor foundation models."
+      "Incorrect. Model complexity is not a substitute for a justified use case, suitable training signal, or measurable business value. For this scenario, breadth and instruction adaptability favor foundation models. FMs trade narrow predictability for versatile capabilities across tasks.",
+      "Incorrect. “Only one fixed label from a table is needed” does not satisfy the scenario's controlling constraint. FMs trade narrow predictability for versatile capabilities across tasks. The required response follows from this rule: breadth and instruction adaptability favor foundation models.",
+      "Correct. This response fits because breadth and instruction adaptability favor foundation models. FMs trade narrow predictability for versatile capabilities across tasks.",
+      "Correct. This response fits because breadth and instruction adaptability favor foundation models. FMs trade narrow predictability for versatile capabilities across tasks.",
+      "Incorrect. “Every output must be mathematically identical” does not satisfy the scenario's controlling constraint. FMs trade narrow predictability for versatile capabilities across tasks. The required response follows from this rule: breadth and instruction adaptability favor foundation models."
     ],
     "principle": "breadth and instruction adaptability favor foundation models",
     "relatedConcept": "FMs trade narrow predictability for versatile capabilities across tasks.",
-    "overallExplanation": "The decisive rule is that breadth and instruction adaptability favor foundation models. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Several natural-language generation tasks are required and New instructions should work without retraining are the best responses because breadth and instruction adaptability favor foundation models. FMs trade narrow predictability for versatile capabilities across tasks.",
+    "set": 1
   },
   {
     "id": 120,
@@ -485,23 +521,24 @@
     "type": "single",
     "question": "A clinic considers a no-show predictor costing $180,000, while missed appointments cost $12,000 yearly and simple reminders already prevent most losses. What should it do first?",
     "options": [
-      "Perform cost-benefit analysis and favor the simpler control",
-      "Deploy SageMaker AI because prediction always helps",
+      "Deploy SageMaker AI because prediction always helps (before validating data quality and business fit)",
       "Train a larger FM for maximum accuracy",
+      "Perform cost-benefit analysis and favor the simpler control",
       "Replace staff before measuring a baseline"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: AI adoption must justify its full cost with measurable value.",
-      "Incorrect. Choosing Deploy SageMaker AI because prediction always helps confuses a related concept with the actual requirement. It does not satisfy the scenario because AI adoption must justify its full cost with measurable value.",
-      "Incorrect. Choosing Train a larger FM for maximum accuracy confuses a related concept with the actual requirement. It does not satisfy the scenario because AI adoption must justify its full cost with measurable value.",
-      "Incorrect. Choosing Replace staff before measuring a baseline confuses a related concept with the actual requirement. It does not satisfy the scenario because AI adoption must justify its full cost with measurable value."
+      "Incorrect. “Deploy SageMaker AI because prediction always helps (before validating data quality and business fit)” does not satisfy the scenario's controlling constraint. Practical use-case selection includes economics, operations, and simpler alternatives. The required response follows from this rule: AI adoption must justify its full cost with measurable value.",
+      "Incorrect. “Train a larger FM for maximum accuracy” does not satisfy the scenario's controlling constraint. Practical use-case selection includes economics, operations, and simpler alternatives. The required response follows from this rule: AI adoption must justify its full cost with measurable value.",
+      "Correct. This response fits because AI adoption must justify its full cost with measurable value. Practical use-case selection includes economics, operations, and simpler alternatives.",
+      "Incorrect. “Replace staff before measuring a baseline” does not satisfy the scenario's controlling constraint. Practical use-case selection includes economics, operations, and simpler alternatives. The required response follows from this rule: AI adoption must justify its full cost with measurable value."
     ],
     "principle": "AI adoption must justify its full cost with measurable value",
     "relatedConcept": "Practical use-case selection includes economics, operations, and simpler alternatives.",
-    "overallExplanation": "The decisive rule is that AI adoption must justify its full cost with measurable value. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Perform cost-benefit analysis and favor the simpler control is the best response because AI adoption must justify its full cost with measurable value. Practical use-case selection includes economics, operations, and simpler alternatives.",
+    "set": 2
   },
   {
     "id": 121,
@@ -510,23 +547,24 @@
     "type": "single",
     "question": "An HR team proposes automatic candidate rejection by an opaque generative model. Regulations require a documented basis and human appeal for adverse decisions. Which design fits?",
     "options": [
-      "Focused explainable decision support with human review",
       "Final FM decisions because fluent rationales ensure compliance",
+      "Higher temperature for varied rationales",
       "Unsupervised clusters as binding categories",
-      "Higher temperature for varied rationales"
+      "Focused explainable decision support with human review"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: high-impact decisions need explainability and human accountability.",
-      "Incorrect. Choosing Final FM decisions because fluent rationales ensure compliance confuses a related concept with the actual requirement. It does not satisfy the scenario because high-impact decisions need explainability and human accountability.",
-      "Incorrect. Choosing Unsupervised clusters as binding categories confuses a related concept with the actual requirement. It does not satisfy the scenario because high-impact decisions need explainability and human accountability.",
-      "Incorrect. Choosing Higher temperature for varied rationales confuses a related concept with the actual requirement. It does not satisfy the scenario because high-impact decisions need explainability and human accountability."
+      "Incorrect. “Final FM decisions because fluent rationales ensure compliance” does not satisfy the scenario's controlling constraint. Regulatory and operational constraints can favor traditional ML over an FM. The required response follows from this rule: high-impact decisions need explainability and human accountability.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: high-impact decisions need explainability and human accountability. Regulatory and operational constraints can favor traditional ML over an FM.",
+      "Incorrect. “Unsupervised clusters as binding categories” does not satisfy the scenario's controlling constraint. Regulatory and operational constraints can favor traditional ML over an FM. The required response follows from this rule: high-impact decisions need explainability and human accountability.",
+      "Correct. This response fits because high-impact decisions need explainability and human accountability. Regulatory and operational constraints can favor traditional ML over an FM."
     ],
     "principle": "high-impact decisions need explainability and human accountability",
     "relatedConcept": "Regulatory and operational constraints can favor traditional ML over an FM.",
-    "overallExplanation": "The decisive rule is that high-impact decisions need explainability and human accountability. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Focused explainable decision support with human review is the best response because high-impact decisions need explainability and human accountability. Regulatory and operational constraints can favor traditional ML over an FM.",
+    "set": 3
   },
   {
     "id": 122,
@@ -536,22 +574,23 @@
     "question": "A data science team changes datasets and hyperparameters repeatedly but cannot reproduce the model that entered production three months ago. Which capability should be added first?",
     "options": [
       "Version data, code, configurations, and model artifacts",
+      "Save only final accuracy in a spreadsheet",
       "Increase endpoint instance size",
-      "Replace the algorithm with an FM",
-      "Save only final accuracy in a spreadsheet"
+      "Replace the algorithm with an FM"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: MLOps makes experiments and releases repeatable.",
-      "Incorrect. Choosing Increase endpoint instance size confuses a related concept with the actual requirement. It does not satisfy the scenario because MLOps makes experiments and releases repeatable.",
-      "Incorrect. Choosing Replace the algorithm with an FM confuses a related concept with the actual requirement. It does not satisfy the scenario because MLOps makes experiments and releases repeatable.",
-      "Incorrect. Choosing Save only final accuracy in a spreadsheet confuses a related concept with the actual requirement. It does not satisfy the scenario because MLOps makes experiments and releases repeatable."
+      "Correct. This response fits because MLOps makes experiments and releases repeatable. Lifecycle discipline controls technical debt from development through production.",
+      "Incorrect. “Save only final accuracy in a spreadsheet” does not satisfy the scenario's controlling constraint. Lifecycle discipline controls technical debt from development through production. The required response follows from this rule: MLOps makes experiments and releases repeatable.",
+      "Incorrect. “Increase endpoint instance size” does not satisfy the scenario's controlling constraint. Lifecycle discipline controls technical debt from development through production. The required response follows from this rule: MLOps makes experiments and releases repeatable.",
+      "Incorrect. “Replace the algorithm with an FM” does not satisfy the scenario's controlling constraint. Lifecycle discipline controls technical debt from development through production. The required response follows from this rule: MLOps makes experiments and releases repeatable."
     ],
     "principle": "MLOps makes experiments and releases repeatable",
     "relatedConcept": "Lifecycle discipline controls technical debt from development through production.",
-    "overallExplanation": "The decisive rule is that MLOps makes experiments and releases repeatable. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Version data, code, configurations, and model artifacts is the best response because MLOps makes experiments and releases repeatable. Lifecycle discipline controls technical debt from development through production.",
+    "set": 1
   },
   {
     "id": 123,
@@ -560,24 +599,27 @@
     "type": "multi",
     "question": "A project has cleaned data and a trained candidate model and now must decide whether it should proceed to production. Which two steps belong before broad deployment? (Choose two.)",
     "options": [
-      "Evaluate on representative held-out data and business metrics",
       "Define monitoring and rollback criteria",
-      "Delete training lineage to reduce storage",
-      "Tune repeatedly against the final test set"
+      "Use a generative model for every workload because it can accept natural-language instructions",
+      "Tune repeatedly against the final test set",
+      "Evaluate on representative held-out data and business metrics",
+      "Delete training lineage to reduce storage"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: evaluation and operational readiness precede production.",
-      "Correct. This option follows the decisive rule: evaluation and operational readiness precede production.",
-      "Incorrect. Choosing Delete training lineage to reduce storage confuses a related concept with the actual requirement. It does not satisfy the scenario because evaluation and operational readiness precede production.",
-      "Incorrect. Choosing Tune repeatedly against the final test set confuses a related concept with the actual requirement. It does not satisfy the scenario because evaluation and operational readiness precede production."
+      "Correct. This response fits because evaluation and operational readiness precede production. An AI pipeline includes validation, deployment controls, monitoring, and feedback.",
+      "Incorrect. Generative flexibility does not make an FM appropriate for deterministic rules, focused prediction, or tightly explainable decisions. For this scenario, evaluation and operational readiness precede production. An AI pipeline includes validation, deployment controls, monitoring, and feedback.",
+      "Incorrect. “Tune repeatedly against the final test set” does not satisfy the scenario's controlling constraint. An AI pipeline includes validation, deployment controls, monitoring, and feedback. The required response follows from this rule: evaluation and operational readiness precede production.",
+      "Correct. This response fits because evaluation and operational readiness precede production. An AI pipeline includes validation, deployment controls, monitoring, and feedback.",
+      "Incorrect. “Delete training lineage to reduce storage” does not satisfy the scenario's controlling constraint. An AI pipeline includes validation, deployment controls, monitoring, and feedback. The required response follows from this rule: evaluation and operational readiness precede production."
     ],
     "principle": "evaluation and operational readiness precede production",
     "relatedConcept": "An AI pipeline includes validation, deployment controls, monitoring, and feedback.",
-    "overallExplanation": "The decisive rule is that evaluation and operational readiness precede production. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Evaluate on representative held-out data and business metrics and Define monitoring and rollback criteria are the best responses because evaluation and operational readiness precede production. An AI pipeline includes validation, deployment controls, monitoring, and feedback.",
+    "set": 2
   },
   {
     "id": 124,
@@ -586,23 +628,24 @@
     "type": "single",
     "question": "A team needs a pre-trained open model plus managed notebooks, training, deployment, and monitoring in one ML platform. Which AWS service is the best primary fit?",
     "options": [
-      "Amazon SageMaker AI",
       "Amazon Polly",
-      "AWS CloudTrail",
+      "Amazon SageMaker AI",
+      "AWS CloudTrail (without comparing against a simpler baseline)",
       "Amazon Quick"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: SageMaker AI manages model development and production lifecycle stages.",
-      "Incorrect. Choosing Amazon Polly confuses a related concept with the actual requirement. It does not satisfy the scenario because SageMaker AI manages model development and production lifecycle stages.",
-      "Incorrect. Choosing AWS CloudTrail confuses a related concept with the actual requirement. It does not satisfy the scenario because SageMaker AI manages model development and production lifecycle stages.",
-      "Incorrect. Choosing Amazon Quick confuses a related concept with the actual requirement. It does not satisfy the scenario because SageMaker AI manages model development and production lifecycle stages."
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: SageMaker AI manages model development and production lifecycle stages. AWS offers specialized AI APIs and broader platforms for custom ML work.",
+      "Correct. Amazon SageMaker AI supports custom model development, deployment, and operations. This response fits because SageMaker AI manages model development and production lifecycle stages. AWS offers specialized AI APIs and broader platforms for custom ML work.",
+      "Incorrect. AWS CloudTrail (without comparing against a simpler baseline) records account and API activity. That capability does not meet the controlling requirement here: SageMaker AI manages model development and production lifecycle stages. AWS offers specialized AI APIs and broader platforms for custom ML work.",
+      "Incorrect. “Amazon Quick” does not satisfy the scenario's controlling constraint. AWS offers specialized AI APIs and broader platforms for custom ML work. The required response follows from this rule: SageMaker AI manages model development and production lifecycle stages."
     ],
     "principle": "SageMaker AI manages model development and production lifecycle stages",
     "relatedConcept": "AWS offers specialized AI APIs and broader platforms for custom ML work.",
-    "overallExplanation": "The decisive rule is that SageMaker AI manages model development and production lifecycle stages. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Amazon SageMaker AI is the best response because SageMaker AI manages model development and production lifecycle stages. AWS offers specialized AI APIs and broader platforms for custom ML work.",
+    "set": 3
   },
   {
     "id": 125,
@@ -611,23 +654,24 @@
     "type": "single",
     "question": "A model's offline accuracy is stable, yet customer complaints rise after a product-policy change and cost per resolved case doubles. Which conclusion is best?",
     "options": [
-      "Monitor business outcomes and data drift, not only accuracy",
-      "The model is healthy because accuracy is unchanged",
       "Retrain daily regardless of input changes",
-      "Use training loss as the only production metric"
+      "Use training loss as the only production metric",
+      "Monitor business outcomes and data drift, not only accuracy",
+      "The model is healthy because accuracy is unchanged (before validating data quality and business fit)"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: technical and business metrics must be monitored together.",
-      "Incorrect. Choosing The model is healthy because accuracy is unchanged confuses a related concept with the actual requirement. It does not satisfy the scenario because technical and business metrics must be monitored together.",
-      "Incorrect. Choosing Retrain daily regardless of input changes confuses a related concept with the actual requirement. It does not satisfy the scenario because technical and business metrics must be monitored together.",
-      "Incorrect. Choosing Use training loss as the only production metric confuses a related concept with the actual requirement. It does not satisfy the scenario because technical and business metrics must be monitored together."
+      "Incorrect. “Retrain daily regardless of input changes” does not satisfy the scenario's controlling constraint. Production health connects model behavior to the outcome the organization values. The required response follows from this rule: technical and business metrics must be monitored together.",
+      "Incorrect. “Use training loss as the only production metric” does not satisfy the scenario's controlling constraint. Production health connects model behavior to the outcome the organization values. The required response follows from this rule: technical and business metrics must be monitored together.",
+      "Correct. This response fits because technical and business metrics must be monitored together. Production health connects model behavior to the outcome the organization values.",
+      "Incorrect. “The model is healthy because accuracy is unchanged (before validating data quality and business fit)” does not satisfy the scenario's controlling constraint. Production health connects model behavior to the outcome the organization values. The required response follows from this rule: technical and business metrics must be monitored together."
     ],
     "principle": "technical and business metrics must be monitored together",
     "relatedConcept": "Production health connects model behavior to the outcome the organization values.",
-    "overallExplanation": "The decisive rule is that technical and business metrics must be monitored together. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Monitor business outcomes and data drift, not only accuracy is the best response because technical and business metrics must be monitored together. Production health connects model behavior to the outcome the organization values.",
+    "set": 1
   },
   {
     "id": 126,
@@ -636,23 +680,24 @@
     "type": "single",
     "question": "A disease-screening model must avoid missing positive cases, even if more healthy patients are referred for follow-up. Which metric deserves emphasis?",
     "options": [
-      "Recall for the positive class",
-      "Precision alone",
+      "Precision alone (without comparing against a simpler baseline)",
       "Overall accuracy alone",
-      "Mean squared error"
+      "Mean squared error",
+      "Recall for the positive class"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: the costly false-negative error makes recall important.",
-      "Incorrect. Choosing Precision alone confuses a related concept with the actual requirement. It does not satisfy the scenario because the costly false-negative error makes recall important.",
-      "Incorrect. Choosing Overall accuracy alone confuses a related concept with the actual requirement. It does not satisfy the scenario because the costly false-negative error makes recall important.",
-      "Incorrect. Choosing Mean squared error confuses a related concept with the actual requirement. It does not satisfy the scenario because the costly false-negative error makes recall important."
+      "Incorrect. “Precision alone (without comparing against a simpler baseline)” does not satisfy the scenario's controlling constraint. Precision, recall, F1, and accuracy answer different performance questions. The required response follows from this rule: the costly false-negative error makes recall important.",
+      "Incorrect. “Overall accuracy alone” does not satisfy the scenario's controlling constraint. Precision, recall, F1, and accuracy answer different performance questions. The required response follows from this rule: the costly false-negative error makes recall important.",
+      "Incorrect. “Mean squared error” does not satisfy the scenario's controlling constraint. Precision, recall, F1, and accuracy answer different performance questions. The required response follows from this rule: the costly false-negative error makes recall important.",
+      "Correct. This response fits because the costly false-negative error makes recall important. Precision, recall, F1, and accuracy answer different performance questions."
     ],
     "principle": "the costly false-negative error makes recall important",
     "relatedConcept": "Precision, recall, F1, and accuracy answer different performance questions.",
-    "overallExplanation": "The decisive rule is that the costly false-negative error makes recall important. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Recall for the positive class is the best response because the costly false-negative error makes recall important. Precision, recall, F1, and accuracy answer different performance questions.",
+    "set": 2
   },
   {
     "id": 127,
@@ -670,14 +715,15 @@
       0
     ],
     "optionExplanations": [
-      "Incorrect. Retraining can be appropriate after drift is measured, but triggering it before diagnosing scope and thresholds skips the monitoring evidence needed for a controlled response.",
-      "Correct. This option follows the decisive rule: monitoring and feedback close the model lifecycle loop.",
-      "Incorrect. Choosing Keep the original model forever confuses a related concept with the actual requirement. It does not satisfy the scenario because monitoring and feedback close the model lifecycle loop.",
-      "Incorrect. Choosing Edit predictions without recording changes confuses a related concept with the actual requirement. It does not satisfy the scenario because monitoring and feedback close the model lifecycle loop."
+      "Correct. This response fits because monitoring and feedback close the model lifecycle loop. MLOps treats models as evolving production systems rather than static files.",
+      "Incorrect. “Trigger controlled retraining and validation at thresholds” does not satisfy the scenario's controlling constraint. MLOps treats models as evolving production systems rather than static files. The required response follows from this rule: monitoring and feedback close the model lifecycle loop.",
+      "Incorrect. “Keep the original model forever” does not satisfy the scenario's controlling constraint. MLOps treats models as evolving production systems rather than static files. The required response follows from this rule: monitoring and feedback close the model lifecycle loop.",
+      "Incorrect. “Edit predictions without recording changes” does not satisfy the scenario's controlling constraint. MLOps treats models as evolving production systems rather than static files. The required response follows from this rule: monitoring and feedback close the model lifecycle loop."
     ],
     "principle": "monitoring and feedback close the model lifecycle loop",
     "relatedConcept": "MLOps treats models as evolving production systems rather than static files.",
-    "overallExplanation": "The decisive rule is that monitoring and feedback close the model lifecycle loop. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Monitor data and performance drift is the best response because monitoring and feedback close the model lifecycle loop. MLOps treats models as evolving production systems rather than static files.",
+    "set": 3
   },
   {
     "id": 128,
@@ -686,48 +732,55 @@
     "type": "single",
     "question": "A startup can use a managed FM API or self-host an open model. It has two engineers, unpredictable demand, and no need to change model weights. Which initial path is better?",
     "options": [
+      "Pre-train a new FM for full control",
       "Use the managed API to reduce operational burden",
       "Self-host to eliminate infrastructure work",
-      "Pre-train a new FM for full control",
-      "Run production inference in notebooks"
+      "Run production inference in notebooks (while deferring evaluation until after deployment)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: managed APIs reduce time to production when customization is unnecessary.",
-      "Incorrect. Choosing Self-host to eliminate infrastructure work confuses a related concept with the actual requirement. It does not satisfy the scenario because managed APIs reduce time to production when customization is unnecessary.",
-      "Incorrect. Choosing Pre-train a new FM for full control confuses a related concept with the actual requirement. It does not satisfy the scenario because managed APIs reduce time to production when customization is unnecessary.",
-      "Incorrect. Choosing Run production inference in notebooks confuses a related concept with the actual requirement. It does not satisfy the scenario because managed APIs reduce time to production when customization is unnecessary."
+      "Incorrect. “Pre-train a new FM for full control” does not satisfy the scenario's controlling constraint. Serving choices balance control, unit cost, scale, and operational capacity. The required response follows from this rule: managed APIs reduce time to production when customization is unnecessary.",
+      "Correct. This response fits because managed APIs reduce time to production when customization is unnecessary. Serving choices balance control, unit cost, scale, and operational capacity.",
+      "Incorrect. “Self-host to eliminate infrastructure work” does not satisfy the scenario's controlling constraint. Serving choices balance control, unit cost, scale, and operational capacity. The required response follows from this rule: managed APIs reduce time to production when customization is unnecessary.",
+      "Incorrect. “Run production inference in notebooks (while deferring evaluation until after deployment)” does not satisfy the scenario's controlling constraint. Serving choices balance control, unit cost, scale, and operational capacity. The required response follows from this rule: managed APIs reduce time to production when customization is unnecessary."
     ],
     "principle": "managed APIs reduce time to production when customization is unnecessary",
     "relatedConcept": "Serving choices balance control, unit cost, scale, and operational capacity.",
-    "overallExplanation": "The decisive rule is that managed APIs reduce time to production when customization is unnecessary. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "Use the managed API to reduce operational burden is the best response because managed APIs reduce time to production when customization is unnecessary. Serving choices balance control, unit cost, scale, and operational capacity.",
+    "set": 1
   },
   {
     "id": 129,
     "domain": "Fundamentals of AI and ML",
     "objective": "Describe the AI/ML development lifecycle.",
-    "type": "single",
-    "question": "A team wants an auditable path from raw data through preprocessing, training, evaluation, approval, deployment, and monitoring. Which order represents the lifecycle?",
+    "type": "ordering",
+    "question": "An ML team needs a governed path from raw source data to a production model that can be monitored and improved. Place the lifecycle stages in the correct order.",
     "options": [
-      "Prepare, train, evaluate, approve, deploy, monitor, and feed back",
-      "Deploy, collect, train, and skip evaluation",
-      "Monitor an untrained model before labeling",
-      "Fine-tune, delete lineage, deploy, and wait for complaints"
+      "Train candidate models",
+      "Prepare and validate the data",
+      "Deploy the first candidate, then define acceptance criteria",
+      "Monitor outcomes, drift, and feedback",
+      "Evaluate candidates, approve the selection, and deploy it"
     ],
     "correct": [
-      0
+      1,
+      0,
+      4,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: validated development stages precede monitored deployment.",
-      "Incorrect. Choosing Deploy, collect, train, and skip evaluation confuses a related concept with the actual requirement. It does not satisfy the scenario because validated development stages precede monitored deployment.",
-      "Incorrect. Choosing Monitor an untrained model before labeling confuses a related concept with the actual requirement. It does not satisfy the scenario because validated development stages precede monitored deployment.",
-      "Incorrect. Choosing Fine-tune, delete lineage, deploy, and wait for complaints confuses a related concept with the actual requirement. It does not satisfy the scenario because validated development stages precede monitored deployment."
+      "Training follows data preparation because candidate models need a validated, reproducible input dataset. The resulting candidates can then be compared against the acceptance criteria.",
+      "Data preparation comes first: the team must collect, clean, transform, and validate suitable data before model training can produce a trustworthy candidate.",
+      "This reverses the control sequence by deploying before evaluation criteria exist. Acceptance criteria must be defined and applied before a candidate is approved for production.",
+      "Production monitoring is the final stage in this sequence. Outcomes, drift, and feedback reveal when the data, model, or acceptance criteria need another lifecycle iteration.",
+      "Evaluation follows training and precedes approval and deployment. It compares candidates with technical metrics, safety requirements, and the business outcome the system must support."
     ],
-    "principle": "validated development stages precede monitored deployment",
-    "relatedConcept": "An AI lifecycle is an ordered repeatable process with feedback.",
-    "overallExplanation": "The decisive rule is that validated development stages precede monitored deployment. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "principle": "validated development and approval stages precede monitored production operation",
+    "relatedConcept": "A reproducible ML lifecycle connects data, training, evaluation, approval, deployment, monitoring, and feedback.",
+    "overallExplanation": "A governed lifecycle prepares and validates data, trains candidate models, evaluates them against acceptance criteria, approves and deploys the selected candidate, and then monitors production outcomes. Deploying before criteria and evaluation bypasses the release gate.",
+    "set": 3
   },
   {
     "id": 130,
@@ -736,22 +789,23 @@
     "type": "single",
     "question": "A recommender lifts click-through from 8% to 10%, but inference costs rise $0.40 per user while incremental profit is only $0.05. What does this show?",
     "options": [
-      "The technical lift has negative ROI at current cost",
       "Any click lift is enough to launch",
-      "Accuracy is 10%, so the model fails",
-      "A larger model is the only remedy"
+      "A larger model is the only remedy (while deferring evaluation until after deployment)",
+      "The technical lift has negative ROI at current cost",
+      "Accuracy is 10%, so the model fails"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: business value can overturn a technically positive metric.",
-      "Incorrect. Choosing Any click lift is enough to launch confuses a related concept with the actual requirement. It does not satisfy the scenario because business value can overturn a technically positive metric.",
-      "Incorrect. Choosing Accuracy is 10%, so the model fails confuses a related concept with the actual requirement. It does not satisfy the scenario because business value can overturn a technically positive metric.",
-      "Incorrect. Choosing A larger model is the only remedy confuses a related concept with the actual requirement. It does not satisfy the scenario because business value can overturn a technically positive metric."
+      "Incorrect. “Any click lift is enough to launch” does not satisfy the scenario's controlling constraint. Lifecycle evaluation includes ROI, cost, feedback, and operational impact. The required response follows from this rule: business value can overturn a technically positive metric.",
+      "Incorrect. “A larger model is the only remedy (while deferring evaluation until after deployment)” does not satisfy the scenario's controlling constraint. Lifecycle evaluation includes ROI, cost, feedback, and operational impact. The required response follows from this rule: business value can overturn a technically positive metric.",
+      "Correct. This response fits because business value can overturn a technically positive metric. Lifecycle evaluation includes ROI, cost, feedback, and operational impact.",
+      "Incorrect. “Accuracy is 10%, so the model fails” does not satisfy the scenario's controlling constraint. Lifecycle evaluation includes ROI, cost, feedback, and operational impact. The required response follows from this rule: business value can overturn a technically positive metric."
     ],
     "principle": "business value can overturn a technically positive metric",
     "relatedConcept": "Lifecycle evaluation includes ROI, cost, feedback, and operational impact.",
-    "overallExplanation": "The decisive rule is that business value can overturn a technically positive metric. Applying that rule identifies the correct response while excluding options that solve a different problem."
+    "overallExplanation": "The technical lift has negative ROI at current cost is the best response because business value can overturn a technically positive metric. Lifecycle evaluation includes ROI, cost, feedback, and operational impact.",
+    "set": 2
   }
 ]

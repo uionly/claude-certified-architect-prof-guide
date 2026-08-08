@@ -6,23 +6,24 @@
     "type": "single",
     "question": "A Bedrock application role currently has `Action: bedrock:*` on `Resource: *`, although it invokes one approved model and reads one knowledge base. What should the team do?",
     "options": [
+      "Store long-lived access keys in the prompt (because model instructions are assumed to prevent misuse)",
+      "Make the model responsible for authorization",
       "Restrict IAM actions and resources to the required operations and approved resources",
-      "Keep administrator access and rely only on CloudTrail",
-      "Store long-lived access keys in the prompt",
-      "Make the model responsible for authorization"
+      "Keep administrator access and rely only on CloudTrail"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: least-privilege IAM permissions reduce the blast radius of compromise.",
-      "Incorrect. Choosing Keep administrator access and rely only on CloudTrail relies on a related but insufficient control. It does not satisfy the scenario because least-privilege IAM permissions reduce the blast radius of compromise.",
-      "Incorrect. Choosing Store long-lived access keys in the prompt relies on a related but insufficient control. It does not satisfy the scenario because least-privilege IAM permissions reduce the blast radius of compromise.",
-      "Incorrect. Choosing Make the model responsible for authorization relies on a related but insufficient control. It does not satisfy the scenario because least-privilege IAM permissions reduce the blast radius of compromise."
+      "Incorrect. “Store long-lived access keys in the prompt (because model instructions are assumed to prevent misuse)” does not satisfy the scenario's controlling constraint. Identity controls must be enforced outside model-generated decisions. The required response follows from this rule: least-privilege IAM permissions reduce the blast radius of compromise.",
+      "Incorrect. “Make the model responsible for authorization” does not satisfy the scenario's controlling constraint. Identity controls must be enforced outside model-generated decisions. The required response follows from this rule: least-privilege IAM permissions reduce the blast radius of compromise.",
+      "Correct. This response fits because least-privilege IAM permissions reduce the blast radius of compromise. Identity controls must be enforced outside model-generated decisions.",
+      "Incorrect. “Keep administrator access and rely only on CloudTrail” does not satisfy the scenario's controlling constraint. Identity controls must be enforced outside model-generated decisions. The required response follows from this rule: least-privilege IAM permissions reduce the blast radius of compromise."
     ],
     "principle": "least-privilege IAM permissions reduce the blast radius of compromise",
     "relatedConcept": "Identity controls must be enforced outside model-generated decisions.",
-    "overallExplanation": "The decisive rule is that least-privilege IAM permissions reduce the blast radius of compromise. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Restrict IAM actions and resources to the required operations and approved resources is the best response because least-privilege IAM permissions reduce the blast radius of compromise. Identity controls must be enforced outside model-generated decisions.",
+    "set": 1
   },
   {
     "id": 502,
@@ -32,23 +33,26 @@
     "question": "A GenAI workload processes confidential documents. Security requires encryption at rest and in transit with controlled key permissions. Which two controls are appropriate? (Choose two.)",
     "options": [
       "Use AWS KMS-backed encryption for supported stored data",
-      "Use TLS for data in transit",
+      "Retain every raw prompt and response indefinitely so no audit detail is lost",
       "Base64-encode documents instead of encrypting them",
+      "Use TLS for data in transit",
       "Put encryption keys directly in prompt templates"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: protect data with real encryption and governed key access.",
-      "Correct. This option follows the decisive rule: protect data with real encryption and governed key access.",
-      "Incorrect. Choosing Base64-encode documents instead of encrypting them relies on a related but insufficient control. It does not satisfy the scenario because protect data with real encryption and governed key access.",
-      "Incorrect. Choosing Put encryption keys directly in prompt templates relies on a related but insufficient control. It does not satisfy the scenario because protect data with real encryption and governed key access."
+      "Correct. AWS KMS manages cryptographic keys and their use. This response fits because protect data with real encryption and governed key access. Encoding is not encryption and secrets do not belong in model context.",
+      "Incorrect. Auditability must be balanced with minimization, redaction, access control, and justified retention. For this scenario, protect data with real encryption and governed key access. Encoding is not encryption and secrets do not belong in model context.",
+      "Incorrect. Base64 is an encoding, not encryption or an access control. That capability does not meet the controlling requirement here: protect data with real encryption and governed key access. Encoding is not encryption and secrets do not belong in model context.",
+      "Correct. This response fits because protect data with real encryption and governed key access. Encoding is not encryption and secrets do not belong in model context.",
+      "Incorrect. “Put encryption keys directly in prompt templates” does not satisfy the scenario's controlling constraint. Encoding is not encryption and secrets do not belong in model context. The required response follows from this rule: protect data with real encryption and governed key access."
     ],
     "principle": "protect data with real encryption and governed key access",
     "relatedConcept": "Encoding is not encryption and secrets do not belong in model context.",
-    "overallExplanation": "The decisive rule is that protect data with real encryption and governed key access. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Use AWS KMS-backed encryption for supported stored data and Use TLS for data in transit are the best responses because protect data with real encryption and governed key access. Encoding is not encryption and secrets do not belong in model context.",
+    "set": 2
   },
   {
     "id": 503,
@@ -57,23 +61,24 @@
     "type": "single",
     "question": "A company wants its VPC-based application to access supported AWS AI services without sending service traffic over the public internet. Which AWS networking feature should it evaluate?",
     "options": [
-      "AWS PrivateLink and interface VPC endpoints",
+      "A larger NAT gateway as the sole control",
       "A public S3 website endpoint",
       "Amazon CloudFront signed cookies only",
-      "A larger NAT gateway as the sole control"
+      "AWS PrivateLink and interface VPC endpoints"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: PrivateLink provides private connectivity to supported services.",
-      "Incorrect. Choosing A public S3 website endpoint relies on a related but insufficient control. It does not satisfy the scenario because PrivateLink provides private connectivity to supported services.",
-      "Incorrect. Choosing Amazon CloudFront signed cookies only relies on a related but insufficient control. It does not satisfy the scenario because PrivateLink provides private connectivity to supported services.",
-      "Incorrect. Choosing A larger NAT gateway as the sole control relies on a related but insufficient control. It does not satisfy the scenario because PrivateLink provides private connectivity to supported services."
+      "Incorrect. “A larger NAT gateway as the sole control” does not satisfy the scenario's controlling constraint. Network paths complement identity encryption and application-layer security. The required response follows from this rule: PrivateLink provides private connectivity to supported services.",
+      "Incorrect. “A public S3 website endpoint” does not satisfy the scenario's controlling constraint. Network paths complement identity encryption and application-layer security. The required response follows from this rule: PrivateLink provides private connectivity to supported services.",
+      "Incorrect. Amazon CloudFront is a content-delivery network. That capability does not meet the controlling requirement here: PrivateLink provides private connectivity to supported services. Network paths complement identity encryption and application-layer security.",
+      "Correct. This response fits because PrivateLink provides private connectivity to supported services. Network paths complement identity encryption and application-layer security."
     ],
     "principle": "PrivateLink provides private connectivity to supported services",
     "relatedConcept": "Network paths complement identity encryption and application-layer security.",
-    "overallExplanation": "The decisive rule is that PrivateLink provides private connectivity to supported services. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "AWS PrivateLink and interface VPC endpoints is the best response because PrivateLink provides private connectivity to supported services. Network paths complement identity encryption and application-layer security.",
+    "set": 3
   },
   {
     "id": 504,
@@ -83,22 +88,23 @@
     "question": "A data lake may contain customer identifiers that must not enter a model-training dataset. The team wants automated discovery of sensitive data in Amazon S3. Which service is relevant?",
     "options": [
       "Amazon Macie",
-      "Amazon Polly",
       "AWS Budgets",
-      "Amazon Personalize"
+      "Amazon Personalize",
+      "Amazon Polly"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Macie discovers and helps classify sensitive data in S3.",
-      "Incorrect. Choosing Amazon Polly relies on a related but insufficient control. It does not satisfy the scenario because Amazon Macie discovers and helps classify sensitive data in S3.",
-      "Incorrect. Choosing AWS Budgets relies on a related but insufficient control. It does not satisfy the scenario because Amazon Macie discovers and helps classify sensitive data in S3.",
-      "Incorrect. Choosing Amazon Personalize relies on a related but insufficient control. It does not satisfy the scenario because Amazon Macie discovers and helps classify sensitive data in S3."
+      "Correct. Amazon Macie discovers and classifies sensitive data in Amazon S3. This response fits because Amazon Macie discovers and helps classify sensitive data in S3. Data discovery supports privacy-aware dataset governance.",
+      "Incorrect. AWS Budgets tracks spending or usage against configured thresholds. That capability does not meet the controlling requirement here: Amazon Macie discovers and helps classify sensitive data in S3. Data discovery supports privacy-aware dataset governance.",
+      "Incorrect. Amazon Personalize builds recommendations and personalized rankings. That capability does not meet the controlling requirement here: Amazon Macie discovers and helps classify sensitive data in S3. Data discovery supports privacy-aware dataset governance.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: Amazon Macie discovers and helps classify sensitive data in S3. Data discovery supports privacy-aware dataset governance."
     ],
     "principle": "Amazon Macie discovers and helps classify sensitive data in S3",
     "relatedConcept": "Data discovery supports privacy-aware dataset governance.",
-    "overallExplanation": "The decisive rule is that Amazon Macie discovers and helps classify sensitive data in S3. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Amazon Macie is the best response because Amazon Macie discovers and helps classify sensitive data in S3. Data discovery supports privacy-aware dataset governance.",
+    "set": 1
   },
   {
     "id": 505,
@@ -107,23 +113,24 @@
     "type": "single",
     "question": "A company uses a managed foundation model and assumes AWS is responsible for deciding which employees may query confidential documents. What does the shared responsibility model imply?",
     "options": [
+      "Managed services remove the need for logging and monitoring",
       "The customer still configures identities permissions data access and application controls",
-      "AWS automatically approves every user and prompt",
-      "The model provider owns all customer compliance obligations",
-      "Managed services remove the need for logging and monitoring"
+      "The model provider owns all customer compliance obligations (while treating audit evidence as optional)",
+      "AWS automatically approves every user and prompt"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: managed infrastructure does not remove customer responsibility for configuration and data.",
-      "Incorrect. Choosing AWS automatically approves every user and prompt relies on a related but insufficient control. It does not satisfy the scenario because managed infrastructure does not remove customer responsibility for configuration and data.",
-      "Incorrect. Choosing The model provider owns all customer compliance obligations relies on a related but insufficient control. It does not satisfy the scenario because managed infrastructure does not remove customer responsibility for configuration and data.",
-      "Incorrect. Choosing Managed services remove the need for logging and monitoring relies on a related but insufficient control. It does not satisfy the scenario because managed infrastructure does not remove customer responsibility for configuration and data."
+      "Incorrect. “Managed services remove the need for logging and monitoring” does not satisfy the scenario's controlling constraint. Security duties are divided rather than transferred entirely to AWS. The required response follows from this rule: managed infrastructure does not remove customer responsibility for configuration and data.",
+      "Correct. This response fits because managed infrastructure does not remove customer responsibility for configuration and data. Security duties are divided rather than transferred entirely to AWS.",
+      "Incorrect. “The model provider owns all customer compliance obligations (while treating audit evidence as optional)” does not satisfy the scenario's controlling constraint. Security duties are divided rather than transferred entirely to AWS. The required response follows from this rule: managed infrastructure does not remove customer responsibility for configuration and data.",
+      "Incorrect. “AWS automatically approves every user and prompt” does not satisfy the scenario's controlling constraint. Security duties are divided rather than transferred entirely to AWS. The required response follows from this rule: managed infrastructure does not remove customer responsibility for configuration and data."
     ],
     "principle": "managed infrastructure does not remove customer responsibility for configuration and data",
     "relatedConcept": "Security duties are divided rather than transferred entirely to AWS.",
-    "overallExplanation": "The decisive rule is that managed infrastructure does not remove customer responsibility for configuration and data. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "The customer still configures identities permissions data access and application controls is the best response because managed infrastructure does not remove customer responsibility for configuration and data. Security duties are divided rather than transferred entirely to AWS.",
+    "set": 2
   },
   {
     "id": 506,
@@ -132,23 +139,24 @@
     "type": "single",
     "question": "An enterprise agent must connect users to tools using enterprise identities without placing reusable passwords in prompts or code. Which capability is most relevant?",
     "options": [
-      "Amazon Bedrock AgentCore Identity",
       "Increasing model temperature",
-      "Amazon Polly voice IDs",
-      "Embedding passwords in a vector database"
+      "Embedding passwords in a vector database",
+      "Amazon Bedrock AgentCore Identity",
+      "Amazon Polly voice IDs"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: AgentCore Identity supports identity-aware access for agent interactions.",
-      "Incorrect. Choosing Increasing model temperature relies on a related but insufficient control. It does not satisfy the scenario because AgentCore Identity supports identity-aware access for agent interactions.",
-      "Incorrect. Choosing Amazon Polly voice IDs relies on a related but insufficient control. It does not satisfy the scenario because AgentCore Identity supports identity-aware access for agent interactions.",
-      "Incorrect. Choosing Embedding passwords in a vector database relies on a related but insufficient control. It does not satisfy the scenario because AgentCore Identity supports identity-aware access for agent interactions."
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: AgentCore Identity supports identity-aware access for agent interactions. Agent systems need explicit identity boundaries around tools and resources.",
+      "Incorrect. “Embedding passwords in a vector database” does not satisfy the scenario's controlling constraint. Agent systems need explicit identity boundaries around tools and resources. The required response follows from this rule: AgentCore Identity supports identity-aware access for agent interactions.",
+      "Correct. Amazon Bedrock AgentCore provides managed infrastructure for production agents. This response fits because AgentCore Identity supports identity-aware access for agent interactions. Agent systems need explicit identity boundaries around tools and resources.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: AgentCore Identity supports identity-aware access for agent interactions. Agent systems need explicit identity boundaries around tools and resources."
     ],
     "principle": "AgentCore Identity supports identity-aware access for agent interactions",
     "relatedConcept": "Agent systems need explicit identity boundaries around tools and resources.",
-    "overallExplanation": "The decisive rule is that AgentCore Identity supports identity-aware access for agent interactions. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Amazon Bedrock AgentCore Identity is the best response because AgentCore Identity supports identity-aware access for agent interactions. Agent systems need explicit identity boundaries around tools and resources.",
+    "set": 3
   },
   {
     "id": 507,
@@ -157,24 +165,27 @@
     "type": "multi",
     "question": "A production agent may search approved catalogs but must never invoke the payment tool unless policy conditions are satisfied. Which two layers best enforce this? (Choose two.)",
     "options": [
-      "IAM and tool-side authorization",
       "Policy controls for the agent such as AgentCore Policy",
-      "A prompt request asking the model to be careful",
-      "Higher model confidence alone"
+      "Higher model confidence alone",
+      "Put access restrictions in the prompt instead of enforcing them with identity and policy controls",
+      "IAM and tool-side authorization",
+      "A prompt request asking the model to be careful"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: authorization and explicit policy controls must bound model tool use.",
-      "Correct. This option follows the decisive rule: authorization and explicit policy controls must bound model tool use.",
-      "Incorrect. Choosing A prompt request asking the model to be careful relies on a related but insufficient control. It does not satisfy the scenario because authorization and explicit policy controls must bound model tool use.",
-      "Incorrect. Choosing Higher model confidence alone relies on a related but insufficient control. It does not satisfy the scenario because authorization and explicit policy controls must bound model tool use."
+      "Correct. This response fits because authorization and explicit policy controls must bound model tool use. The model is not a trustworthy security enforcement point.",
+      "Incorrect. “Higher model confidence alone” does not satisfy the scenario's controlling constraint. The model is not a trustworthy security enforcement point. The required response follows from this rule: authorization and explicit policy controls must bound model tool use.",
+      "Incorrect. Prompt instructions are not an authorization boundary and cannot replace IAM, verified identity, or tool-side policy. For this scenario, authorization and explicit policy controls must bound model tool use. The model is not a trustworthy security enforcement point.",
+      "Correct. This response fits because authorization and explicit policy controls must bound model tool use. The model is not a trustworthy security enforcement point.",
+      "Incorrect. “A prompt request asking the model to be careful” does not satisfy the scenario's controlling constraint. The model is not a trustworthy security enforcement point. The required response follows from this rule: authorization and explicit policy controls must bound model tool use."
     ],
     "principle": "authorization and explicit policy controls must bound model tool use",
     "relatedConcept": "The model is not a trustworthy security enforcement point.",
-    "overallExplanation": "The decisive rule is that authorization and explicit policy controls must bound model tool use. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "IAM and tool-side authorization and Policy controls for the agent such as AgentCore Policy are the best responses because authorization and explicit policy controls must bound model tool use. The model is not a trustworthy security enforcement point.",
+    "set": 1
   },
   {
     "id": 508,
@@ -183,23 +194,24 @@
     "type": "single",
     "question": "An answer cites a pricing paragraph, but auditors cannot determine which source version was indexed or when it was approved. What capability is missing?",
     "options": [
-      "Data lineage and source-version documentation",
       "A higher output token limit",
+      "More sampling randomness",
       "A larger model",
-      "More sampling randomness"
+      "Data lineage and source-version documentation"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: lineage records the origin transformations version and approval of data.",
-      "Incorrect. Choosing A higher output token limit relies on a related but insufficient control. It does not satisfy the scenario because lineage records the origin transformations version and approval of data.",
-      "Incorrect. Choosing A larger model relies on a related but insufficient control. It does not satisfy the scenario because lineage records the origin transformations version and approval of data.",
-      "Incorrect. Choosing More sampling randomness relies on a related but insufficient control. It does not satisfy the scenario because lineage records the origin transformations version and approval of data."
+      "Incorrect. “A higher output token limit” does not satisfy the scenario's controlling constraint. Citations are strongest when the underlying source chain is governed. The required response follows from this rule: lineage records the origin transformations version and approval of data.",
+      "Incorrect. “More sampling randomness” does not satisfy the scenario's controlling constraint. Citations are strongest when the underlying source chain is governed. The required response follows from this rule: lineage records the origin transformations version and approval of data.",
+      "Incorrect. “A larger model” does not satisfy the scenario's controlling constraint. Citations are strongest when the underlying source chain is governed. The required response follows from this rule: lineage records the origin transformations version and approval of data.",
+      "Correct. This response fits because lineage records the origin transformations version and approval of data. Citations are strongest when the underlying source chain is governed."
     ],
     "principle": "lineage records the origin transformations version and approval of data",
     "relatedConcept": "Citations are strongest when the underlying source chain is governed.",
-    "overallExplanation": "The decisive rule is that lineage records the origin transformations version and approval of data. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Data lineage and source-version documentation is the best response because lineage records the origin transformations version and approval of data. Citations are strongest when the underlying source chain is governed.",
+    "set": 2
   },
   {
     "id": 509,
@@ -208,24 +220,27 @@
     "type": "multi",
     "question": "A training pipeline accepts files from many teams. Some records are corrupted, duplicated, or altered after approval. Which two practices are most important? (Choose two.)",
     "options": [
-      "Validate data quality and integrity before use",
       "Apply controlled access and immutable or traceable versions",
-      "Increase model temperature to absorb errors",
-      "Grant every contributor unrestricted write access"
+      "Validate data quality and integrity before use",
+      "Grant every contributor unrestricted write access",
+      "Treat a successful compliance assessment as a permanent production approval",
+      "Increase model temperature to absorb errors"
     ],
     "correct": [
       0,
       1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: secure data engineering protects quality integrity and authorized access.",
-      "Correct. This option follows the decisive rule: secure data engineering protects quality integrity and authorized access.",
-      "Incorrect. Choosing Increase model temperature to absorb errors relies on a related but insufficient control. It does not satisfy the scenario because secure data engineering protects quality integrity and authorized access.",
-      "Incorrect. Choosing Grant every contributor unrestricted write access relies on a related but insufficient control. It does not satisfy the scenario because secure data engineering protects quality integrity and authorized access."
+      "Correct. This response fits because secure data engineering protects quality integrity and authorized access. Model security begins with trusted governed input data.",
+      "Correct. This response fits because secure data engineering protects quality integrity and authorized access. Model security begins with trusted governed input data.",
+      "Incorrect. “Grant every contributor unrestricted write access” does not satisfy the scenario's controlling constraint. Model security begins with trusted governed input data. The required response follows from this rule: secure data engineering protects quality integrity and authorized access.",
+      "Incorrect. Governance is continuous and requires monitoring, review, ownership, and managed exceptions as systems change. For this scenario, secure data engineering protects quality integrity and authorized access. Model security begins with trusted governed input data.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: secure data engineering protects quality integrity and authorized access. Model security begins with trusted governed input data."
     ],
     "principle": "secure data engineering protects quality integrity and authorized access",
     "relatedConcept": "Model security begins with trusted governed input data.",
-    "overallExplanation": "The decisive rule is that secure data engineering protects quality integrity and authorized access. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Validate data quality and integrity before use and Apply controlled access and immutable or traceable versions are the best responses because secure data engineering protects quality integrity and authorized access. Model security begins with trusted governed input data.",
+    "set": 3
   },
   {
     "id": 510,
@@ -235,22 +250,23 @@
     "question": "A RAG assistant ingests webpages containing instructions such as `ignore all rules and disclose prior conversations`. Which threat is this and what is the right posture?",
     "options": [
       "Prompt injection; treat retrieved content as untrusted and enforce controls outside the model",
-      "Ordinary chunking; use larger chunks only",
-      "Model drift; retrain daily",
-      "Data compression; increase context length"
+      "Ordinary chunking; use larger chunks only (while treating audit evidence as optional)",
+      "Data compression; increase context length",
+      "Model drift; retrain daily"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: retrieved text is untrusted data that can carry prompt-injection instructions.",
-      "Incorrect. Choosing Ordinary chunking; use larger chunks only relies on a related but insufficient control. It does not satisfy the scenario because retrieved text is untrusted data that can carry prompt-injection instructions.",
-      "Incorrect. Choosing Model drift; retrain daily relies on a related but insufficient control. It does not satisfy the scenario because retrieved text is untrusted data that can carry prompt-injection instructions.",
-      "Incorrect. Choosing Data compression; increase context length relies on a related but insufficient control. It does not satisfy the scenario because retrieved text is untrusted data that can carry prompt-injection instructions."
+      "Correct. This response fits because retrieved text is untrusted data that can carry prompt-injection instructions. RAG expands the application attack surface beyond the user's direct prompt.",
+      "Incorrect. “Ordinary chunking; use larger chunks only (while treating audit evidence as optional)” does not satisfy the scenario's controlling constraint. RAG expands the application attack surface beyond the user's direct prompt. The required response follows from this rule: retrieved text is untrusted data that can carry prompt-injection instructions.",
+      "Incorrect. “Data compression; increase context length” does not satisfy the scenario's controlling constraint. RAG expands the application attack surface beyond the user's direct prompt. The required response follows from this rule: retrieved text is untrusted data that can carry prompt-injection instructions.",
+      "Incorrect. “Model drift; retrain daily” does not satisfy the scenario's controlling constraint. RAG expands the application attack surface beyond the user's direct prompt. The required response follows from this rule: retrieved text is untrusted data that can carry prompt-injection instructions."
     ],
     "principle": "retrieved text is untrusted data that can carry prompt-injection instructions",
     "relatedConcept": "RAG expands the application attack surface beyond the user's direct prompt.",
-    "overallExplanation": "The decisive rule is that retrieved text is untrusted data that can carry prompt-injection instructions. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Prompt injection; treat retrieved content as untrusted and enforce controls outside the model is the best response because retrieved text is untrusted data that can carry prompt-injection instructions. RAG expands the application attack surface beyond the user's direct prompt.",
+    "set": 1
   },
   {
     "id": 511,
@@ -259,24 +275,27 @@
     "type": "multi",
     "question": "A customer-service model can emit toxic content or accidental secrets. The company wants evidence for incident investigation. Which two controls are appropriate? (Choose two.)",
     "options": [
-      "Filter and validate outputs against policy",
+      "Retain every raw prompt and response indefinitely so no audit detail is lost",
+      "Trust the model's self-reported confidence as the only control",
       "Log AI interactions with privacy-aware access and retention controls",
-      "Disable all audit trails to reduce exposure",
-      "Trust the model's self-reported confidence as the only control"
+      "Filter and validate outputs against policy",
+      "Disable all audit trails to reduce exposure"
     ],
     "correct": [
-      0,
-      1
+      2,
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: output controls and governed audit trails support prevention and investigation.",
-      "Correct. This option follows the decisive rule: output controls and governed audit trails support prevention and investigation.",
-      "Incorrect. Choosing Disable all audit trails to reduce exposure relies on a related but insufficient control. It does not satisfy the scenario because output controls and governed audit trails support prevention and investigation.",
-      "Incorrect. Choosing Trust the model's self-reported confidence as the only control relies on a related but insufficient control. It does not satisfy the scenario because output controls and governed audit trails support prevention and investigation."
+      "Incorrect. Auditability must be balanced with minimization, redaction, access control, and justified retention. For this scenario, output controls and governed audit trails support prevention and investigation. AI application security covers content validation leakage prevention and observability.",
+      "Incorrect. “Trust the model's self-reported confidence as the only control” does not satisfy the scenario's controlling constraint. AI application security covers content validation leakage prevention and observability. The required response follows from this rule: output controls and governed audit trails support prevention and investigation.",
+      "Correct. This response fits because output controls and governed audit trails support prevention and investigation. AI application security covers content validation leakage prevention and observability.",
+      "Correct. This response fits because output controls and governed audit trails support prevention and investigation. AI application security covers content validation leakage prevention and observability.",
+      "Incorrect. “Disable all audit trails to reduce exposure” does not satisfy the scenario's controlling constraint. AI application security covers content validation leakage prevention and observability. The required response follows from this rule: output controls and governed audit trails support prevention and investigation."
     ],
     "principle": "output controls and governed audit trails support prevention and investigation",
     "relatedConcept": "AI application security covers content validation leakage prevention and observability.",
-    "overallExplanation": "The decisive rule is that output controls and governed audit trails support prevention and investigation. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Filter and validate outputs against policy and Log AI interactions with privacy-aware access and retention controls are the best responses because output controls and governed audit trails support prevention and investigation. AI application security covers content validation leakage prevention and observability.",
+    "set": 2
   },
   {
     "id": 512,
@@ -285,23 +304,24 @@
     "type": "single",
     "question": "A policy assistant sometimes invents numbers. The source documents contain the correct values and citations are required. Which design most directly improves grounding?",
     "options": [
+      "Fine-tune on unrelated conversations",
       "Use RAG to retrieve authoritative passages and validate answers against them",
       "Increase temperature to encourage alternative numbers",
-      "Fine-tune on unrelated conversations",
-      "Remove citations so users are not confused"
+      "Remove citations so users are not confused (while treating audit evidence as optional)"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: grounding ties generated claims to authoritative retrieved evidence.",
-      "Incorrect. Choosing Increase temperature to encourage alternative numbers relies on a related but insufficient control. It does not satisfy the scenario because grounding ties generated claims to authoritative retrieved evidence.",
-      "Incorrect. Choosing Fine-tune on unrelated conversations relies on a related but insufficient control. It does not satisfy the scenario because grounding ties generated claims to authoritative retrieved evidence.",
-      "Incorrect. Choosing Remove citations so users are not confused relies on a related but insufficient control. It does not satisfy the scenario because grounding ties generated claims to authoritative retrieved evidence."
+      "Incorrect. Fine-tuning changes persistent model behavior and introduces a managed model lifecycle. That capability does not meet the controlling requirement here: grounding ties generated claims to authoritative retrieved evidence. RAG reduces but does not eliminate hallucination risk, so validation still matters.",
+      "Correct. This response fits because grounding ties generated claims to authoritative retrieved evidence. RAG reduces but does not eliminate hallucination risk, so validation still matters.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: grounding ties generated claims to authoritative retrieved evidence. RAG reduces but does not eliminate hallucination risk, so validation still matters.",
+      "Incorrect. “Remove citations so users are not confused (while treating audit evidence as optional)” does not satisfy the scenario's controlling constraint. RAG reduces but does not eliminate hallucination risk, so validation still matters. The required response follows from this rule: grounding ties generated claims to authoritative retrieved evidence."
     ],
     "principle": "grounding ties generated claims to authoritative retrieved evidence",
     "relatedConcept": "RAG reduces but does not eliminate hallucination risk, so validation still matters.",
-    "overallExplanation": "The decisive rule is that grounding ties generated claims to authoritative retrieved evidence. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Use RAG to retrieve authoritative passages and validate answers against them is the best response because grounding ties generated claims to authoritative retrieved evidence. RAG reduces but does not eliminate hallucination risk, so validation still matters.",
+    "set": 3
   },
   {
     "id": 513,
@@ -310,23 +330,24 @@
     "type": "single",
     "question": "An auditor asks for a history of who changed an AI resource configuration and which AWS API calls were made. Which service supplies the primary event history?",
     "options": [
-      "AWS CloudTrail",
-      "Amazon Polly",
       "Amazon Personalize",
-      "Amazon Translate"
+      "Amazon Translate",
+      "AWS CloudTrail",
+      "Amazon Polly"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: CloudTrail records AWS API activity for audit and investigation.",
-      "Incorrect. Choosing Amazon Polly relies on a related but insufficient control. It does not satisfy the scenario because CloudTrail records AWS API activity for audit and investigation.",
-      "Incorrect. Choosing Amazon Personalize relies on a related but insufficient control. It does not satisfy the scenario because CloudTrail records AWS API activity for audit and investigation.",
-      "Incorrect. Choosing Amazon Translate relies on a related but insufficient control. It does not satisfy the scenario because CloudTrail records AWS API activity for audit and investigation."
+      "Incorrect. Amazon Personalize builds recommendations and personalized rankings. That capability does not meet the controlling requirement here: CloudTrail records AWS API activity for audit and investigation. Audit evidence depends on preserved attributable activity records.",
+      "Incorrect. Amazon Translate translates text between supported languages. That capability does not meet the controlling requirement here: CloudTrail records AWS API activity for audit and investigation. Audit evidence depends on preserved attributable activity records.",
+      "Correct. AWS CloudTrail records account and API activity. This response fits because CloudTrail records AWS API activity for audit and investigation. Audit evidence depends on preserved attributable activity records.",
+      "Incorrect. Amazon Polly synthesizes speech from text. That capability does not meet the controlling requirement here: CloudTrail records AWS API activity for audit and investigation. Audit evidence depends on preserved attributable activity records."
     ],
     "principle": "CloudTrail records AWS API activity for audit and investigation",
     "relatedConcept": "Audit evidence depends on preserved attributable activity records.",
-    "overallExplanation": "The decisive rule is that CloudTrail records AWS API activity for audit and investigation. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "AWS CloudTrail is the best response because CloudTrail records AWS API activity for audit and investigation. Audit evidence depends on preserved attributable activity records.",
+    "set": 1
   },
   {
     "id": 514,
@@ -335,23 +356,24 @@
     "type": "single",
     "question": "Security wants continuous checks that resources remain configured according to approved rules, with a history of configuration changes. Which service best fits?",
     "options": [
-      "AWS Config",
       "AWS Artifact",
+      "SageMaker JumpStart",
       "Amazon Transcribe",
-      "SageMaker JumpStart"
+      "AWS Config"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: AWS Config evaluates resource configuration and records configuration history.",
-      "Incorrect. Choosing AWS Artifact relies on a related but insufficient control. It does not satisfy the scenario because AWS Config evaluates resource configuration and records configuration history.",
-      "Incorrect. Choosing Amazon Transcribe relies on a related but insufficient control. It does not satisfy the scenario because AWS Config evaluates resource configuration and records configuration history.",
-      "Incorrect. Choosing SageMaker JumpStart relies on a related but insufficient control. It does not satisfy the scenario because AWS Config evaluates resource configuration and records configuration history."
+      "Incorrect. AWS Artifact provides AWS compliance reports and agreements. That capability does not meet the controlling requirement here: AWS Config evaluates resource configuration and records configuration history. Preventive policies and detective configuration controls work together.",
+      "Incorrect. SageMaker JumpStart provides pretrained models and solution templates. That capability does not meet the controlling requirement here: AWS Config evaluates resource configuration and records configuration history. Preventive policies and detective configuration controls work together.",
+      "Incorrect. Amazon Transcribe converts speech audio into text. That capability does not meet the controlling requirement here: AWS Config evaluates resource configuration and records configuration history. Preventive policies and detective configuration controls work together.",
+      "Correct. AWS Config records and evaluates resource configuration. This response fits because AWS Config evaluates resource configuration and records configuration history. Preventive policies and detective configuration controls work together."
     ],
     "principle": "AWS Config evaluates resource configuration and records configuration history",
     "relatedConcept": "Preventive policies and detective configuration controls work together.",
-    "overallExplanation": "The decisive rule is that AWS Config evaluates resource configuration and records configuration history. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "AWS Config is the best response because AWS Config evaluates resource configuration and records configuration history. Preventive policies and detective configuration controls work together.",
+    "set": 2
   },
   {
     "id": 515,
@@ -369,14 +391,15 @@
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: AWS Artifact provides AWS security and compliance reports and agreements.",
-      "Incorrect. Choosing AWS Audit Manager relies on a related but insufficient control. It does not satisfy the scenario because AWS Artifact provides AWS security and compliance reports and agreements.",
-      "Incorrect. Choosing Amazon Inspector relies on a related but insufficient control. It does not satisfy the scenario because AWS Artifact provides AWS security and compliance reports and agreements.",
-      "Incorrect. Choosing AWS Trusted Advisor relies on a related but insufficient control. It does not satisfy the scenario because AWS Artifact provides AWS security and compliance reports and agreements."
+      "Correct. AWS Artifact provides AWS compliance reports and agreements. This response fits because AWS Artifact provides AWS security and compliance reports and agreements. Provider evidence is an input to, not a replacement for, customer compliance.",
+      "Incorrect. AWS Audit Manager helps collect evidence for assessments. That capability does not meet the controlling requirement here: AWS Artifact provides AWS security and compliance reports and agreements. Provider evidence is an input to, not a replacement for, customer compliance.",
+      "Incorrect. Amazon Inspector produces vulnerability findings for supported workloads. That capability does not meet the controlling requirement here: AWS Artifact provides AWS security and compliance reports and agreements. Provider evidence is an input to, not a replacement for, customer compliance.",
+      "Incorrect. “AWS Trusted Advisor” does not satisfy the scenario's controlling constraint. Provider evidence is an input to, not a replacement for, customer compliance. The required response follows from this rule: AWS Artifact provides AWS security and compliance reports and agreements."
     ],
     "principle": "AWS Artifact provides AWS security and compliance reports and agreements",
     "relatedConcept": "Provider evidence is an input to, not a replacement for, customer compliance.",
-    "overallExplanation": "The decisive rule is that AWS Artifact provides AWS security and compliance reports and agreements. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "AWS Artifact is the best response because AWS Artifact provides AWS security and compliance reports and agreements. Provider evidence is an input to, not a replacement for, customer compliance.",
+    "set": 3
   },
   {
     "id": 516,
@@ -385,23 +408,24 @@
     "type": "single",
     "question": "A company wants to collect evidence against control frameworks and streamline recurring audits across AWS usage. Which service is designed for this?",
     "options": [
+      "Amazon Rekognition (with the prompt acting as the enforcement boundary)",
       "AWS Audit Manager",
-      "Amazon Rekognition",
-      "Amazon Lex",
-      "AWS Budgets"
+      "AWS Budgets",
+      "Amazon Lex"
     ],
     "correct": [
-      0
+      1
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: AWS Audit Manager helps collect and organize evidence for assessments.",
-      "Incorrect. Choosing Amazon Rekognition relies on a related but insufficient control. It does not satisfy the scenario because AWS Audit Manager helps collect and organize evidence for assessments.",
-      "Incorrect. Choosing Amazon Lex relies on a related but insufficient control. It does not satisfy the scenario because AWS Audit Manager helps collect and organize evidence for assessments.",
-      "Incorrect. Choosing AWS Budgets relies on a related but insufficient control. It does not satisfy the scenario because AWS Audit Manager helps collect and organize evidence for assessments."
+      "Incorrect. Amazon Rekognition (with the prompt acting as the enforcement boundary) analyzes images and video. That capability does not meet the controlling requirement here: AWS Audit Manager helps collect and organize evidence for assessments. Compliance operations require repeatable evidence collection and review.",
+      "Correct. AWS Audit Manager helps collect evidence for assessments. This response fits because AWS Audit Manager helps collect and organize evidence for assessments. Compliance operations require repeatable evidence collection and review.",
+      "Incorrect. AWS Budgets tracks spending or usage against configured thresholds. That capability does not meet the controlling requirement here: AWS Audit Manager helps collect and organize evidence for assessments. Compliance operations require repeatable evidence collection and review.",
+      "Incorrect. Amazon Lex provides intent-based conversational interfaces. That capability does not meet the controlling requirement here: AWS Audit Manager helps collect and organize evidence for assessments. Compliance operations require repeatable evidence collection and review."
     ],
     "principle": "AWS Audit Manager helps collect and organize evidence for assessments",
     "relatedConcept": "Compliance operations require repeatable evidence collection and review.",
-    "overallExplanation": "The decisive rule is that AWS Audit Manager helps collect and organize evidence for assessments. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "AWS Audit Manager is the best response because AWS Audit Manager helps collect and organize evidence for assessments. Compliance operations require repeatable evidence collection and review.",
+    "set": 1
   },
   {
     "id": 517,
@@ -410,23 +434,24 @@
     "type": "single",
     "question": "A security team wants automated vulnerability findings for supported compute workloads that host parts of an AI application. Which service is relevant?",
     "options": [
-      "Amazon Inspector",
-      "Amazon Comprehend",
+      "Amazon Quick",
       "AWS Glue DataBrew",
-      "Amazon Quick"
+      "Amazon Inspector",
+      "Amazon Comprehend"
     ],
     "correct": [
-      0
+      2
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources.",
-      "Incorrect. Choosing Amazon Comprehend relies on a related but insufficient control. It does not satisfy the scenario because Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources.",
-      "Incorrect. Choosing AWS Glue DataBrew relies on a related but insufficient control. It does not satisfy the scenario because Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources.",
-      "Incorrect. Choosing Amazon Quick relies on a related but insufficient control. It does not satisfy the scenario because Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources."
+      "Incorrect. “Amazon Quick” does not satisfy the scenario's controlling constraint. AI systems inherit the security needs of their surrounding infrastructure. The required response follows from this rule: Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources.",
+      "Incorrect. “AWS Glue DataBrew” does not satisfy the scenario's controlling constraint. AI systems inherit the security needs of their surrounding infrastructure. The required response follows from this rule: Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources.",
+      "Correct. Amazon Inspector produces vulnerability findings for supported workloads. This response fits because Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources. AI systems inherit the security needs of their surrounding infrastructure.",
+      "Incorrect. “Amazon Comprehend” does not satisfy the scenario's controlling constraint. AI systems inherit the security needs of their surrounding infrastructure. The required response follows from this rule: Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources."
     ],
     "principle": "Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources",
     "relatedConcept": "AI systems inherit the security needs of their surrounding infrastructure.",
-    "overallExplanation": "The decisive rule is that Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Amazon Inspector is the best response because Amazon Inspector identifies software vulnerabilities and unintended network exposure for supported resources. AI systems inherit the security needs of their surrounding infrastructure.",
+    "set": 2
   },
   {
     "id": 518,
@@ -436,23 +461,26 @@
     "question": "A regulator requires customer data and derived embeddings to remain in an approved region and be deleted after a defined period. Which two governance controls are required? (Choose two.)",
     "options": [
       "Enforce data residency in approved regions",
+      "Move data globally because encryption cancels residency rules",
+      "Treat a successful compliance assessment as a permanent production approval",
       "Define and implement retention and deletion lifecycles",
-      "Retain every record forever for convenience",
-      "Move data globally because encryption cancels residency rules"
+      "Retain every record forever for convenience"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: data governance covers residency retention and lifecycle enforcement.",
-      "Correct. This option follows the decisive rule: data governance covers residency retention and lifecycle enforcement.",
-      "Incorrect. Choosing Retain every record forever for convenience relies on a related but insufficient control. It does not satisfy the scenario because data governance covers residency retention and lifecycle enforcement.",
-      "Incorrect. Choosing Move data globally because encryption cancels residency rules relies on a related but insufficient control. It does not satisfy the scenario because data governance covers residency retention and lifecycle enforcement."
+      "Correct. This response fits because data governance covers residency retention and lifecycle enforcement. Derived AI artifacts must be governed along with source data.",
+      "Incorrect. “Move data globally because encryption cancels residency rules” does not satisfy the scenario's controlling constraint. Derived AI artifacts must be governed along with source data. The required response follows from this rule: data governance covers residency retention and lifecycle enforcement.",
+      "Incorrect. Governance is continuous and requires monitoring, review, ownership, and managed exceptions as systems change. For this scenario, data governance covers residency retention and lifecycle enforcement. Derived AI artifacts must be governed along with source data.",
+      "Correct. This response fits because data governance covers residency retention and lifecycle enforcement. Derived AI artifacts must be governed along with source data.",
+      "Incorrect. “Retain every record forever for convenience” does not satisfy the scenario's controlling constraint. Derived AI artifacts must be governed along with source data. The required response follows from this rule: data governance covers residency retention and lifecycle enforcement."
     ],
     "principle": "data governance covers residency retention and lifecycle enforcement",
     "relatedConcept": "Derived AI artifacts must be governed along with source data.",
-    "overallExplanation": "The decisive rule is that data governance covers residency retention and lifecycle enforcement. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Enforce data residency in approved regions and Define and implement retention and deletion lifecycles are the best responses because data governance covers residency retention and lifecycle enforcement. Derived AI artifacts must be governed along with source data.",
+    "set": 3
   },
   {
     "id": 519,
@@ -461,24 +489,27 @@
     "type": "multi",
     "question": "A company has an AI policy document, but teams do not know it, exceptions are never reviewed, and controls have not changed in two years. Which two process improvements matter most? (Choose two.)",
     "options": [
-      "Train teams on their responsibilities",
       "Establish review cadence ownership and exception handling",
-      "Rely on the model to interpret policy at runtime",
-      "Remove governance metrics to simplify reporting"
+      "Put access restrictions in the prompt instead of enforcing them with identity and policy controls",
+      "Remove governance metrics to simplify reporting",
+      "Train teams on their responsibilities",
+      "Rely on the model to interpret policy at runtime"
     ],
     "correct": [
       0,
-      1
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: governance requires trained owners recurring review and managed exceptions.",
-      "Correct. This option follows the decisive rule: governance requires trained owners recurring review and managed exceptions.",
-      "Incorrect. Choosing Rely on the model to interpret policy at runtime relies on a related but insufficient control. It does not satisfy the scenario because governance requires trained owners recurring review and managed exceptions.",
-      "Incorrect. Choosing Remove governance metrics to simplify reporting relies on a related but insufficient control. It does not satisfy the scenario because governance requires trained owners recurring review and managed exceptions."
+      "Correct. This response fits because governance requires trained owners recurring review and managed exceptions. A written policy is ineffective without operating processes.",
+      "Incorrect. Prompt instructions are not an authorization boundary and cannot replace IAM, verified identity, or tool-side policy. For this scenario, governance requires trained owners recurring review and managed exceptions. A written policy is ineffective without operating processes.",
+      "Incorrect. “Remove governance metrics to simplify reporting” does not satisfy the scenario's controlling constraint. A written policy is ineffective without operating processes. The required response follows from this rule: governance requires trained owners recurring review and managed exceptions.",
+      "Correct. This response fits because governance requires trained owners recurring review and managed exceptions. A written policy is ineffective without operating processes.",
+      "Incorrect. “Rely on the model to interpret policy at runtime” does not satisfy the scenario's controlling constraint. A written policy is ineffective without operating processes. The required response follows from this rule: governance requires trained owners recurring review and managed exceptions."
     ],
     "principle": "governance requires trained owners recurring review and managed exceptions",
     "relatedConcept": "A written policy is ineffective without operating processes.",
-    "overallExplanation": "The decisive rule is that governance requires trained owners recurring review and managed exceptions. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Train teams on their responsibilities and Establish review cadence ownership and exception handling are the best responses because governance requires trained owners recurring review and managed exceptions. A written policy is ineffective without operating processes.",
+    "set": 1
   },
   {
     "id": 520,
@@ -487,23 +518,24 @@
     "type": "single",
     "question": "Leaders need to scope security responsibilities for a generative AI use case before selecting controls. Which named framework from the exam guide can help structure the discussion?",
     "options": [
-      "Generative AI Security Scoping Matrix",
       "BLEU translation score",
+      "A prompt-temperature matrix (because model instructions are assumed to prevent misuse)",
       "ROUGE summarization score",
-      "A prompt-temperature matrix"
+      "Generative AI Security Scoping Matrix"
     ],
     "correct": [
-      0
+      3
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility.",
-      "Incorrect. Choosing BLEU translation score relies on a related but insufficient control. It does not satisfy the scenario because the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility.",
-      "Incorrect. Choosing ROUGE summarization score relies on a related but insufficient control. It does not satisfy the scenario because the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility.",
-      "Incorrect. Choosing A prompt-temperature matrix relies on a related but insufficient control. It does not satisfy the scenario because the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility."
+      "Incorrect. “BLEU translation score” does not satisfy the scenario's controlling constraint. Governance frameworks organize decisions but still require implementation and review. The required response follows from this rule: the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility.",
+      "Incorrect. Temperature controls sampling randomness; it does not add knowledge or enforcement. That capability does not meet the controlling requirement here: the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility. Governance frameworks organize decisions but still require implementation and review.",
+      "Incorrect. “ROUGE summarization score” does not satisfy the scenario's controlling constraint. Governance frameworks organize decisions but still require implementation and review. The required response follows from this rule: the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility.",
+      "Correct. This response fits because the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility. Governance frameworks organize decisions but still require implementation and review."
     ],
     "principle": "the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility",
     "relatedConcept": "Governance frameworks organize decisions but still require implementation and review.",
-    "overallExplanation": "The decisive rule is that the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Generative AI Security Scoping Matrix is the best response because the Generative AI Security Scoping Matrix helps frame GenAI security scope and responsibility. Governance frameworks organize decisions but still require implementation and review.",
+    "set": 2
   },
   {
     "id": 521,
@@ -513,22 +545,22 @@
     "question": "A team treats a passing compliance review as proof the AI assistant will remain safe and useful indefinitely. Which governance approach is better?",
     "options": [
       "Continuously monitor, reassess, document changes, and review controls on a defined cadence",
-      "Freeze the system and stop collecting evidence",
+      "Assume AWS service compliance automatically certifies the application",
       "Replace audit records with model-generated summaries only",
-      "Assume AWS service compliance automatically certifies the application"
+      "Freeze the system and stop collecting evidence (with the prompt acting as the enforcement boundary)"
     ],
     "correct": [
       0
     ],
     "optionExplanations": [
-      "Correct. This option follows the decisive rule: governance is a continuing lifecycle rather than a one-time approval.",
-      "Incorrect. Choosing Freeze the system and stop collecting evidence relies on a related but insufficient control. It does not satisfy the scenario because governance is a continuing lifecycle rather than a one-time approval.",
-      "Incorrect. Choosing Replace audit records with model-generated summaries only relies on a related but insufficient control. It does not satisfy the scenario because governance is a continuing lifecycle rather than a one-time approval.",
-      "Incorrect. Choosing Assume AWS service compliance automatically certifies the application relies on a related but insufficient control. It does not satisfy the scenario because governance is a continuing lifecycle rather than a one-time approval."
+      "Correct. This response fits because governance is a continuing lifecycle rather than a one-time approval. Models data threats regulations and business contexts change after launch.",
+      "Incorrect. “Assume AWS service compliance automatically certifies the application” does not satisfy the scenario's controlling constraint. Models data threats regulations and business contexts change after launch. The required response follows from this rule: governance is a continuing lifecycle rather than a one-time approval.",
+      "Incorrect. “Replace audit records with model-generated summaries only” does not satisfy the scenario's controlling constraint. Models data threats regulations and business contexts change after launch. The required response follows from this rule: governance is a continuing lifecycle rather than a one-time approval.",
+      "Incorrect. “Freeze the system and stop collecting evidence (with the prompt acting as the enforcement boundary)” does not satisfy the scenario's controlling constraint. Models data threats regulations and business contexts change after launch. The required response follows from this rule: governance is a continuing lifecycle rather than a one-time approval."
     ],
     "principle": "governance is a continuing lifecycle rather than a one-time approval",
     "relatedConcept": "Models data threats regulations and business contexts change after launch.",
-    "overallExplanation": "The decisive rule is that governance is a continuing lifecycle rather than a one-time approval. Security and governance require enforceable controls, evidence, and lifecycle ownership outside the model."
+    "overallExplanation": "Continuously monitor, reassess, document changes, and review controls on a defined cadence is the best response because governance is a continuing lifecycle rather than a one-time approval. Models data threats regulations and business contexts change after launch.",
+    "set": 3
   }
 ]
-

@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useCertData } from '../lib/cert.js'
 import { hasStudy, slugify } from '../data/loader.js'
 import { getAttempt } from '../lib/storage.js'
-import { formatClock, percent } from '../lib/quiz.js'
+import { applyOptionOrder, formatClock, percent } from '../lib/quiz.js'
 import FeedbackPanel from '../components/FeedbackPanel.jsx'
 import Meter from '../components/Meter.jsx'
 import StatTile from '../components/StatTile.jsx'
@@ -22,7 +22,7 @@ function groupStats(items, keyFn) {
 
 function ReviewItem({ item, index, questionsById }) {
   const [open, setOpen] = useState(false)
-  const question = questionsById.get(item.qid)
+  const question = applyOptionOrder(questionsById.get(item.qid), item.optionOrder)
   if (!question) return null
   return (
     <li className="rounded-lg border border-stone-200 bg-white">
@@ -42,6 +42,7 @@ function ReviewItem({ item, index, questionsById }) {
         <span className="flex-1">
           <span className="text-sm text-stone-800">
             <span className="font-semibold text-stone-500">Q{index + 1}.</span> {question.question}
+            {item.scored === false && <span className="ml-2 text-xs font-semibold text-amber-700">unscored-style trial item</span>}
           </span>
         </span>
         <span className="text-xs text-stone-400">{open ? '▲' : '▼'}</span>
@@ -70,23 +71,29 @@ export default function Results() {
     )
   }
 
-  const correct = attempt.items.filter((i) => i.isCorrect).length
-  const total = attempt.items.length
-  const byDomain = groupStats(attempt.items, (i) => i.domain)
-  const byObjective = groupStats(attempt.items, (i) => i.objective)
+  const scoredItems = attempt.items.filter((item) => item.scored !== false)
+  const correct = scoredItems.filter((item) => item.isCorrect).length
+  const total = scoredItems.length
+  const shown = attempt.items.length
+  const byDomain = groupStats(scoredItems, (item) => item.domain)
+  const byObjective = groupStats(scoredItems, (item) => item.objective)
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <header>
         <p className="text-sm text-stone-500">{new Date(attempt.ts).toLocaleString()}</p>
         <h1 className="font-serif text-3xl font-semibold tracking-tight text-stone-900 capitalize">
-          {attempt.mode} session results
+          {attempt.sessionKind === 'mock' ? `Practice set ${attempt.setNumber} results` : `${attempt.mode} session results`}
         </h1>
       </header>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Score" value={`${percent(correct, total)}%`} detail={`${correct} of ${total} correct`} />
-        <StatTile label="Questions" value={total} detail={attempt.mode === 'exam' ? 'all scored' : 'answered & scored'} />
+        <StatTile
+          label="Questions"
+          value={shown}
+          detail={shown === total ? `${total} scored` : `${total} scored · ${shown - total} trial`}
+        />
         <StatTile label="Time" value={formatClock(attempt.elapsedSec)} detail={attempt.timeLimitSec ? `limit ${formatClock(attempt.timeLimitSec)}` : 'untimed'} />
         <StatTile label="Mode" value={attempt.mode === 'exam' ? 'Exam' : 'Learn'} detail={attempt.mode === 'exam' ? 'feedback after submit' : 'feedback per question'} />
       </section>
@@ -110,7 +117,7 @@ export default function Results() {
         )}
         <ul className="mt-3 space-y-3 rounded-lg border border-stone-200 bg-white p-4">
           {Object.entries(byObjective).map(([objective, s]) => {
-            const domainId = domainByTitle[attempt.items.find((i) => i.objective === objective)?.domain]?.id
+            const domainId = domainByTitle[scoredItems.find((item) => item.objective === objective)?.domain]?.id
             return (
               <li key={objective}>
                 <Tag
@@ -128,7 +135,9 @@ export default function Results() {
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Question review</h2>
-        <p className="mt-1 text-xs text-stone-500">Expand any question for the full reasoning panel.</p>
+        <p className="mt-1 text-xs text-stone-500">
+          Expand any question for the full reasoning panel. Trial items are identified only now, after submission.
+        </p>
         <ul className="mt-3 space-y-2">
           {attempt.items.map((item, i) => (
             <ReviewItem key={item.qid} item={item} index={i} questionsById={questionsById} />
