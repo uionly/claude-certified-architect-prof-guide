@@ -1,0 +1,529 @@
+[
+  {
+    "id": 401,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A hiring model has equal overall accuracy across the company, but qualified applicants from one demographic group are rejected twice as often as others. What should the team examine first?",
+    "options": [
+      "Subgroup error rates and potential dataset bias",
+      "Only the aggregate accuracy",
+      "Only endpoint latency",
+      "The number of model parameters"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: responsible evaluation checks outcomes across relevant groups.",
+      "Incorrect. Choosing Only the aggregate accuracy focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evaluation checks outcomes across relevant groups.",
+      "Incorrect. Choosing Only endpoint latency focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evaluation checks outcomes across relevant groups.",
+      "Incorrect. Choosing The number of model parameters focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evaluation checks outcomes across relevant groups."
+    ],
+    "principle": "responsible evaluation checks outcomes across relevant groups",
+    "relatedConcept": "Aggregate metrics can conceal unfair impacts on subgroups.",
+    "overallExplanation": "The decisive rule is that responsible evaluation checks outcomes across relevant groups. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 402,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A public chatbot must block harmful categories and sensitive topics consistently across several supported foundation models. Which AWS feature is most directly relevant?",
+    "options": [
+      "Amazon Bedrock Guardrails",
+      "AWS Cost Explorer",
+      "Amazon Transcribe",
+      "SageMaker Feature Store"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Bedrock Guardrails applies configurable safety controls to model interactions.",
+      "Incorrect. Choosing AWS Cost Explorer focuses on a related but insufficient signal. It does not satisfy the scenario because Bedrock Guardrails applies configurable safety controls to model interactions.",
+      "Incorrect. Choosing Amazon Transcribe focuses on a related but insufficient signal. It does not satisfy the scenario because Bedrock Guardrails applies configurable safety controls to model interactions.",
+      "Incorrect. Choosing SageMaker Feature Store focuses on a related but insufficient signal. It does not satisfy the scenario because Bedrock Guardrails applies configurable safety controls to model interactions."
+    ],
+    "principle": "Bedrock Guardrails applies configurable safety controls to model interactions",
+    "relatedConcept": "Safety controls complement model choice prompting and application validation.",
+    "overallExplanation": "The decisive rule is that Bedrock Guardrails applies configurable safety controls to model interactions. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 403,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "Two models meet quality requirements, but one uses substantially more compute and energy for a negligible gain. Which responsible selection factor applies?",
+    "options": [
+      "Sustainability and environmental cost",
+      "Choose the largest model regardless of impact",
+      "Ignore compute once accuracy is acceptable",
+      "Increase output length to justify the larger model"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: responsible model selection includes environmental and resource tradeoffs.",
+      "Incorrect. Choosing Choose the largest model regardless of impact focuses on a related but insufficient signal. It does not satisfy the scenario because responsible model selection includes environmental and resource tradeoffs.",
+      "Incorrect. Choosing Ignore compute once accuracy is acceptable focuses on a related but insufficient signal. It does not satisfy the scenario because responsible model selection includes environmental and resource tradeoffs.",
+      "Incorrect. Choosing Increase output length to justify the larger model focuses on a related but insufficient signal. It does not satisfy the scenario because responsible model selection includes environmental and resource tradeoffs."
+    ],
+    "principle": "responsible model selection includes environmental and resource tradeoffs",
+    "relatedConcept": "Model choice balances quality with cost safety and sustainability.",
+    "overallExplanation": "The decisive rule is that responsible model selection includes environmental and resource tradeoffs. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 404,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A marketing model generates an image closely resembling a living artist's protected work, and the company plans to use it commercially without review. Which risk should be assessed?",
+    "options": [
+      "Intellectual property infringement and licensing risk",
+      "Only inference latency",
+      "Only vector dimensionality",
+      "Only class imbalance"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: generated content can create intellectual-property and licensing exposure.",
+      "Incorrect. Choosing Only inference latency focuses on a related but insufficient signal. It does not satisfy the scenario because generated content can create intellectual-property and licensing exposure.",
+      "Incorrect. Choosing Only vector dimensionality focuses on a related but insufficient signal. It does not satisfy the scenario because generated content can create intellectual-property and licensing exposure.",
+      "Incorrect. Choosing Only class imbalance focuses on a related but insufficient signal. It does not satisfy the scenario because generated content can create intellectual-property and licensing exposure."
+    ],
+    "principle": "generated content can create intellectual-property and licensing exposure",
+    "relatedConcept": "Responsible GenAI includes legal review provenance and permitted use.",
+    "overallExplanation": "The decisive rule is that generated content can create intellectual-property and licensing exposure. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 405,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A clinical dataset includes 95% adults aged 25-55 but the model will serve children and older adults as well. Which dataset characteristic is missing?",
+    "options": [
+      "Representative diversity across the intended population",
+      "A longer model output limit",
+      "Higher inference temperature",
+      "A lower token price"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: training and evaluation data should represent the population served.",
+      "Incorrect. Choosing A longer model output limit focuses on a related but insufficient signal. It does not satisfy the scenario because training and evaluation data should represent the population served.",
+      "Incorrect. Choosing Higher inference temperature focuses on a related but insufficient signal. It does not satisfy the scenario because training and evaluation data should represent the population served.",
+      "Incorrect. Choosing A lower token price focuses on a related but insufficient signal. It does not satisfy the scenario because training and evaluation data should represent the population served."
+    ],
+    "principle": "training and evaluation data should represent the population served",
+    "relatedConcept": "Dataset composition affects reliability fairness and inclusivity.",
+    "overallExplanation": "The decisive rule is that training and evaluation data should represent the population served. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 406,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A fraud model performs extremely well on training records and poorly on new transactions. The gap grows as more complex features are added. Which condition is most likely?",
+    "options": [
+      "High variance and overfitting",
+      "High bias and underfitting",
+      "Perfect generalization",
+      "Prompt injection"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: high variance appears as strong training fit and weak unseen-data performance.",
+      "Incorrect. Choosing High bias and underfitting focuses on a related but insufficient signal. It does not satisfy the scenario because high variance appears as strong training fit and weak unseen-data performance.",
+      "Incorrect. Choosing Perfect generalization focuses on a related but insufficient signal. It does not satisfy the scenario because high variance appears as strong training fit and weak unseen-data performance.",
+      "Incorrect. Choosing Prompt injection focuses on a related but insufficient signal. It does not satisfy the scenario because high variance appears as strong training fit and weak unseen-data performance."
+    ],
+    "principle": "high variance appears as strong training fit and weak unseen-data performance",
+    "relatedConcept": "Bias and variance describe different patterns of model error.",
+    "overallExplanation": "The decisive rule is that high variance appears as strong training fit and weak unseen-data performance. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 407,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A simple demand model performs poorly on both training data and held-out data and misses obvious seasonal patterns. Which condition best explains this?",
+    "options": [
+      "High bias and underfitting",
+      "High variance and overfitting",
+      "Data leakage producing perfect scores",
+      "Excessive explainability"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: high bias prevents the model from capturing important structure even in training data.",
+      "Incorrect. Choosing High variance and overfitting focuses on a related but insufficient signal. It does not satisfy the scenario because high bias prevents the model from capturing important structure even in training data.",
+      "Incorrect. Choosing Data leakage producing perfect scores focuses on a related but insufficient signal. It does not satisfy the scenario because high bias prevents the model from capturing important structure even in training data.",
+      "Incorrect. Choosing Excessive explainability focuses on a related but insufficient signal. It does not satisfy the scenario because high bias prevents the model from capturing important structure even in training data."
+    ],
+    "principle": "high bias prevents the model from capturing important structure even in training data",
+    "relatedConcept": "Error patterns across training and evaluation distinguish underfit from overfit.",
+    "overallExplanation": "The decisive rule is that high bias prevents the model from capturing important structure even in training data. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 408,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A lender wants to quantify whether a credit model's predictions differ unfairly across protected groups and to explain feature influence. Which AWS tool is designed for this work?",
+    "options": [
+      "SageMaker Clarify",
+      "Amazon Polly",
+      "AWS Budgets",
+      "Amazon S3 Glacier"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: SageMaker Clarify supports bias detection and model explainability.",
+      "Incorrect. Choosing Amazon Polly focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Clarify supports bias detection and model explainability.",
+      "Incorrect. Choosing AWS Budgets focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Clarify supports bias detection and model explainability.",
+      "Incorrect. Choosing Amazon S3 Glacier focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Clarify supports bias detection and model explainability."
+    ],
+    "principle": "SageMaker Clarify supports bias detection and model explainability",
+    "relatedConcept": "Responsible AI requires measurable analysis rather than fairness claims.",
+    "overallExplanation": "The decisive rule is that SageMaker Clarify supports bias detection and model explainability. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 409,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A manufacturer needs ongoing detection of changes in production inputs and model quality after deployment. Which AWS capability is relevant?",
+    "options": [
+      "SageMaker Model Monitor",
+      "Amazon Translate",
+      "AWS Artifact",
+      "Amazon Quick"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: SageMaker Model Monitor detects production data and model-quality changes.",
+      "Incorrect. Choosing Amazon Translate focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Monitor detects production data and model-quality changes.",
+      "Incorrect. Choosing AWS Artifact focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Monitor detects production data and model-quality changes.",
+      "Incorrect. Choosing Amazon Quick focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Monitor detects production data and model-quality changes."
+    ],
+    "principle": "SageMaker Model Monitor detects production data and model-quality changes",
+    "relatedConcept": "Responsible operation continues after initial model approval.",
+    "overallExplanation": "The decisive rule is that SageMaker Model Monitor detects production data and model-quality changes. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 410,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "An insurance decision has low model confidence and could significantly affect a customer. The company wants a person to validate such cases. Which service supports this pattern?",
+    "options": [
+      "Amazon Augmented AI (Amazon A2I)",
+      "Amazon Personalize",
+      "Amazon CloudFront",
+      "AWS Glue DataBrew"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Amazon A2I supports human review workflows for ML predictions.",
+      "Incorrect. Choosing Amazon Personalize focuses on a related but insufficient signal. It does not satisfy the scenario because Amazon A2I supports human review workflows for ML predictions.",
+      "Incorrect. Choosing Amazon CloudFront focuses on a related but insufficient signal. It does not satisfy the scenario because Amazon A2I supports human review workflows for ML predictions.",
+      "Incorrect. Choosing AWS Glue DataBrew focuses on a related but insufficient signal. It does not satisfy the scenario because Amazon A2I supports human review workflows for ML predictions."
+    ],
+    "principle": "Amazon A2I supports human review workflows for ML predictions",
+    "relatedConcept": "Human oversight is valuable when uncertainty and consequence are high.",
+    "overallExplanation": "The decisive rule is that Amazon A2I supports human review workflows for ML predictions. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 411,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "single",
+    "question": "A facial-analysis model has balanced age groups, but images for one group were captured mostly in studio lighting while others came from mobile devices. Which check should the team perform first?",
+    "options": [
+      "Evaluate subgroup performance under different capture conditions",
+      "Audit data provenance and collection quality",
+      "Assume demographic balance eliminates all bias",
+      "Measure only overall throughput"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Incorrect. Provenance auditing is valuable, but the immediate risk signal is a capture-condition confounder; measuring subgroup performance by condition reveals whether it affects outcomes.",
+      "Correct. This option follows the decisive rule: responsible datasets require both demographic and contextual representativeness.",
+      "Incorrect. Choosing Assume demographic balance eliminates all bias focuses on a related but insufficient signal. It does not satisfy the scenario because responsible datasets require both demographic and contextual representativeness.",
+      "Incorrect. Choosing Measure only overall throughput focuses on a related but insufficient signal. It does not satisfy the scenario because responsible datasets require both demographic and contextual representativeness."
+    ],
+    "principle": "responsible datasets require both demographic and contextual representativeness",
+    "relatedConcept": "Balanced counts alone do not eliminate collection and measurement bias.",
+    "overallExplanation": "The decisive rule is that responsible datasets require both demographic and contextual representativeness. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 412,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Explain the development of AI systems that are responsible.",
+    "type": "multi",
+    "question": "A health assistant can produce unsafe advice when users phrase requests indirectly. The team currently relies only on a friendly system prompt. Which two controls strengthen the design? (Choose two.)",
+    "options": [
+      "Apply Bedrock Guardrails for defined safety categories",
+      "Use human review or escalation for high-risk responses",
+      "Increase temperature to reveal more options",
+      "Remove all monitoring to avoid storing evidence"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: responsible systems layer safety controls with human oversight.",
+      "Correct. This option follows the decisive rule: responsible systems layer safety controls with human oversight.",
+      "Incorrect. Choosing Increase temperature to reveal more options focuses on a related but insufficient signal. It does not satisfy the scenario because responsible systems layer safety controls with human oversight.",
+      "Incorrect. Choosing Remove all monitoring to avoid storing evidence focuses on a related but insufficient signal. It does not satisfy the scenario because responsible systems layer safety controls with human oversight."
+    ],
+    "principle": "responsible systems layer safety controls with human oversight",
+    "relatedConcept": "Prompts alone are not a complete safety architecture.",
+    "overallExplanation": "The decisive rule is that responsible systems layer safety controls with human oversight. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 413,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A bank uses a simple scorecard where each feature's contribution is visible and a deep model with better accuracy but opaque internal behavior. Which statement is correct?",
+    "options": [
+      "The scorecard is more transparent, while the deep model may need explanation methods",
+      "The deep model is automatically transparent because it is more accurate",
+      "Both are equally explainable because they return numbers",
+      "Transparency means publishing model weights to every customer"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: transparency and predictive performance are distinct model properties.",
+      "Incorrect. Choosing The deep model is automatically transparent because it is more accurate focuses on a related but insufficient signal. It does not satisfy the scenario because transparency and predictive performance are distinct model properties.",
+      "Incorrect. Choosing Both are equally explainable because they return numbers focuses on a related but insufficient signal. It does not satisfy the scenario because transparency and predictive performance are distinct model properties.",
+      "Incorrect. Choosing Transparency means publishing model weights to every customer focuses on a related but insufficient signal. It does not satisfy the scenario because transparency and predictive performance are distinct model properties."
+    ],
+    "principle": "transparency and predictive performance are distinct model properties",
+    "relatedConcept": "Model choice can involve an interpretability-performance tradeoff.",
+    "overallExplanation": "The decisive rule is that transparency and predictive performance are distinct model properties. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 414,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A model owner needs standardized documentation of intended use, training information, evaluation results, limitations, and risk considerations. Which AWS artifact is most appropriate?",
+    "options": [
+      "SageMaker Model Cards",
+      "Amazon Lex intents",
+      "AWS Budgets reports",
+      "CloudFront access logs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: SageMaker Model Cards document model purpose performance and risk context.",
+      "Incorrect. Choosing Amazon Lex intents focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Cards document model purpose performance and risk context.",
+      "Incorrect. Choosing AWS Budgets reports focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Cards document model purpose performance and risk context.",
+      "Incorrect. Choosing CloudFront access logs focuses on a related but insufficient signal. It does not satisfy the scenario because SageMaker Model Cards document model purpose performance and risk context."
+    ],
+    "principle": "SageMaker Model Cards document model purpose performance and risk context",
+    "relatedConcept": "Structured model documentation supports review governance and communication.",
+    "overallExplanation": "The decisive rule is that SageMaker Model Cards document model purpose performance and risk context. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 415,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A team claims an open-source model is fully transparent merely because its weights can be downloaded. What else must be examined?",
+    "options": [
+      "Training data information, license, documentation, evaluation, and limitations",
+      "Only the download file size",
+      "Only the model's marketing name",
+      "Only the number of regions where it runs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: open weights alone do not establish full transparency or permitted use.",
+      "Incorrect. Choosing Only the download file size focuses on a related but insufficient signal. It does not satisfy the scenario because open weights alone do not establish full transparency or permitted use.",
+      "Incorrect. Choosing Only the model's marketing name focuses on a related but insufficient signal. It does not satisfy the scenario because open weights alone do not establish full transparency or permitted use.",
+      "Incorrect. Choosing Only the number of regions where it runs focuses on a related but insufficient signal. It does not satisfy the scenario because open weights alone do not establish full transparency or permitted use."
+    ],
+    "principle": "open weights alone do not establish full transparency or permitted use",
+    "relatedConcept": "Explainability includes provenance documentation licensing and behavior.",
+    "overallExplanation": "The decisive rule is that open weights alone do not establish full transparency or permitted use. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 416,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A medical model is slightly more accurate than an interpretable alternative, but clinicians cannot understand individual recommendations and the decisions are high impact. What tradeoff should be reviewed?",
+    "options": [
+      "Whether the accuracy gain justifies reduced interpretability and oversight risk",
+      "Whether a larger hidden layer is always safer",
+      "Whether transparency should be ignored for high-impact decisions",
+      "Whether longer responses make model decisions explainable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: interpretability requirements rise with consequence and accountability.",
+      "Incorrect. Choosing Whether a larger hidden layer is always safer focuses on a related but insufficient signal. It does not satisfy the scenario because interpretability requirements rise with consequence and accountability.",
+      "Incorrect. Choosing Whether transparency should be ignored for high-impact decisions focuses on a related but insufficient signal. It does not satisfy the scenario because interpretability requirements rise with consequence and accountability.",
+      "Incorrect. Choosing Whether longer responses make model decisions explainable focuses on a related but insufficient signal. It does not satisfy the scenario because interpretability requirements rise with consequence and accountability."
+    ],
+    "principle": "interpretability requirements rise with consequence and accountability",
+    "relatedConcept": "Safety and transparency must be balanced against performance.",
+    "overallExplanation": "The decisive rule is that interpretability requirements rise with consequence and accountability. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 417,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A benefit-decision system gives users only `denied` with no contributing factors and no correction path. Which human-centered improvement is most important?",
+    "options": [
+      "Provide understandable reasons and a mechanism to contest or correct data",
+      "Expose raw model weights instead of reasons",
+      "Increase throughput so denials arrive faster",
+      "Hide uncertainty to avoid confusing users"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: human-centered explanations support understanding feedback and recourse.",
+      "Incorrect. Choosing Expose raw model weights instead of reasons focuses on a related but insufficient signal. It does not satisfy the scenario because human-centered explanations support understanding feedback and recourse.",
+      "Incorrect. Choosing Increase throughput so denials arrive faster focuses on a related but insufficient signal. It does not satisfy the scenario because human-centered explanations support understanding feedback and recourse.",
+      "Incorrect. Choosing Hide uncertainty to avoid confusing users focuses on a related but insufficient signal. It does not satisfy the scenario because human-centered explanations support understanding feedback and recourse."
+    ],
+    "principle": "human-centered explanations support understanding feedback and recourse",
+    "relatedConcept": "Explainability should serve the needs of affected people.",
+    "overallExplanation": "The decisive rule is that human-centered explanations support understanding feedback and recourse. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 418,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A model explanation lists technical feature codes that auditors understand but customers do not. What does human-centered design require?",
+    "options": [
+      "Tailor explanations to each audience's decisions and level of understanding",
+      "Use one technical explanation for every audience",
+      "Remove explanations because they are imperfect",
+      "Show only the final probability with no context"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: an explanation is useful only when its audience can act on it.",
+      "Incorrect. Choosing Use one technical explanation for every audience focuses on a related but insufficient signal. It does not satisfy the scenario because an explanation is useful only when its audience can act on it.",
+      "Incorrect. Choosing Remove explanations because they are imperfect focuses on a related but insufficient signal. It does not satisfy the scenario because an explanation is useful only when its audience can act on it.",
+      "Incorrect. Choosing Show only the final probability with no context focuses on a related but insufficient signal. It does not satisfy the scenario because an explanation is useful only when its audience can act on it."
+    ],
+    "principle": "an explanation is useful only when its audience can act on it",
+    "relatedConcept": "Different stakeholders need different levels and forms of explanation.",
+    "overallExplanation": "The decisive rule is that an explanation is useful only when its audience can act on it. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 419,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "multi",
+    "question": "A team wants both global insight into a model's overall behavior and local reasons for one declined application. Which two approaches are needed? (Choose two.)",
+    "options": [
+      "Global behavior and subgroup analysis",
+      "A local explanation for the individual prediction",
+      "Only aggregate accuracy",
+      "Only the model's source-code license"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: global and local explanations answer different accountability questions.",
+      "Correct. This option follows the decisive rule: global and local explanations answer different accountability questions.",
+      "Incorrect. Choosing Only aggregate accuracy focuses on a related but insufficient signal. It does not satisfy the scenario because global and local explanations answer different accountability questions.",
+      "Incorrect. Choosing Only the model's source-code license focuses on a related but insufficient signal. It does not satisfy the scenario because global and local explanations answer different accountability questions."
+    ],
+    "principle": "global and local explanations answer different accountability questions",
+    "relatedConcept": "Explainability operates at system and individual-decision levels.",
+    "overallExplanation": "The decisive rule is that global and local explanations answer different accountability questions. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 420,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A generative assistant cites model documentation but users cannot report incorrect or harmful responses. Which addition best supports human-centered explainability?",
+    "options": [
+      "A visible feedback and escalation mechanism tied to reviewed outcomes",
+      "A hidden prompt with no user controls",
+      "A higher temperature setting",
+      "A larger context window with no transparency"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: feedback mechanisms let people challenge and improve AI behavior.",
+      "Incorrect. Choosing A hidden prompt with no user controls focuses on a related but insufficient signal. It does not satisfy the scenario because feedback mechanisms let people challenge and improve AI behavior.",
+      "Incorrect. Choosing A higher temperature setting focuses on a related but insufficient signal. It does not satisfy the scenario because feedback mechanisms let people challenge and improve AI behavior.",
+      "Incorrect. Choosing A larger context window with no transparency focuses on a related but insufficient signal. It does not satisfy the scenario because feedback mechanisms let people challenge and improve AI behavior."
+    ],
+    "principle": "feedback mechanisms let people challenge and improve AI behavior",
+    "relatedConcept": "Human-centered design includes communication recourse and learning loops.",
+    "overallExplanation": "The decisive rule is that feedback mechanisms let people challenge and improve AI behavior. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  },
+  {
+    "id": 421,
+    "domain": "Guidelines for Responsible AI",
+    "objective": "Recognize the importance of transparent and explainable models.",
+    "type": "single",
+    "question": "A product team uses Amazon Bedrock Model Evaluation to compare quality and safety, SageMaker Clarify for bias analysis, and Model Cards for documentation. Which statement best describes the combination?",
+    "options": [
+      "The tools provide complementary evidence rather than one universal transparency score",
+      "Any one tool makes all models fully explainable",
+      "Model Cards automatically remove bias",
+      "Evaluation eliminates the need for human judgment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: responsible evidence comes from multiple complementary evaluation and documentation methods.",
+      "Incorrect. Choosing Any one tool makes all models fully explainable focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evidence comes from multiple complementary evaluation and documentation methods.",
+      "Incorrect. Choosing Model Cards automatically remove bias focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evidence comes from multiple complementary evaluation and documentation methods.",
+      "Incorrect. Choosing Evaluation eliminates the need for human judgment focuses on a related but insufficient signal. It does not satisfy the scenario because responsible evidence comes from multiple complementary evaluation and documentation methods."
+    ],
+    "principle": "responsible evidence comes from multiple complementary evaluation and documentation methods",
+    "relatedConcept": "No single artifact proves fairness safety transparency and fitness for use.",
+    "overallExplanation": "The decisive rule is that responsible evidence comes from multiple complementary evaluation and documentation methods. Responsible AI requires evidence and controls matched to the people, risks, and decisions involved."
+  }
+]

@@ -1,6 +1,6 @@
 # Cert Prep — Study Guides & Question Banks
 
-A study + practice web app covering multiple AI certifications, currently from two vendors: Anthropic (Claude) and Microsoft (Azure AI). Every certification gets a question bank; the Claude certifications also get a study guide and a revision pass:
+A study + practice web app covering multiple AI certifications from Anthropic (Claude), Microsoft (Azure AI), and Amazon Web Services. Every certification gets a question bank; the Claude certifications also get a study guide and a revision pass:
 
 - **Question bank** — reasoning-based scenario questions distributed by domain weight, every question tagged with its exact blueprint objective and (where one exists) linking back to the study section that teaches it.
 - **Study guide** — one page per exam domain, one section per blueprint objective, each ending with a "Practice this objective" deep link into the question bank.
@@ -38,7 +38,17 @@ Three transcription notes:
 - **AI-200 domain 4 has two official spellings.** "Skills at a glance" and the exam page say `Secure, monitor, troubleshoot Azure solutions`; the study guide's section heading adds "and". We use the former.
 - **Level.** Microsoft's "At a glance → Level" says *Intermediate* for both; we record `"Associate"` to match the credential names and the app's existing level vocabulary.
 
+### Amazon Web Services
+
+| Code | Name | Content |
+|---|---|---|
+| AIF-C01 | AWS Certified AI Practitioner | ✅ practice only (150 questions = 3 × 50 scored-question sets) |
+
+The blueprint is transcribed from the official [AWS Certified AI Practitioner exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html), **version 1.1, published April 30, 2026**. AWS lists 65 questions on the live exam: the guide identifies 50 scored questions and 15 unscored questions. Each practice set models the 50 scored questions and preserves the official 20/24/28/14/14 domain weighting exactly. The bank includes the version 1.1 additions covering agentic AI, context engineering, prompt management, business-alignment metrics, and hallucination grounding.
+
 The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification grouped by vendor with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice, minus whatever that cert doesn't ship) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
+
+Adding another certification: [docs/adding-a-certification.md](docs/adding-a-certification.md) lists the exams worth adding next and carries the fill-in prompt that builds one end to end.
 
 ## Setup
 
@@ -117,7 +127,7 @@ Performance is tracked **per objective tag** (not just per domain) across all at
 }
 ```
 
-`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to the per-set question count (`examQuestions`, or `questionsPerSet` where the vendor doesn't publish an item count — see below); each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
+`idStart` for domain N should be `N*100 + 1` so question ids don't collide across domains (domain 3 → ids 301-399). Weights must sum to 100; `questionCount`s must sum to the per-set question count (`questionsPerSet` when explicitly declared, otherwise `examQuestions`); each domain's objectives' `questions` counts must sum to that domain's `questionCount`.
 
 `vendor` is the exam vendor. It groups the landing-page cards and the header cert switcher; the display label and the vendor/cert ordering live in `src/lib/vendors.js`. A cert missing from those order arrays still renders — it's appended, never silently dropped.
 
@@ -147,11 +157,24 @@ The two Microsoft certs' facts come from Microsoft Learn (study guide + certific
 
 Because Microsoft doesn't publish an item count, `examQuestions` is `null` for both and the overview page says so rather than inventing a number. `examMinutesPerQuestion: 2.4` is **derived** (120 min ÷ our 50-question set), not a sourced fact — it only sets the Exam-mode pace.
 
+AIF-C01 facts come from the official AWS certification page and exam guide, checked August 2026:
+
+| | AIF-C01 |
+|---|---|
+| Items | 65 total: 50 scored + 15 unscored |
+| Time limit | 90 min |
+| Passing score | 700 / 1000 scaled |
+| Fee | $100 USD |
+| Validity | 36 months |
+| Question types | multiple choice, multiple response, ordering, matching |
+
+`questionsPerSet: 50` deliberately models only the scored blueprint; `examQuestions: 65` remains the independently sourced live-exam total. `examMinutesPerQuestion: 1.38` is derived from the live pace (90 ÷ 65) for Exam mode.
+
 Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — vendors don't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
 
-Validation rules: when `practiceSets` is declared, the per-set question count must equal the sum of per-domain `questionCount`, so bank size can never be mistaken for set size. That count comes from `examQuestions` when the official figure is known, otherwise from **`questionsPerSet`** — one of the two must be present, or nothing would check that a set really holds what it claims. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
+Validation rules: when `practiceSets` is declared, the per-set question count must equal the sum of per-domain `questionCount`, so bank size can never be mistaken for set size. An explicit **`questionsPerSet`** takes precedence when a bank models scored content rather than unscored exam items, or when a vendor does not publish an item count; otherwise the validator uses `examQuestions`. One of the two must be present. Certs *without* `practiceSets` (legacy banks like CCAR-P, whose per-domain counts describe the whole 283-question bank) carry `examQuestions` as an independently-sourced figure and skip that check. `examTimeMinutes` is the official figure; if a cert lacks one, the UI falls back to `examQuestions × examMinutesPerQuestion`.
 
-`examQuestions`, `questionCount`, and per-objective `questions` always describe **one real exam** (transcribed from the official guide). The optional `practiceSets` (default 1) says how many distinct full exams the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into `practiceSets` non-overlapping CSVs, each matching the official exam's exact size and distribution.
+`examQuestions` describes the real exam total. `questionCount` and per-objective `questions` describe one practice set: normally a full exam, or the scored blueprint when unscored items have no published distribution. The optional `practiceSets` (default 1) says how many distinct sets the bank holds: the validator requires each objective to have `questions × practiceSets` items in its `domain-N.json`, and `scripts/export-practice-sets.mjs` splits the bank per objective (round-robin by id) into non-overlapping CSVs with the declared distribution.
 
 `npm run export:csv [certCode] [--force]`. The exporter **skips any cert that has more `PracticeSet*.csv` files on disk than it generates**, because those extra files were added by hand and rewriting sets 1..n would pull their questions into the earlier sets while the extra file still holds them — silently duplicating questions across published tests. This currently applies to **CCAR-P**: sets 1–3 hold its original 200 questions and a hand-added set 4 holds the 83 added later (verified zero overlap, 283 total). Since 283 is prime it can't be partitioned into equal exam-sized sets, so decide the intended partition before running with `--force`.
 
@@ -317,5 +340,20 @@ Practice only (no study guide, no revision). 3 practice sets × 50 questions (ba
 | **Total** | 100% | **150/150** | — | — |
 
 Every weight sits inside its published band (20–25 / 25–30 / 20–25 / 20–25).
+
+### AIF-C01 — AWS Certified AI Practitioner
+
+Practice only (no study guide, no revision). 3 practice sets × 50 scored questions (bank = 150). Per-domain bank counts (each set gets ⅓):
+
+| Domain | Weight | Questions | Study guide | Revision |
+|---|---|---|---|---|
+| 1. Fundamentals of AI and ML | 20% | ✅ 30/30 | — practice only | — practice only |
+| 2. Fundamentals of GenAI | 24% | ✅ 36/36 | — practice only | — practice only |
+| 3. Applications of Foundation Models | 28% | ✅ 42/42 | — practice only | — practice only |
+| 4. Guidelines for Responsible AI | 14% | ✅ 21/21 | — practice only | — practice only |
+| 5. Security, Compliance, and Governance for AI Solutions | 14% | ✅ 21/21 | — practice only | — practice only |
+| **Total** | 100% | **150/150** | — | — |
+
+AWS publishes exact weights against the 50 scored items, so every set contains 10/12/14/7/7 questions across the five domains. The 15 unscored live-exam items are intentionally not simulated because AWS does not publish their domain distribution.
 
 App shell: ✅ scaffold · ✅ purpose-first landing page with exam facts · ✅ vendor-grouped cert cards & switcher · ✅ multi-cert switcher · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass · ✅ practice-only certs

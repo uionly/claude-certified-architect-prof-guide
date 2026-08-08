@@ -41,13 +41,18 @@ const courseCopy = {
     description:
       'Production engineering for AI back ends: containers and orchestration, Cosmos DB, PostgreSQL with pgvector, Managed Redis, messaging, Key Vault, OpenTelemetry and KQL.',
   },
+  'AIF-C01': {
+    title: 'AWS Certified AI Practitioner',
+    description:
+      'AI and ML fundamentals, generative AI, foundation-model applications, responsible AI, and security, compliance and governance on AWS.',
+  },
 }
 
 const steps = [
   {
     n: 1,
     title: 'Pick your certification',
-    body: 'Claude and Microsoft Azure exams, from Associate to Architect Professional. Each one has its own question bank; the Claude certifications add a study guide and revision recaps.',
+    body: 'Claude, Microsoft Azure, and AWS exams, from Foundational to Architect Professional. Each one has its own question bank; the Claude certifications add a study guide and revision recaps.',
   },
   {
     n: 2,
@@ -117,7 +122,7 @@ export default function Courses() {
           Free · No sign-up · {certRegistry.length} certifications
         </p>
         <h1 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-          Prepare for the Claude and Azure AI certification exams.
+          Prepare for Claude, Azure AI, and AWS AI certification exams.
         </h1>
         <p className="mt-4 max-w-3xl leading-relaxed text-stone-700">
           A reasoning-based question bank for every certification here — plus a full study guide for the Claude

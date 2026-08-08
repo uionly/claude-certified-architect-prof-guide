@@ -91,21 +91,21 @@ for (const certCode of certCodes) {
   // bank is that × practiceSets — so the counts must add up to the declared set
   // length. This is what stops bank size being mistaken for set size.
   //
-  // The set length is normally the official exam length (examQuestions). Where the
-  // vendor doesn't publish an item count (Microsoft), examQuestions stays null and
-  // questionsPerSet records the length we chose for our own sets — otherwise nothing
-  // would check that each set really holds that many questions.
+  // The set length is normally the official exam length (examQuestions). A cert can
+  // explicitly use questionsPerSet when its practice sets intentionally model only
+  // scored content (for example, an exam that also contains unscored items) or when
+  // the vendor does not publish an item count.
   //
   // Certs WITHOUT practiceSets (legacy banks like CCAR-P) use per-domain counts to
   // describe the whole bank, so no such equality holds and examQuestions is simply
   // the independently-sourced official figure.
   if (blueprint.cert.practiceSets) {
-    const setSize = cert.examQuestions ?? cert.questionsPerSet;
+    const setSize = cert.questionsPerSet ?? cert.examQuestions;
     if (setSize == null)
       errors.push('cert.practiceSets is set, so one of cert.examQuestions / cert.questionsPerSet must give the per-set question count');
     else if (typeof setSize === 'number' && setSize !== oneExamQuestions)
       errors.push(
-        `per-set question count (${setSize}, from cert.${cert.examQuestions != null ? 'examQuestions' : 'questionsPerSet'}) must equal the sum of per-domain questionCount (${oneExamQuestions}); the bank holds ${oneExamQuestions * sets} (× ${sets} practiceSets)`,
+        `per-set question count (${setSize}, from cert.${cert.questionsPerSet != null ? 'questionsPerSet' : 'examQuestions'}) must equal the sum of per-domain questionCount (${oneExamQuestions}); the bank holds ${oneExamQuestions * sets} (× ${sets} practiceSets)`,
       );
   }
 

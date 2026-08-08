@@ -164,7 +164,7 @@ export default function Home() {
           ) : (
             <>
               A reasoning-based question bank built around the official exam blueprint:{' '}
-              {cert.practiceSets ?? 1} practice sets of {cert.examQuestions ?? cert.questionsPerSet} questions, each one
+              {cert.practiceSets ?? 1} practice sets of {cert.questionsPerSet ?? cert.examQuestions} questions, each one
               a scenario tagged to the exact blueprint objective, with a full explanation of why every option is right
               or wrong.
             </>

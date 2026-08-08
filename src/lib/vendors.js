@@ -1,15 +1,16 @@
 // Certifications are grouped by the exam vendor (blueprint cert.vendor) on the landing
 // page and in the header switcher.
-export const VENDOR_ORDER = ['Anthropic', 'Microsoft']
+export const VENDOR_ORDER = ['Anthropic', 'Microsoft', 'AWS']
 
 export const VENDOR_LABELS = {
   Anthropic: 'Anthropic Claude',
   Microsoft: 'Microsoft Azure',
+  AWS: 'Amazon Web Services',
 }
 
 // Easiest first within a vendor. A cert missing from this list is still rendered — it is
 // appended after the ordered ones, never silently dropped.
-const CERT_ORDER = ['CCAO-F', 'CCDV-F', 'CCAR-F', 'CCAR-P', 'AI-103', 'AI-200']
+const CERT_ORDER = ['CCAO-F', 'CCDV-F', 'CCAR-F', 'CCAR-P', 'AI-103', 'AI-200', 'AIF-C01']
 
 const LAST = Number.MAX_SAFE_INTEGER
 

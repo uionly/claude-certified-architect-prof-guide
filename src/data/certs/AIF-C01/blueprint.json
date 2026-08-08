@@ -1,0 +1,85 @@
+{
+  "cert": {
+    "name": "AWS Certified AI Practitioner",
+    "code": "AIF-C01",
+    "vendor": "AWS",
+    "level": "Foundational",
+    "audience": "People who use, but do not necessarily build, AI/ML solutions on AWS, including business analysts, IT support, marketing, product and project managers, managers, and sales professionals.",
+    "examQuestions": 65,
+    "scoredQuestions": 50,
+    "unscoredQuestions": 15,
+    "questionsPerSet": 50,
+    "examTimeMinutes": 90,
+    "examMinutesPerQuestion": 1.38,
+    "passingScore": "700 / 1000 (scaled)",
+    "format": "Multiple choice, multiple response, ordering, and matching · Pearson VUE test center or online proctored",
+    "examFee": "$100 USD",
+    "validityMonths": 36,
+    "registrationUrl": "https://aws.amazon.com/certification/certified-ai-practitioner/",
+    "examGuideUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html",
+    "examGuideVersion": "1.1 (published April 30, 2026)",
+    "practiceSets": 3,
+    "content": { "study": false, "revision": false }
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Fundamentals of AI and ML",
+      "weight": 20,
+      "questionCount": 10,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Explain basic AI concepts and terminologies.", "questions": 3 },
+        { "objective": "Identify practical use cases for AI.", "questions": 4 },
+        { "objective": "Describe the AI/ML development lifecycle.", "questions": 3 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Fundamentals of GenAI",
+      "weight": 24,
+      "questionCount": 12,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Explain the basic concepts of generative AI (GenAI).", "questions": 4 },
+        { "objective": "Understand the capabilities and limitations of GenAI for solving business problems.", "questions": 4 },
+        { "objective": "Describe AWS infrastructure and technologies for building GenAI applications.", "questions": 4 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Applications of Foundation Models",
+      "weight": 28,
+      "questionCount": 14,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Describe design considerations for applications that use foundation models (FMs).", "questions": 4 },
+        { "objective": "Choose effective prompt engineering techniques.", "questions": 4 },
+        { "objective": "Describe the training and fine-tuning process for FMs.", "questions": 3 },
+        { "objective": "Describe methods to evaluate FM performance.", "questions": 3 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Guidelines for Responsible AI",
+      "weight": 14,
+      "questionCount": 7,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Explain the development of AI systems that are responsible.", "questions": 4 },
+        { "objective": "Recognize the importance of transparent and explainable models.", "questions": 3 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Security, Compliance, and Governance for AI Solutions",
+      "weight": 14,
+      "questionCount": 7,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "Explain methods to secure AI systems.", "questions": 4 },
+        { "objective": "Recognize governance and compliance regulations for AI systems.", "questions": 3 }
+      ]
+    }
+  ]
+}

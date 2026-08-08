@@ -1,0 +1,908 @@
+[
+  {
+    "id": 201,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A support assistant sends a 12,000-token conversation to a foundation model on every turn, even though only the latest question and a short summary matter. Which change most directly lowers inference cost?",
+    "options": [
+      "Send only relevant context and a compact history summary",
+      "Raise temperature to shorten billing",
+      "Convert embeddings back into full documents",
+      "Pre-train a new model for each conversation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: token pricing makes unnecessary input context a direct recurring cost.",
+      "Incorrect. Choosing Raise temperature to shorten billing confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost.",
+      "Incorrect. Choosing Convert embeddings back into full documents confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost.",
+      "Incorrect. Choosing Pre-train a new model for each conversation confuses a related capability with the actual requirement. It does not satisfy the scenario because token pricing makes unnecessary input context a direct recurring cost."
+    ],
+    "principle": "token pricing makes unnecessary input context a direct recurring cost",
+    "relatedConcept": "Context selection affects both model focus and token consumption.",
+    "overallExplanation": "The decisive rule is that token pricing makes unnecessary input context a direct recurring cost. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 202,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A knowledge search system splits manuals into passages, converts each passage into a numeric representation, and compares a query representation by semantic similarity. What are those numeric representations?",
+    "options": [
+      "Embeddings stored as vectors",
+      "Prompt templates stored as tokens",
+      "Diffusion steps stored as pixels",
+      "Labels used for supervised regression"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: embeddings encode semantic meaning as vectors.",
+      "Incorrect. Choosing Prompt templates stored as tokens confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors.",
+      "Incorrect. Choosing Diffusion steps stored as pixels confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors.",
+      "Incorrect. Choosing Labels used for supervised regression confuses a related capability with the actual requirement. It does not satisfy the scenario because embeddings encode semantic meaning as vectors."
+    ],
+    "principle": "embeddings encode semantic meaning as vectors",
+    "relatedConcept": "Vector similarity enables semantic retrieval beyond exact keyword matching.",
+    "overallExplanation": "The decisive rule is that embeddings encode semantic meaning as vectors. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 203,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A RAG assistant retrieves entire 400-page manuals for every question and often misses the relevant sentence because the context is noisy and exceeds model limits. Which preparation change helps most?",
+    "options": [
+      "Chunk documents into coherent smaller passages before embedding",
+      "Increase temperature to make retrieval more creative",
+      "Translate every manual before indexing",
+      "Use reinforcement rewards at inference time"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: chunking creates retrievable units that fit useful context windows.",
+      "Incorrect. Choosing Increase temperature to make retrieval more creative confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows.",
+      "Incorrect. Choosing Translate every manual before indexing confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows.",
+      "Incorrect. Choosing Use reinforcement rewards at inference time confuses a related capability with the actual requirement. It does not satisfy the scenario because chunking creates retrievable units that fit useful context windows."
+    ],
+    "principle": "chunking creates retrievable units that fit useful context windows",
+    "relatedConcept": "Document segmentation strongly affects retrieval precision and context quality.",
+    "overallExplanation": "The decisive rule is that chunking creates retrievable units that fit useful context windows. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 204,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A design studio needs text instructions to produce original product concept images rather than classify existing photographs. Which model category best matches?",
+    "options": [
+      "A diffusion-based generative model",
+      "A binary classifier",
+      "A clustering algorithm",
+      "A time-series forecaster"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: diffusion models are commonly used for image generation.",
+      "Incorrect. Choosing A binary classifier confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation.",
+      "Incorrect. Choosing A clustering algorithm confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation.",
+      "Incorrect. Choosing A time-series forecaster confuses a related capability with the actual requirement. It does not satisfy the scenario because diffusion models are commonly used for image generation."
+    ],
+    "principle": "diffusion models are commonly used for image generation",
+    "relatedConcept": "Generative model families are selected according to the modality being created.",
+    "overallExplanation": "The decisive rule is that diffusion models are commonly used for image generation. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 205,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A team begins an FM project by choosing data and a model, then plans customization, evaluation, deployment, and feedback collection. Which lifecycle statement is correct?",
+    "options": [
+      "Evaluation should occur before deployment and continue with production feedback",
+      "Deployment should precede model selection",
+      "Feedback eliminates the need for evaluation",
+      "Pre-training must be repeated for every application"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: the FM lifecycle validates before release and learns from feedback afterward.",
+      "Incorrect. Choosing Deployment should precede model selection confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward.",
+      "Incorrect. Choosing Feedback eliminates the need for evaluation confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward.",
+      "Incorrect. Choosing Pre-training must be repeated for every application confuses a related capability with the actual requirement. It does not satisfy the scenario because the FM lifecycle validates before release and learns from feedback afterward."
+    ],
+    "principle": "the FM lifecycle validates before release and learns from feedback afterward",
+    "relatedConcept": "Foundation models move through selection, customization, evaluation, deployment, and feedback.",
+    "overallExplanation": "The decisive rule is that the FM lifecycle validates before release and learns from feedback afterward. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 206,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A meeting assistant accepts audio plus presentation screenshots and produces a text summary with referenced slide content. What capability is required?",
+    "options": [
+      "A multimodal model that handles audio, images, and text",
+      "A text-only regression model",
+      "An unsupervised tabular clusterer",
+      "A diffusion model limited to image creation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: multimodal models reason across more than one input modality.",
+      "Incorrect. Choosing A text-only regression model confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality.",
+      "Incorrect. Choosing An unsupervised tabular clusterer confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality.",
+      "Incorrect. Choosing A diffusion model limited to image creation confuses a related capability with the actual requirement. It does not satisfy the scenario because multimodal models reason across more than one input modality."
+    ],
+    "principle": "multimodal models reason across more than one input modality",
+    "relatedConcept": "The model must support every modality the application supplies.",
+    "overallExplanation": "The decisive rule is that multimodal models reason across more than one input modality. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 207,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "multi",
+    "question": "A travel assistant plans a trip, calls flight and hotel systems, remembers constraints, recovers when a booking fails, and asks for approval before purchase. Which two capabilities distinguish this agentic design from a one-shot text response? (Choose two.)",
+    "options": [
+      "Goal-directed workflow orchestration across multiple steps",
+      "Tool use combined with memory of task state",
+      "Image diffusion for every intermediate decision",
+      "A batch classifier that returns one fixed label"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. The assistant pursues a goal through a sequence of decisions and recovery steps instead of producing only one generated response.",
+      "Correct. Calling external systems and retaining constraints and prior results are core tool-use and memory capabilities in agentic workflows.",
+      "Incorrect. Diffusion is a generative modeling approach commonly associated with media; it is not what creates planning or controlled tool use.",
+      "Incorrect. A batch classifier can label accumulated records, but it does not plan, maintain task state, or sequence external actions toward a goal."
+    ],
+    "principle": "agentic AI combines goal-directed planning with tools and state",
+    "relatedConcept": "Agents extend generation into controlled multi-step action.",
+    "overallExplanation": "The decisive rule is that agentic AI combines goal-directed planning with tools and state. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 208,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "multi",
+    "question": "Two specialized agents must exchange structured task context while connecting to external calendars and inventory systems through a standard interface. Which two concepts are relevant? (Choose two.)",
+    "options": [
+      "Multi-agent communication patterns",
+      "Model Context Protocol connections to external systems",
+      "Higher temperature for deterministic tool calls",
+      "Image diffusion for workflow state"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: multi-agent coordination and MCP address collaboration and external-system access.",
+      "Correct. This option follows the decisive rule: multi-agent coordination and MCP address collaboration and external-system access.",
+      "Incorrect. Choosing Higher temperature for deterministic tool calls confuses a related capability with the actual requirement. It does not satisfy the scenario because multi-agent coordination and MCP address collaboration and external-system access.",
+      "Incorrect. Choosing Image diffusion for workflow state confuses a related capability with the actual requirement. It does not satisfy the scenario because multi-agent coordination and MCP address collaboration and external-system access."
+    ],
+    "principle": "multi-agent coordination and MCP address collaboration and external-system access",
+    "relatedConcept": "Agentic architecture includes communication, tools, memory, and workflow orchestration.",
+    "overallExplanation": "The decisive rule is that multi-agent coordination and MCP address collaboration and external-system access. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 209,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "An assistant has a 200-page policy library, the user's role, conversation history, and current case facts. Sending everything reduces answer quality. What does context engineering emphasize?",
+    "options": [
+      "Selecting and structuring the most relevant information for each model call",
+      "Training a new foundation model from raw internet data",
+      "Increasing output tokens regardless of task",
+      "Replacing retrieval with a longer system prompt"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: context engineering deliberately assembles useful information within constraints.",
+      "Incorrect. Choosing Training a new foundation model from raw internet data confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints.",
+      "Incorrect. Choosing Increasing output tokens regardless of task confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints.",
+      "Incorrect. Choosing Replacing retrieval with a longer system prompt confuses a related capability with the actual requirement. It does not satisfy the scenario because context engineering deliberately assembles useful information within constraints."
+    ],
+    "principle": "context engineering deliberately assembles useful information within constraints",
+    "relatedConcept": "Good context is curated and structured rather than merely maximized.",
+    "overallExplanation": "The decisive rule is that context engineering deliberately assembles useful information within constraints. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 210,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A finance team compares two models with equal answer quality. Model A averages 900 input and 200 output tokens; Model B averages 2,000 input and 400 output tokens at similar rates. Which statement is most accurate?",
+    "options": [
+      "Model A should have lower per-request token cost",
+      "Model B is cheaper because larger prompts are always cached",
+      "Token counts affect latency but never price",
+      "Only training data size determines inference cost"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: both input and output token volumes influence token-based inference cost.",
+      "Incorrect. Choosing Model B is cheaper because larger prompts are always cached confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost.",
+      "Incorrect. Choosing Token counts affect latency but never price confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost.",
+      "Incorrect. Choosing Only training data size determines inference cost confuses a related capability with the actual requirement. It does not satisfy the scenario because both input and output token volumes influence token-based inference cost."
+    ],
+    "principle": "both input and output token volumes influence token-based inference cost",
+    "relatedConcept": "Cost comparisons must use real request sizes as well as published rates.",
+    "overallExplanation": "The decisive rule is that both input and output token volumes influence token-based inference cost. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 211,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "multi",
+    "question": "A retailer wants an assistant to create text descriptions from product images and also answer questions about those images. Which two requirements should guide model selection? (Choose two.)",
+    "options": [
+      "Support for image input and text output",
+      "A context window large enough for the supplied content",
+      "A regression loss exposed to end users",
+      "A reward signal for every inference"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: modality support and context capacity are necessary application constraints.",
+      "Correct. This option follows the decisive rule: modality support and context capacity are necessary application constraints.",
+      "Incorrect. Choosing A regression loss exposed to end users confuses a related capability with the actual requirement. It does not satisfy the scenario because modality support and context capacity are necessary application constraints.",
+      "Incorrect. Choosing A reward signal for every inference confuses a related capability with the actual requirement. It does not satisfy the scenario because modality support and context capacity are necessary application constraints."
+    ],
+    "principle": "modality support and context capacity are necessary application constraints",
+    "relatedConcept": "Model capabilities must match input types and expected output.",
+    "overallExplanation": "The decisive rule is that modality support and context capacity are necessary application constraints. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 212,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Explain the basic concepts of generative AI (GenAI).",
+    "type": "single",
+    "question": "A company connects an agent to a CRM using MCP but assumes the protocol will automatically decide which customer record an employee may view. What is the correct interpretation?",
+    "options": [
+      "MCP standardizes context and tool connections; authorization still needs enforcement",
+      "MCP grants universal least-privilege access by default",
+      "MCP is a model-training algorithm that removes access control",
+      "MCP replaces workflow orchestration and agent memory"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: a connection protocol does not replace identity and authorization controls.",
+      "Incorrect. Choosing MCP grants universal least-privilege access by default confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls.",
+      "Incorrect. Choosing MCP is a model-training algorithm that removes access control confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls.",
+      "Incorrect. Choosing MCP replaces workflow orchestration and agent memory confuses a related capability with the actual requirement. It does not satisfy the scenario because a connection protocol does not replace identity and authorization controls."
+    ],
+    "principle": "a connection protocol does not replace identity and authorization controls",
+    "relatedConcept": "Agent tools remain subject to the security boundaries of external systems.",
+    "overallExplanation": "The decisive rule is that a connection protocol does not replace identity and authorization controls. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 213,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A communications team needs rapid first drafts for dozens of audiences and wants editors to refine them rather than write every version from scratch. Which GenAI advantage is most relevant?",
+    "options": [
+      "Adaptable content generation from natural-language instructions",
+      "Guaranteed factual correctness without review",
+      "Perfect deterministic output on every run",
+      "Automatic legal approval of generated claims"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Incorrect. Choosing Guaranteed factual correctness without review confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Incorrect. Choosing Perfect deterministic output on every run confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval.",
+      "Incorrect. Choosing Automatic legal approval of generated claims confuses a related capability with the actual requirement. It does not satisfy the scenario because GenAI accelerates varied content creation but does not guarantee truth or approval."
+    ],
+    "principle": "GenAI accelerates varied content creation but does not guarantee truth or approval",
+    "relatedConcept": "Business value comes from pairing versatile generation with suitable oversight.",
+    "overallExplanation": "The decisive rule is that GenAI accelerates varied content creation but does not guarantee truth or approval. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 214,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A customer assistant sometimes invents return-policy details that sound plausible when source material is missing. Which limitation is being observed?",
+    "options": [
+      "Hallucination",
+      "Clustering",
+      "Tokenization",
+      "Deterministic rule execution"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: hallucination is plausible but unsupported generated content.",
+      "Incorrect. Choosing Clustering confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content.",
+      "Incorrect. Choosing Tokenization confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content.",
+      "Incorrect. Choosing Deterministic rule execution confuses a related capability with the actual requirement. It does not satisfy the scenario because hallucination is plausible but unsupported generated content."
+    ],
+    "principle": "hallucination is plausible but unsupported generated content",
+    "relatedConcept": "Fluency is not evidence that a generated statement is grounded or accurate.",
+    "overallExplanation": "The decisive rule is that hallucination is plausible but unsupported generated content. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 215,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A regulated lender compares FMs for a multilingual assistant. It needs low latency, regional availability, documented licensing, and a strict monthly budget. Which factors must be evaluated?",
+    "options": [
+      "Capability, latency, compliance, regional coverage, and cost",
+      "Only parameter count",
+      "Only benchmark popularity",
+      "Only the longest available output"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: model selection is a multi-constraint business and technical decision.",
+      "Incorrect. Choosing Only parameter count confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision.",
+      "Incorrect. Choosing Only benchmark popularity confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision.",
+      "Incorrect. Choosing Only the longest available output confuses a related capability with the actual requirement. It does not satisfy the scenario because model selection is a multi-constraint business and technical decision."
+    ],
+    "principle": "model selection is a multi-constraint business and technical decision",
+    "relatedConcept": "The best model is the smallest viable fit across quality, risk, latency, and cost.",
+    "overallExplanation": "The decisive rule is that model selection is a multi-constraint business and technical decision. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 216,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A chatbot gives slightly different wording to the same request on repeated calls, even though the application has not changed. Which limitation does this illustrate?",
+    "options": [
+      "Nondeterminism in generated outputs",
+      "Data residency failure",
+      "Supervised-label leakage",
+      "Vector database corruption"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: probabilistic generation can vary across otherwise similar calls.",
+      "Incorrect. Choosing Data residency failure confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls.",
+      "Incorrect. Choosing Supervised-label leakage confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls.",
+      "Incorrect. Choosing Vector database corruption confuses a related capability with the actual requirement. It does not satisfy the scenario because probabilistic generation can vary across otherwise similar calls."
+    ],
+    "principle": "probabilistic generation can vary across otherwise similar calls",
+    "relatedConcept": "Applications must design evaluation and controls around variable outputs.",
+    "overallExplanation": "The decisive rule is that probabilistic generation can vary across otherwise similar calls. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 217,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A sales assistant cuts average proposal preparation from four hours to one hour but increases review time by twenty minutes. Which metric best captures the direct productivity value?",
+    "options": [
+      "Net staff time saved per completed proposal",
+      "Total model parameter count",
+      "Number of prompt words",
+      "Size of the pre-training corpus"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: business value should measure the workflow outcome changed by the application.",
+      "Incorrect. Choosing Total model parameter count confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application.",
+      "Incorrect. Choosing Number of prompt words confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application.",
+      "Incorrect. Choosing Size of the pre-training corpus confuses a related capability with the actual requirement. It does not satisfy the scenario because business value should measure the workflow outcome changed by the application."
+    ],
+    "principle": "business value should measure the workflow outcome changed by the application",
+    "relatedConcept": "GenAI metrics should connect model behavior to efficiency, revenue, or user outcomes.",
+    "overallExplanation": "The decisive rule is that business value should measure the workflow outcome changed by the application. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 218,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "An ecommerce team reports that an AI product-description feature increased conversion from 3.0% to 3.1%, but inference and review cost more than the incremental margin. What should the team conclude?",
+    "options": [
+      "Evaluate ROI; the conversion lift alone does not prove business value",
+      "Launch because any conversion increase justifies any cost",
+      "Measure only model latency",
+      "Increase model size before calculating cost"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: business value requires benefits to exceed full operating costs.",
+      "Incorrect. Choosing Launch because any conversion increase justifies any cost confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs.",
+      "Incorrect. Choosing Measure only model latency confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs.",
+      "Incorrect. Choosing Increase model size before calculating cost confuses a related capability with the actual requirement. It does not satisfy the scenario because business value requires benefits to exceed full operating costs."
+    ],
+    "principle": "business value requires benefits to exceed full operating costs",
+    "relatedConcept": "Outcome metrics and economics matter more than impressive model behavior.",
+    "overallExplanation": "The decisive rule is that business value requires benefits to exceed full operating costs. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 219,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "multi",
+    "question": "A legal assistant is highly fluent but cannot cite its claims, and repeated evaluation shows occasional fabricated precedents. Which two limitations require controls? (Choose two.)",
+    "options": [
+      "Hallucination and inaccuracy",
+      "Limited interpretability of how answers were produced",
+      "Excess labeled tabular data",
+      "Deterministic outputs that never vary"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: unsupported claims and limited interpretability are central GenAI risks.",
+      "Correct. This option follows the decisive rule: unsupported claims and limited interpretability are central GenAI risks.",
+      "Incorrect. Choosing Excess labeled tabular data confuses a related capability with the actual requirement. It does not satisfy the scenario because unsupported claims and limited interpretability are central GenAI risks.",
+      "Incorrect. Choosing Deterministic outputs that never vary confuses a related capability with the actual requirement. It does not satisfy the scenario because unsupported claims and limited interpretability are central GenAI risks."
+    ],
+    "principle": "unsupported claims and limited interpretability are central GenAI risks",
+    "relatedConcept": "High-stakes GenAI needs grounding, evaluation, and human review.",
+    "overallExplanation": "The decisive rule is that unsupported claims and limited interpretability are central GenAI risks. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 220,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A mobile help feature needs responses under 300 milliseconds, while the most capable model regularly takes three seconds and its extra quality is not visible to users. Which choice is best?",
+    "options": [
+      "Select a smaller model that meets quality and latency requirements",
+      "Always select the largest model available",
+      "Ignore latency because capability is the only criterion",
+      "Fine-tune the slow model without measuring serving time"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: the best model satisfies the actual performance envelope rather than maximizing size.",
+      "Incorrect. Choosing Always select the largest model available confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size.",
+      "Incorrect. Choosing Ignore latency because capability is the only criterion confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size.",
+      "Incorrect. Choosing Fine-tune the slow model without measuring serving time confuses a related capability with the actual requirement. It does not satisfy the scenario because the best model satisfies the actual performance envelope rather than maximizing size."
+    ],
+    "principle": "the best model satisfies the actual performance envelope rather than maximizing size",
+    "relatedConcept": "Model complexity, quality, latency, and cost involve tradeoffs.",
+    "overallExplanation": "The decisive rule is that the best model satisfies the actual performance envelope rather than maximizing size. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 221,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A team asks a GenAI model to calculate a safety-critical dosage where an exact approved formula already exists. Which limitation drives the right design?",
+    "options": [
+      "Nondeterministic generation is unsuitable for an exact deterministic calculation",
+      "Conversational ability makes formulas unnecessary",
+      "More tokens guarantee exact arithmetic",
+      "A broader model removes the need for validation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: exact safety rules should be implemented and validated deterministically.",
+      "Incorrect. Choosing Conversational ability makes formulas unnecessary confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically.",
+      "Incorrect. Choosing More tokens guarantee exact arithmetic confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically.",
+      "Incorrect. Choosing A broader model removes the need for validation confuses a related capability with the actual requirement. It does not satisfy the scenario because exact safety rules should be implemented and validated deterministically."
+    ],
+    "principle": "exact safety rules should be implemented and validated deterministically",
+    "relatedConcept": "GenAI is not automatically appropriate for every language-shaped interface.",
+    "overallExplanation": "The decisive rule is that exact safety rules should be implemented and validated deterministically. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 222,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A support pilot answers 90% of questions but frequently fails on one high-value enterprise product line. Which evaluation view is most useful?",
+    "options": [
+      "Measure performance by product segment as well as aggregate accuracy",
+      "Use only the overall 90% score",
+      "Count output tokens as the success metric",
+      "Replace customer outcomes with model size"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: cross-domain and subgroup performance can reveal hidden business failures.",
+      "Incorrect. Choosing Use only the overall 90% score confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures.",
+      "Incorrect. Choosing Count output tokens as the success metric confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures.",
+      "Incorrect. Choosing Replace customer outcomes with model size confuses a related capability with the actual requirement. It does not satisfy the scenario because cross-domain and subgroup performance can reveal hidden business failures."
+    ],
+    "principle": "cross-domain and subgroup performance can reveal hidden business failures",
+    "relatedConcept": "Aggregate quality can conceal poor performance where value or risk is concentrated.",
+    "overallExplanation": "The decisive rule is that cross-domain and subgroup performance can reveal hidden business failures. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 223,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "single",
+    "question": "A creative-writing tool is expected to propose diverse slogans, while a policy-answering bot must remain consistent and grounded. Which statement is correct?",
+    "options": [
+      "Different use cases require different tolerance for variability and risk",
+      "Both should maximize temperature and novelty",
+      "Both should eliminate all human review",
+      "One universal quality metric is sufficient"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: application purpose determines acceptable creativity, consistency, and oversight.",
+      "Incorrect. Choosing Both should maximize temperature and novelty confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight.",
+      "Incorrect. Choosing Both should eliminate all human review confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight.",
+      "Incorrect. Choosing One universal quality metric is sufficient confuses a related capability with the actual requirement. It does not satisfy the scenario because application purpose determines acceptable creativity, consistency, and oversight."
+    ],
+    "principle": "application purpose determines acceptable creativity, consistency, and oversight",
+    "relatedConcept": "GenAI capabilities and limitations must be judged in the business context.",
+    "overallExplanation": "The decisive rule is that application purpose determines acceptable creativity, consistency, and oversight. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 224,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Understand the capabilities and limitations of GenAI for solving business problems.",
+    "type": "multi",
+    "question": "A procurement team compares an inexpensive text-only model with a costlier multimodal model for summarizing text contracts only. Which two selection criteria favor the text model? (Choose two.)",
+    "options": [
+      "The required modality is text only",
+      "Lower cost matters when quality is sufficient",
+      "Unused image capability automatically improves summaries",
+      "Greater complexity is always safer for compliance"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: pay only for capabilities needed to meet measured requirements.",
+      "Correct. This option follows the decisive rule: pay only for capabilities needed to meet measured requirements.",
+      "Incorrect. Choosing Unused image capability automatically improves summaries confuses a related capability with the actual requirement. It does not satisfy the scenario because pay only for capabilities needed to meet measured requirements.",
+      "Incorrect. Choosing Greater complexity is always safer for compliance confuses a related capability with the actual requirement. It does not satisfy the scenario because pay only for capabilities needed to meet measured requirements."
+    ],
+    "principle": "pay only for capabilities needed to meet measured requirements",
+    "relatedConcept": "Model selection should avoid complexity that adds cost without business value.",
+    "overallExplanation": "The decisive rule is that pay only for capabilities needed to meet measured requirements. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 225,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A startup wants to access several managed foundation models through one AWS service without operating model-serving infrastructure. Which service is the primary fit?",
+    "options": [
+      "Amazon Bedrock",
+      "Amazon SageMaker AI training jobs",
+      "Amazon Transcribe",
+      "AWS Glue DataBrew"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Amazon Bedrock provides managed access to foundation models for GenAI applications.",
+      "Incorrect. Choosing Amazon SageMaker AI training jobs confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications.",
+      "Incorrect. Choosing Amazon Transcribe confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications.",
+      "Incorrect. Choosing AWS Glue DataBrew confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock provides managed access to foundation models for GenAI applications."
+    ],
+    "principle": "Amazon Bedrock provides managed access to foundation models for GenAI applications",
+    "relatedConcept": "Managed FM access lowers the infrastructure barrier to application development.",
+    "overallExplanation": "The decisive rule is that Amazon Bedrock provides managed access to foundation models for GenAI applications. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 226,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A research team needs deep control over training code, custom algorithms, experiments, and model hosting rather than only invoking managed FMs. Which service is the better fit?",
+    "options": [
+      "Amazon SageMaker AI",
+      "Amazon Polly",
+      "Amazon Quick",
+      "AWS Artifact"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: SageMaker AI supports custom model development training and deployment.",
+      "Incorrect. Choosing Amazon Polly confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment.",
+      "Incorrect. Choosing Amazon Quick confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment.",
+      "Incorrect. Choosing AWS Artifact confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker AI supports custom model development training and deployment."
+    ],
+    "principle": "SageMaker AI supports custom model development training and deployment",
+    "relatedConcept": "Bedrock and SageMaker AI serve overlapping but distinct levels of customization.",
+    "overallExplanation": "The decisive rule is that SageMaker AI supports custom model development training and deployment. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 227,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A developer wants to discover and deploy a pre-trained model from a curated model hub within the SageMaker AI environment. Which feature best fits?",
+    "options": [
+      "SageMaker JumpStart",
+      "Amazon Bedrock Guardrails",
+      "Amazon Macie",
+      "AWS Cost Explorer"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: SageMaker JumpStart provides pre-trained models and solution templates.",
+      "Incorrect. Choosing Amazon Bedrock Guardrails confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates.",
+      "Incorrect. Choosing Amazon Macie confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates.",
+      "Incorrect. Choosing AWS Cost Explorer confuses a related capability with the actual requirement. It does not satisfy the scenario because SageMaker JumpStart provides pre-trained models and solution templates."
+    ],
+    "principle": "SageMaker JumpStart provides pre-trained models and solution templates",
+    "relatedConcept": "Model hubs accelerate experimentation without requiring pre-training from scratch.",
+    "overallExplanation": "The decisive rule is that SageMaker JumpStart provides pre-trained models and solution templates. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 228,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A business analyst wants natural-language assistance over governed business data and dashboards, rather than building a custom model endpoint. Which current in-scope AWS offering is most relevant?",
+    "options": [
+      "Amazon Quick",
+      "Amazon EC2 Auto Scaling",
+      "Amazon Inspector",
+      "Amazon S3 Glacier"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
+      "Incorrect. Choosing Amazon EC2 Auto Scaling confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
+      "Incorrect. Choosing Amazon Inspector confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences.",
+      "Incorrect. Choosing Amazon S3 Glacier confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Quick provides business intelligence and AI-assisted analytics experiences."
+    ],
+    "principle": "Amazon Quick provides business intelligence and AI-assisted analytics experiences",
+    "relatedConcept": "Service selection starts with the user's workflow and required level of development.",
+    "overallExplanation": "The decisive rule is that Amazon Quick provides business intelligence and AI-assisted analytics experiences. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 229,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A developer wants an AI-powered development environment to help turn requirements into code and iterate on an application. Which in-scope developer tool is the closest match?",
+    "options": [
+      "Kiro",
+      "Amazon Textract",
+      "AWS Audit Manager",
+      "Amazon Personalize"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Kiro is an AI development tool rather than a managed document or recommendation API.",
+      "Incorrect. Choosing Amazon Textract confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API.",
+      "Incorrect. Choosing AWS Audit Manager confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API.",
+      "Incorrect. Choosing Amazon Personalize confuses a related capability with the actual requirement. It does not satisfy the scenario because Kiro is an AI development tool rather than a managed document or recommendation API."
+    ],
+    "principle": "Kiro is an AI development tool rather than a managed document or recommendation API",
+    "relatedConcept": "AWS GenAI tooling includes developer experiences as well as model services.",
+    "overallExplanation": "The decisive rule is that Kiro is an AI development tool rather than a managed document or recommendation API. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 230,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A team is building agents in code and wants an open-source SDK for model-driven workflows and tool use. Which offering aligns with that goal?",
+    "options": [
+      "Strands Agents",
+      "Amazon Translate",
+      "AWS Budgets",
+      "Amazon RDS"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Strands Agents supports code-based agent development and tool orchestration.",
+      "Incorrect. Choosing Amazon Translate confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration.",
+      "Incorrect. Choosing AWS Budgets confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration.",
+      "Incorrect. Choosing Amazon RDS confuses a related capability with the actual requirement. It does not satisfy the scenario because Strands Agents supports code-based agent development and tool orchestration."
+    ],
+    "principle": "Strands Agents supports code-based agent development and tool orchestration",
+    "relatedConcept": "Agent frameworks help structure model tool use without becoming the authorization boundary.",
+    "overallExplanation": "The decisive rule is that Strands Agents supports code-based agent development and tool orchestration. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 231,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A production agent needs managed runtime capabilities for identity, policy, memory, tool access, and operational controls. Which offering most directly fits?",
+    "options": [
+      "Amazon Bedrock AgentCore",
+      "SageMaker Data Wrangler",
+      "Amazon Comprehend",
+      "AWS Glue DataBrew"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: Amazon Bedrock AgentCore provides infrastructure services for production agents.",
+      "Incorrect. Choosing SageMaker Data Wrangler confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents.",
+      "Incorrect. Choosing Amazon Comprehend confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents.",
+      "Incorrect. Choosing AWS Glue DataBrew confuses a related capability with the actual requirement. It does not satisfy the scenario because Amazon Bedrock AgentCore provides infrastructure services for production agents."
+    ],
+    "principle": "Amazon Bedrock AgentCore provides infrastructure services for production agents",
+    "relatedConcept": "Production agent infrastructure extends beyond the foundation-model invocation itself.",
+    "overallExplanation": "The decisive rule is that Amazon Bedrock AgentCore provides infrastructure services for production agents. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 232,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A healthcare company wants to use managed GenAI while retaining encryption, IAM controls, auditability, and regional service choices. Which AWS infrastructure benefits are relevant?",
+    "options": [
+      "Security and compliance controls integrated with AWS services",
+      "A guarantee that every generated answer is correct",
+      "Automatic exemption from healthcare obligations",
+      "Removal of the customer side of shared responsibility"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: managed infrastructure supplies controls but does not transfer all responsibility.",
+      "Incorrect. Choosing A guarantee that every generated answer is correct confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility.",
+      "Incorrect. Choosing Automatic exemption from healthcare obligations confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility.",
+      "Incorrect. Choosing Removal of the customer side of shared responsibility confuses a related capability with the actual requirement. It does not satisfy the scenario because managed infrastructure supplies controls but does not transfer all responsibility."
+    ],
+    "principle": "managed infrastructure supplies controls but does not transfer all responsibility",
+    "relatedConcept": "Cloud security capabilities support, rather than replace, responsible application governance.",
+    "overallExplanation": "The decisive rule is that managed infrastructure supplies controls but does not transfer all responsibility. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 233,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "An application has predictable high sustained demand. The team compares on-demand token billing with provisioned throughput. Which tradeoff should be analyzed?",
+    "options": [
+      "Commitment and utilization versus predictable capacity and price",
+      "Whether provisioned throughput removes all token limits forever",
+      "Whether on-demand requires pre-training a custom FM",
+      "Whether redundancy eliminates regional availability needs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Incorrect. Choosing Whether provisioned throughput removes all token limits forever confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Incorrect. Choosing Whether on-demand requires pre-training a custom FM confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it.",
+      "Incorrect. Choosing Whether redundancy eliminates regional availability needs confuses a related capability with the actual requirement. It does not satisfy the scenario because capacity commitment is valuable only when utilization and service requirements justify it."
+    ],
+    "principle": "capacity commitment is valuable only when utilization and service requirements justify it",
+    "relatedConcept": "GenAI cost options trade flexibility against predictable performance.",
+    "overallExplanation": "The decisive rule is that capacity commitment is valuable only when utilization and service requirements justify it. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 234,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A global assistant must operate in three regions, but its preferred model is available in only one of them. What should the architecture team consider?",
+    "options": [
+      "Model regional coverage, compliance constraints, and fallback choices",
+      "Assume every Bedrock model is available in every region",
+      "Copy model weights between regions without authorization",
+      "Ignore residency because managed services remove it"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: model availability and data constraints are region specific.",
+      "Incorrect. Choosing Assume every Bedrock model is available in every region confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific.",
+      "Incorrect. Choosing Copy model weights between regions without authorization confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific.",
+      "Incorrect. Choosing Ignore residency because managed services remove it confuses a related capability with the actual requirement. It does not satisfy the scenario because model availability and data constraints are region specific."
+    ],
+    "principle": "model availability and data constraints are region specific",
+    "relatedConcept": "Regional coverage is a real model-selection and resilience constraint.",
+    "overallExplanation": "The decisive rule is that model availability and data constraints are region specific. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 235,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "multi",
+    "question": "A small team needs the fastest route to a proof of concept, while another team needs custom training and fine-grained model control. Which two mappings are reasonable? (Choose two.)",
+    "options": [
+      "Use Amazon Bedrock for managed FM experimentation",
+      "Use SageMaker AI for custom training and hosting",
+      "Use AWS Artifact to train the custom model",
+      "Use Amazon Polly as a general multi-model platform"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: managed FM access and custom ML platforms solve different development needs.",
+      "Correct. This option follows the decisive rule: managed FM access and custom ML platforms solve different development needs.",
+      "Incorrect. Choosing Use AWS Artifact to train the custom model confuses a related capability with the actual requirement. It does not satisfy the scenario because managed FM access and custom ML platforms solve different development needs.",
+      "Incorrect. Choosing Use Amazon Polly as a general multi-model platform confuses a related capability with the actual requirement. It does not satisfy the scenario because managed FM access and custom ML platforms solve different development needs."
+    ],
+    "principle": "managed FM access and custom ML platforms solve different development needs",
+    "relatedConcept": "AWS services lower barriers at different layers of the GenAI stack.",
+    "overallExplanation": "The decisive rule is that managed FM access and custom ML platforms solve different development needs. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  },
+  {
+    "id": 236,
+    "domain": "Fundamentals of GenAI",
+    "objective": "Describe AWS infrastructure and technologies for building GenAI applications.",
+    "type": "single",
+    "question": "A finance app chooses a larger custom model that costs six times more but improves a low-risk summarization score by only 0.3%. Which recommendation is best?",
+    "options": [
+      "Use the lowest-cost model that meets measured business requirements",
+      "Choose the largest model because complexity always improves ROI",
+      "Provision maximum throughput before measuring demand",
+      "Add multi-region redundancy solely to improve summary style"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This option follows the decisive rule: cost effectiveness means paying for measurable business value.",
+      "Incorrect. Choosing Choose the largest model because complexity always improves ROI confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value.",
+      "Incorrect. Choosing Provision maximum throughput before measuring demand confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value.",
+      "Incorrect. Choosing Add multi-region redundancy solely to improve summary style confuses a related capability with the actual requirement. It does not satisfy the scenario because cost effectiveness means paying for measurable business value."
+    ],
+    "principle": "cost effectiveness means paying for measurable business value",
+    "relatedConcept": "Customization, capacity, redundancy, and model size all need an explicit benefit.",
+    "overallExplanation": "The decisive rule is that cost effectiveness means paying for measurable business value. Applying that rule identifies the correct response while excluding choices that solve a different problem."
+  }
+]
