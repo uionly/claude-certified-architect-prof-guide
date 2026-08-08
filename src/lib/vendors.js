@@ -10,7 +10,7 @@ export const VENDOR_LABELS = {
 
 // Easiest first within a vendor. A cert missing from this list is still rendered — it is
 // appended after the ordered ones, never silently dropped.
-const CERT_ORDER = ['CCAO-F', 'CCDV-F', 'CCAR-F', 'CCAR-P', 'AI-103', 'AI-200', 'AIF-C01']
+const CERT_ORDER = ['CCAO-F', 'CCDV-F', 'CCAR-F', 'CCAR-P', 'AI-103', 'AI-200', 'AIF-C01', 'AIP-C01']
 
 const LAST = Number.MAX_SAFE_INTEGER
 

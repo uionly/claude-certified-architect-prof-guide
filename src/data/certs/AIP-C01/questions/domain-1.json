@@ -1,0 +1,1512 @@
+[
+  {
+    "id": 101,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "multi",
+    "question": "A bank wants a GenAI assistant for policy questions. Answers must cite approved documents, enforce employee entitlements, and remain available during one-region failures. Which two architecture elements address these requirements? (Choose two.)",
+    "options": [
+      "RAG that returns source citations from approved documents",
+      "Authorization-filtered retrieval with a tested regional failover path",
+      "A single large prompt containing every policy and no authorization filter",
+      "Fine-tune on policies and let the model decide document access"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Source-grounded retrieval and citations provide the traceability required for policy answers without relying on model memory.",
+      "Correct. Verified entitlements must constrain retrieval, while a tested regional path addresses the stated availability requirement.",
+      "Incorrect. Choosing A single large prompt containing every policy and no authorization filter addresses a related concern but misses the decisive constraint. The required design follows the rule that architecture must combine grounding authorization traceability and resilience.",
+      "Incorrect. Choosing Fine-tune on policies and let the model decide document access addresses a related concern but misses the decisive constraint. The required design follows the rule that architecture must combine grounding authorization traceability and resilience."
+    ],
+    "principle": "architecture must combine grounding authorization traceability and resilience",
+    "relatedConcept": "Professional solution design turns business constraints into multiple enforceable components.",
+    "overallExplanation": "The decisive production principle is that architecture must combine grounding authorization traceability and resilience. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 102,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "A retailer proposes rolling a customer-facing agent to 20 million users before measuring task completion, latency, safety, or cost with realistic traffic. What should the team do first?",
+    "options": [
+      "Build a bounded proof of concept with explicit success and failure criteria",
+      "Purchase provisioned throughput for peak traffic immediately",
+      "Fine-tune the largest model before establishing a baseline",
+      "Skip evaluation because managed models are already production ready"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: a proof of concept validates feasibility quality cost and risk before scale.",
+      "Incorrect. Choosing Purchase provisioned throughput for peak traffic immediately addresses a related concern but misses the decisive constraint. The required design follows the rule that a proof of concept validates feasibility quality cost and risk before scale.",
+      "Incorrect. Choosing Fine-tune the largest model before establishing a baseline addresses a related concern but misses the decisive constraint. The required design follows the rule that a proof of concept validates feasibility quality cost and risk before scale.",
+      "Incorrect. Choosing Skip evaluation because managed models are already production ready addresses a related concern but misses the decisive constraint. The required design follows the rule that a proof of concept validates feasibility quality cost and risk before scale."
+    ],
+    "principle": "a proof of concept validates feasibility quality cost and risk before scale",
+    "relatedConcept": "PoCs should answer named uncertainties rather than merely demonstrate fluent output.",
+    "overallExplanation": "The decisive production principle is that a proof of concept validates feasibility quality cost and risk before scale. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 103,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "Five product teams independently implement authentication, prompt logging, guardrails, and model invocation, producing incompatible controls and duplicated defects. Which design improvement has the highest leverage?",
+    "options": [
+      "Create governed reusable components for common GenAI capabilities",
+      "Let every team choose unrelated security patterns",
+      "Put all business logic into a universal system prompt",
+      "Remove shared observability to preserve team autonomy"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: standardized governed components improve consistency and reviewability.",
+      "Incorrect. Choosing Let every team choose unrelated security patterns addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized governed components improve consistency and reviewability.",
+      "Incorrect. Choosing Put all business logic into a universal system prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized governed components improve consistency and reviewability.",
+      "Incorrect. Choosing Remove shared observability to preserve team autonomy addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized governed components improve consistency and reviewability."
+    ],
+    "principle": "standardized governed components improve consistency and reviewability",
+    "relatedConcept": "The Generative AI Lens helps teams evaluate reusable architecture against operational principles.",
+    "overallExplanation": "The decisive production principle is that standardized governed components improve consistency and reviewability. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 104,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "multi",
+    "question": "A healthcare assistant needs subsecond triage suggestions, human approval for clinical actions, strict PHI controls, and an auditable source trail. Which two design decisions are essential? (Choose two.)",
+    "options": [
+      "Keep clinical actions behind a human approval workflow",
+      "Filter retrieval by patient and clinician authorization",
+      "Increase temperature to expose alternative diagnoses",
+      "Store full conversations indefinitely for debugging"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: high-impact workflows require human authority and data-scoped retrieval.",
+      "Correct. This choice applies the key production rule: high-impact workflows require human authority and data-scoped retrieval.",
+      "Incorrect. Choosing Increase temperature to expose alternative diagnoses addresses a related concern but misses the decisive constraint. The required design follows the rule that high-impact workflows require human authority and data-scoped retrieval.",
+      "Incorrect. Choosing Store full conversations indefinitely for debugging addresses a related concern but misses the decisive constraint. The required design follows the rule that high-impact workflows require human authority and data-scoped retrieval."
+    ],
+    "principle": "high-impact workflows require human authority and data-scoped retrieval",
+    "relatedConcept": "Architecture must satisfy safety privacy latency and audit requirements together.",
+    "overallExplanation": "The decisive production principle is that high-impact workflows require human authority and data-scoped retrieval. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 105,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "A manufacturer wants a maintenance copilot but has no reliable maintenance corpus, no labeled outcome data, and no agreement on which technician workflow it should improve. What should architecture discovery prioritize?",
+    "options": [
+      "Define the target workflow and assess source-data readiness before selecting a model",
+      "Select the model with the largest context window first",
+      "Build a multi-agent system before interviewing technicians",
+      "Commit to custom training because data quality can be fixed later"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: business workflow and data feasibility precede model and orchestration choices.",
+      "Incorrect. Choosing Select the model with the largest context window first addresses a related concern but misses the decisive constraint. The required design follows the rule that business workflow and data feasibility precede model and orchestration choices.",
+      "Incorrect. Choosing Build a multi-agent system before interviewing technicians addresses a related concern but misses the decisive constraint. The required design follows the rule that business workflow and data feasibility precede model and orchestration choices.",
+      "Incorrect. Choosing Commit to custom training because data quality can be fixed later addresses a related concern but misses the decisive constraint. The required design follows the rule that business workflow and data feasibility precede model and orchestration choices."
+    ],
+    "principle": "business workflow and data feasibility precede model and orchestration choices",
+    "relatedConcept": "Model choice cannot compensate for an undefined outcome or unusable source data.",
+    "overallExplanation": "The decisive production principle is that business workflow and data feasibility precede model and orchestration choices. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 106,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "A proof of concept reaches 92% answer accuracy but violates the 800-ms latency target and costs four times the approved amount at expected volume. What is the correct decision?",
+    "options": [
+      "Treat the PoC as failing current feasibility criteria and redesign the solution",
+      "Approve production because accuracy is the only meaningful signal",
+      "Hide latency with a longer user timeout",
+      "Buy peak capacity without revisiting model and context choices"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: production feasibility includes quality latency cost safety and operations.",
+      "Incorrect. Choosing Approve production because accuracy is the only meaningful signal addresses a related concern but misses the decisive constraint. The required design follows the rule that production feasibility includes quality latency cost safety and operations.",
+      "Incorrect. Choosing Hide latency with a longer user timeout addresses a related concern but misses the decisive constraint. The required design follows the rule that production feasibility includes quality latency cost safety and operations.",
+      "Incorrect. Choosing Buy peak capacity without revisiting model and context choices addresses a related concern but misses the decisive constraint. The required design follows the rule that production feasibility includes quality latency cost safety and operations."
+    ],
+    "principle": "production feasibility includes quality latency cost safety and operations",
+    "relatedConcept": "A PoC must validate the whole business envelope rather than one favorable metric.",
+    "overallExplanation": "The decisive production principle is that production feasibility includes quality latency cost safety and operations. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 107,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "An enterprise wants every GenAI workload reviewed consistently for reliability, security, cost, operational excellence, and responsible AI considerations. Which AWS resource most directly supports this architecture review?",
+    "options": [
+      "AWS Well-Architected Tool with the Generative AI Lens",
+      "Amazon Transcribe vocabulary filters",
+      "S3 Transfer Acceleration",
+      "SageMaker Ground Truth labeling jobs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: the Generative AI Lens structures repeatable workload reviews.",
+      "Incorrect. Choosing Amazon Transcribe vocabulary filters addresses a related concern but misses the decisive constraint. The required design follows the rule that the Generative AI Lens structures repeatable workload reviews.",
+      "Incorrect. Choosing S3 Transfer Acceleration addresses a related concern but misses the decisive constraint. The required design follows the rule that the Generative AI Lens structures repeatable workload reviews.",
+      "Incorrect. Choosing SageMaker Ground Truth labeling jobs addresses a related concern but misses the decisive constraint. The required design follows the rule that the Generative AI Lens structures repeatable workload reviews."
+    ],
+    "principle": "the Generative AI Lens structures repeatable workload reviews",
+    "relatedConcept": "Architecture governance benefits from a common review framework and recorded improvements.",
+    "overallExplanation": "The decisive production principle is that the Generative AI Lens structures repeatable workload reviews. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 108,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "multi",
+    "question": "A legal-document generator has a mandatory approval step, regional data residency, and a recovery-time objective of fifteen minutes. Which two artifacts should the architecture produce before implementation? (Choose two.)",
+    "options": [
+      "A data-flow and trust-boundary design showing residency and access",
+      "A failure-mode and recovery design mapped to the RTO",
+      "Only a model benchmark leaderboard",
+      "Only a list of prompt examples"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: architecture artifacts must make security boundaries and recovery behavior explicit.",
+      "Correct. This choice applies the key production rule: architecture artifacts must make security boundaries and recovery behavior explicit.",
+      "Incorrect. Choosing Only a model benchmark leaderboard addresses a related concern but misses the decisive constraint. The required design follows the rule that architecture artifacts must make security boundaries and recovery behavior explicit.",
+      "Incorrect. Choosing Only a list of prompt examples addresses a related concern but misses the decisive constraint. The required design follows the rule that architecture artifacts must make security boundaries and recovery behavior explicit."
+    ],
+    "principle": "architecture artifacts must make security boundaries and recovery behavior explicit",
+    "relatedConcept": "Implementation teams need traceable decisions for data flows integrations and failure handling.",
+    "overallExplanation": "The decisive production principle is that architecture artifacts must make security boundaries and recovery behavior explicit. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 109,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Analyze requirements and design GenAI solutions.",
+    "type": "single",
+    "question": "A team evaluates whether a new GenAI claims workflow creates value. It measures model fluency but not adjuster time, escalation rate, or cost per completed claim. What is missing?",
+    "options": [
+      "Business outcome metrics linked to the proposed workflow",
+      "A larger embedding dimension",
+      "More model providers in the architecture",
+      "A GPU endpoint for every development environment"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: success criteria must connect technical performance to business value.",
+      "Incorrect. Choosing A larger embedding dimension addresses a related concern but misses the decisive constraint. The required design follows the rule that success criteria must connect technical performance to business value.",
+      "Incorrect. Choosing More model providers in the architecture addresses a related concern but misses the decisive constraint. The required design follows the rule that success criteria must connect technical performance to business value.",
+      "Incorrect. Choosing A GPU endpoint for every development environment addresses a related concern but misses the decisive constraint. The required design follows the rule that success criteria must connect technical performance to business value."
+    ],
+    "principle": "success criteria must connect technical performance to business value",
+    "relatedConcept": "A technically impressive system is not viable unless it improves the intended operating outcome.",
+    "overallExplanation": "The decisive production principle is that success criteria must connect technical performance to business value. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 110,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "multi",
+    "question": "A multilingual support service compares three Bedrock models. One leads a public benchmark but misses required languages and exceeds the p95 latency budget. Which two selection practices are appropriate? (Choose two.)",
+    "options": [
+      "Evaluate quality and safety on representative requests in every required language",
+      "Reject candidates that cannot meet the measured latency and cost envelope",
+      "Choose the model with the most parameters",
+      "Choose whichever model has the longest marketing feature list"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Representative multilingual evaluation reveals task quality and safety behavior that an aggregate public benchmark can hide.",
+      "Correct. Latency and cost are explicit production constraints, so a model that violates them is not viable despite benchmark rank.",
+      "Incorrect. Choosing Choose the model with the most parameters addresses a related concern but misses the decisive constraint. The required design follows the rule that model selection must be based on representative workload constraints.",
+      "Incorrect. Choosing Choose whichever model has the longest marketing feature list addresses a related concern but misses the decisive constraint. The required design follows the rule that model selection must be based on representative workload constraints."
+    ],
+    "principle": "model selection must be based on representative workload constraints",
+    "relatedConcept": "Generic leaderboards cannot replace application-specific evaluation.",
+    "overallExplanation": "The decisive production principle is that model selection must be based on representative workload constraints. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 111,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "An application hardcodes provider-specific request schemas throughout business logic, making a model change require edits to twelve services. Which pattern improves flexibility?",
+    "options": [
+      "Place a stable model abstraction behind routing configuration such as AppConfig",
+      "Copy provider conditionals into every caller",
+      "Store provider names only in prompt text",
+      "Create one Lambda function per individual user"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: a configurable abstraction decouples callers from model providers.",
+      "Incorrect. Choosing Copy provider conditionals into every caller addresses a related concern but misses the decisive constraint. The required design follows the rule that a configurable abstraction decouples callers from model providers.",
+      "Incorrect. Choosing Store provider names only in prompt text addresses a related concern but misses the decisive constraint. The required design follows the rule that a configurable abstraction decouples callers from model providers.",
+      "Incorrect. Choosing Create one Lambda function per individual user addresses a related concern but misses the decisive constraint. The required design follows the rule that a configurable abstraction decouples callers from model providers."
+    ],
+    "principle": "a configurable abstraction decouples callers from model providers",
+    "relatedConcept": "Model portability depends on stable contracts and externalized routing decisions.",
+    "overallExplanation": "The decisive production principle is that a configurable abstraction decouples callers from model providers. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 112,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A regional Bedrock model outage must not stop a customer assistant. The model supports cross-region inference and degraded answers are acceptable during recovery. Which strategy is best?",
+    "options": [
+      "Use cross-region inference with circuit breaking and a tested fallback mode",
+      "Retry the failed region indefinitely with no backoff",
+      "Route all traffic to an untested custom model",
+      "Return fabricated cached answers without freshness metadata"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: resilience combines regional routing bounded retries and graceful degradation.",
+      "Incorrect. Choosing Retry the failed region indefinitely with no backoff addresses a related concern but misses the decisive constraint. The required design follows the rule that resilience combines regional routing bounded retries and graceful degradation.",
+      "Incorrect. Choosing Route all traffic to an untested custom model addresses a related concern but misses the decisive constraint. The required design follows the rule that resilience combines regional routing bounded retries and graceful degradation.",
+      "Incorrect. Choosing Return fabricated cached answers without freshness metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that resilience combines regional routing bounded retries and graceful degradation."
+    ],
+    "principle": "resilience combines regional routing bounded retries and graceful degradation",
+    "relatedConcept": "Continuity plans must be tested and preserve explicit behavior when dependencies fail.",
+    "overallExplanation": "The decisive production principle is that resilience combines regional routing bounded retries and graceful degradation. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 113,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A domain-adapted model is deployed from SageMaker AI. The team must promote versions, audit approvals, roll back bad releases, and retire superseded artifacts. Which service should anchor lifecycle control?",
+    "options": [
+      "SageMaker Model Registry",
+      "Amazon Polly lexicons",
+      "AWS Cost Explorer saved reports",
+      "Amazon S3 website hosting"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: a model registry provides versioned approval and deployment lineage.",
+      "Incorrect. Choosing Amazon Polly lexicons addresses a related concern but misses the decisive constraint. The required design follows the rule that a model registry provides versioned approval and deployment lineage.",
+      "Incorrect. Choosing AWS Cost Explorer saved reports addresses a related concern but misses the decisive constraint. The required design follows the rule that a model registry provides versioned approval and deployment lineage.",
+      "Incorrect. Choosing Amazon S3 website hosting addresses a related concern but misses the decisive constraint. The required design follows the rule that a model registry provides versioned approval and deployment lineage."
+    ],
+    "principle": "a model registry provides versioned approval and deployment lineage",
+    "relatedConcept": "Customized models require controlled promotion rollback and retirement.",
+    "overallExplanation": "The decisive production principle is that a model registry provides versioned approval and deployment lineage. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 114,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A team needs to adapt a large model to internal terminology with limited GPU memory and wants to avoid updating all model weights. Which technique is appropriate?",
+    "options": [
+      "Parameter-efficient adaptation such as LoRA",
+      "Full pre-training from random initialization",
+      "Increasing inference temperature",
+      "Replacing vector search with exact keyword matching"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: LoRA adapts a model through a small number of trainable parameters.",
+      "Incorrect. Choosing Full pre-training from random initialization addresses a related concern but misses the decisive constraint. The required design follows the rule that LoRA adapts a model through a small number of trainable parameters.",
+      "Incorrect. Choosing Increasing inference temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that LoRA adapts a model through a small number of trainable parameters.",
+      "Incorrect. Choosing Replacing vector search with exact keyword matching addresses a related concern but misses the decisive constraint. The required design follows the rule that LoRA adapts a model through a small number of trainable parameters."
+    ],
+    "principle": "LoRA adapts a model through a small number of trainable parameters",
+    "relatedConcept": "Customization method should reflect data compute and lifecycle constraints.",
+    "overallExplanation": "The decisive production principle is that LoRA adapts a model through a small number of trainable parameters. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 115,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "Routine requests can use a small inexpensive model, while complex regulated requests require a stronger model and additional controls. Which component should decide which model tier handles each request?",
+    "options": [
+      "A policy-driven routing layer based on request classification",
+      "A common response contract and evaluation suite for both models",
+      "Random model choice to distribute traffic",
+      "Provider details embedded directly in every client"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. The policy-driven router classifies each request and selects the model tier whose capability and controls match its complexity and risk.",
+      "Incorrect. A common response contract is important after routing, but it does not classify a request or select the correct model tier.",
+      "Incorrect. Choosing Random model choice to distribute traffic addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model routing needs governed selection and stable contracts.",
+      "Incorrect. Choosing Provider details embedded directly in every client addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model routing needs governed selection and stable contracts."
+    ],
+    "principle": "tiered model routing needs governed selection and stable contracts",
+    "relatedConcept": "Cascading can reduce cost only when quality and policy boundaries are preserved.",
+    "overallExplanation": "The decisive production principle is that tiered model routing needs governed selection and stable contracts. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 116,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A model replacement improves quality but changes tool-call JSON and breaks downstream validation in canary traffic. What should the team do?",
+    "options": [
+      "Roll back through the versioned deployment pipeline and update contract tests",
+      "Disable schema validation so the release can continue",
+      "Send all traffic to the candidate to gather more failures",
+      "Patch production responses manually without versioning"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: model changes require versioned rollback and interface contract testing.",
+      "Incorrect. Choosing Disable schema validation so the release can continue addresses a related concern but misses the decisive constraint. The required design follows the rule that model changes require versioned rollback and interface contract testing.",
+      "Incorrect. Choosing Send all traffic to the candidate to gather more failures addresses a related concern but misses the decisive constraint. The required design follows the rule that model changes require versioned rollback and interface contract testing.",
+      "Incorrect. Choosing Patch production responses manually without versioning addresses a related concern but misses the decisive constraint. The required design follows the rule that model changes require versioned rollback and interface contract testing."
+    ],
+    "principle": "model changes require versioned rollback and interface contract testing",
+    "relatedConcept": "FM lifecycle management covers behavioral contracts as well as model artifacts.",
+    "overallExplanation": "The decisive production principle is that model changes require versioned rollback and interface contract testing. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 117,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A product is deployed in regions where the preferred model is unavailable and customer data cannot cross jurisdiction boundaries. What is the correct selection approach?",
+    "options": [
+      "Choose compliant region-available models and validate fallback equivalence",
+      "Use cross-region inference even when it violates residency",
+      "Copy proprietary weights without provider support",
+      "Ignore residency because inference is transient"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: regional availability and data residency are hard selection constraints.",
+      "Incorrect. Choosing Use cross-region inference even when it violates residency addresses a related concern but misses the decisive constraint. The required design follows the rule that regional availability and data residency are hard selection constraints.",
+      "Incorrect. Choosing Copy proprietary weights without provider support addresses a related concern but misses the decisive constraint. The required design follows the rule that regional availability and data residency are hard selection constraints.",
+      "Incorrect. Choosing Ignore residency because inference is transient addresses a related concern but misses the decisive constraint. The required design follows the rule that regional availability and data residency are hard selection constraints."
+    ],
+    "principle": "regional availability and data residency are hard selection constraints",
+    "relatedConcept": "Resilience patterns must operate inside compliance boundaries.",
+    "overallExplanation": "The decisive production principle is that regional availability and data residency are hard selection constraints. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 118,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Select and configure FMs.",
+    "type": "single",
+    "question": "A team plans to fine-tune every model version even though RAG already supplies changing facts and prompt tests show only formatting inconsistency. What is the better first step?",
+    "options": [
+      "Use prompt and output-schema controls before weight customization",
+      "Fine-tune because any inconsistency requires new weights",
+      "Pre-train a new foundation model",
+      "Increase vector dimensions to fix formatting"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: use the least costly adaptation mechanism that addresses the observed gap.",
+      "Incorrect. Choosing Fine-tune because any inconsistency requires new weights addresses a related concern but misses the decisive constraint. The required design follows the rule that use the least costly adaptation mechanism that addresses the observed gap.",
+      "Incorrect. Choosing Pre-train a new foundation model addresses a related concern but misses the decisive constraint. The required design follows the rule that use the least costly adaptation mechanism that addresses the observed gap.",
+      "Incorrect. Choosing Increase vector dimensions to fix formatting addresses a related concern but misses the decisive constraint. The required design follows the rule that use the least costly adaptation mechanism that addresses the observed gap."
+    ],
+    "principle": "use the least costly adaptation mechanism that addresses the observed gap",
+    "relatedConcept": "Customization should solve a measured behavior that prompting and retrieval cannot.",
+    "overallExplanation": "The decisive production principle is that use the least costly adaptation mechanism that addresses the observed gap. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 119,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "multi",
+    "question": "A document pipeline sends malformed, empty, and duplicate records into an embedding job, causing vector-store drift and unpredictable retrieval. Which two controls should be introduced? (Choose two.)",
+    "options": [
+      "A quality gate using Glue Data Quality or equivalent validation before indexing",
+      "A quarantine path with observable failure metrics for rejected records",
+      "More endpoint instances for malformed records",
+      "A nightly prompt rewrite"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. Explicit quality rules stop invalid and duplicate content before it becomes a persistent vector-store defect.",
+      "Correct. Quarantine preserves failed inputs for remediation, while metrics make deterioration visible instead of silently dropping data.",
+      "Incorrect. Choosing More endpoint instances for malformed records addresses a related concern but misses the decisive constraint. The required design follows the rule that data must pass explicit quality rules before FM consumption.",
+      "Incorrect. Choosing A nightly prompt rewrite addresses a related concern but misses the decisive constraint. The required design follows the rule that data must pass explicit quality rules before FM consumption."
+    ],
+    "principle": "data must pass explicit quality rules before FM consumption",
+    "relatedConcept": "Bad inputs become persistent retrieval defects when indexed without validation.",
+    "overallExplanation": "The decisive production principle is that data must pass explicit quality rules before FM consumption. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 120,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "A multimodal claims workflow receives PDFs, photographs, call audio, and structured policy records. Which processing design is most appropriate?",
+    "options": [
+      "Use modality-specific extraction then normalize into a governed common representation",
+      "Convert every input to CSV without preserving provenance",
+      "Send raw binary from every format in one text prompt",
+      "Discard metadata after extraction"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: multimodal pipelines need specialized processing and normalized traced outputs.",
+      "Incorrect. Choosing Convert every input to CSV without preserving provenance addresses a related concern but misses the decisive constraint. The required design follows the rule that multimodal pipelines need specialized processing and normalized traced outputs.",
+      "Incorrect. Choosing Send raw binary from every format in one text prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that multimodal pipelines need specialized processing and normalized traced outputs.",
+      "Incorrect. Choosing Discard metadata after extraction addresses a related concern but misses the decisive constraint. The required design follows the rule that multimodal pipelines need specialized processing and normalized traced outputs."
+    ],
+    "principle": "multimodal pipelines need specialized processing and normalized traced outputs",
+    "relatedConcept": "Different modalities require different extraction while sharing downstream contracts.",
+    "overallExplanation": "The decisive production principle is that multimodal pipelines need specialized processing and normalized traced outputs. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 121,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "A Bedrock request intermittently fails validation after a team switches models because message roles and content blocks differ between provider APIs. What should be fixed?",
+    "options": [
+      "Transform inputs into the selected model's required request schema",
+      "Raise the API timeout",
+      "Change the vector distance metric",
+      "Disable request validation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: FM inputs must match model-specific schemas and conversation formats.",
+      "Incorrect. Choosing Raise the API timeout addresses a related concern but misses the decisive constraint. The required design follows the rule that FM inputs must match model-specific schemas and conversation formats.",
+      "Incorrect. Choosing Change the vector distance metric addresses a related concern but misses the decisive constraint. The required design follows the rule that FM inputs must match model-specific schemas and conversation formats.",
+      "Incorrect. Choosing Disable request validation addresses a related concern but misses the decisive constraint. The required design follows the rule that FM inputs must match model-specific schemas and conversation formats."
+    ],
+    "principle": "FM inputs must match model-specific schemas and conversation formats",
+    "relatedConcept": "Provider abstraction includes correct request and response transformation.",
+    "overallExplanation": "The decisive production principle is that FM inputs must match model-specific schemas and conversation formats. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 122,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "Product descriptions contain inconsistent units, duplicated whitespace, and entity aliases that reduce retrieval and generation quality. Which preprocessing is best?",
+    "options": [
+      "Normalize units and text and canonicalize entities before inference",
+      "Increase temperature to reinterpret every inconsistency",
+      "Retain all variants with no metadata",
+      "Fine-tune on the uncleaned stream"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: normalization and entity canonicalization improve consistent model inputs.",
+      "Incorrect. Choosing Increase temperature to reinterpret every inconsistency addresses a related concern but misses the decisive constraint. The required design follows the rule that normalization and entity canonicalization improve consistent model inputs.",
+      "Incorrect. Choosing Retain all variants with no metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that normalization and entity canonicalization improve consistent model inputs.",
+      "Incorrect. Choosing Fine-tune on the uncleaned stream addresses a related concern but misses the decisive constraint. The required design follows the rule that normalization and entity canonicalization improve consistent model inputs."
+    ],
+    "principle": "normalization and entity canonicalization improve consistent model inputs",
+    "relatedConcept": "Input-quality enhancement reduces avoidable ambiguity before invoking an FM.",
+    "overallExplanation": "The decisive production principle is that normalization and entity canonicalization improve consistent model inputs. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 123,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "multi",
+    "question": "A pipeline must reject records missing consent metadata, quarantine invalid media, and emit a metric when failure rate exceeds 2%. Which two elements are required? (Choose two.)",
+    "options": [
+      "Schema and business-rule validation with quarantine routing",
+      "CloudWatch metrics and alarms for validation failures",
+      "A longer model output limit",
+      "Random sampling that silently drops invalid records"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: quality gates need deterministic routing and observable failure thresholds.",
+      "Correct. This choice applies the key production rule: quality gates need deterministic routing and observable failure thresholds.",
+      "Incorrect. Choosing A longer model output limit addresses a related concern but misses the decisive constraint. The required design follows the rule that quality gates need deterministic routing and observable failure thresholds.",
+      "Incorrect. Choosing Random sampling that silently drops invalid records addresses a related concern but misses the decisive constraint. The required design follows the rule that quality gates need deterministic routing and observable failure thresholds."
+    ],
+    "principle": "quality gates need deterministic routing and observable failure thresholds",
+    "relatedConcept": "Validation is an operational workflow rather than a one-time data check.",
+    "overallExplanation": "The decisive production principle is that quality gates need deterministic routing and observable failure thresholds. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 124,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "Transcribed calls must preserve speaker timestamps and source identifiers so generated summaries can be audited back to audio. Which pipeline property is essential?",
+    "options": [
+      "Maintain provenance metadata through every transformation",
+      "Strip timestamps to reduce token usage before archiving",
+      "Store only the generated summary",
+      "Use anonymous file names with no lineage map"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: processing must preserve lineage needed for audit and diagnosis.",
+      "Incorrect. Choosing Strip timestamps to reduce token usage before archiving addresses a related concern but misses the decisive constraint. The required design follows the rule that processing must preserve lineage needed for audit and diagnosis.",
+      "Incorrect. Choosing Store only the generated summary addresses a related concern but misses the decisive constraint. The required design follows the rule that processing must preserve lineage needed for audit and diagnosis.",
+      "Incorrect. Choosing Use anonymous file names with no lineage map addresses a related concern but misses the decisive constraint. The required design follows the rule that processing must preserve lineage needed for audit and diagnosis."
+    ],
+    "principle": "processing must preserve lineage needed for audit and diagnosis",
+    "relatedConcept": "Compression for inference must not erase authoritative source traceability.",
+    "overallExplanation": "The decisive production principle is that processing must preserve lineage needed for audit and diagnosis. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 125,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "A high-volume image workflow performs OCR, entity extraction, redaction, and FM inference. Failures must resume without redoing completed expensive stages. Which orchestration pattern fits?",
+    "options": [
+      "Persist stage outputs and orchestrate idempotent steps with Step Functions",
+      "Put all stages in one unbounded Lambda invocation",
+      "Retry the entire raw workload on every error",
+      "Use the FM prompt as the workflow state store"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: durable idempotent stages make complex processing recoverable.",
+      "Incorrect. Choosing Put all stages in one unbounded Lambda invocation addresses a related concern but misses the decisive constraint. The required design follows the rule that durable idempotent stages make complex processing recoverable.",
+      "Incorrect. Choosing Retry the entire raw workload on every error addresses a related concern but misses the decisive constraint. The required design follows the rule that durable idempotent stages make complex processing recoverable.",
+      "Incorrect. Choosing Use the FM prompt as the workflow state store addresses a related concern but misses the decisive constraint. The required design follows the rule that durable idempotent stages make complex processing recoverable."
+    ],
+    "principle": "durable idempotent stages make complex processing recoverable",
+    "relatedConcept": "Multimodal pipelines need explicit state error handling and replay boundaries.",
+    "overallExplanation": "The decisive production principle is that durable idempotent stages make complex processing recoverable. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 126,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "A team uses an FM to rewrite source documents before indexing but never compares semantic meaning before and after transformation. What risk must be controlled?",
+    "options": [
+      "Transformation can introduce semantic drift or fabricated content",
+      "The embedding model will automatically restore original meaning",
+      "A larger context window guarantees fidelity",
+      "Schema validity proves factual equivalence"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: quality enhancement must validate semantic fidelity not just formatting.",
+      "Incorrect. Choosing The embedding model will automatically restore original meaning addresses a related concern but misses the decisive constraint. The required design follows the rule that quality enhancement must validate semantic fidelity not just formatting.",
+      "Incorrect. Choosing A larger context window guarantees fidelity addresses a related concern but misses the decisive constraint. The required design follows the rule that quality enhancement must validate semantic fidelity not just formatting.",
+      "Incorrect. Choosing Schema validity proves factual equivalence addresses a related concern but misses the decisive constraint. The required design follows the rule that quality enhancement must validate semantic fidelity not just formatting."
+    ],
+    "principle": "quality enhancement must validate semantic fidelity not just formatting",
+    "relatedConcept": "FM-based preprocessing itself requires evaluation and provenance.",
+    "overallExplanation": "The decisive production principle is that quality enhancement must validate semantic fidelity not just formatting. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 127,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement data validation and processing pipelines for FM consumption.",
+    "type": "single",
+    "question": "Tabular account data and free-text notes must be combined for inference, but PII may not leave the approved processing boundary. Which step directly protects restricted data before model invocation?",
+    "options": [
+      "Detect and mask restricted fields before assembly",
+      "Validate the final structured payload against the model contract",
+      "Send raw records first and redact model outputs only",
+      "Log unmasked payloads for debugging"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Detecting and masking restricted fields keeps PII inside the approved processing boundary before any model payload is assembled.",
+      "Incorrect. Schema validation remains necessary for a valid request, but it does not remove or protect PII before the payload crosses the approved boundary.",
+      "Incorrect. Choosing Send raw records first and redact model outputs only addresses a related concern but misses the decisive constraint. The required design follows the rule that privacy controls and schema validation must precede model invocation.",
+      "Incorrect. Choosing Log unmasked payloads for debugging addresses a related concern but misses the decisive constraint. The required design follows the rule that privacy controls and schema validation must precede model invocation."
+    ],
+    "principle": "privacy controls and schema validation must precede model invocation",
+    "relatedConcept": "A valid request can still be unsafe if sensitive fields are not governed.",
+    "overallExplanation": "The decisive production principle is that privacy controls and schema validation must precede model invocation. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 128,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A knowledge base serves legal, engineering, and sales content with different schemas and access rules. One global index causes noisy retrieval and complex filters. Which architecture should be evaluated?",
+    "options": [
+      "Separate domain indexes with shared governed retrieval interfaces",
+      "One unfiltered index with all metadata removed",
+      "A model fine-tune that memorizes every document",
+      "A larger output token limit"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: domain-aware index boundaries can improve relevance and access control.",
+      "Incorrect. Choosing One unfiltered index with all metadata removed addresses a related concern but misses the decisive constraint. The required design follows the rule that domain-aware index boundaries can improve relevance and access control.",
+      "Incorrect. Choosing A model fine-tune that memorizes every document addresses a related concern but misses the decisive constraint. The required design follows the rule that domain-aware index boundaries can improve relevance and access control.",
+      "Incorrect. Choosing A larger output token limit addresses a related concern but misses the decisive constraint. The required design follows the rule that domain-aware index boundaries can improve relevance and access control."
+    ],
+    "principle": "domain-aware index boundaries can improve relevance and access control",
+    "relatedConcept": "Vector architecture should reflect content domains scale and security boundaries.",
+    "overallExplanation": "The decisive production principle is that domain-aware index boundaries can improve relevance and access control. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 129,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "Search results must prefer documents effective today, authored by the requesting business unit, and permitted for the user's region. What enables this precision?",
+    "options": [
+      "Rich metadata fields and authorization-aware filtering",
+      "Only increasing embedding dimensions",
+      "Only lowering model temperature",
+      "Deleting document timestamps"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: metadata filtering adds business context and security to semantic similarity.",
+      "Incorrect. Choosing Only increasing embedding dimensions addresses a related concern but misses the decisive constraint. The required design follows the rule that metadata filtering adds business context and security to semantic similarity.",
+      "Incorrect. Choosing Only lowering model temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that metadata filtering adds business context and security to semantic similarity.",
+      "Incorrect. Choosing Deleting document timestamps addresses a related concern but misses the decisive constraint. The required design follows the rule that metadata filtering adds business context and security to semantic similarity."
+    ],
+    "principle": "metadata filtering adds business context and security to semantic similarity",
+    "relatedConcept": "Embeddings alone do not express every governance and freshness constraint.",
+    "overallExplanation": "The decisive production principle is that metadata filtering adds business context and security to semantic similarity. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 130,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "An OpenSearch vector index receives 50 million vectors and p99 latency rises after uneven tenant growth overloads several shards. What should the team analyze?",
+    "options": [
+      "Shard sizing distribution and tenant-aware partition strategy",
+      "FM temperature and top-p",
+      "Prompt version approval state",
+      "S3 lifecycle expiration only"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: vector performance at scale depends on balanced indexing and partition design.",
+      "Incorrect. Choosing FM temperature and top-p addresses a related concern but misses the decisive constraint. The required design follows the rule that vector performance at scale depends on balanced indexing and partition design.",
+      "Incorrect. Choosing Prompt version approval state addresses a related concern but misses the decisive constraint. The required design follows the rule that vector performance at scale depends on balanced indexing and partition design.",
+      "Incorrect. Choosing S3 lifecycle expiration only addresses a related concern but misses the decisive constraint. The required design follows the rule that vector performance at scale depends on balanced indexing and partition design."
+    ],
+    "principle": "vector performance at scale depends on balanced indexing and partition design",
+    "relatedConcept": "Retrieval latency can originate in vector-store topology rather than the FM.",
+    "overallExplanation": "The decisive production principle is that vector performance at scale depends on balanced indexing and partition design. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 131,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A wiki update is visible in the source system but not in generated answers for 24 hours because only a nightly full reindex exists. Which improvement best meets a five-minute freshness target?",
+    "options": [
+      "Implement incremental change detection and idempotent vector updates",
+      "Increase FM context length",
+      "Run a full model fine-tune every five minutes",
+      "Cache old answers longer"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: fresh vector stores require change-aware synchronization within the stated SLA.",
+      "Incorrect. Choosing Increase FM context length addresses a related concern but misses the decisive constraint. The required design follows the rule that fresh vector stores require change-aware synchronization within the stated SLA.",
+      "Incorrect. Choosing Run a full model fine-tune every five minutes addresses a related concern but misses the decisive constraint. The required design follows the rule that fresh vector stores require change-aware synchronization within the stated SLA.",
+      "Incorrect. Choosing Cache old answers longer addresses a related concern but misses the decisive constraint. The required design follows the rule that fresh vector stores require change-aware synchronization within the stated SLA."
+    ],
+    "principle": "fresh vector stores require change-aware synchronization within the stated SLA",
+    "relatedConcept": "Retrieval quality depends on lifecycle maintenance as much as initial indexing.",
+    "overallExplanation": "The decisive production principle is that fresh vector stores require change-aware synchronization within the stated SLA. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 132,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A company stores canonical documents in S3 and relational metadata in RDS while using a vector engine for similarity search. Which principle should govern identifiers?",
+    "options": [
+      "Use stable document and chunk identifiers across stores for traceability",
+      "Generate unrelated identifiers in every store",
+      "Use document text itself as a mutable primary key",
+      "Discard source identifiers after embedding"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: stable cross-store identifiers preserve lineage updates and deletion.",
+      "Incorrect. Choosing Generate unrelated identifiers in every store addresses a related concern but misses the decisive constraint. The required design follows the rule that stable cross-store identifiers preserve lineage updates and deletion.",
+      "Incorrect. Choosing Use document text itself as a mutable primary key addresses a related concern but misses the decisive constraint. The required design follows the rule that stable cross-store identifiers preserve lineage updates and deletion.",
+      "Incorrect. Choosing Discard source identifiers after embedding addresses a related concern but misses the decisive constraint. The required design follows the rule that stable cross-store identifiers preserve lineage updates and deletion."
+    ],
+    "principle": "stable cross-store identifiers preserve lineage updates and deletion",
+    "relatedConcept": "Multi-store architectures need deterministic joins between source metadata and vectors.",
+    "overallExplanation": "The decisive production principle is that stable cross-store identifiers preserve lineage updates and deletion. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 133,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "multi",
+    "question": "Two tenants have identical semantic queries but must never retrieve each other's chunks. Which two controls are required? (Choose two.)",
+    "options": [
+      "Attach tenant metadata and enforce it in retrieval filters",
+      "Authorize vector-search requests outside model instructions",
+      "Tell the FM not to mention other tenants",
+      "Rely on similarity scores to separate tenants"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: tenant isolation must be enforced in data access and query filters.",
+      "Correct. This choice applies the key production rule: tenant isolation must be enforced in data access and query filters.",
+      "Incorrect. Choosing Tell the FM not to mention other tenants addresses a related concern but misses the decisive constraint. The required design follows the rule that tenant isolation must be enforced in data access and query filters.",
+      "Incorrect. Choosing Rely on similarity scores to separate tenants addresses a related concern but misses the decisive constraint. The required design follows the rule that tenant isolation must be enforced in data access and query filters."
+    ],
+    "principle": "tenant isolation must be enforced in data access and query filters",
+    "relatedConcept": "Prompt instructions are not a security boundary for vector retrieval.",
+    "overallExplanation": "The decisive production principle is that tenant isolation must be enforced in data access and query filters. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 134,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "An OpenSearch cluster uses one index for all languages; recall is poor and analyzers conflict with language-specific keyword behavior. What should the team evaluate?",
+    "options": [
+      "Language-aware analyzers or specialized indexes combined with vector retrieval",
+      "Increasing generation temperature",
+      "Removing language metadata",
+      "Replacing retrieval with larger prompts"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: index organization and analysis should match corpus and query characteristics.",
+      "Incorrect. Choosing Increasing generation temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that index organization and analysis should match corpus and query characteristics.",
+      "Incorrect. Choosing Removing language metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that index organization and analysis should match corpus and query characteristics.",
+      "Incorrect. Choosing Replacing retrieval with larger prompts addresses a related concern but misses the decisive constraint. The required design follows the rule that index organization and analysis should match corpus and query characteristics."
+    ],
+    "principle": "index organization and analysis should match corpus and query characteristics",
+    "relatedConcept": "Hybrid retrieval quality depends on lexical configuration as well as embeddings.",
+    "overallExplanation": "The decisive production principle is that index organization and analysis should match corpus and query characteristics. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 135,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A vector-store migration changes embedding dimensions, and new vectors cannot coexist with the old index mapping. Which rollout is safest?",
+    "options": [
+      "Build a versioned parallel index, backfill, validate, then switch an alias",
+      "Overwrite the live index mapping in place",
+      "Mix dimensions and ignore rejected writes",
+      "Delete the live index before backfill"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: versioned parallel indexes enable validation and rollback during schema changes.",
+      "Incorrect. Choosing Overwrite the live index mapping in place addresses a related concern but misses the decisive constraint. The required design follows the rule that versioned parallel indexes enable validation and rollback during schema changes.",
+      "Incorrect. Choosing Mix dimensions and ignore rejected writes addresses a related concern but misses the decisive constraint. The required design follows the rule that versioned parallel indexes enable validation and rollback during schema changes.",
+      "Incorrect. Choosing Delete the live index before backfill addresses a related concern but misses the decisive constraint. The required design follows the rule that versioned parallel indexes enable validation and rollback during schema changes."
+    ],
+    "principle": "versioned parallel indexes enable validation and rollback during schema changes",
+    "relatedConcept": "Embedding upgrades are data migrations requiring controlled cutover.",
+    "overallExplanation": "The decisive production principle is that versioned parallel indexes enable validation and rollback during schema changes. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 136,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A source document is deleted under a legal request, but its chunks remain searchable in the vector database. What capability is missing?",
+    "options": [
+      "Deletion propagation using source-to-chunk lineage",
+      "Prompt compression",
+      "Cross-region inference",
+      "Response streaming"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: data maintenance must propagate source lifecycle events to derived vectors.",
+      "Incorrect. Choosing Prompt compression addresses a related concern but misses the decisive constraint. The required design follows the rule that data maintenance must propagate source lifecycle events to derived vectors.",
+      "Incorrect. Choosing Cross-region inference addresses a related concern but misses the decisive constraint. The required design follows the rule that data maintenance must propagate source lifecycle events to derived vectors.",
+      "Incorrect. Choosing Response streaming addresses a related concern but misses the decisive constraint. The required design follows the rule that data maintenance must propagate source lifecycle events to derived vectors."
+    ],
+    "principle": "data maintenance must propagate source lifecycle events to derived vectors",
+    "relatedConcept": "Deletion obligations cover derived embeddings and indexes.",
+    "overallExplanation": "The decisive production principle is that data maintenance must propagate source lifecycle events to derived vectors. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 137,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "multi",
+    "question": "An internal wiki connector may read only approved spaces and must preserve document ACLs in retrieval. Which two integration requirements matter? (Choose two.)",
+    "options": [
+      "Use least-privilege connector credentials",
+      "Carry source ACL metadata into authorization-aware retrieval",
+      "Index every space then ask the model to hide results",
+      "Remove ownership metadata to simplify ingestion"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: connectors and retrieval must preserve source authorization semantics.",
+      "Correct. This choice applies the key production rule: connectors and retrieval must preserve source authorization semantics.",
+      "Incorrect. Choosing Index every space then ask the model to hide results addresses a related concern but misses the decisive constraint. The required design follows the rule that connectors and retrieval must preserve source authorization semantics.",
+      "Incorrect. Choosing Remove ownership metadata to simplify ingestion addresses a related concern but misses the decisive constraint. The required design follows the rule that connectors and retrieval must preserve source authorization semantics."
+    ],
+    "principle": "connectors and retrieval must preserve source authorization semantics",
+    "relatedConcept": "Integration convenience cannot widen access to enterprise content.",
+    "overallExplanation": "The decisive production principle is that connectors and retrieval must preserve source authorization semantics. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 138,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A team selects DynamoDB for document metadata and OpenSearch for vectors. It needs atomic visibility of a new document across both systems. Which design is most robust?",
+    "options": [
+      "Use a workflow with idempotency status and publish only after both writes succeed",
+      "Assume two independent writes are automatically atomic",
+      "Let users query partially indexed records",
+      "Use model confidence to detect incomplete transactions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: multi-store indexing needs explicit state and idempotent consistency controls.",
+      "Incorrect. Choosing Assume two independent writes are automatically atomic addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-store indexing needs explicit state and idempotent consistency controls.",
+      "Incorrect. Choosing Let users query partially indexed records addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-store indexing needs explicit state and idempotent consistency controls.",
+      "Incorrect. Choosing Use model confidence to detect incomplete transactions addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-store indexing needs explicit state and idempotent consistency controls."
+    ],
+    "principle": "multi-store indexing needs explicit state and idempotent consistency controls",
+    "relatedConcept": "Distributed vector architectures must define publication and recovery semantics.",
+    "overallExplanation": "The decisive production principle is that multi-store indexing needs explicit state and idempotent consistency controls. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 139,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design and implement vector store solutions.",
+    "type": "single",
+    "question": "A Bedrock Knowledge Base meets current scale and integration needs, while a custom vector platform would require a new operations team. Which choice is justified?",
+    "options": [
+      "Use the managed knowledge base unless measured requirements demand customization",
+      "Build custom infrastructure because professional systems must be bespoke",
+      "Fine-tune instead of maintaining any knowledge source",
+      "Use S3 keyword search as a vector replacement"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: managed services are preferable when they meet measured control and performance needs.",
+      "Incorrect. Choosing Build custom infrastructure because professional systems must be bespoke addresses a related concern but misses the decisive constraint. The required design follows the rule that managed services are preferable when they meet measured control and performance needs.",
+      "Incorrect. Choosing Fine-tune instead of maintaining any knowledge source addresses a related concern but misses the decisive constraint. The required design follows the rule that managed services are preferable when they meet measured control and performance needs.",
+      "Incorrect. Choosing Use S3 keyword search as a vector replacement addresses a related concern but misses the decisive constraint. The required design follows the rule that managed services are preferable when they meet measured control and performance needs."
+    ],
+    "principle": "managed services are preferable when they meet measured control and performance needs",
+    "relatedConcept": "Architecture complexity should be earned by a requirement.",
+    "overallExplanation": "The decisive production principle is that managed services are preferable when they meet measured control and performance needs. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 140,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A policy corpus contains nested chapters, clauses, and exceptions. Fixed 1,000-token chunks separate exceptions from their governing clauses. Which segmentation approach is better?",
+    "options": [
+      "Structure-aware hierarchical chunking with parent context",
+      "Smaller random chunks without headings",
+      "One chunk for the whole corpus",
+      "Character-level chunks with no overlap"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: chunk boundaries should preserve semantic and structural relationships.",
+      "Incorrect. Choosing Smaller random chunks without headings addresses a related concern but misses the decisive constraint. The required design follows the rule that chunk boundaries should preserve semantic and structural relationships.",
+      "Incorrect. Choosing One chunk for the whole corpus addresses a related concern but misses the decisive constraint. The required design follows the rule that chunk boundaries should preserve semantic and structural relationships.",
+      "Incorrect. Choosing Character-level chunks with no overlap addresses a related concern but misses the decisive constraint. The required design follows the rule that chunk boundaries should preserve semantic and structural relationships."
+    ],
+    "principle": "chunk boundaries should preserve semantic and structural relationships",
+    "relatedConcept": "Hierarchical retrieval can return precise passages with necessary parent context.",
+    "overallExplanation": "The decisive production principle is that chunk boundaries should preserve semantic and structural relationships. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 141,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A code knowledge base performs poorly because an embedding model selected for general prose does not preserve code similarity. What should the team do?",
+    "options": [
+      "Benchmark embedding models on representative code retrieval tasks",
+      "Increase generation temperature",
+      "Add more replicas before measuring recall",
+      "Assume all embeddings are domain interchangeable"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: embedding selection requires domain-specific retrieval evaluation.",
+      "Incorrect. Choosing Increase generation temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that embedding selection requires domain-specific retrieval evaluation.",
+      "Incorrect. Choosing Add more replicas before measuring recall addresses a related concern but misses the decisive constraint. The required design follows the rule that embedding selection requires domain-specific retrieval evaluation.",
+      "Incorrect. Choosing Assume all embeddings are domain interchangeable addresses a related concern but misses the decisive constraint. The required design follows the rule that embedding selection requires domain-specific retrieval evaluation."
+    ],
+    "principle": "embedding selection requires domain-specific retrieval evaluation",
+    "relatedConcept": "Vector dimension and model family affect quality cost and index design.",
+    "overallExplanation": "The decisive production principle is that embedding selection requires domain-specific retrieval evaluation. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 142,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A transactional application already uses Aurora PostgreSQL and needs moderate-scale vector search with relational joins and one operations model. Which option should it evaluate?",
+    "options": [
+      "Aurora PostgreSQL with pgvector",
+      "Amazon Polly",
+      "CloudTrail Lake",
+      "S3 Glacier Deep Archive"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: pgvector can combine relational and vector access when scale requirements fit.",
+      "Incorrect. Choosing Amazon Polly addresses a related concern but misses the decisive constraint. The required design follows the rule that pgvector can combine relational and vector access when scale requirements fit.",
+      "Incorrect. Choosing CloudTrail Lake addresses a related concern but misses the decisive constraint. The required design follows the rule that pgvector can combine relational and vector access when scale requirements fit.",
+      "Incorrect. Choosing S3 Glacier Deep Archive addresses a related concern but misses the decisive constraint. The required design follows the rule that pgvector can combine relational and vector access when scale requirements fit."
+    ],
+    "principle": "pgvector can combine relational and vector access when scale requirements fit",
+    "relatedConcept": "Vector-store choice should consider existing data and operational constraints.",
+    "overallExplanation": "The decisive production principle is that pgvector can combine relational and vector access when scale requirements fit. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 143,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "Users search exact product codes and natural-language descriptions. Pure semantic search often misses exact identifiers. Which retrieval approach fits?",
+    "options": [
+      "Hybrid keyword and vector search with calibrated scoring",
+      "Only vector search with no metadata",
+      "Only generation from model memory",
+      "Randomly alternate search modes"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: hybrid search combines lexical precision with semantic recall.",
+      "Incorrect. Choosing Only vector search with no metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that hybrid search combines lexical precision with semantic recall.",
+      "Incorrect. Choosing Only generation from model memory addresses a related concern but misses the decisive constraint. The required design follows the rule that hybrid search combines lexical precision with semantic recall.",
+      "Incorrect. Choosing Randomly alternate search modes addresses a related concern but misses the decisive constraint. The required design follows the rule that hybrid search combines lexical precision with semantic recall."
+    ],
+    "principle": "hybrid search combines lexical precision with semantic recall",
+    "relatedConcept": "Retrieval architecture should match both exact and conceptual query signals.",
+    "overallExplanation": "The decisive production principle is that hybrid search combines lexical precision with semantic recall. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 144,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "Initial retrieval returns relevant passages but low-value near duplicates crowd out the most authoritative source. Which post-retrieval step can help?",
+    "options": [
+      "Apply an Amazon Bedrock reranker and deduplicate candidates",
+      "Increase output token count",
+      "Disable source metadata",
+      "Re-embed the user response"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: reranking can reorder candidates using richer relevance signals.",
+      "Incorrect. Choosing Increase output token count addresses a related concern but misses the decisive constraint. The required design follows the rule that reranking can reorder candidates using richer relevance signals.",
+      "Incorrect. Choosing Disable source metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that reranking can reorder candidates using richer relevance signals.",
+      "Incorrect. Choosing Re-embed the user response addresses a related concern but misses the decisive constraint. The required design follows the rule that reranking can reorder candidates using richer relevance signals."
+    ],
+    "principle": "reranking can reorder candidates using richer relevance signals",
+    "relatedConcept": "A two-stage retrieval pipeline separates broad recall from precise ranking.",
+    "overallExplanation": "The decisive production principle is that reranking can reorder candidates using richer relevance signals. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 145,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A complex question asks for obligations shared across three contracts, but a single similarity query retrieves only one contract. Which technique should be added?",
+    "options": [
+      "Query decomposition followed by merged and reranked retrieval",
+      "Higher model temperature",
+      "One larger fixed-size chunk",
+      "Disable metadata filters"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: multi-part questions benefit from decomposition into focused retrieval queries.",
+      "Incorrect. Choosing Higher model temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-part questions benefit from decomposition into focused retrieval queries.",
+      "Incorrect. Choosing One larger fixed-size chunk addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-part questions benefit from decomposition into focused retrieval queries.",
+      "Incorrect. Choosing Disable metadata filters addresses a related concern but misses the decisive constraint. The required design follows the rule that multi-part questions benefit from decomposition into focused retrieval queries."
+    ],
+    "principle": "multi-part questions benefit from decomposition into focused retrieval queries",
+    "relatedConcept": "Query handling can be as important as vector similarity.",
+    "overallExplanation": "The decisive production principle is that multi-part questions benefit from decomposition into focused retrieval queries. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 146,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "multi",
+    "question": "Short user acronyms differ from formal terminology in the indexed corpus, reducing recall. Which two techniques should be evaluated? (Choose two.)",
+    "options": [
+      "Query expansion using governed terminology",
+      "Hybrid lexical and semantic retrieval",
+      "Removing all domain synonyms",
+      "Fine-tuning the generator without testing retrieval"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: query transformation and hybrid search bridge vocabulary mismatch.",
+      "Correct. This choice applies the key production rule: query transformation and hybrid search bridge vocabulary mismatch.",
+      "Incorrect. Choosing Removing all domain synonyms addresses a related concern but misses the decisive constraint. The required design follows the rule that query transformation and hybrid search bridge vocabulary mismatch.",
+      "Incorrect. Choosing Fine-tuning the generator without testing retrieval addresses a related concern but misses the decisive constraint. The required design follows the rule that query transformation and hybrid search bridge vocabulary mismatch."
+    ],
+    "principle": "query transformation and hybrid search bridge vocabulary mismatch",
+    "relatedConcept": "Retrieval improvement should address the query-corpus gap directly.",
+    "overallExplanation": "The decisive production principle is that query transformation and hybrid search bridge vocabulary mismatch. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 147,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A service exposes vector queries to several agents. Each agent currently invents a different request schema and authorization field. What should replace this?",
+    "options": [
+      "A standardized function or MCP contract with enforced identity context",
+      "Prompt examples alone",
+      "Separate unversioned endpoints per agent",
+      "Direct database credentials in model context"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: standardized retrieval contracts preserve validation identity and portability.",
+      "Incorrect. Choosing Prompt examples alone addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized retrieval contracts preserve validation identity and portability.",
+      "Incorrect. Choosing Separate unversioned endpoints per agent addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized retrieval contracts preserve validation identity and portability.",
+      "Incorrect. Choosing Direct database credentials in model context addresses a related concern but misses the decisive constraint. The required design follows the rule that standardized retrieval contracts preserve validation identity and portability."
+    ],
+    "principle": "standardized retrieval contracts preserve validation identity and portability",
+    "relatedConcept": "Tool interfaces need stable schemas and external authorization.",
+    "overallExplanation": "The decisive production principle is that standardized retrieval contracts preserve validation identity and portability. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 148,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "Retrieval recall drops after switching embedding models, but the index still contains vectors produced by the previous model. What is the likely fix?",
+    "options": [
+      "Re-embed the corpus and queries consistently into a versioned compatible index",
+      "Raise generation temperature",
+      "Add more output tokens",
+      "Use old and new vector dimensions in one field"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: query and corpus embeddings must share a compatible representation.",
+      "Incorrect. Choosing Raise generation temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that query and corpus embeddings must share a compatible representation.",
+      "Incorrect. Choosing Add more output tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that query and corpus embeddings must share a compatible representation.",
+      "Incorrect. Choosing Use old and new vector dimensions in one field addresses a related concern but misses the decisive constraint. The required design follows the rule that query and corpus embeddings must share a compatible representation."
+    ],
+    "principle": "query and corpus embeddings must share a compatible representation",
+    "relatedConcept": "Embedding-model changes require coordinated data migration.",
+    "overallExplanation": "The decisive production principle is that query and corpus embeddings must share a compatible representation. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 149,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A RAG system retrieves confidential passages before filtering them from the final answer. Why is this unsafe? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "Authorization must constrain retrieval before sensitive context reaches the model",
+      "Output filtering makes prior exposure irrelevant",
+      "The FM cannot process content it later omits",
+      "Encryption at rest automatically authorizes retrieval"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: security filtering must occur before retrieval results enter model context.",
+      "Incorrect. Choosing Output filtering makes prior exposure irrelevant addresses a related concern but misses the decisive constraint. The required design follows the rule that security filtering must occur before retrieval results enter model context.",
+      "Incorrect. Choosing The FM cannot process content it later omits addresses a related concern but misses the decisive constraint. The required design follows the rule that security filtering must occur before retrieval results enter model context.",
+      "Incorrect. Choosing Encryption at rest automatically authorizes retrieval addresses a related concern but misses the decisive constraint. The required design follows the rule that security filtering must occur before retrieval results enter model context."
+    ],
+    "principle": "security filtering must occur before retrieval results enter model context",
+    "relatedConcept": "Preventing disclosure starts at data access not only response post-processing.",
+    "overallExplanation": "The decisive production principle is that security filtering must occur before retrieval results enter model context. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 150,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "A latency trace shows vector search consumes 900 ms, reranking 80 ms, and FM generation 250 ms. Where should optimization start?",
+    "options": [
+      "Vector index and query performance",
+      "The model's output temperature",
+      "Prompt approval workflow",
+      "FM cross-region routing"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: measurement should target the dominant latency component.",
+      "Incorrect. Choosing The model's output temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that measurement should target the dominant latency component.",
+      "Incorrect. Choosing Prompt approval workflow addresses a related concern but misses the decisive constraint. The required design follows the rule that measurement should target the dominant latency component.",
+      "Incorrect. Choosing FM cross-region routing addresses a related concern but misses the decisive constraint. The required design follows the rule that measurement should target the dominant latency component."
+    ],
+    "principle": "measurement should target the dominant latency component",
+    "relatedConcept": "End-to-end RAG optimization depends on component-level tracing.",
+    "overallExplanation": "The decisive production principle is that measurement should target the dominant latency component. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 151,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Design retrieval mechanisms for FM augmentation.",
+    "type": "single",
+    "question": "Documents change hourly and retrieval must be fresh, but embedding every file nightly consumes unnecessary compute. Which change most directly reduces repeated embedding work for updates?",
+    "options": [
+      "Embed only changed chunks using stable content fingerprints",
+      "Delete vectors for removed chunks through lineage tracking",
+      "Re-embed the entire unchanged corpus more often",
+      "Cache stale retrieval forever"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. Stable content fingerprints let the pipeline identify changed chunks and avoid paying to regenerate embeddings for unchanged content.",
+      "Incorrect. Deletion propagation is essential for correctness when content is removed, but it is not the primary mechanism for avoiding re-embedding unchanged files.",
+      "Incorrect. Choosing Re-embed the entire unchanged corpus more often addresses a related concern but misses the decisive constraint. The required design follows the rule that incremental synchronization minimizes cost while preserving correctness.",
+      "Incorrect. Choosing Cache stale retrieval forever addresses a related concern but misses the decisive constraint. The required design follows the rule that incremental synchronization minimizes cost while preserving correctness."
+    ],
+    "principle": "incremental synchronization minimizes cost while preserving correctness",
+    "relatedConcept": "Freshness workflows must handle additions updates and deletions.",
+    "overallExplanation": "The decisive production principle is that incremental synchronization minimizes cost while preserving correctness. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 152,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "A support prompt must enforce role, approved sources, JSON output, and refusal behavior across four applications. Which implementation improves control?",
+    "options": [
+      "A versioned parameterized template in Bedrock Prompt Management",
+      "Four copied strings edited independently",
+      "Instructions stored only in developer laptops",
+      "A fine-tune with no prompt contract"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: governed prompt templates centralize reusable behavior and versioning.",
+      "Incorrect. Choosing Four copied strings edited independently addresses a related concern but misses the decisive constraint. The required design follows the rule that governed prompt templates centralize reusable behavior and versioning.",
+      "Incorrect. Choosing Instructions stored only in developer laptops addresses a related concern but misses the decisive constraint. The required design follows the rule that governed prompt templates centralize reusable behavior and versioning.",
+      "Incorrect. Choosing A fine-tune with no prompt contract addresses a related concern but misses the decisive constraint. The required design follows the rule that governed prompt templates centralize reusable behavior and versioning."
+    ],
+    "principle": "governed prompt templates centralize reusable behavior and versioning",
+    "relatedConcept": "Prompts are production artifacts that need ownership and controlled releases.",
+    "overallExplanation": "The decisive production principle is that governed prompt templates centralize reusable behavior and versioning. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 153,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "An assistant cannot determine which of two customer accounts a request references and currently guesses. Which workflow is best?",
+    "options": [
+      "Ask a targeted clarification and persist the selected context",
+      "Increase temperature so one account is chosen creatively",
+      "Search both accounts without authorization",
+      "Return a plausible combined answer"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: ambiguity should trigger clarification rather than unsupported action.",
+      "Incorrect. Choosing Increase temperature so one account is chosen creatively addresses a related concern but misses the decisive constraint. The required design follows the rule that ambiguity should trigger clarification rather than unsupported action.",
+      "Incorrect. Choosing Search both accounts without authorization addresses a related concern but misses the decisive constraint. The required design follows the rule that ambiguity should trigger clarification rather than unsupported action.",
+      "Incorrect. Choosing Return a plausible combined answer addresses a related concern but misses the decisive constraint. The required design follows the rule that ambiguity should trigger clarification rather than unsupported action."
+    ],
+    "principle": "ambiguity should trigger clarification rather than unsupported action",
+    "relatedConcept": "Interactive systems need explicit state and uncertainty handling.",
+    "overallExplanation": "The decisive production principle is that ambiguity should trigger clarification rather than unsupported action. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 154,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "Prompt v12 is promoted without regression testing and causes invoices to omit currency fields. What should the pipeline require?",
+    "options": [
+      "Golden-case prompt tests and schema checks before promotion",
+      "Only manual spot checks after full release",
+      "A higher token limit",
+      "Deletion of earlier prompt versions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: prompt changes require automated behavioral and structural regression gates.",
+      "Incorrect. Choosing Only manual spot checks after full release addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt changes require automated behavioral and structural regression gates.",
+      "Incorrect. Choosing A higher token limit addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt changes require automated behavioral and structural regression gates.",
+      "Incorrect. Choosing Deletion of earlier prompt versions addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt changes require automated behavioral and structural regression gates."
+    ],
+    "principle": "prompt changes require automated behavioral and structural regression gates",
+    "relatedConcept": "Prompt governance mirrors software release discipline.",
+    "overallExplanation": "The decisive production principle is that prompt changes require automated behavioral and structural regression gates. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 155,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "multi",
+    "question": "Auditors need to know who approved a prompt, which version ran, and when sensitive templates were accessed. Which two capabilities are required? (Choose two.)",
+    "options": [
+      "Prompt approval and version metadata",
+      "CloudTrail and controlled access logging",
+      "A public prompt bucket",
+      "Unattributed local prompt copies"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: prompt governance needs change lineage and access auditability.",
+      "Correct. This choice applies the key production rule: prompt governance needs change lineage and access auditability.",
+      "Incorrect. Choosing A public prompt bucket addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt governance needs change lineage and access auditability.",
+      "Incorrect. Choosing Unattributed local prompt copies addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt governance needs change lineage and access auditability."
+    ],
+    "principle": "prompt governance needs change lineage and access auditability",
+    "relatedConcept": "Templates may encode sensitive policy and deserve controlled repositories.",
+    "overallExplanation": "The decisive production principle is that prompt governance needs change lineage and access auditability. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 156,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "A workflow must classify a request, branch to specialized prompts, validate output, and retry only the failed stage. Which Bedrock capability is designed for this composition?",
+    "options": [
+      "Amazon Bedrock Prompt Flows",
+      "Amazon Polly neural voices",
+      "S3 Transfer Acceleration",
+      "AWS Artifact agreements"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: Prompt Flows composes reusable prompt stages with branching and processing.",
+      "Incorrect. Choosing Amazon Polly neural voices addresses a related concern but misses the decisive constraint. The required design follows the rule that Prompt Flows composes reusable prompt stages with branching and processing.",
+      "Incorrect. Choosing S3 Transfer Acceleration addresses a related concern but misses the decisive constraint. The required design follows the rule that Prompt Flows composes reusable prompt stages with branching and processing.",
+      "Incorrect. Choosing AWS Artifact agreements addresses a related concern but misses the decisive constraint. The required design follows the rule that Prompt Flows composes reusable prompt stages with branching and processing."
+    ],
+    "principle": "Prompt Flows composes reusable prompt stages with branching and processing",
+    "relatedConcept": "Complex prompt systems benefit from explicit observable workflow structure.",
+    "overallExplanation": "The decisive production principle is that Prompt Flows composes reusable prompt stages with branching and processing. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 157,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "A model emits prose around valid JSON, breaking a strict downstream parser. Which application control guarantees that malformed output cannot reach the parser?",
+    "options": [
+      "Specify the exact output schema in the template",
+      "Validate and reject nonconforming output before downstream use",
+      "Increase temperature",
+      "Remove examples of valid responses"
+    ],
+    "correct": [
+      1
+    ],
+    "optionExplanations": [
+      "Incorrect. Schema instructions improve the probability of compliant output, but model instructions alone cannot guarantee malformed text is blocked.",
+      "Correct. This choice applies the key production rule: structured instructions and deterministic validation protect downstream contracts.",
+      "Incorrect. Choosing Increase temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that structured instructions and deterministic validation protect downstream contracts.",
+      "Incorrect. Choosing Remove examples of valid responses addresses a related concern but misses the decisive constraint. The required design follows the rule that structured instructions and deterministic validation protect downstream contracts."
+    ],
+    "principle": "structured instructions and deterministic validation protect downstream contracts",
+    "relatedConcept": "Prompting improves compliance but application validation remains necessary.",
+    "overallExplanation": "The decisive production principle is that structured instructions and deterministic validation protect downstream contracts. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 158,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "Conversation history stored in DynamoDB grows without bound and pushes old irrelevant turns into every prompt. What should the team implement?",
+    "options": [
+      "Summarize and prune history while retaining durable task state",
+      "Send the full history forever",
+      "Delete the system instructions first",
+      "Increase embedding dimensions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: conversation memory must be intentionally scoped and compressed.",
+      "Incorrect. Choosing Send the full history forever addresses a related concern but misses the decisive constraint. The required design follows the rule that conversation memory must be intentionally scoped and compressed.",
+      "Incorrect. Choosing Delete the system instructions first addresses a related concern but misses the decisive constraint. The required design follows the rule that conversation memory must be intentionally scoped and compressed.",
+      "Incorrect. Choosing Increase embedding dimensions addresses a related concern but misses the decisive constraint. The required design follows the rule that conversation memory must be intentionally scoped and compressed."
+    ],
+    "principle": "conversation memory must be intentionally scoped and compressed",
+    "relatedConcept": "State storage and prompt context are related but not identical.",
+    "overallExplanation": "The decisive production principle is that conversation memory must be intentionally scoped and compressed. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 159,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "A team uses a reasoning-style prompt and assumes its persuasive explanation proves the answer is factual. What is the correct governance response?",
+    "options": [
+      "Evaluate outputs against evidence and task metrics rather than trusting reasoning text",
+      "Expose longer reasoning as the only quality gate",
+      "Remove source citations",
+      "Skip human evaluation because reasoning is visible"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: generated reasoning is not a substitute for verifiable evaluation.",
+      "Incorrect. Choosing Expose longer reasoning as the only quality gate addresses a related concern but misses the decisive constraint. The required design follows the rule that generated reasoning is not a substitute for verifiable evaluation.",
+      "Incorrect. Choosing Remove source citations addresses a related concern but misses the decisive constraint. The required design follows the rule that generated reasoning is not a substitute for verifiable evaluation.",
+      "Incorrect. Choosing Skip human evaluation because reasoning is visible addresses a related concern but misses the decisive constraint. The required design follows the rule that generated reasoning is not a substitute for verifiable evaluation."
+    ],
+    "principle": "generated reasoning is not a substitute for verifiable evaluation",
+    "relatedConcept": "Advanced prompts still require grounding and outcome-based quality controls.",
+    "overallExplanation": "The decisive production principle is that generated reasoning is not a substitute for verifiable evaluation. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  },
+  {
+    "id": 160,
+    "domain": "Foundation Model Integration, Data Management, and Compliance",
+    "objective": "Implement prompt engineering strategies and governance for FM interactions.",
+    "type": "single",
+    "question": "A parameterized prompt is shared across regions, but one deployment silently uses an unapproved draft version. Which safeguard is best?",
+    "options": [
+      "Promote immutable approved versions through CI/CD with environment mapping",
+      "Let each region select the latest draft automatically",
+      "Store prompt IDs only in user sessions",
+      "Disable deployment logs"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: approved immutable prompt versions must be explicitly mapped to environments.",
+      "Incorrect. Choosing Let each region select the latest draft automatically addresses a related concern but misses the decisive constraint. The required design follows the rule that approved immutable prompt versions must be explicitly mapped to environments.",
+      "Incorrect. Choosing Store prompt IDs only in user sessions addresses a related concern but misses the decisive constraint. The required design follows the rule that approved immutable prompt versions must be explicitly mapped to environments.",
+      "Incorrect. Choosing Disable deployment logs addresses a related concern but misses the decisive constraint. The required design follows the rule that approved immutable prompt versions must be explicitly mapped to environments."
+    ],
+    "principle": "approved immutable prompt versions must be explicitly mapped to environments",
+    "relatedConcept": "Prompt governance must prevent configuration drift across deployments.",
+    "overallExplanation": "The decisive production principle is that approved immutable prompt versions must be explicitly mapped to environments. Applying it addresses the explicit architecture, quality, security, or operational signal in the scenario."
+  }
+]

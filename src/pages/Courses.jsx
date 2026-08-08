@@ -46,6 +46,11 @@ const courseCopy = {
     description:
       'AI and ML fundamentals, generative AI, foundation-model applications, responsible AI, and security, compliance and governance on AWS.',
   },
+  'AIP-C01': {
+    title: 'AWS Generative AI Developer Professional',
+    description:
+      'Production GenAI architecture across foundation models, RAG and vector search, agents and tools, enterprise integration, security, governance, optimization, evaluation, and troubleshooting.',
+  },
 }
 
 const steps = [

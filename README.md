@@ -43,8 +43,11 @@ Three transcription notes:
 | Code | Name | Content |
 |---|---|---|
 | AIF-C01 | AWS Certified AI Practitioner | ✅ practice only (150 questions = 3 × 50 scored-question sets) |
+| AIP-C01 | AWS Certified Generative AI Developer - Professional | ✅ practice only (195 questions = 3 × 65 scored-question sets) |
 
 The blueprint is transcribed from the official [AWS Certified AI Practitioner exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-practitioner-01.html), **version 1.1, published April 30, 2026**. AWS lists 65 questions on the live exam: the guide identifies 50 scored questions and 15 unscored questions. Each practice set models the 50 scored questions and preserves the official 20/24/28/14/14 domain weighting exactly. The bank includes the version 1.1 additions covering agentic AI, context engineering, prompt management, business-alignment metrics, and hallucination grounding.
+
+AIP-C01 is transcribed from the current official [AWS Certified Generative AI Developer - Professional exam guide](https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01.html), checked August 2026. The live exam contains 75 questions: 65 scored and 10 unscored. Each practice set models the 65 scored questions using a 20/17/13/8/7 allocation, the closest integer realization of AWS's published 31/26/20/12/11 domain weighting. AWS does not publish a revision/version label for the current guide, so the blueprint records that field as `null` rather than inventing one.
 
 The landing page (`/`) explains what the app is, how to use it in three steps, and lists every certification grouped by vendor with its exam facts — that's the canonical way in. Inside a cert, use the header nav (Overview / Study Guide / Revision / Practice, minus whatever that cert doesn't ship) or the header cert switcher to move around. The per-cert nav is deliberately hidden on the landing page so nobody lands inside a certification they never chose; `/certs` now redirects to the landing page's certification section.
 
@@ -157,18 +160,18 @@ The two Microsoft certs' facts come from Microsoft Learn (study guide + certific
 
 Because Microsoft doesn't publish an item count, `examQuestions` is `null` for both and the overview page says so rather than inventing a number. `examMinutesPerQuestion: 2.4` is **derived** (120 min ÷ our 50-question set), not a sourced fact — it only sets the Exam-mode pace.
 
-AIF-C01 facts come from the official AWS certification page and exam guide, checked August 2026:
+AIF-C01 and AIP-C01 facts come from the official AWS certification pages and exam guides, checked August 2026:
 
-| | AIF-C01 |
-|---|---|
-| Items | 65 total: 50 scored + 15 unscored |
-| Time limit | 90 min |
-| Passing score | 700 / 1000 scaled |
-| Fee | $100 USD |
-| Validity | 36 months |
-| Question types | multiple choice, multiple response, ordering, matching |
+| | AIF-C01 | AIP-C01 |
+|---|---|---|
+| Items | 65 total: 50 scored + 15 unscored | 75 total: 65 scored + 10 unscored |
+| Time limit | 90 min | 180 min |
+| Passing score | 700 / 1000 scaled | 750 / 1000 scaled |
+| Fee | $100 USD | $300 USD |
+| Validity | 36 months | 36 months |
+| Question types | multiple choice, multiple response, ordering, matching | multiple choice, multiple response |
 
-`questionsPerSet: 50` deliberately models only the scored blueprint; `examQuestions: 65` remains the independently sourced live-exam total. `examMinutesPerQuestion: 1.38` is derived from the live pace (90 ÷ 65) for Exam mode.
+For AIF-C01, `questionsPerSet: 50` deliberately models only the scored blueprint while `examQuestions: 65` remains the independently sourced live-exam total. For AIP-C01 those values are 65 and 75. Each `examMinutesPerQuestion` is derived from the corresponding live pace (90 ÷ 65 and 180 ÷ 75) for Exam mode.
 
 Two cautions. **The passing score is a scaled score on a 100–1,000 scale, not a percentage** — vendors don't publish the raw-to-scaled conversion, so rendering it as "72%" would be wrong; the validator rejects a bare percentage in `passingScore`. And the guides say "subject to change without notice", so re-check periodically.
 
@@ -355,5 +358,20 @@ Practice only (no study guide, no revision). 3 practice sets × 50 scored questi
 | **Total** | 100% | **150/150** | — | — |
 
 AWS publishes exact weights against the 50 scored items, so every set contains 10/12/14/7/7 questions across the five domains. The 15 unscored live-exam items are intentionally not simulated because AWS does not publish their domain distribution.
+
+### AIP-C01 — AWS Certified Generative AI Developer - Professional
+
+Practice only (no study guide, no revision). 3 practice sets × 65 scored questions (bank = 195). Per-domain bank counts (each set gets ⅓):
+
+| Domain | Weight | Questions | Study guide | Revision |
+|---|---|---|---|---|
+| 1. Foundation Model Integration, Data Management, and Compliance | 31% | ✅ 60/60 | — practice only | — practice only |
+| 2. Implementation and Integration | 26% | ✅ 51/51 | — practice only | — practice only |
+| 3. AI Safety, Security, and Governance | 20% | ✅ 39/39 | — practice only | — practice only |
+| 4. Operational Efficiency and Optimization for GenAI Applications | 12% | ✅ 24/24 | — practice only | — practice only |
+| 5. Testing, Validation, and Troubleshooting | 11% | ✅ 21/21 | — practice only | — practice only |
+| **Total** | 100% | **195/195** | — | — |
+
+AWS publishes percentages rather than integer domain item counts. Each 65-question set uses 20/17/13/8/7 questions, which rounds to 30.77/26.15/20.00/12.31/10.77% and is the closest whole-question allocation to the official 31/26/20/12/11 weighting. The 10 unscored live-exam items are not simulated because AWS does not publish their domain distribution.
 
 App shell: ✅ scaffold · ✅ purpose-first landing page with exam facts · ✅ vendor-grouped cert cards & switcher · ✅ multi-cert switcher · ✅ navigation & filtering · ✅ learn/exam modes · ✅ feedback panel · ✅ results & review screens · ✅ per-objective tracking · ✅ study↔practice cross-links · ✅ revision pass · ✅ practice-only certs

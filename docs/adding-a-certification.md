@@ -15,7 +15,6 @@ re-cut, before authoring 150 questions against it.
 | Cert | Code | Verified facts | Why |
 |---|---|---|---|
 | AWS Certified Machine Learning Engineer – Associate | MLA-C01 | 65 q · 720/1000 | The practitioner→engineer step; SageMaker and MLOps |
-| AWS Certified Generative AI Developer – Professional | AIP-C01 | 75 q · 180 min · $300 | GA March 2026; **replaces the retired ML Specialty**. Closest AWS analogue to AI-103 |
 | Google Cloud Professional Machine Learning Engineer | — | ~50–60 q · 120 min · $200 | Vertex AI + Gemini. **Major June 2026 refresh — re-verify the outline first** |
 | Databricks Certified Generative AI Engineer – Associate | — | Design 14% · Data prep 14% · App dev 30% · Deploy 22% · Governance 8% · Eval & monitoring 12% | RAG, Vector Search, Model Serving, Unity Catalog |
 

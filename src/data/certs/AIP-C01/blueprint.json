@@ -1,0 +1,91 @@
+{
+  "cert": {
+    "name": "AWS Certified Generative AI Developer - Professional",
+    "code": "AIP-C01",
+    "vendor": "AWS",
+    "level": "Professional",
+    "audience": "Developers with at least 2 years of production application experience and at least 1 year implementing generative AI solutions who integrate foundation models into production AWS applications and workflows.",
+    "examQuestions": 75,
+    "scoredQuestions": 65,
+    "unscoredQuestions": 10,
+    "questionsPerSet": 65,
+    "examTimeMinutes": 180,
+    "examMinutesPerQuestion": 2.4,
+    "passingScore": "750 / 1000 (scaled)",
+    "format": "Multiple choice and multiple response · Pearson VUE test center or online proctored",
+    "examFee": "$300 USD",
+    "validityMonths": 36,
+    "registrationUrl": "https://aws.amazon.com/certification/certified-generative-ai-developer-professional/",
+    "examGuideUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-professional-01.html",
+    "examGuideVersion": null,
+    "practiceSets": 3,
+    "content": { "study": false, "revision": false }
+  },
+  "domains": [
+    {
+      "id": 1,
+      "title": "Foundation Model Integration, Data Management, and Compliance",
+      "weight": 31,
+      "questionCount": 20,
+      "idStart": 101,
+      "objectives": [
+        { "objective": "Analyze requirements and design GenAI solutions.", "questions": 3 },
+        { "objective": "Select and configure FMs.", "questions": 3 },
+        { "objective": "Implement data validation and processing pipelines for FM consumption.", "questions": 3 },
+        { "objective": "Design and implement vector store solutions.", "questions": 4 },
+        { "objective": "Design retrieval mechanisms for FM augmentation.", "questions": 4 },
+        { "objective": "Implement prompt engineering strategies and governance for FM interactions.", "questions": 3 }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implementation and Integration",
+      "weight": 26,
+      "questionCount": 17,
+      "idStart": 201,
+      "objectives": [
+        { "objective": "Implement agentic AI solutions and tool integrations.", "questions": 4 },
+        { "objective": "Implement model deployment strategies.", "questions": 3 },
+        { "objective": "Design and implement enterprise integration architectures.", "questions": 3 },
+        { "objective": "Implement FM API integrations.", "questions": 3 },
+        { "objective": "Implement application integration patterns and development tools.", "questions": 4 }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "AI Safety, Security, and Governance",
+      "weight": 20,
+      "questionCount": 13,
+      "idStart": 301,
+      "objectives": [
+        { "objective": "Implement input and output safety controls.", "questions": 4 },
+        { "objective": "Implement data security and privacy controls.", "questions": 3 },
+        { "objective": "Implement AI governance and compliance mechanisms.", "questions": 3 },
+        { "objective": "Implement responsible AI principles.", "questions": 3 }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Operational Efficiency and Optimization for GenAI Applications",
+      "weight": 12,
+      "questionCount": 8,
+      "idStart": 401,
+      "objectives": [
+        { "objective": "Implement cost optimization and resource efficiency strategies.", "questions": 3 },
+        { "objective": "Optimize application performance.", "questions": 3 },
+        { "objective": "Implement monitoring systems for GenAI applications.", "questions": 2 }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Testing, Validation, and Troubleshooting",
+      "weight": 11,
+      "questionCount": 7,
+      "idStart": 501,
+      "objectives": [
+        { "objective": "Implement evaluation systems for GenAI.", "questions": 4 },
+        { "objective": "Troubleshoot GenAI applications.", "questions": 3 }
+      ]
+    }
+  ]
+}

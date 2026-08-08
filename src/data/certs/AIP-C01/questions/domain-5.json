@@ -1,0 +1,532 @@
+[
+  {
+    "id": 501,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "A summarization model scores well on fluency but omits contractual obligations that human reviewers consider critical. Which evaluation dimensions must be added?",
+    "options": [
+      "Factual coverage and omission severity against authoritative references",
+      "Only grammar quality",
+      "Only output length",
+      "Only endpoint availability"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: GenAI evaluation must measure task-specific correctness beyond fluency.",
+      "Incorrect. Choosing Only grammar quality addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI evaluation must measure task-specific correctness beyond fluency.",
+      "Incorrect. Choosing Only output length addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI evaluation must measure task-specific correctness beyond fluency.",
+      "Incorrect. Choosing Only endpoint availability addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI evaluation must measure task-specific correctness beyond fluency."
+    ],
+    "principle": "GenAI evaluation must measure task-specific correctness beyond fluency",
+    "relatedConcept": "A readable answer can still fail the business task.",
+    "overallExplanation": "The decisive production principle is that GenAI evaluation must measure task-specific correctness beyond fluency. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 502,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "Two models differ in quality, latency, token cost, and escalation rate. Management asks which one should ship. What evaluation is appropriate?",
+    "options": [
+      "A workload-based scorecard combining quality operations cost and business outcomes",
+      "Select the model with the largest parameter count",
+      "Use one public benchmark",
+      "Choose the fastest model without quality gates"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: model choice requires multi-dimensional evaluation on representative workloads.",
+      "Incorrect. Choosing Select the model with the largest parameter count addresses a related concern but misses the decisive constraint. The required design follows the rule that model choice requires multi-dimensional evaluation on representative workloads.",
+      "Incorrect. Choosing Use one public benchmark addresses a related concern but misses the decisive constraint. The required design follows the rule that model choice requires multi-dimensional evaluation on representative workloads.",
+      "Incorrect. Choosing Choose the fastest model without quality gates addresses a related concern but misses the decisive constraint. The required design follows the rule that model choice requires multi-dimensional evaluation on representative workloads."
+    ],
+    "principle": "model choice requires multi-dimensional evaluation on representative workloads",
+    "relatedConcept": "Production suitability cannot be reduced to one generic score.",
+    "overallExplanation": "The decisive production principle is that model choice requires multi-dimensional evaluation on representative workloads. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 503,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "A canary model improves answer quality but increases harmful-response rate above the approved threshold. What should the release system do?",
+    "options": [
+      "Fail the automated quality gate and roll back",
+      "Promote because average quality increased",
+      "Hide the safety metric",
+      "Increase canary traffic before action"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: critical safety thresholds are release gates not advisory metrics.",
+      "Incorrect. Choosing Promote because average quality increased addresses a related concern but misses the decisive constraint. The required design follows the rule that critical safety thresholds are release gates not advisory metrics.",
+      "Incorrect. Choosing Hide the safety metric addresses a related concern but misses the decisive constraint. The required design follows the rule that critical safety thresholds are release gates not advisory metrics.",
+      "Incorrect. Choosing Increase canary traffic before action addresses a related concern but misses the decisive constraint. The required design follows the rule that critical safety thresholds are release gates not advisory metrics."
+    ],
+    "principle": "critical safety thresholds are release gates not advisory metrics",
+    "relatedConcept": "Canary evaluation must support automatic rollback on unacceptable regressions.",
+    "overallExplanation": "The decisive production principle is that critical safety thresholds are release gates not advisory metrics. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 504,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "Users rate answers with thumbs up or down, but only satisfied power users submit feedback. What risk exists? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "Feedback selection bias can misrepresent overall quality",
+      "User feedback is always representative",
+      "More ratings automatically remove bias",
+      "The issue can be fixed by increasing temperature"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: user feedback must be interpreted with sampling and participation bias in mind.",
+      "Incorrect. Choosing User feedback is always representative addresses a related concern but misses the decisive constraint. The required design follows the rule that user feedback must be interpreted with sampling and participation bias in mind.",
+      "Incorrect. Choosing More ratings automatically remove bias addresses a related concern but misses the decisive constraint. The required design follows the rule that user feedback must be interpreted with sampling and participation bias in mind.",
+      "Incorrect. Choosing The issue can be fixed by increasing temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that user feedback must be interpreted with sampling and participation bias in mind."
+    ],
+    "principle": "user feedback must be interpreted with sampling and participation bias in mind",
+    "relatedConcept": "User-centered evaluation needs context annotation and representative collection.",
+    "overallExplanation": "The decisive production principle is that user feedback must be interpreted with sampling and participation bias in mind. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 505,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "multi",
+    "question": "A RAG system gives incorrect answers. Retrieval returns irrelevant chunks, but the team measures only final-answer fluency. Which two component metrics are needed? (Choose two.)",
+    "options": [
+      "Retrieval relevance or recall on golden queries",
+      "Answer groundedness against retrieved evidence",
+      "Only model token rate",
+      "Only UI render latency"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: RAG evaluation separates retrieval quality from generation faithfulness.",
+      "Correct. This choice applies the key production rule: RAG evaluation separates retrieval quality from generation faithfulness.",
+      "Incorrect. Choosing Only model token rate addresses a related concern but misses the decisive constraint. The required design follows the rule that RAG evaluation separates retrieval quality from generation faithfulness.",
+      "Incorrect. Choosing Only UI render latency addresses a related concern but misses the decisive constraint. The required design follows the rule that RAG evaluation separates retrieval quality from generation faithfulness."
+    ],
+    "principle": "RAG evaluation separates retrieval quality from generation faithfulness",
+    "relatedConcept": "Component metrics isolate which stage causes end-to-end failure.",
+    "overallExplanation": "The decisive production principle is that RAG evaluation separates retrieval quality from generation faithfulness. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 506,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "An LLM judge strongly prefers longer answers even when experts rate concise answers higher. What should the team do? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "Calibrate the judge against expert labels and test positional and style bias",
+      "Trust the judge because it is scalable",
+      "Increase candidate response length",
+      "Remove the human reference set"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: LLM judges require calibration against independent human evidence.",
+      "Incorrect. Choosing Trust the judge because it is scalable addresses a related concern but misses the decisive constraint. The required design follows the rule that LLM judges require calibration against independent human evidence.",
+      "Incorrect. Choosing Increase candidate response length addresses a related concern but misses the decisive constraint. The required design follows the rule that LLM judges require calibration against independent human evidence.",
+      "Incorrect. Choosing Remove the human reference set addresses a related concern but misses the decisive constraint. The required design follows the rule that LLM judges require calibration against independent human evidence."
+    ],
+    "principle": "LLM judges require calibration against independent human evidence",
+    "relatedConcept": "Automated evaluation can introduce systematic measurement bias.",
+    "overallExplanation": "The decisive production principle is that LLM judges require calibration against independent human evidence. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 507,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "An agent calls the correct tools but completes only 60% of customer workflows because it abandons tasks after recoverable errors. Which metric is most useful?",
+    "options": [
+      "End-to-end task completion with error-recovery breakdown",
+      "ROUGE only",
+      "Final response word count",
+      "Model parameter count"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: agent evaluation must measure successful goal completion and tool recovery.",
+      "Incorrect. Choosing ROUGE only addresses a related concern but misses the decisive constraint. The required design follows the rule that agent evaluation must measure successful goal completion and tool recovery.",
+      "Incorrect. Choosing Final response word count addresses a related concern but misses the decisive constraint. The required design follows the rule that agent evaluation must measure successful goal completion and tool recovery.",
+      "Incorrect. Choosing Model parameter count addresses a related concern but misses the decisive constraint. The required design follows the rule that agent evaluation must measure successful goal completion and tool recovery."
+    ],
+    "principle": "agent evaluation must measure successful goal completion and tool recovery",
+    "relatedConcept": "Correct individual actions do not prove the workflow achieves its objective.",
+    "overallExplanation": "The decisive production principle is that agent evaluation must measure successful goal completion and tool recovery. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 508,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "A new embedding model improves offline similarity but increases retrieval latency and index cost beyond the SLA. What should the evaluation conclude?",
+    "options": [
+      "Assess quality gain against latency and cost before adoption",
+      "Adopt because similarity alone improved",
+      "Ignore index cost",
+      "Measure only generation quality"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: retrieval changes require quality performance and cost evaluation.",
+      "Incorrect. Choosing Adopt because similarity alone improved addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval changes require quality performance and cost evaluation.",
+      "Incorrect. Choosing Ignore index cost addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval changes require quality performance and cost evaluation.",
+      "Incorrect. Choosing Measure only generation quality addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval changes require quality performance and cost evaluation."
+    ],
+    "principle": "retrieval changes require quality performance and cost evaluation",
+    "relatedConcept": "RAG component choices affect the entire application envelope.",
+    "overallExplanation": "The decisive production principle is that retrieval changes require quality performance and cost evaluation. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 509,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "A deployment updates prompts, model routing, and retrieval chunking simultaneously and final quality falls. Why is diagnosis difficult?",
+    "options": [
+      "Multiple uncontrolled changes prevent attributing the regression",
+      "GenAI systems cannot be tested",
+      "A larger model would identify the cause",
+      "Final quality is unrelated to retrieval"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: controlled experiments isolate the causal effect of each change.",
+      "Incorrect. Choosing GenAI systems cannot be tested addresses a related concern but misses the decisive constraint. The required design follows the rule that controlled experiments isolate the causal effect of each change.",
+      "Incorrect. Choosing A larger model would identify the cause addresses a related concern but misses the decisive constraint. The required design follows the rule that controlled experiments isolate the causal effect of each change.",
+      "Incorrect. Choosing Final quality is unrelated to retrieval addresses a related concern but misses the decisive constraint. The required design follows the rule that controlled experiments isolate the causal effect of each change."
+    ],
+    "principle": "controlled experiments isolate the causal effect of each change",
+    "relatedConcept": "Evaluation design should limit confounded releases.",
+    "overallExplanation": "The decisive production principle is that controlled experiments isolate the causal effect of each change. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 510,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "Executives need to compare three models, while engineers need detailed failure examples and compliance needs audit evidence. Which reporting design fits?",
+    "options": [
+      "Layered dashboards and reports tailored to each stakeholder with traceable source metrics",
+      "One raw log export for every audience",
+      "Only an executive average score",
+      "Only screenshots of sample answers"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: evaluation reporting must communicate appropriate detail without losing traceability.",
+      "Incorrect. Choosing One raw log export for every audience addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation reporting must communicate appropriate detail without losing traceability.",
+      "Incorrect. Choosing Only an executive average score addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation reporting must communicate appropriate detail without losing traceability.",
+      "Incorrect. Choosing Only screenshots of sample answers addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation reporting must communicate appropriate detail without losing traceability."
+    ],
+    "principle": "evaluation reporting must communicate appropriate detail without losing traceability",
+    "relatedConcept": "Different stakeholders need different views of the same governed evidence.",
+    "overallExplanation": "The decisive production principle is that evaluation reporting must communicate appropriate detail without losing traceability. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 511,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "single",
+    "question": "A golden dataset was created a year ago and no longer covers new products, languages, or adversarial behavior. What should happen?",
+    "options": [
+      "Version and refresh evaluation sets while retaining historical comparability",
+      "Keep it immutable forever as the only gate",
+      "Delete historical results",
+      "Use production complaints as the only test"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: evaluation datasets must evolve with workload and threat changes.",
+      "Incorrect. Choosing Keep it immutable forever as the only gate addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation datasets must evolve with workload and threat changes.",
+      "Incorrect. Choosing Delete historical results addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation datasets must evolve with workload and threat changes.",
+      "Incorrect. Choosing Use production complaints as the only test addresses a related concern but misses the decisive constraint. The required design follows the rule that evaluation datasets must evolve with workload and threat changes."
+    ],
+    "principle": "evaluation datasets must evolve with workload and threat changes",
+    "relatedConcept": "Continuous evaluation requires maintained representative test assets.",
+    "overallExplanation": "The decisive production principle is that evaluation datasets must evolve with workload and threat changes. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 512,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Implement evaluation systems for GenAI.",
+    "type": "multi",
+    "question": "A synthetic workflow test validates happy paths but never exercises tool timeouts, malformed results, or user cancellation. Which two additions improve deployment validation? (Choose two.)",
+    "options": [
+      "Fault-injection scenarios for dependencies",
+      "End-to-end recovery and cancellation tests",
+      "More happy-path paraphrases only",
+      "Removal of rollback testing"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: deployment tests must exercise realistic failure and recovery behavior.",
+      "Correct. This choice applies the key production rule: deployment tests must exercise realistic failure and recovery behavior.",
+      "Incorrect. Choosing More happy-path paraphrases only addresses a related concern but misses the decisive constraint. The required design follows the rule that deployment tests must exercise realistic failure and recovery behavior.",
+      "Incorrect. Choosing Removal of rollback testing addresses a related concern but misses the decisive constraint. The required design follows the rule that deployment tests must exercise realistic failure and recovery behavior."
+    ],
+    "principle": "deployment tests must exercise realistic failure and recovery behavior",
+    "relatedConcept": "Production reliability depends on edge cases beyond response quality.",
+    "overallExplanation": "The decisive production principle is that deployment tests must exercise realistic failure and recovery behavior. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 513,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "A long document is truncated before the clauses relevant to the user's question, but the UI reports a successful model response. What should be diagnosed first?",
+    "options": [
+      "Context-window construction token counts and truncation policy",
+      "Endpoint CPU only",
+      "Model card formatting",
+      "IAM password age"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: content loss often originates in context assembly before inference.",
+      "Incorrect. Choosing Endpoint CPU only addresses a related concern but misses the decisive constraint. The required design follows the rule that content loss often originates in context assembly before inference.",
+      "Incorrect. Choosing Model card formatting addresses a related concern but misses the decisive constraint. The required design follows the rule that content loss often originates in context assembly before inference.",
+      "Incorrect. Choosing IAM password age addresses a related concern but misses the decisive constraint. The required design follows the rule that content loss often originates in context assembly before inference."
+    ],
+    "principle": "content loss often originates in context assembly before inference",
+    "relatedConcept": "A successful API response can still represent an application failure.",
+    "overallExplanation": "The decisive production principle is that content loss often originates in context assembly before inference. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 514,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "A Bedrock request returns validation errors only for one model after routing changes. What is the most likely cause? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "The adapter is sending the wrong model-specific request schema",
+      "The vector database has too many shards",
+      "CloudTrail is disabled",
+      "The user's browser cache is stale"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: provider and model schemas differ and must be translated correctly.",
+      "Incorrect. Choosing The vector database has too many shards addresses a related concern but misses the decisive constraint. The required design follows the rule that provider and model schemas differ and must be translated correctly.",
+      "Incorrect. Choosing CloudTrail is disabled addresses a related concern but misses the decisive constraint. The required design follows the rule that provider and model schemas differ and must be translated correctly.",
+      "Incorrect. Choosing The user's browser cache is stale addresses a related concern but misses the decisive constraint. The required design follows the rule that provider and model schemas differ and must be translated correctly."
+    ],
+    "principle": "provider and model schemas differ and must be translated correctly",
+    "relatedConcept": "Integration errors should be isolated at the request-contract boundary.",
+    "overallExplanation": "The decisive production principle is that provider and model schemas differ and must be translated correctly. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 515,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "A prompt version produces valid JSON on common cases but fails when source text contains braces and quoted examples. Which troubleshooting method is best?",
+    "options": [
+      "Add the failure to a regression suite and refine delimiters schema instructions and validation",
+      "Increase temperature",
+      "Remove schema validation",
+      "Test only the common cases again"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: prompt defects should become reproducible tests before systematic refinement.",
+      "Incorrect. Choosing Increase temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt defects should become reproducible tests before systematic refinement.",
+      "Incorrect. Choosing Remove schema validation addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt defects should become reproducible tests before systematic refinement.",
+      "Incorrect. Choosing Test only the common cases again addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt defects should become reproducible tests before systematic refinement."
+    ],
+    "principle": "prompt defects should become reproducible tests before systematic refinement",
+    "relatedConcept": "Prompt maintenance requires versioned examples and automated contract checks.",
+    "overallExplanation": "The decisive production principle is that prompt defects should become reproducible tests before systematic refinement. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 516,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "multi",
+    "question": "Retrieval recall dropped after a new document parser was deployed. Embedding and query models did not change. Which two checks should come first? (Choose two.)",
+    "options": [
+      "Compare parsed chunk content before and after the release",
+      "Run golden retrieval queries by parser version",
+      "Change the generator model immediately",
+      "Increase output tokens"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: parser and chunk regressions should be isolated before unrelated model changes.",
+      "Correct. This choice applies the key production rule: parser and chunk regressions should be isolated before unrelated model changes.",
+      "Incorrect. Choosing Change the generator model immediately addresses a related concern but misses the decisive constraint. The required design follows the rule that parser and chunk regressions should be isolated before unrelated model changes.",
+      "Incorrect. Choosing Increase output tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that parser and chunk regressions should be isolated before unrelated model changes."
+    ],
+    "principle": "parser and chunk regressions should be isolated before unrelated model changes",
+    "relatedConcept": "RAG troubleshooting follows the data path from source to retrieval.",
+    "overallExplanation": "The decisive production principle is that parser and chunk regressions should be isolated before unrelated model changes. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 517,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "Vector search latency rose sharply, but only one tenant is affected and its index grew tenfold. Where should investigation focus?",
+    "options": [
+      "Tenant partition shard balance filters and query plans",
+      "Global FM temperature",
+      "Prompt approval state",
+      "Client-side font rendering"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: localized vector latency points to index topology and query behavior.",
+      "Incorrect. Choosing Global FM temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that localized vector latency points to index topology and query behavior.",
+      "Incorrect. Choosing Prompt approval state addresses a related concern but misses the decisive constraint. The required design follows the rule that localized vector latency points to index topology and query behavior.",
+      "Incorrect. Choosing Client-side font rendering addresses a related concern but misses the decisive constraint. The required design follows the rule that localized vector latency points to index topology and query behavior."
+    ],
+    "principle": "localized vector latency points to index topology and query behavior",
+    "relatedConcept": "Component and tenant dimensions narrow retrieval diagnosis.",
+    "overallExplanation": "The decisive production principle is that localized vector latency points to index topology and query behavior. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 518,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "A model returns inconsistent fields despite an unchanged prompt. Logs reveal requests route to two model versions with different output behavior. What is the fix?",
+    "options": [
+      "Stabilize version routing and enforce a shared output contract with tests",
+      "Increase randomness",
+      "Delete route metadata",
+      "Accept both shapes downstream without validation"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: consistent behavior requires controlled model versions and interface contracts.",
+      "Incorrect. Choosing Increase randomness addresses a related concern but misses the decisive constraint. The required design follows the rule that consistent behavior requires controlled model versions and interface contracts.",
+      "Incorrect. Choosing Delete route metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that consistent behavior requires controlled model versions and interface contracts.",
+      "Incorrect. Choosing Accept both shapes downstream without validation addresses a related concern but misses the decisive constraint. The required design follows the rule that consistent behavior requires controlled model versions and interface contracts."
+    ],
+    "principle": "consistent behavior requires controlled model versions and interface contracts",
+    "relatedConcept": "Prompt troubleshooting must include model and configuration provenance.",
+    "overallExplanation": "The decisive production principle is that consistent behavior requires controlled model versions and interface contracts. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 519,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "An agent occasionally repeats a payment after a timeout. Trace data shows the tool succeeded, but the agent never persisted the result. What is the root cause?",
+    "options": [
+      "Missing durable operation state and idempotent retry handling",
+      "Insufficient model creativity",
+      "A vector index error",
+      "Too few output tokens"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: transactional tool recovery depends on state and idempotency outside the model.",
+      "Incorrect. Choosing Insufficient model creativity addresses a related concern but misses the decisive constraint. The required design follows the rule that transactional tool recovery depends on state and idempotency outside the model.",
+      "Incorrect. Choosing A vector index error addresses a related concern but misses the decisive constraint. The required design follows the rule that transactional tool recovery depends on state and idempotency outside the model.",
+      "Incorrect. Choosing Too few output tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that transactional tool recovery depends on state and idempotency outside the model."
+    ],
+    "principle": "transactional tool recovery depends on state and idempotency outside the model",
+    "relatedConcept": "Agent failures often originate in orchestration rather than reasoning.",
+    "overallExplanation": "The decisive production principle is that transactional tool recovery depends on state and idempotency outside the model. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 520,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "single",
+    "question": "Answer quality degrades gradually after source documents adopt a new template. Retrieval still returns chunks, but headings and tables are scrambled. What should be remediated?",
+    "options": [
+      "Update parsing and structure-aware chunking then reindex affected content",
+      "Fine-tune the model without fixing data",
+      "Increase response temperature",
+      "Disable retrieval"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: source-format drift requires preprocessing and index repair.",
+      "Incorrect. Choosing Fine-tune the model without fixing data addresses a related concern but misses the decisive constraint. The required design follows the rule that source-format drift requires preprocessing and index repair.",
+      "Incorrect. Choosing Increase response temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that source-format drift requires preprocessing and index repair.",
+      "Incorrect. Choosing Disable retrieval addresses a related concern but misses the decisive constraint. The required design follows the rule that source-format drift requires preprocessing and index repair."
+    ],
+    "principle": "source-format drift requires preprocessing and index repair",
+    "relatedConcept": "Retrieved content can be present yet unusable when document structure is lost.",
+    "overallExplanation": "The decisive production principle is that source-format drift requires preprocessing and index repair. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  },
+  {
+    "id": 521,
+    "domain": "Testing, Validation, and Troubleshooting",
+    "objective": "Troubleshoot GenAI applications.",
+    "type": "multi",
+    "question": "A production failure cannot be reproduced because logs omit prompt version, model ID, retrieval candidates, and tool results. Which two improvements are required? (Choose two.)",
+    "options": [
+      "Record correlation and version metadata across components",
+      "Capture privacy-safe intermediate outcomes and error codes",
+      "Log only final prose",
+      "Remove distributed traces"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: reproducible diagnosis requires correlated provenance and safe intermediate evidence.",
+      "Correct. This choice applies the key production rule: reproducible diagnosis requires correlated provenance and safe intermediate evidence.",
+      "Incorrect. Choosing Log only final prose addresses a related concern but misses the decisive constraint. The required design follows the rule that reproducible diagnosis requires correlated provenance and safe intermediate evidence.",
+      "Incorrect. Choosing Remove distributed traces addresses a related concern but misses the decisive constraint. The required design follows the rule that reproducible diagnosis requires correlated provenance and safe intermediate evidence."
+    ],
+    "principle": "reproducible diagnosis requires correlated provenance and safe intermediate evidence",
+    "relatedConcept": "GenAI troubleshooting depends on tracing the whole request path.",
+    "overallExplanation": "The decisive production principle is that reproducible diagnosis requires correlated provenance and safe intermediate evidence. Applying it addresses the explicit evaluation, validation, integration, retrieval, prompt, or agent failure signal in the scenario."
+  }
+]
+

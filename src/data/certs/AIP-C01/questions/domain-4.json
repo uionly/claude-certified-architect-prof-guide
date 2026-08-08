@@ -1,0 +1,607 @@
+[
+  {
+    "id": 401,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A support assistant sends the full 40,000-token history on every turn, although recent messages and a durable summary contain all relevant context. Which optimization has the greatest direct impact?",
+    "options": [
+      "Prune irrelevant turns and send a compact validated summary",
+      "Increase output token limits",
+      "Use a larger model for every request",
+      "Disable token metering"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: context pruning reduces recurring token cost and often improves focus.",
+      "Incorrect. Choosing Increase output token limits addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus.",
+      "Incorrect. Choosing Use a larger model for every request addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus.",
+      "Incorrect. Choosing Disable token metering addresses a related concern but misses the decisive constraint. The required design follows the rule that context pruning reduces recurring token cost and often improves focus."
+    ],
+    "principle": "context pruning reduces recurring token cost and often improves focus",
+    "relatedConcept": "Token efficiency starts with measuring and removing context that does not help.",
+    "overallExplanation": "The decisive production principle is that context pruning reduces recurring token cost and often improves focus. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 402,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "Eighty percent of requests are simple classifications, while twenty percent require complex generation. Which architecture is most cost effective?",
+    "options": [
+      "Route simple cases to a smaller model and escalate complex cases by policy",
+      "Send every request to the largest model",
+      "Invoke both models for all traffic",
+      "Choose a model randomly"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: tiered model selection aligns capability cost with request complexity.",
+      "Incorrect. Choosing Send every request to the largest model addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity.",
+      "Incorrect. Choosing Invoke both models for all traffic addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity.",
+      "Incorrect. Choosing Choose a model randomly addresses a related concern but misses the decisive constraint. The required design follows the rule that tiered model selection aligns capability cost with request complexity."
+    ],
+    "principle": "tiered model selection aligns capability cost with request complexity",
+    "relatedConcept": "Model routing must preserve measured quality while reducing unnecessary spend.",
+    "overallExplanation": "The decisive production principle is that tiered model selection aligns capability cost with request complexity. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 403,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A workload has steady high utilization and predictable token demand. On-demand pricing is higher and occasional throttling violates the SLA. What should be evaluated?",
+    "options": [
+      "Provisioned throughput sized from measured utilization",
+      "More immediate retries",
+      "A larger response cache with stale data",
+      "Batching unrelated interactive sessions"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: predictable sustained demand can justify committed capacity.",
+      "Incorrect. Choosing More immediate retries addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity.",
+      "Incorrect. Choosing A larger response cache with stale data addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity.",
+      "Incorrect. Choosing Batching unrelated interactive sessions addresses a related concern but misses the decisive constraint. The required design follows the rule that predictable sustained demand can justify committed capacity."
+    ],
+    "principle": "predictable sustained demand can justify committed capacity",
+    "relatedConcept": "Capacity economics depend on utilization and service requirements.",
+    "overallExplanation": "The decisive production principle is that predictable sustained demand can justify committed capacity. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 404,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A prompt contains a stable 8,000-token policy prefix reused across millions of calls, and the selected model supports prompt caching. What should the team do?",
+    "options": [
+      "Enable and measure prompt caching for the reusable prefix",
+      "Duplicate the prefix in user messages",
+      "Fine-tune after every policy request",
+      "Disable cache metrics"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: prompt caching avoids repeated processing of identical stable context.",
+      "Incorrect. Choosing Duplicate the prefix in user messages addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context.",
+      "Incorrect. Choosing Fine-tune after every policy request addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context.",
+      "Incorrect. Choosing Disable cache metrics addresses a related concern but misses the decisive constraint. The required design follows the rule that prompt caching avoids repeated processing of identical stable context."
+    ],
+    "principle": "prompt caching avoids repeated processing of identical stable context",
+    "relatedConcept": "Caching helps only when content reuse and invalidation are understood.",
+    "overallExplanation": "The decisive production principle is that prompt caching avoids repeated processing of identical stable context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 405,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A semantic cache returns a prior answer for two similar questions whose customer entitlements differ. What is wrong? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "The cache key omitted authorization and material context dimensions",
+      "Semantic caching can never be used",
+      "The model temperature is too low",
+      "The vector index has too many shards"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: cache equivalence must include security and business context.",
+      "Incorrect. Choosing Semantic caching can never be used addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context.",
+      "Incorrect. Choosing The model temperature is too low addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context.",
+      "Incorrect. Choosing The vector index has too many shards addresses a related concern but misses the decisive constraint. The required design follows the rule that cache equivalence must include security and business context."
+    ],
+    "principle": "cache equivalence must include security and business context",
+    "relatedConcept": "Cost savings cannot cross authorization or correctness boundaries.",
+    "overallExplanation": "The decisive production principle is that cache equivalence must include security and business context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 406,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "multi",
+    "question": "A batch content-generation job submits one request at a time and leaves provisioned capacity mostly idle. Which two changes can improve utilization? (Choose two.)",
+    "options": [
+      "Batch compatible work where the API and use case allow it",
+      "Control concurrency from measured token throughput",
+      "Increase idle provisioned capacity",
+      "Retry successful requests"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: batching and controlled concurrency improve throughput utilization.",
+      "Correct. This choice applies the key production rule: batching and controlled concurrency improve throughput utilization.",
+      "Incorrect. Choosing Increase idle provisioned capacity addresses a related concern but misses the decisive constraint. The required design follows the rule that batching and controlled concurrency improve throughput utilization.",
+      "Incorrect. Choosing Retry successful requests addresses a related concern but misses the decisive constraint. The required design follows the rule that batching and controlled concurrency improve throughput utilization."
+    ],
+    "principle": "batching and controlled concurrency improve throughput utilization",
+    "relatedConcept": "GenAI capacity is constrained by tokens and concurrency not only request count.",
+    "overallExplanation": "The decisive production principle is that batching and controlled concurrency improve throughput utilization. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 407,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "Output responses average 3,000 tokens although users read only the first 400 and task success is unchanged at 500. Which control should be implemented?",
+    "options": [
+      "Set response limits and concise output contracts",
+      "Increase context window",
+      "Use the largest model",
+      "Remove user-success measurement"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: response limits reduce completion cost when longer output adds no value.",
+      "Incorrect. Choosing Increase context window addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value.",
+      "Incorrect. Choosing Use the largest model addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value.",
+      "Incorrect. Choosing Remove user-success measurement addresses a related concern but misses the decisive constraint. The required design follows the rule that response limits reduce completion cost when longer output adds no value."
+    ],
+    "principle": "response limits reduce completion cost when longer output adds no value",
+    "relatedConcept": "Token optimization should be validated against task success.",
+    "overallExplanation": "The decisive production principle is that response limits reduce completion cost when longer output adds no value. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 408,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A team caches every model response indefinitely, including answers grounded in hourly changing inventory. What must be added?",
+    "options": [
+      "Freshness-aware TTLs and invalidation tied to source changes",
+      "Longer cache retention",
+      "Removal of source version metadata",
+      "Higher temperature for cached responses"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: cache lifetime must reflect source volatility and correctness risk.",
+      "Incorrect. Choosing Longer cache retention addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk.",
+      "Incorrect. Choosing Removal of source version metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk.",
+      "Incorrect. Choosing Higher temperature for cached responses addresses a related concern but misses the decisive constraint. The required design follows the rule that cache lifetime must reflect source volatility and correctness risk."
+    ],
+    "principle": "cache lifetime must reflect source volatility and correctness risk",
+    "relatedConcept": "Caching is a data lifecycle system not merely a storage switch.",
+    "overallExplanation": "The decisive production principle is that cache lifetime must reflect source volatility and correctness risk. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 409,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement cost optimization and resource efficiency strategies.",
+    "type": "single",
+    "question": "A model is six times more expensive and improves a low-risk drafting score by 0.4%, with no measurable business lift. What is the best recommendation?",
+    "options": [
+      "Use the cheaper model that meets the business threshold",
+      "Select the costliest model for prestige",
+      "Increase provisioned capacity first",
+      "Measure only benchmark score"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: price-to-performance decisions require measurable business benefit.",
+      "Incorrect. Choosing Select the costliest model for prestige addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit.",
+      "Incorrect. Choosing Increase provisioned capacity first addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit.",
+      "Incorrect. Choosing Measure only benchmark score addresses a related concern but misses the decisive constraint. The required design follows the rule that price-to-performance decisions require measurable business benefit."
+    ],
+    "principle": "price-to-performance decisions require measurable business benefit",
+    "relatedConcept": "Model capability beyond the requirement is unnecessary operating cost.",
+    "overallExplanation": "The decisive production principle is that price-to-performance decisions require measurable business benefit. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 410,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "Users wait four seconds before seeing any text, although total generation takes five seconds and the client supports incremental rendering. Which change improves perceived latency?",
+    "options": [
+      "Stream tokens end to end",
+      "Increase maximum output length",
+      "Run retrieval after generation",
+      "Disable connection reuse"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: response streaming reduces time to first useful output.",
+      "Incorrect. Choosing Increase maximum output length addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output.",
+      "Incorrect. Choosing Run retrieval after generation addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output.",
+      "Incorrect. Choosing Disable connection reuse addresses a related concern but misses the decisive constraint. The required design follows the rule that response streaming reduces time to first useful output."
+    ],
+    "principle": "response streaming reduces time to first useful output",
+    "relatedConcept": "User-perceived latency differs from total completion time.",
+    "overallExplanation": "The decisive production principle is that response streaming reduces time to first useful output. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 411,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "A workflow makes independent retrieval, policy, and personalization calls sequentially, adding 1.8 seconds. Which optimization should be evaluated?",
+    "options": [
+      "Run independent operations in parallel with bounded timeouts",
+      "Add arbitrary sleeps for ordering",
+      "Combine every operation into the model prompt",
+      "Retry all stages twice"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: independent work can be parallelized to reduce critical-path latency.",
+      "Incorrect. Choosing Add arbitrary sleeps for ordering addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency.",
+      "Incorrect. Choosing Combine every operation into the model prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency.",
+      "Incorrect. Choosing Retry all stages twice addresses a related concern but misses the decisive constraint. The required design follows the rule that independent work can be parallelized to reduce critical-path latency."
+    ],
+    "principle": "independent work can be parallelized to reduce critical-path latency",
+    "relatedConcept": "Workflow structure often dominates model latency.",
+    "overallExplanation": "The decisive production principle is that independent work can be parallelized to reduce critical-path latency. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 412,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "Hybrid retrieval returns good results but p99 search latency rises after an index grows tenfold. Where should tuning focus?",
+    "options": [
+      "Index topology query filters and scoring execution",
+      "FM temperature",
+      "Prompt approval metadata",
+      "Model output length only"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: retrieval performance requires vector and lexical query optimization.",
+      "Incorrect. Choosing FM temperature addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization.",
+      "Incorrect. Choosing Prompt approval metadata addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization.",
+      "Incorrect. Choosing Model output length only addresses a related concern but misses the decisive constraint. The required design follows the rule that retrieval performance requires vector and lexical query optimization."
+    ],
+    "principle": "retrieval performance requires vector and lexical query optimization",
+    "relatedConcept": "RAG latency should be diagnosed by component.",
+    "overallExplanation": "The decisive production principle is that retrieval performance requires vector and lexical query optimization. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 413,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "A model produces deterministic product-code extraction, yet temperature is 0.9 and output varies across retries. What should be changed?",
+    "options": [
+      "Lower randomness parameters and enforce structured validation",
+      "Increase top-p",
+      "Use longer creative examples",
+      "Remove schema checks"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: deterministic extraction benefits from low randomness and output contracts.",
+      "Incorrect. Choosing Increase top-p addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts.",
+      "Incorrect. Choosing Use longer creative examples addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts.",
+      "Incorrect. Choosing Remove schema checks addresses a related concern but misses the decisive constraint. The required design follows the rule that deterministic extraction benefits from low randomness and output contracts."
+    ],
+    "principle": "deterministic extraction benefits from low randomness and output contracts",
+    "relatedConcept": "Inference parameters should match the application's creativity tolerance.",
+    "overallExplanation": "The decisive production principle is that deterministic extraction benefits from low randomness and output contracts. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 414,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "Traffic varies from 20 to 2,000 concurrent sessions. Scaling uses HTTP request count, but long prompts consume far more capacity. Which metric is better?",
+    "options": [
+      "Token throughput and concurrency-aware utilization",
+      "Only total daily users",
+      "Only prompt version number",
+      "Only vector dimension"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: FM autoscaling must reflect token-processing workload.",
+      "Incorrect. Choosing Only total daily users addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload.",
+      "Incorrect. Choosing Only prompt version number addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload.",
+      "Incorrect. Choosing Only vector dimension addresses a related concern but misses the decisive constraint. The required design follows the rule that FM autoscaling must reflect token-processing workload."
+    ],
+    "principle": "FM autoscaling must reflect token-processing workload",
+    "relatedConcept": "Request counts can hide large differences in compute demand.",
+    "overallExplanation": "The decisive production principle is that FM autoscaling must reflect token-processing workload. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 415,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "multi",
+    "question": "A long workflow invokes the same slow model for classification, extraction, and final composition. Which two optimizations should be evaluated? (Choose two.)",
+    "options": [
+      "Use smaller specialized models for simple stages",
+      "Profile stages and remove redundant model calls",
+      "Increase every stage's output limit",
+      "Serialize all independent stages"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: workflow profiling and task-appropriate models reduce cost and latency.",
+      "Correct. This choice applies the key production rule: workflow profiling and task-appropriate models reduce cost and latency.",
+      "Incorrect. Choosing Increase every stage's output limit addresses a related concern but misses the decisive constraint. The required design follows the rule that workflow profiling and task-appropriate models reduce cost and latency.",
+      "Incorrect. Choosing Serialize all independent stages addresses a related concern but misses the decisive constraint. The required design follows the rule that workflow profiling and task-appropriate models reduce cost and latency."
+    ],
+    "principle": "workflow profiling and task-appropriate models reduce cost and latency",
+    "relatedConcept": "Complex pipelines should not default every stage to the most capable model.",
+    "overallExplanation": "The decisive production principle is that workflow profiling and task-appropriate models reduce cost and latency. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 416,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "A customer assistant repeatedly computes answers for immutable public FAQs but personalization is added only in the final sentence. Which design can reduce latency safely?",
+    "options": [
+      "Precompute or cache the stable FAQ portion and generate only personalized content",
+      "Cache the full personalized answer for all users",
+      "Always invoke the largest model twice",
+      "Remove authorization checks"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: separate stable reusable work from user-specific generation.",
+      "Incorrect. Choosing Cache the full personalized answer for all users addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation.",
+      "Incorrect. Choosing Always invoke the largest model twice addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation.",
+      "Incorrect. Choosing Remove authorization checks addresses a related concern but misses the decisive constraint. The required design follows the rule that separate stable reusable work from user-specific generation."
+    ],
+    "principle": "separate stable reusable work from user-specific generation",
+    "relatedConcept": "Precomputation is safe only for content whose context is truly invariant.",
+    "overallExplanation": "The decisive production principle is that separate stable reusable work from user-specific generation. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 417,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "p95 model latency is healthy, but service time is high because each call opens new network connections and serializes oversized JSON. What should the team optimize?",
+    "options": [
+      "Connection reuse payload size and service communication",
+      "Model weights",
+      "Embedding dimensions",
+      "Prompt governance approvals"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: end-to-end latency includes network and serialization overhead.",
+      "Incorrect. Choosing Model weights addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead.",
+      "Incorrect. Choosing Embedding dimensions addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead.",
+      "Incorrect. Choosing Prompt governance approvals addresses a related concern but misses the decisive constraint. The required design follows the rule that end-to-end latency includes network and serialization overhead."
+    ],
+    "principle": "end-to-end latency includes network and serialization overhead",
+    "relatedConcept": "Application performance is broader than FM inference time.",
+    "overallExplanation": "The decisive production principle is that end-to-end latency includes network and serialization overhead. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 418,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Optimize application performance.",
+    "type": "single",
+    "question": "A throughput test uses short prompts, while production prompts are ten times longer and capacity immediately saturates. What was wrong with the test?",
+    "options": [
+      "It did not model representative prompt and completion token distributions",
+      "It used too many business metrics",
+      "It should have ignored tokens",
+      "It needed only more test users with the same short prompt"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: performance benchmarks must reflect production token shapes.",
+      "Incorrect. Choosing It used too many business metrics addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes.",
+      "Incorrect. Choosing It should have ignored tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes.",
+      "Incorrect. Choosing It needed only more test users with the same short prompt addresses a related concern but misses the decisive constraint. The required design follows the rule that performance benchmarks must reflect production token shapes."
+    ],
+    "principle": "performance benchmarks must reflect production token shapes",
+    "relatedConcept": "Capacity planning based on unrealistic inputs produces false limits.",
+    "overallExplanation": "The decisive production principle is that performance benchmarks must reflect production token shapes. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 419,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "single",
+    "question": "Executives see cost and uptime, while engineers cannot trace prompt version, model route, retrieval latency, or tool failures for one request. What should observability add?",
+    "options": [
+      "Correlated end-to-end traces with GenAI-specific dimensions",
+      "Only more aggregate CPU dashboards",
+      "Raw prompts in public logs",
+      "A weekly manual incident summary"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: GenAI observability needs request-level model retrieval prompt and tool context.",
+      "Incorrect. Choosing Only more aggregate CPU dashboards addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context.",
+      "Incorrect. Choosing Raw prompts in public logs addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context.",
+      "Incorrect. Choosing A weekly manual incident summary addresses a related concern but misses the decisive constraint. The required design follows the rule that GenAI observability needs request-level model retrieval prompt and tool context."
+    ],
+    "principle": "GenAI observability needs request-level model retrieval prompt and tool context",
+    "relatedConcept": "Aggregate infrastructure metrics cannot isolate application failure modes.",
+    "overallExplanation": "The decisive production principle is that GenAI observability needs request-level model retrieval prompt and tool context. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 420,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "multi",
+    "question": "Token usage triples overnight with no traffic increase. Most growth comes from one prompt version. Which two detections help? (Choose two.)",
+    "options": [
+      "Token-usage anomaly alarms by prompt version",
+      "Cost anomaly detection tied to deployment metadata",
+      "Only endpoint availability alarms",
+      "Removal of version tags"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: cost anomalies require dimensional usage metrics and release correlation.",
+      "Correct. This choice applies the key production rule: cost anomalies require dimensional usage metrics and release correlation.",
+      "Incorrect. Choosing Only endpoint availability alarms addresses a related concern but misses the decisive constraint. The required design follows the rule that cost anomalies require dimensional usage metrics and release correlation.",
+      "Incorrect. Choosing Removal of version tags addresses a related concern but misses the decisive constraint. The required design follows the rule that cost anomalies require dimensional usage metrics and release correlation."
+    ],
+    "principle": "cost anomalies require dimensional usage metrics and release correlation",
+    "relatedConcept": "GenAI monitoring should connect token behavior to deployable artifacts.",
+    "overallExplanation": "The decisive production principle is that cost anomalies require dimensional usage metrics and release correlation. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 421,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "single",
+    "question": "An agent's average response time is stable, but task completion falls because a tool now returns partial records. What should be monitored?",
+    "options": [
+      "Tool success semantics and task completion, not latency alone",
+      "Only total tokens",
+      "Only model availability",
+      "Only cache hit ratio"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: agent monitoring must measure tool correctness and business outcome.",
+      "Incorrect. Choosing Only total tokens addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome.",
+      "Incorrect. Choosing Only model availability addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome.",
+      "Incorrect. Choosing Only cache hit ratio addresses a related concern but misses the decisive constraint. The required design follows the rule that agent monitoring must measure tool correctness and business outcome."
+    ],
+    "principle": "agent monitoring must measure tool correctness and business outcome",
+    "relatedConcept": "Operationally healthy components can still produce failed workflows.",
+    "overallExplanation": "The decisive production principle is that agent monitoring must measure tool correctness and business outcome. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 422,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "single",
+    "question": "A vector store remains available but retrieval recall falls after a source-format change. Which monitoring is missing? Select the option that best satisfies the stated production requirements.",
+    "options": [
+      "Data quality and retrieval effectiveness checks using golden queries",
+      "Only cluster CPU monitoring",
+      "Only model temperature logs",
+      "Only AWS billing alarms"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: vector operations require quality monitoring as well as infrastructure health.",
+      "Incorrect. Choosing Only cluster CPU monitoring addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health.",
+      "Incorrect. Choosing Only model temperature logs addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health.",
+      "Incorrect. Choosing Only AWS billing alarms addresses a related concern but misses the decisive constraint. The required design follows the rule that vector operations require quality monitoring as well as infrastructure health."
+    ],
+    "principle": "vector operations require quality monitoring as well as infrastructure health",
+    "relatedConcept": "Availability does not prove useful retrieval.",
+    "overallExplanation": "The decisive production principle is that vector operations require quality monitoring as well as infrastructure health. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 423,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "single",
+    "question": "Invocation logs are enabled with full inputs and outputs, but the workload contains sensitive customer data. Which design is required?",
+    "options": [
+      "Redaction access control encryption and retention around invocation logs",
+      "Public access for easier troubleshooting",
+      "Indefinite raw retention",
+      "No correlation identifiers"
+    ],
+    "correct": [
+      0
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: detailed model logs must be governed as sensitive production data.",
+      "Incorrect. Choosing Public access for easier troubleshooting addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data.",
+      "Incorrect. Choosing Indefinite raw retention addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data.",
+      "Incorrect. Choosing No correlation identifiers addresses a related concern but misses the decisive constraint. The required design follows the rule that detailed model logs must be governed as sensitive production data."
+    ],
+    "principle": "detailed model logs must be governed as sensitive production data",
+    "relatedConcept": "Observability depth must be balanced with privacy and compliance.",
+    "overallExplanation": "The decisive production principle is that detailed model logs must be governed as sensitive production data. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  },
+  {
+    "id": 424,
+    "domain": "Operational Efficiency and Optimization for GenAI Applications",
+    "objective": "Implement monitoring systems for GenAI applications.",
+    "type": "multi",
+    "question": "A multi-agent workflow intermittently loops. Final-response logs do not show the intermediate routing decisions. Which two telemetry sources help? (Choose two.)",
+    "options": [
+      "Per-agent state transitions and coordination traces",
+      "Tool-call counts and stopping-condition events",
+      "Only final answer length",
+      "Only endpoint instance type"
+    ],
+    "correct": [
+      0,
+      1
+    ],
+    "optionExplanations": [
+      "Correct. This choice applies the key production rule: agent troubleshooting requires visibility into coordination and termination behavior.",
+      "Correct. This choice applies the key production rule: agent troubleshooting requires visibility into coordination and termination behavior.",
+      "Incorrect. Choosing Only final answer length addresses a related concern but misses the decisive constraint. The required design follows the rule that agent troubleshooting requires visibility into coordination and termination behavior.",
+      "Incorrect. Choosing Only endpoint instance type addresses a related concern but misses the decisive constraint. The required design follows the rule that agent troubleshooting requires visibility into coordination and termination behavior."
+    ],
+    "principle": "agent troubleshooting requires visibility into coordination and termination behavior",
+    "relatedConcept": "Workflow-specific telemetry exposes failures hidden by final outputs.",
+    "overallExplanation": "The decisive production principle is that agent troubleshooting requires visibility into coordination and termination behavior. Applying it addresses the explicit cost, latency, throughput, monitoring, or reliability signal in the scenario."
+  }
+]
+
